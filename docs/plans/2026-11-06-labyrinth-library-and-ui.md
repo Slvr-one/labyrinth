@@ -1,7 +1,7 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
 - **Date:** 2026-11-06
-- **Status:** DRAFT FOR IMPLEMENTATION APPROVAL — no implementation authorized by this document
+- **Status:** APPROVED PLAN — execution parked by the owner before phase 1
 - **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
 - **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
@@ -32,6 +32,9 @@ claimed crossings must exist in the topology and rendered geometry.
 - Oversee each phase with actual execution and carry validation through the Portfolio UI.
 - Documentation commits/PRs are authorized. Implementation-plan approval, merging, and live
   deployment are separate gates.
+- The owner approved the detailed plan and selected starting phase 1, then explicitly parked
+  execution before any implementation or installation. Resume only on a new owner request;
+  start with phase 1 and recheck repository/toolchain state, not a new planning exercise.
 
 ## Existing state and corrections
 

@@ -206,3 +206,6 @@ labyrinth is not mapped to HumanLayer thoughts; metadata above was gathered dire
   enforced constraints.
 - The [canonical implementation plan](../plans/2026-11-06-labyrinth-library-and-ui.md)
   replaces the earlier proposal as the detailed design, pending explicit implementation approval.
+- The detailed plan was subsequently approved, then execution was explicitly parked before
+  phase 1 started. Keep the approved scope and resume point; do not install tooling or begin
+  implementation until the owner resumes the work.
