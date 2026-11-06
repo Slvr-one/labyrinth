@@ -201,3 +201,8 @@ labyrinth is not mapped to HumanLayer thoughts; metadata above was gathered dire
 - Portfolio integration remains a distinct phase/PR, but stays within the overseen delivery
   through browser acceptance. The earlier separate-follow-on decision is not a stopping point.
 - Documentation commits and PRs are authorized. Merging and deployment remain separate gates.
+- The five-phase order was approved. Both spinning-doorway and bounded-twisting ring modes
+  must be configurable, alongside behavior tunables; valid passage/collision rules remain
+  enforced constraints.
+- The [canonical implementation plan](../plans/2026-11-06-labyrinth-library-and-ui.md)
+  replaces the earlier proposal as the detailed design, pending explicit implementation approval.
