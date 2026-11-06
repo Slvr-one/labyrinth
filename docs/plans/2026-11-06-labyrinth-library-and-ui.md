@@ -1,9 +1,9 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
-**Date:** 2026-11-06  
-**Status:** DRAFT FOR IMPLEMENTATION APPROVAL — no implementation authorized by this document  
-**Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)  
-**Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
+- **Date:** 2026-11-06
+- **Status:** DRAFT FOR IMPLEMENTATION APPROVAL — no implementation authorized by this document
+- **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
+- **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
 ## Outcome and scope
 
@@ -67,10 +67,17 @@ physically possible crossings from the currently open tree passages.
 - Rectangular cells inside a circular replacement region are removed, not hidden while
   remaining traversable underneath it.
 - Polar center/ring/sector cells and explicit transition cells join the retained grid.
-- Every circle has at least two usable visible outer portals and a through-route between
-  their exterior endpoints. Do not join two complete trees with two bridges: build the
-  combined tree, or perform a valid edge exchange that removes the resulting cycle.
-- Clipping and text clearance cannot leave the only entrances off-screen or unusable.
+- Distinguish candidate portals in `H` from open portals in `T`. Every enabled circle must
+  have at least two open usable portals whose unique `T` path between exterior endpoints
+  crosses that circle's polar interior. Its complete swept corridor must be visible and clear,
+  not routed through clipped/off-screen sectors or underneath text.
+- Construct a required interior-route forest first, then extend it to the global tree.
+  Constructors, walker carving, patch rewiring and moving-doorway commits preserve a checked
+  route certificate for every circle. A replacement certificate is published atomically with
+  its new topology; no intermediate disconnected or exterior-only substitute is observable.
+- Internal tree primitives retain their general tree-preservation theorem. The UI publication
+  layer rejects transitions that violate the stronger route/reservation certificate.
+  Do not join complete grid/polar trees with two bridges without removing a cycle edge.
 - Fixed carrier adjacency uses compact preallocated storage, such as CSR. Moving-doorway
   admissibility is explicit state; a fixed adjacency table must not silently change meaning.
 - Geometry maps each carrier edge to a shared boundary, an open doorway interval, and
@@ -79,6 +86,13 @@ physically possible crossings from the currently open tree passages.
 `Epoch` identifies a complete layout; `Revision` identifies a committed topology snapshot.
 A transition records passage changes and walker moves between revisions. The renderer
 never combines parents from one revision with doorways from another.
+
+Keep the standalone unconstrained DFS constructor and the scene constructor explicit.
+For a scene, validate the required route edges as an acyclic forest, contract its components,
+run DFS on the connected quotient carrier, then expand the selected inter-component edges
+together with the forest and orient the resulting tree. Prove this concrete constructor
+produces a spanning tree containing every required route, rather than citing existence
+of some extension. Reject an impossible/cyclic route forest before publication.
 
 ### Core and browser responsibilities
 
@@ -137,6 +151,8 @@ New Worker mappings and initial defaults:
 | `LAB_RING_DIRECTIONS` | `alternating` (`same` and `reverse` are also valid) |
 | `LAB_TWIST_MAX_RAD` | `0.35` |
 | `LAB_TWIST_PERIOD_MS` | `20000` |
+| `LAB_RING_BASE_SPEED_RAD_S` | `0.015` |
+| `LAB_RING_SPEED_JITTER_RAD_S` | `0.05` |
 | `LAB_PORTALS_PER_CIRCLE` | `2` |
 | `LAB_PORTAL_CLEARANCE_PX` | `2`, in addition to the walker footprint |
 | `LAB_TRANSITION_BAND_PX` | `max(cell, ring)` when unset |
@@ -148,8 +164,20 @@ New Worker mappings and initial defaults:
 | `LAB_REFORM_WAVE_MS` | `160` |
 | `LAB_REFORM_FADE_MS` | `380` |
 | `LAB_REFORM_GLINT_ALPHA` | `0.75` |
+| `LAB_SCENE_FADE_MS` | `180`, only when motion is permitted |
 
 Ring speed continues to use `LAB_RING_SPEED`; all other existing variables keep their names.
+Number rings from one. With clockwise positive, `alternating` assigns odd rings `+1` and
+even rings `-1`; `same` assigns `+1` throughout; `reverse` negates `alternating`.
+Spinning angular speed is direction × `LAB_RING_SPEED` × a once-sampled rate in
+`[LAB_RING_BASE_SPEED_RAD_S, base + LAB_RING_SPEED_JITTER_RAD_S)`.
+Twisting uses direction × amplitude × sin(phase), with phase advancing by
+`2π × LAB_RING_SPEED × dt / LAB_TWIST_PERIOD_MS`. Zero speed freezes the current phase;
+motion holds consume no phase time and never catch up on release.
+
+Retain step-opportunity jitter only as scheduling input. A walker accepts no new move until
+its current interpolation/reservation completes, even when its next jittered opportunity was
+earlier. Keep at most one pending opportunity per walker; no catch-up move queue.
 Validate finite values, opacity/range bounds and geometric clearance as one configuration.
 Requested portal counts must permit at least two usable connections when a circle is enabled.
 Reject an unsafe effective layout rather than exposing a knob that allows wall crossings.
@@ -161,6 +189,12 @@ Implement and test both modes:
    clearance, commit a valid replacement or hold the relevant motion until the crossing
    finishes. Maintain a connected admissible carrier and passage tree across every doorway
    event. No disconnected interval while waiting for two old holes to line up.
+   Occupants use cell-local coordinates and ride the sector's transform, rather than staying
+   screen-fixed while walls rotate. An inter-cell crossing reserves both endpoint approach
+   corridors and the shared doorway; hold all implicated ring/adapter transforms for the
+   entire swept footprint, complete interpolation in that held shared frame, then transfer
+   ownership to target-local coordinates before releasing the hold. Prioritize completion
+   of accepted crossings over admitting new ones; no new wall may sweep an occupied corridor.
 2. **Twisting:** apply one shared orientation-preserving polar deformation to walls, doorways,
    and walkers. Inter-ring bands and the outer grid adapter interpolate the angular offset.
    Bound relative twist, then reverse/unwind before clearance is lost. This is configurable
@@ -168,6 +202,33 @@ Implement and test both modes:
 
 Reserve active crossings against closure or incompatible geometry changes. Clip/expire a
 historical trail when its passage closes; otherwise a trail can cross a newly drawn wall.
+
+### Shatter, epoch replacement, and suspension
+
+Shatter first closes admission to the affected region and drains accepted crossings.
+Park remaining occupants at valid cell-local poses; fade those occupants and affected trails
+out before displaced wall fragments move. Fragments are non-traversable presentation, not
+passage geometry. Parked occupants do not move or carve while hidden. Core topology and
+the protected through-route remain valid despite temporary movement restrictions.
+
+Commit the valid patch topology/geometry before reopening. Re-form the walls, then restore
+occupant visibility and movement only at the shared patch deadline after clearance checks.
+Clear stale affected trails. Hit-testing, admission and the patch's lifetime include grid,
+polar and adapter cells. A new shatter cannot bypass active reservations or an unfinished patch.
+
+Resize, orientation and geometry-affecting mode/config changes construct a replacement epoch
+off-screen while the old scene freezes. With motion enabled, fade the old scene to zero,
+terminate its walkers explicitly, release reservations, cancel its callbacks and trails, swap
+the complete validated epoch, and fade new walkers in at valid initial poses. Do not report
+old walkers as teleported into new cell IDs. If reduced motion is active, perform one coherent
+static scene replacement without a fade. Reject every late callback carrying the old epoch.
+
+Hidden-page suspension and runtime reduced motion freeze the current interpolation fraction,
+geometry phases and simulation clock, retaining a valid crossing reservation and pose.
+Reduced motion renders that coherent frame and disables moving shatter/glow. Restoring motion
+resumes from the saved fraction/phase with one animation loop and no wall-time backlog.
+Epoch replacement during suspension disposes of the old reservation with the old epoch.
+
 
 ## Solver and metric definitions
 
@@ -268,6 +329,8 @@ Define the initial DFS distribution by its root/neighbor-choice policy. Prove it
 sum to one and every supported outcome is a tree. Define each expected metric/solve rate by
 a finite weighted sum; universal metric bounds also bound these expectations. Do not claim
 unproved closed-form DFS statistics or reuse this distribution after biased mutations.
+The scene constructor has its own explicitly labeled constrained-DFS distribution; do not
+report it as the unconstrained DFS ensemble. Define its finite choice distribution separately.
 
 ## Phases and verification gates
 
@@ -315,6 +378,8 @@ The safety contract is independent of RNG quality and applies to every accepted 
 - [ ] Constructors reject invalid/asymmetric/disconnected carriers and preserve singleton behavior.
 - [ ] Prove DFS termination/tree construction, re-root edge-set preservation, edge-exchange
   preservation, and validity of every prefix of a finite accepted operation trace.
+- [ ] Prove the contracted-forest scene constructor produces a global tree containing every
+  required interior route; reject a cyclic forest or an impossible visible portal layout.
 - [ ] Native seeded scenarios enter polar cells and exit by another portal; invalid or occupied
   doorway changes fail without publishing a partial state.
 - [ ] Both motion modes retain connected admissible doorways across sector-boundary events.
@@ -388,13 +453,22 @@ fall back to the disconnected implementation.
   and check the entire swept footprint against contemporaneous walls/doorway clearance.
 - [ ] Capture a synchronized browser recording showing that same real path; report no wall
   crossings over that observed trace, not universal correctness from a video.
-- [ ] Exercise autonomous walkers as well as a seeded test scenario; no teleport, JS-drawn fake
-  route, or permanent test-only product controls.
+- [ ] The required synchronized traversal recording comes from the normal autonomous walker
+  policy in both modes, without an externally commanded route or a special circle-seeking
+  test policy. A seeded replay may reproduce that same production policy; additional seeded
+  scenarios do not replace autonomous evidence. If autonomous traversal cannot be obtained,
+  the gate fails; do not fake it with teleportation, a JS route, or permanent test controls.
 - [ ] Cover multiple walkers, portal-area shatter/reform, resize/orientation/DPR, content scrolling,
   tab/disclosure/font/layout changes, hidden-page resume, and reduced-motion changes mid-crossing.
 - [ ] Test light/dark, actual coarse/touch input, scroll/cancel/multi-touch gestures, links/text
   selection, no horizontal overflow, and usable content/navigation with JavaScript disabled.
 - [ ] Respect motion preferences; suspend on hidden pages; resume one loop without a catch-up burst.
+- [ ] Assert the specified outcomes: no entry into broken cells, occupants hidden before
+  fragments move, re-entry only after the shared deadline, no old-epoch callbacks/reservations
+  after replacement, and exact pose/fraction continuity on suspension and resumption.
+- [ ] Inject missing/failing Wasm fetch, compilation/CSP rejection, incompatible exports/version,
+  and initialization failure. Content, navigation and CV remain usable; the decoration is inert
+  with no surviving animation loop, disconnected fallback, or partially initialized listeners.
 - [ ] Compare startup, frame-time distributions, long tasks, memory and binding traffic with a
   matched existing-site baseline. Record measured regressions and resolve them; no invented
   performance pass threshold or per-frame whole-graph reconstruction.
