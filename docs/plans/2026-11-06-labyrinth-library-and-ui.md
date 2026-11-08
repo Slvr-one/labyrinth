@@ -172,8 +172,10 @@ New Worker mappings and initial defaults:
 Ring speed continues to use `LAB_RING_SPEED`; all other existing variables keep their names.
 Number rings from one. With clockwise positive, `alternating` assigns odd rings `+1` and
 even rings `-1`; `same` assigns `+1` throughout; `reverse` negates `alternating`.
-Spinning angular speed is direction × `LAB_RING_SPEED` × a once-sampled rate in
-`[LAB_RING_BASE_SPEED_RAD_S, base + LAB_RING_SPEED_JITTER_RAD_S)`.
+Spinning angular speed is direction × `LAB_RING_SPEED` × a once-sampled rate.
+`LAB_RING_SPEED_JITTER_RAD_S` must be finite and nonnegative. Positive jitter samples the rate
+from `[LAB_RING_BASE_SPEED_RAD_S, base + LAB_RING_SPEED_JITTER_RAD_S)`; zero jitter performs
+no sampling and deterministically uses `LAB_RING_BASE_SPEED_RAD_S`.
 Twisting uses direction × amplitude × sin(phase), with phase advancing by
 `2π × LAB_RING_SPEED × dt / LAB_TWIST_PERIOD_MS`. Zero speed freezes the current phase;
 motion holds consume no phase time and never catch up on release.
@@ -181,7 +183,7 @@ motion holds consume no phase time and never catch up on release.
 Retain step-opportunity jitter only as scheduling input. A walker accepts no new move until
 its current interpolation/reservation completes, even when its next jittered opportunity was
 earlier. Keep at most one pending opportunity per walker; no catch-up move queue.
-Validate finite values, opacity/range bounds and geometric clearance as one configuration.
+Validate finite values (including nonnegative ring-speed jitter), opacity/range bounds and geometric clearance as one configuration.
 Requested portal counts must permit at least two usable connections when a circle is enabled.
 Reject an unsafe effective layout rather than exposing a knob that allows wall crossings.
 
@@ -220,7 +222,12 @@ Clear stale affected trails. Hit-testing, admission and the patch's lifetime inc
 polar and adapter cells. A new shatter cannot bypass active reservations or an unfinished patch.
 
 Resize, orientation and geometry-affecting mode/config changes construct a replacement epoch
-off-screen while the old scene freezes. With motion enabled, fade the old scene to zero,
+off-screen while the old scene freezes. Overlapping requests are coalesced or cancelled: a
+superseded request may never publish, and only the replacement for the latest requested layout
+may. Validate the candidate before fading or disposing the current epoch. If validation rejects
+it, discard the candidate and resume the current epoch when it still fits; otherwise leave the
+decoration inert, with content and navigation usable and no replacement transition left active,
+frozen or partially cleaned up. After acceptance and with motion enabled, fade the old scene to zero,
 terminate its walkers explicitly, release reservations, cancel its callbacks and trails, swap
 the complete validated epoch, and fade new walkers in at valid initial poses. Do not report
 old walkers as teleported into new cell IDs. If reduced motion is active, perform one coherent
