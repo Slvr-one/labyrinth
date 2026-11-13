@@ -1,0 +1,5 @@
+/rust/target/
+/rust/*.llbc
+/lean/.lake/
+__pycache__/
+.ruff_cache/
