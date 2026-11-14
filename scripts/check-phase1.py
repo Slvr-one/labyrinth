@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import shutil
 import subprocess  # nosec B404 -- invokes the pinned compiler toolchain
 import tempfile
@@ -39,7 +40,7 @@ def run(args, cwd, *, env=None, expect_failure=False):
     return result
 
 
-def extract(root):
+def extract(root, destination):
     run(["charon", "cargo", "--preset=aeneas"], root / "rust")
     run(
         [
@@ -51,13 +52,28 @@ def extract(root):
             "-warnings-as-errors",
             "-no-progress-bar",
             "-dest",
-            str(root / "lean"),
+            str(destination),
             "-subdir",
             "LabyrinthCore",
             str(root / "rust/labyrinth_core.llbc"),
         ],
         root,
     )
+
+
+def check_axioms(output):
+    text = output.strip()
+    if text == "'set_parent_spec' does not depend on any axioms":
+        return
+    match = re.fullmatch(
+        r"'set_parent_spec' depends on axioms: \[(.*)\]", text, re.DOTALL
+    )
+    if match is None:
+        raise ValueError("Could not parse the Lean axiom audit")
+    names = {name.strip() for name in match[1].split(",") if name.strip()}
+    unexpected = names - {"propext", "Classical.choice", "Quot.sound"}
+    if unexpected:
+        raise ValueError("Unexpected theorem axioms: " + ", ".join(sorted(unexpected)))
 
 
 pins = json.loads((ROOT / "toolchain-pins.json").read_text())
@@ -71,9 +87,20 @@ version = run(["aeneas", "-version"], ROOT).stdout.strip()
 if version != "aeneas " + pins["aeneas"][:8]:
     raise SystemExit("Aeneas executable does not match the pin")
 
-extract(ROOT)
+with tempfile.TemporaryDirectory(prefix="labyrinth-model-") as generated:
+    destination = Path(generated)
+    extract(ROOT, destination)
+    for module in ("Types.lean", "Funs.lean"):
+        expected = ROOT / "lean/LabyrinthCore" / module
+        actual = destination / "LabyrinthCore" / module
+        if actual.read_bytes() != expected.read_bytes():
+            raise SystemExit(f"Generated Lean differs from checked-in {module}")
 run(["lake", "build"], ROOT / "lean")
-run(["lake", "env", "lean", "-DwarningAsError=true", "Audit.lean"], ROOT / "lean")
+check_axioms(
+    run(
+        ["lake", "env", "lean", "-DwarningAsError=true", "Audit.lean"], ROOT / "lean"
+    ).stdout
+)
 lean_path = run(["lake", "env", "printenv", "LEAN_PATH"], ROOT / "lean").stdout.strip()
 
 with tempfile.TemporaryDirectory(prefix="labyrinth-negative-") as scratch:
@@ -95,7 +122,22 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-negative-") as scratch:
         ROOT / "lean/LabyrinthCore/Spec.lean",
         negative / "lean/LabyrinthCore/Spec.lean",
     )
-    extract(negative)
+    axiom_fixture = negative / "lean/AxiomGuard.lean"
+    axiom_fixture.write_text(
+        "axiom unapproved_axiom : False\n"
+        "theorem set_parent_spec : True := False.elim unapproved_axiom\n"
+        "#print axioms set_parent_spec\n"
+    )
+    audit = run(["lean", "-DwarningAsError=true", "AxiomGuard.lean"], negative / "lean")
+    try:
+        check_axioms(audit.stdout)
+    except ValueError as error:
+        if str(error) != "Unexpected theorem axioms: unapproved_axiom":
+            raise
+    else:
+        raise SystemExit("Application-defined axiom was not rejected")
+    print("PASS: application-defined axiom rejected by allowlist")
+    extract(negative, negative / "lean")
     compiled = negative / "compiled"
     (compiled / "LabyrinthCore").mkdir(parents=True)
     negative_env = ENV | {"LEAN_PATH": str(compiled) + os.pathsep + lean_path}

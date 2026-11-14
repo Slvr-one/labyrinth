@@ -52,14 +52,20 @@ From the repository root:
 python3 scripts/check-phase1.py
 ```
 
-The runner checks the translator source revisions and Aeneas executable version, invokes
-Charon on the actual crate, regenerates the Lean definitions, runs `lake build` with Lean
-warnings treated as errors, and prints the theorem's imported axioms. It then copies the
-Rust source into a temporary directory, changes the indexed assignment to store `child`
-instead of `new_parent`, and independently extracts and compiles that incorrect operation.
-The unchanged specification must report an unsolved proof goal. A compiler/translation
-failure is not accepted as evidence that the specification rejects the mutation.
-The temporary check reuses compiled dependencies without rebuilding their shared package caches.
+The runner checks translator source revisions and the Aeneas executable version, then extracts
+the actual crate into temporary Lean files. They must byte-match the checked-in generated
+definitions before `lake build` checks them with warnings treated as errors. Drift fails the
+gate without overwriting the model that the owner inspects.
+
+The theorem's imported axioms must be drawn only from `propext`, `Classical.choice`, and
+`Quot.sound`; an unrecognized audit result also fails. A separate Lean fixture relying on an
+application-defined axiom exercises this rejection.
+
+The runner then copies the Rust source into a temporary directory, changes the indexed
+assignment to store `child` instead of `new_parent`, and independently extracts and compiles
+that incorrect operation. The unchanged specification must report an unsolved proof goal.
+A compiler/translation failure is not accepted as evidence that the specification rejects
+the mutation. Temporary checks reuse compiled dependencies without rebuilding shared caches.
 
 For the native checks, use the same isolated Cargo/Rustup environment and run from `rust/`:
 
