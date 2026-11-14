@@ -1,7 +1,7 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
 - **Date:** 2026-11-06
-- **Status:** APPROVED PLAN — execution parked by the owner before phase 1
+- **Status:** APPROVED PLAN — phase-1 automated checks passed; manual acceptance pending
 - **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
 - **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
@@ -32,14 +32,16 @@ claimed crossings must exist in the topology and rendered geometry.
 - Oversee each phase with actual execution and carry validation through the Portfolio UI.
 - Documentation commits/PRs are authorized. Implementation-plan approval, merging, and live
   deployment are separate gates.
-- The owner approved the detailed plan and selected starting phase 1, then explicitly parked
-  execution before any implementation or installation. Resume only on a new owner request;
-  start with phase 1 and recheck repository/toolchain state, not a new planning exercise.
+- The owner approved the detailed plan, initially parked execution, and resumed phase 1 on
+  2026-11-14. Its automated feasibility checks passed; manual inspection is required before
+  phase 2. The approved scope and separate merge/deployment gates are unchanged.
 
 ## Existing state and corrections
 
-The website uses JavaScript, not a reusable Rust/Wasm maze library. The reviewed library
-base had LICENSE only; subsequent changes are documentation/research, not implementation.
+The website still uses JavaScript. The reviewed library base had LICENSE only. Phase 1 now
+contains a `no_std` parent-update operation, generated Lean and a checked partial-correctness
+theorem; [proof coverage and limitations](../properties.md) distinguish this from a completed
+maze library or structural proof suite.
 
 The grid uses a parent array. Initialization is randomized DFS, not uniform spanning-tree
 sampling. `reroot` reverses a target-to-root path without changing undirected passages.
@@ -362,12 +364,12 @@ adapter form. Handwritten Lean statements target the extracted functions, not a 
 look-alike implementation.
 
 **Automated acceptance:**
-- [ ] Matching Charon emits LLBC; pinned Aeneas emits Lean; `lake build` checks the actual
+- [x] Matching Charon emits LLBC; pinned Aeneas emits Lean; `lake build` checks the actual
   representative operation and correspondence proof.
-- [ ] A deliberately incorrect parent update fails its specification; no `sorry`, `admit`,
+- [x] A deliberately incorrect parent update fails its specification; no `sorry`, `admit`,
   skipped obligation, or application-defined axiom substitutes for a required proof.
-- [ ] Native singleton and invalid-index scenarios exercise the same Rust operation.
-- [ ] Record imported axioms, supported subset limitations, target-width assumptions and
+- [x] Native singleton and invalid-index scenarios exercise the same Rust operation.
+- [x] Record imported axioms, supported subset limitations, target-width assumptions and
   trusted compiler/translator components.
 
 **Manual acceptance:** owner can inspect a concrete Rust function, its generated Lean,
