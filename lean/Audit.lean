@@ -1,3 +1,11 @@
 import LabyrinthCore.Spec
+import LabyrinthCore.ConstructorTreeInterpretation
+import LabyrinthCore.MutationRerootSpec
 
 #print axioms set_parent_spec
+#print axioms Labyrinth.constructor_parentGraph_adj_iff
+#print axioms Labyrinth.constructor_rooted_connected
+#print axioms Labyrinth.constructor_rooted_isTree
+#print axioms Labyrinth.constructor_treeValid_isTree
+#print axioms Labyrinth.mutation_reroot_success
+#print axioms Labyrinth.mutation_reroot_preserves

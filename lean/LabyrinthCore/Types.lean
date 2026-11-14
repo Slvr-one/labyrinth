@@ -20,6 +20,75 @@ set_option maxRecDepth 2048
 
 namespace labyrinth_core
 
+/-- [labyrinth_core::spanning_tree::Frame]
+    Source: 'src/spanning_tree.rs', lines 10:0-14:1 -/
+structure spanning_tree.Frame where
+  cell : Std.Usize
+  next : Std.Usize
+  remaining : Std.Usize
+
+/-- [labyrinth_core::spanning_tree::Workspace]
+    Source: 'src/spanning_tree.rs', lines 17:0-27:1
+    Visibility: public -/
+structure spanning_tree.Workspace where
+  seen : alloc.vec.Vec Bool
+  frames : alloc.vec.Vec spanning_tree.Frame
+  path : alloc.vec.Vec Std.Usize
+  parents : alloc.vec.Vec Std.Usize
+  incoming : alloc.vec.Vec Std.Usize
+  edit_slots : alloc.vec.Vec Std.Usize
+  edit_nodes : alloc.vec.Vec Std.Usize
+  edit_count : Std.Usize
+  edge_capacity : Std.Usize
+
+/-- [labyrinth_core::topology::Error]
+    Source: 'src/topology.rs', lines 8:0-23:1
+    Visibility: public -/
+@[discriminant isize]
+inductive topology.Error where
+| InvalidSize : topology.Error
+| InvalidIndex : topology.Error
+| InvalidCarrier : topology.Error
+| Disconnected : topology.Error
+| InvalidChoice : topology.Error
+| InvalidForest : topology.Error
+| InvalidTree : topology.Error
+| InvalidTransition : topology.Error
+| InsufficientWorkspace : topology.Error
+| Overflow : topology.Error
+| StaleEpoch : topology.Error
+| StaleRevision : topology.Error
+| Occupied : topology.Error
+| InvalidGeometry : topology.Error
+
+/-- Trait declaration: [labyrinth_core::tree::Rng]
+    Source: 'src/tree.rs', lines 9:0-11:1
+    Visibility: public -/
+structure tree.Rng (Self : Type _) where
+  next_below : Self → Std.Usize → Result (Std.Usize × Self)
+
+/-- [labyrinth_core::topology::Edge]
+    Source: 'src/topology.rs', lines 50:0-53:1
+    Visibility: public -/
+structure topology.Edge where
+  u : Std.Usize
+  v : Std.Usize
+
+/-- [labyrinth_core::topology::Carrier]
+    Source: 'src/topology.rs', lines 139:0-143:1
+    Visibility: public -/
+structure topology.Carrier where
+  offsets : alloc.vec.Vec Std.Usize
+  neighbors : alloc.vec.Vec Std.Usize
+  edges : alloc.vec.Vec topology.Edge
+
+/-- [labyrinth_core::spanning_tree::Tree]
+    Source: 'src/spanning_tree.rs', lines 197:0-200:1
+    Visibility: public -/
+structure spanning_tree.Tree where
+  parents : alloc.vec.Vec Std.Usize
+  root : Std.Usize
+
 /-- [labyrinth_core::tree::Error]
     Source: 'src/tree.rs', lines 2:0-6:1
     Visibility: public -/
@@ -28,11 +97,5 @@ inductive tree.Error where
 | InvalidIndex : tree.Error
 | SelfParent : tree.Error
 | Cycle : tree.Error
-
-/-- Trait declaration: [labyrinth_core::tree::Rng]
-    Source: 'src/tree.rs', lines 9:0-11:1
-    Visibility: public -/
-structure tree.Rng (Self : Type _) where
-  next_below : Self → Std.Usize → Result (Std.Usize × Self)
 
 end labyrinth_core

@@ -1,4 +1,4 @@
-# Phase 1: actual Rust-to-Lean correspondence
+# Verification coverage and reproduction
 
 ## Scope
 
@@ -100,5 +100,45 @@ or verified by this feasibility operation.
 
 The phase-1 manual gate is to inspect [`tree.rs`](../rust/src/tree.rs), its generated
 [`Funs.lean`](../lean/LabyrinthCore/Funs.lean), and
-[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together. Phase 2 requires owner acceptance
-of that gate. Merge and deployment require separate authorization.
+[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together. The owner accepted that gate
+on 2026-11-14 with the limitations above and authorized phase 2. Phase-2 structural and
+transition proofs are not established by this acceptance. Merge and deployment require
+separate authorization.
+
+## Phase 2 — native checkpoint, formal gate incomplete
+
+The native crate now implements validated CSR carriers, ordinary DFS, required-forest
+contraction/quotient DFS/expansion, sparse tree edits, combined grid/polar layouts, reservations,
+shatter, suspension and epoch replacement. `Scene::advance_motion` performs production
+boundary-event planning with reusable flow/search storage and sparse edge proposals; the
+example no longer supplies a geometry-specific planner.
+
+Spinning admission uses conservative radius/clearance bounds and checks the chosen exterior
+portal pair over every quantized one-unit outer-ring sweep. Some geometrically feasible
+layouts can be rejected by these conservative bounds. Accepted proposals still pass the
+existing geometry, route, reservation and tree checks before publication. The returned
+positive subdivision divisor specifies the consumed phase increments; errors never represent
+a partially committed request.
+
+Native tests cover multiple circles, unequal ring counts/sectors, impossible spinning layouts,
+safe resized high-sector layouts, reserved crossings, stale workspaces and atomic rejection.
+The seeded native example traverses grid → polar interior → different portal → grid in both
+modes and completes three motion periods. Allocation instrumentation observed zero allocations
+after initialization for the exercised crossings, ticks and production planning events.
+These are execution results, not universal proofs or browser acceptance.
+
+Several handwritten proof foundations check, including the parent representation's
+interpretation as a connected acyclic graph and extracted validation/loop helpers. The extracted
+`mutation_reroot_preserves` theorem establishes totality for valid carriers, trees and workspaces:
+every undirected tree edge is preserved, errors leave the tree unchanged, and success occurs
+exactly when the requested root is in bounds and path capacity is sufficient. Its axiom audit
+contains only `propext`, `Classical.choice` and `Quot.sound`.
+
+Complete carrier, DFS, constrained-constructor, batch-edit/exchange, trace and scene-publication
+specifications remain unfinished. The full crate's extraction and strict Lean gate are not yet
+passing.
+The checked-in generated core model does not currently cover the full scene/planner source.
+The correspondence runner rejects model drift and unmodeled external-operation templates;
+it must not be treated as a phase-2 pass until the complete source/model/proof gate succeeds.
+
+No phase-2 manual acceptance, merge, Wasm result, browser result or deployment is claimed.
