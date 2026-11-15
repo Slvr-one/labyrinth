@@ -1052,7 +1052,8 @@ fn check_route_edge(
         }
     }
     if !required.contains(&edge) {
-        if required.len() == required.capacity() {
+        // Scene reserves this carrier-edge budget once and never shrinks the workspace.
+        if required.len() == layout.carrier.edges().len() {
             return Err(Error::InsufficientWorkspace);
         }
         required.push(edge);
