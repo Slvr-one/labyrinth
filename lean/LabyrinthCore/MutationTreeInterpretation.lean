@@ -1,4 +1,5 @@
 module
+public import LabyrinthCore.MutationFunctionalGraph
 public import LabyrinthCore.Mutations
 public import LabyrinthCore.ConstructorTreeInterpretation
 public import Mathlib.Data.Fintype.Card
@@ -78,5 +79,43 @@ namespace Labyrinth
   obtain ⟨walk⟩ := hconnected (⟨root, hrange⟩ : Fin p.length) ⟨v, hv⟩
   have hreach : reaches ⟨v, hv⟩ := hwalk walk ⟨0, rfl⟩
   exact mutation_reachable_root_bounded p root v hp hv hfixed hreach
+
+/-- A bounded functional parent representation whose undirected graph is connected is
+rooted at any distinguished fixed point. -/
+theorem mutation_functional_connected_rooted
+    (p : List Nat) (root : Nat) (next : Nat → Nat)
+    (hroot : root < p.length)
+    (hbounded : ∀ u, u < p.length → next u < p.length)
+    (hfixed : next root = root)
+    (hparents : ∀ u, u < p.length → parentAt p u = next u)
+    (hconnected : (mutationFunctionalGraph p.length next).Connected) :
+    RootedTree p root := by
+  have hrootParent : parentAt p root = root := (hparents root hroot).trans hfixed
+  have hrootEntry : p[root]? = some root := by
+    simpa [parentAt, hroot] using hrootParent
+  have hp : ∀ x ∈ p, x < p.length := by
+    intro x hx
+    obtain ⟨u, hu, hux⟩ := List.mem_iff_getElem.mp hx
+    have hparent : parentAt p u = x := by simp [parentAt, hu, hux]
+    rw [← hparent, hparents u hu]
+    exact hbounded u hu
+  have hfollow : ∀ k u, u < p.length → follow p k u = next^[k] u := by
+    intro k
+    induction k with
+    | zero => exact fun _ _ => rfl
+    | succ k ih =>
+      intro u hu
+      rw [follow, Function.iterate_succ_apply, hparents u hu]
+      exact ih (next u) (hbounded u hu)
+  refine ⟨hroot, hrootEntry, hp, ?_⟩
+  intro v hv
+  let r : Fin p.length := ⟨root, hroot⟩
+  let x : Fin p.length := ⟨v, hv⟩
+  have hpath : (mutationFunctionalGraph p.length next).Reachable r x :=
+    hconnected r x
+  obtain ⟨k, hk⟩ := mutation_functional_reachable_root p.length next r x root
+    hfixed hpath ⟨0, rfl⟩
+  apply mutation_reachable_root_bounded p root v hp hv hrootParent
+  exact ⟨k, (hfollow k v hv).trans hk⟩
 
 end Labyrinth

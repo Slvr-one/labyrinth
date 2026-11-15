@@ -2,6 +2,7 @@ module
 public import LabyrinthCore.MutationBatchAttach
 public import LabyrinthCore.MutationCommit
 public import LabyrinthCore.MutationCut
+public import LabyrinthCore.MutationRerootSpec
 
 @[expose] public section
 
@@ -104,5 +105,59 @@ theorem mutation_cut_functional_edges_exact
         simp [he, mutationFunctionalEdge, parentEdge]
     · simp [mutationFunctionalEdge, parentEdge, hv]
   · simp [mutationFunctionalEdge, parentEdge, hu]
+
+/-- Committing the sparse overlay publishes exactly its functional undirected edges. -/
+theorem mutation_committed_parent_edges_exact
+    (published result : alloc.vec.Vec Usize) (work : spanning_tree.Workspace)
+    (hlen : result.val.length = published.val.length)
+    (hparents : ∀ u, u < published.val.length →
+      (result.val[u]?.getD 0#usize).val =
+        mutationVirtualParent work (alloc.vec.Vec.deref published) u) :
+    ∀ u v, parentEdge (result.val.map (·.val)) u v ↔
+      mutationFunctionalEdge published.val.length
+        (mutationVirtualParent work (alloc.vec.Vec.deref published)) u v := by
+  apply mutation_parent_edge_functional_exact
+  · simpa only [List.length_map] using hlen
+  · intro u hu
+    have hresult : u < result.val.length := by omega
+    simpa [parentAt, hresult] using hparents u (by omega)
+
+/-- The committed parent vector refines the complete remove/add edge model. -/
+theorem mutation_committed_edit_edges_exact
+    (published result : alloc.vec.Vec Usize) (cut attached : spanning_tree.Workspace)
+    (remove add : Slice topology.Edge)
+    (hlen : result.val.length = published.val.length)
+    (hparents : ∀ u, u < published.val.length →
+      (result.val[u]?.getD 0#usize).val =
+        mutationVirtualParent attached (alloc.vec.Vec.deref published) u)
+    (hcut : ∀ u v,
+      mutationFunctionalEdge published.val.length
+          (mutationVirtualParent cut (alloc.vec.Vec.deref published)) u v ↔
+        parentEdge (published.val.map (·.val)) u v ∧ ¬ mutationRemoval remove u v)
+    (hattached : ∀ u v,
+      mutationFunctionalEdge published.val.length
+          (mutationVirtualParent attached (alloc.vec.Vec.deref published)) u v ↔
+        mutationFunctionalEdge published.val.length
+          (mutationVirtualParent cut (alloc.vec.Vec.deref published)) u v ∨
+        mutationAddedBefore add add.val.length u v) :
+    ∀ u v, parentEdge (result.val.map (·.val)) u v ↔
+      MutationEditedEdge (published.val.map (·.val)) remove add u v := by
+  intro u v
+  rw [mutation_committed_parent_edges_exact published result attached hlen hparents u v,
+    hattached u v, hcut u v, mutation_added_before_full]
+  rfl
+
+/-- Every edge admitted by the batch refinement remains an edge of the carrier. -/
+theorem mutation_edited_edge_carrier
+    (c : topology.Carrier) (t : spanning_tree.Tree) (remove add : Slice topology.Edge)
+    (hc : CarrierValid c) (ht : TreeValid c t)
+    (hadd : ∀ edge ∈ add.val, carrierEdge c edge.u.val edge.v.val)
+    (u v : Nat) (hedge : MutationEditedEdge (parents t) remove add u v) :
+    carrierEdge c u v := by
+  rcases hedge with ⟨hold, _⟩ | ⟨edge, hedge, huv | hvu⟩
+  · exact mutation_tree_edge_carrier c t hc ht u v hold
+  · simpa only [huv.1, huv.2] using hadd edge hedge
+  · apply (mutation_carrier_symmetric c hc v u).mp
+    simpa only [hvu.1, hvu.2] using hadd edge hedge
 
 end Labyrinth
