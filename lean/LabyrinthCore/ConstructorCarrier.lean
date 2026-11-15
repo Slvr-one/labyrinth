@@ -74,9 +74,15 @@ theorem constructor_carrier_from_csr_accepts (offsets neighbors : alloc.vec.Vec 
   simp only [hvtrue, ite_true]
   apply WP.spec_bind (constructor_csr_all_rows_spec offsets neighbors n hsize hnval hrows)
   rintro ⟨unused, status⟩ hstatus
-  dsimp only
   have hstatusOk : status = .Ok () := hstatus.2.mpr (by simpa only [hnval] using hentries)
-  simp only [hstatusOk, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  rw [hstatusOk]
+  have hbranch : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (.Ok () : core.result.Result Unit topology.Error))
+      (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hbranch
+  intro cf hcf
+  subst cf
   have hnodeFits : constructorStorageFits n 8#usize := by
     simp only [constructorStorageFits, hnval, UScalar.ofNatCore_val_eq]
     exact ⟨hnodeMax, hnodeStorage⟩
@@ -94,7 +100,6 @@ theorem constructor_carrier_from_csr_accepts (offsets neighbors : alloc.vec.Vec 
     rw [hseen.1, List.length_replicate]
     omega))
   rintro ⟨old, back⟩ ⟨_, rfl⟩
-  dsimp only
   apply WP.spec_bind (constructor_csr_connectivity_accepts offsets neighbors n unused seen stack
     hnval (by omega) hseen.1 hstack.1 hrows hentries)
   intro reached hr
@@ -109,7 +114,7 @@ theorem constructor_carrier_from_csr_accepts (offsets neighbors : alloc.vec.Vec 
   apply WP.spec_bind (constructor_check_storage_spec edgeCount 16#usize)
   intro edgeStorage hes
   have hesok : edgeStorage = .Ok () := by simpa only [hedgeFits, ite_true] using hes
-  simp only [hesok, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+  simp only [hesok, bind_ok,
     topology.Edge.new, le_refl, ite_true]
   apply WP.spec_bind (Usize.div_spec (x := alloc.vec.Vec.len neighbors) (y := 2#usize) (by simp))
   intro edgeCount' hec'
@@ -200,17 +205,34 @@ theorem constructor_carrier_from_csr_spec (offsets neighbors : alloc.vec.Vec Usi
               List.getElem?_eq_getElem hin, Option.getD_some] using h
           apply WP.spec_bind (constructor_csr_all_rows_spec offsets neighbors n hsize hnval hrows)
           rintro ⟨unused, status⟩ hstatus
-          dsimp only
           cases status with
           | Err error =>
-            simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
-              WP.spec_ok]
+            have hbranch : WP.spec
+                (core.result.Result.Insts.CoreOpsTry.branch
+                  (.Err error : core.result.Result Unit topology.Error))
+                (fun cf => cf = .Break (.Err error)) := (WP.spec_ok _).mpr rfl
+            apply WP.spec_bind hbranch
+            intro cf hcf
+            subst cf
+            unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            have hconvert : WP.spec (ok (core.convert.FromSame.from error))
+                (fun actual => actual = core.convert.FromSame.from error) :=
+              (WP.spec_ok _).mpr rfl
+            apply WP.spec_bind hconvert
+            intro actual _
+            apply (WP.spec_ok _).mpr
+            trivial
           | Ok value =>
             cases value
             have hentries : constructorAllRows offsets neighbors (offsets.val.length - 1) :=
               by simpa only [hnval] using hstatus.2.mp rfl
-            simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+            have hbranch : WP.spec
+                (core.result.Result.Insts.CoreOpsTry.branch
+                  (.Ok () : core.result.Result Unit topology.Error))
+                (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+            apply WP.spec_bind hbranch
+            intro cf hcf
+            subst cf
             apply WP.spec_bind (constructor_check_storage_spec n 8#usize)
             intro storage hs
             by_cases hnodeFits : constructorStorageFits n 8#usize
@@ -226,7 +248,6 @@ theorem constructor_carrier_from_csr_spec (offsets neighbors : alloc.vec.Vec Usi
                 rw [hseen.1, List.length_replicate]
                 omega))
               rintro ⟨old, back⟩ ⟨_, rfl⟩
-              dsimp only
               apply WP.spec_bind (constructor_csr_connectivity_accepts offsets neighbors n
                 unused seen stack hnval (by omega) hseen.1 hstack.1 hrows hentries)
               intro reached hr
@@ -244,7 +265,7 @@ theorem constructor_carrier_from_csr_spec (offsets neighbors : alloc.vec.Vec Usi
                 by_cases hedgeFits : constructorStorageFits edgeCount 16#usize
                 · have hesok : edgeStorage = .Ok () := by
                     simpa only [hedgeFits, ite_true] using hes
-                  simp only [hesok, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+                  simp only [hesok, bind_ok,
                     topology.Edge.new, le_refl, ite_true]
                   apply WP.spec_bind (Usize.div_spec
                     (x := alloc.vec.Vec.len neighbors) (y := 2#usize) (by simp))
@@ -271,15 +292,27 @@ theorem constructor_carrier_from_csr_spec (offsets neighbors : alloc.vec.Vec Usi
                       And.intro hnodeFits hedgeFits
                 · have heserr : edgeStorage = .Err .Overflow := by
                     simpa only [hedgeFits, ite_false] using hes
-                  simp only [heserr, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
-                    WP.spec_ok]
+                  simp only [heserr, bind_ok,
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+                  have hconvert : WP.spec (ok (core.convert.FromSame.from topology.Error.Overflow))
+                      (fun actual => actual = core.convert.FromSame.from topology.Error.Overflow) :=
+                    (WP.spec_ok _).mpr rfl
+                  apply WP.spec_bind hconvert
+                  intro actual _
+                  apply (WP.spec_ok _).mpr
+                  trivial
               · simp only [hreached, not_false_eq_true, ite_true, WP.spec_ok]
             · have hserr : storage = .Err .Overflow := by
                 simpa only [hnodeFits, ite_false] using hs
               simp only [hserr, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
-                WP.spec_ok]
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+              have hconvert : WP.spec (ok (core.convert.FromSame.from topology.Error.Overflow))
+                  (fun actual => actual = core.convert.FromSame.from topology.Error.Overflow) :=
+                (WP.spec_ok _).mpr rfl
+              apply WP.spec_bind hconvert
+              intro actual _
+              apply (WP.spec_ok _).mpr
+              trivial
       · simp only [hlastEq, not_false_eq_true, ite_true, WP.spec_ok]
     · simp only [bne_iff_ne, ne_eq, hzero, not_false_eq_true, ite_true, WP.spec_ok]
 

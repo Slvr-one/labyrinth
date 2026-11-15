@@ -151,6 +151,13 @@ namespace Labyrinth
     have hnodeBound : w.edit_count.val < w.edit_nodes.val.length := by omega
     apply spec_bind (alloc.vec.Vec.index_mut_usize_spec w.edit_nodes w.edit_count hnodeBound)
     rintro ⟨oldNode, backNode⟩ ⟨_, hbackNode⟩
+    have hreturn :
+        Result.ok (backSlot w.edit_count, backNode cell, count, w.edit_count)
+          ⦃ fields => fields = (backSlot w.edit_count, backNode cell, count, w.edit_count) ⦄ :=
+      (spec_ok _).mpr rfl
+    apply spec_bind hreturn
+    intro fields hfields
+    subst fields
     change (do
       let (_, backParent) ← w.parents.index_mut_usize w.edit_count
       Result.ok { w with
@@ -169,12 +176,13 @@ namespace Labyrinth
       (by simpa using hcount), rfl, rfl, rfl, rfl, rfl, ?_, ?_, ?_⟩
     · refine ⟨w.edit_count, by simp [hsbound], ?_,
         by simp [show w.edit_count.val < w.parents.val.length by omega]⟩
+      change w.edit_count.val < count.val
       have hcountval : count.val = w.edit_count.val + 1 := by simpa using hcount
       omega
     · intro node hne
-      simp [List.getElem?_set, hne, Ne.symm hne]
+      simp [Ne.symm hne]
     · intro index hindex _
-      simp [List.getElem?_set, Nat.ne_of_lt hindex, Ne.symm (Nat.ne_of_lt hindex)]
+      simp [Ne.symm (Nat.ne_of_lt hindex)]
   · simp only [hempty, ite_false, bind_ok, alloc.vec.Vec.index_mut_slice_index]
     have hnotmax : slot.val ≠ Usize.max := by
       intro he

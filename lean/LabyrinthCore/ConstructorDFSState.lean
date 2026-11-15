@@ -237,7 +237,7 @@ theorem constructor_dfs_invariant_discover
     by_cases he : i = depth
     · have hlookupPush : ((frames.set index advanced).set push child).val[i]? = some child := by
         rw [he, ← hp]
-        change ((frames.val.set index.val advanced).set push.val child)[push.val]? = some child
+        simp only [alloc.vec.Vec.set, alloc.vec.Vec.from_val]
         apply List.getElem?_set_self
         simpa using hpb
       have heq : value = child := Option.some.inj (hval.symm.trans hlookupPush)
@@ -268,7 +268,7 @@ theorem constructor_dfs_invariant_discover
     · subst u
       refine ⟨depth, child, by omega, ?_, by simp only [hchild], ?_⟩
       · rw [← hp]
-        change ((frames.val.set index.val advanced).set push.val child)[push.val]? = some child
+        simp only [alloc.vec.Vec.set, alloc.vec.Vec.from_val]
         apply List.getElem?_set_self
         simpa using hpb
       · have hrow : constructorDFSOffset offsets neighbor.val <

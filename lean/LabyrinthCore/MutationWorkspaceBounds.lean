@@ -86,7 +86,10 @@ namespace Labyrinth
       apply spec_bind (Usize.sub_spec (x := j) (y := 1#usize) (by simpa using hj))
       rintro previous ⟨hprevious, _⟩
       have hpreviousVal : previous.val = j.val - 1 := by simpa using hprevious
-      apply spec_bind (alloc.vec.Vec.index_usize_spec scratch.path previous (by rw [hpath]; omega))
+      apply spec_bind (alloc.vec.Vec.index_usize_spec scratch.path previous (by
+        change previous.val < scratch.path.val.length
+        rw [hpath]
+        omega))
       intro parent hparent
       have hnodeGet : w.path.val[j.val]? = some node := by
         rw [← hpath, List.getElem?_eq_getElem hjBound]

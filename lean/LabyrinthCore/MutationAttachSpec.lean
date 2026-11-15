@@ -107,9 +107,8 @@ namespace Labyrinth
     intro i hi node hnode
     obtain ⟨expected, hexpected, hval⟩ := hpath i (by omega)
     have he : node = expected := Option.some.inj (hnode.symm.trans hexpected)
-    have hb := hbound i (by omega)
     rw [he, hval, hpreparedLen]
-    omega
+    simpa only [next] using hbound i (by omega)
   have hunique : ∀ i j, i < count'.val → j < count'.val → ∀ x y,
       prepared.path.val[i]? = some x → prepared.path.val[j]? = some y → x.val = y.val → i = j := by
     intro i j hi hj x y hx hy he
@@ -161,11 +160,16 @@ namespace Labyrinth
     have hb : node.val < reversed.path.val.length := by
       rw [hrevPath]
       exact hbounded (j + 1) (by omega) node hnode
-    simpa only [← hnodeval, hupdate node.val hb, if_neg hne, hassigned, hprevval]
+    change mutationVirtualParent result (alloc.vec.Vec.deref v) (next^[j + 1] inside.val) =
+      next^[j] inside.val
+    rw [← hnodeval, hupdate node.val hb]
+    simp only [hne, ite_false, hassigned, hprevval]
   · intro u hu hout
     have hne : u ≠ inside.val := Ne.symm (hout 0 (by omega))
     have hb : u < reversed.path.val.length := by rw [hrevPath, hpreparedLen]; omega
-    rw [hupdate u hb, if_neg hne, hoff u (by rw [hpreparedLen]; omega), hpreparedParent]
+    rw [hupdate u hb]
+    simp only [hne, ite_false]
+    rw [hoff u (by rw [hpreparedLen]; omega), hpreparedParent]
     intro i _ hi node hnode
     obtain ⟨expected, hexpected, hval⟩ := hpath i (by omega)
     have he : node = expected := Option.some.inj (hnode.symm.trans hexpected)
@@ -232,7 +236,8 @@ namespace Labyrinth
         (out.1 = core.result.Result.Ok () → ∀ a b,
           mutationFunctionalEdge n (mutationVirtualParent out.2 (alloc.vec.Vec.deref t.parents)) a b ↔
           mutationFunctionalEdge n before a b ∨
-            (a = edge.u.val ∧ b = edge.v.val) ∨ (b = edge.u.val ∧ a = edge.v.val)) := by
+            (a = edge.u.val ∧ b = edge.v.val) ∨
+              (b = edge.u.val ∧ a = edge.v.val)) ⦄ := by
     obtain ⟨first, hfirst, hreach, hfixed, _⟩ := hcomponent
     obtain ⟨k, hk, hreachk, hminimal, hdistinct⟩ := mutation_functional_first_reach before n
       inside.val component.val hbeforeBound hi ⟨first, hreach⟩

@@ -134,7 +134,9 @@ theorem constructor_dfs_loop_body_spec {R : Type*} (adapter : tree.Rng R)
         refine ⟨⟨rfl, visited, rank,
           constructor_dfs_invariant_seen hinv index frame advanced (by omega) hf hpos hc hr
             hanext neighbor hn hm⟩, ?_⟩
-        exact constructor_dfs_measure_scan _ _ _ _ frames.val index frame advanced hi hib hf hpos hr
+        simpa only [constructorDFSLoopMeasure, alloc.vec.Vec.set, alloc.vec.Vec.from_val] using
+          (constructor_dfs_measure_scan (constructorDFSVertexCount offsets) neighbors.val.length
+            reached.val depth.val frames.val index frame advanced hi hib hf hpos hr)
       · have hreached := constructor_dfs_unseen_reached_lt hinv neighbor.val hnv hm
         have hroom : depth.val < capacity := by have := hinv.depth_bound; have := hinv.capacity_bound; omega
         have hfalse : seen.val[neighbor.val]? = some false := by
@@ -193,8 +195,10 @@ theorem constructor_dfs_loop_body_spec {R : Type*} (adapter : tree.Rng R)
             have hb := constructor_dfs_offset_bound offsets neighbors root hinput
               (neighbor.val + 1) (by omega)
             omega
-          exact constructor_dfs_measure_discover _ _ _ _ frames.val index depth frame advanced child
-            hi rfl (by rw [hinv.frames_length]; exact hroom) hf hpos hr hslots hreached
+          simpa only [alloc.vec.Vec.set, alloc.vec.Vec.from_val] using
+            (constructor_dfs_measure_discover (constructorDFSVertexCount offsets) neighbors.val.length
+              reached.val depth.val frames.val index depth frame advanced child hi rfl
+              (by rw [hinv.frames_length]; exact hroom) hf hpos hr hslots hreached)
 
 /-- Universal totality of the actual stack loop under legal cyclic choices. -/
 theorem constructor_dfs_loop_spec {R : Type*} (adapter : tree.Rng R)
@@ -210,8 +214,13 @@ theorem constructor_dfs_loop_spec {R : Type*} (adapter : tree.Rng R)
   unfold spanning_tree.depth_first_loop1
   apply loop.spec_decr_nat (constructorDFSLoopMeasure offsets neighbors)
     (constructorDFSLoopInvariant offsets neighbors root capacity)
-  · intro state hs
-    exact constructor_dfs_loop_body_spec adapter hrng offsets neighbors root capacity hinput state hs
+  · rintro ⟨stateRng, stateSeen, stateFrames, stateParents, stateIncoming,
+      stateReached, stateDepth, stateStatus⟩ hs
+    apply WP.spec_mono (constructor_dfs_loop_body_spec adapter hrng offsets neighbors root capacity hinput
+      (stateRng, stateSeen, stateFrames, stateParents, stateIncoming,
+        stateReached, stateDepth, stateStatus) hs)
+    intro result hresult
+    cases result <;> exact hresult
   · exact ⟨rfl, visited, rank, hinv⟩
 
 end Labyrinth

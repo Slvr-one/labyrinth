@@ -7,6 +7,20 @@ open Aeneas Aeneas.Std Result labyrinth_core
 
 namespace Labyrinth
 
+private theorem constructor_edges_error_return (error : topology.Error) :
+    WP.spec (do
+      let actual ← ok (core.convert.FromSame.from error)
+      ok (.Err actual : core.result.Result topology.Carrier topology.Error))
+      (fun result => match result with
+        | .Ok carrier => CarrierValid carrier
+        | .Err _ => True) := by
+  have hconvert : WP.spec (ok (core.convert.FromSame.from error))
+      (fun actual => actual = core.convert.FromSame.from error) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hconvert
+  intro actual _
+  apply (WP.spec_ok _).mpr
+  trivial
+
 /-- Widths of the allocations explicitly checked by the edge-list constructor. -/
 def constructorEdgesStorageFits (n : Usize) (edges : Slice topology.Edge) : Prop :=
   n.val + 1 ≤ Usize.max ∧ edges.val.length * 2 ≤ Usize.max ∧
@@ -33,11 +47,11 @@ theorem constructor_carrier_from_edges_spec (n : Usize) (edges : Slice topology.
     obtain ⟨count, hchecked, hcount⟩ := constructor_checked_add_some n 1#usize (by
       simpa only [UScalar.ofNatCore_val_eq] using hadd)
     obtain ⟨twice, hmul, htwiceValue⟩ := constructor_checked_mul_some (Slice.len edges)
-      2#usize (by simpa only [Slice.len, UScalar.ofNatCore_val_eq] using htwice)
+      2#usize (by simpa using htwice)
     have hcountValue : count.val = n.val + 1 := by
       simpa only [UScalar.ofNatCore_val_eq] using hcount
     have htwiceNat : twice.val = edges.val.length * 2 := by
-      simpa only [Slice.len, UScalar.ofNatCore_val_eq] using htwiceValue
+      simpa using htwiceValue
     have hcountFits : constructorStorageFits count 8#usize := by
       simpa only [constructorStorageFits, hcountValue, UScalar.ofNatCore_val_eq] using
         And.intro hcountMax hcountStorage
@@ -150,9 +164,10 @@ theorem constructor_carrier_from_edges_total_spec (n : Usize) (edges : Slice top
     · simp only [hn, ite_false]
       cases hadd : Usize.checked_add n 1#usize with
       | none =>
-        simp only [hadd, lift, bind_ok, core.option.Option.ok_or,
+        simp only [lift, bind_ok, core.option.Option.ok_or,
           core.result.Result.Insts.CoreOpsTry.branch,
-          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+        exact constructor_edges_error_return _
       | some count =>
         have ha := Usize.checked_add_bv_spec n 1#usize
         simp only [hadd] at ha
@@ -160,15 +175,16 @@ theorem constructor_carrier_from_edges_total_spec (n : Usize) (edges : Slice top
           simpa only [UScalar.ofNatCore_val_eq] using ha.2.1
         cases hmul : Usize.checked_mul (Slice.len edges) 2#usize with
         | none =>
-          simp only [hadd, hmul, lift, bind_ok, core.option.Option.ok_or,
+          simp only [lift, bind_ok, core.option.Option.ok_or,
             core.result.Result.Insts.CoreOpsTry.branch,
-            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+          exact constructor_edges_error_return _
         | some twice =>
           have hm := Usize.checked_mul_bv_spec (Slice.len edges) 2#usize
           simp only [hmul] at hm
           have htwice : twice.val = edges.val.length * 2 := by
-            simpa only [Slice.len, UScalar.ofNatCore_val_eq] using hm.2.1
-          simp only [hadd, hmul, lift, bind_ok, core.option.Option.ok_or,
+            simpa using hm.2.1
+          simp only [lift, bind_ok, core.option.Option.ok_or,
             core.result.Result.Insts.CoreOpsTry.branch, constructor_check_storage_eq]
           by_cases hc : constructorStorageFits count 8#usize
           · simp only [hc, ite_true, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
@@ -181,15 +197,19 @@ theorem constructor_carrier_from_edges_total_spec (n : Usize) (edges : Slice top
                 simp only [constructorStorageFits, htwice, UScalar.ofNatCore_val_eq] at ht'
                 exact False.elim (hwidth ⟨by omega, by omega, hc'.1, hc'.2, ht'.1, ht'.2, he⟩)
               · simp only [he, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+                exact constructor_edges_error_return _
             · simp only [ht, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+              exact constructor_edges_error_return _
           · simp only [hc, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+            exact constructor_edges_error_return _
 
 /-- Input-only absence of parallel undirected edges, independent of CSR storage. -/
 def constructorEdgesSimple (edges : List topology.Edge) : Prop :=
-  ∀ i j edge other cell value, edges[i]? = some edge → edges[j]? = some other →
+  ∀ (i j : Nat) (edge other : topology.Edge) (cell : Nat) (value : Usize),
+    edges[i]? = some edge → edges[j]? = some other →
     ((cell = edge.u.val ∧ value = edge.v) ∨ (cell = edge.v.val ∧ value = edge.u)) →
     ((cell = other.u.val ∧ value = other.v) ∨ (cell = other.v.val ∧ value = other.u)) →
     i = j
@@ -377,11 +397,11 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
   obtain ⟨count, hchecked, hcount⟩ := constructor_checked_add_some n 1#usize (by
     simpa only [UScalar.ofNatCore_val_eq] using hadd)
   obtain ⟨twice, hmul, htwiceValue⟩ := constructor_checked_mul_some (Slice.len edges)
-    2#usize (by simpa only [Slice.len, UScalar.ofNatCore_val_eq] using htwice)
+    2#usize (by simpa using htwice)
   have hcountValue : count.val = n.val + 1 := by
     simpa only [UScalar.ofNatCore_val_eq] using hcount
   have htwiceNat : twice.val = edges.val.length * 2 := by
-    simpa only [Slice.len, UScalar.ofNatCore_val_eq] using htwiceValue
+    simpa using htwiceValue
   have hnpos : 0 < n.val := by
     have hne : n.val ≠ 0 := by
       intro he
@@ -524,7 +544,7 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
       omega
   have hcsrWidth : constructorCsrStorageFits offsets filled := by
     have he := hedgeStorage
-    simp only [constructorStorageFits, Slice.len, UScalar.ofNatCore_val_eq] at he
+    simp [constructorStorageFits] at he
     simp only [constructorCsrStorageFits, hoffsetsLength, Nat.add_sub_cancel,
       hfilledLength, Nat.mul_div_cancel]
     exact ⟨by omega, by omega, he.1, he.2⟩

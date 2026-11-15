@@ -44,7 +44,11 @@ theorem constructor_tree_dfs_accepts {R : Type*} (adapter : tree.Rng R)
   rintro ⟨status, rng', after⟩ ⟨hstatus, hout⟩
   dsimp only at hstatus hout
   rw [hstatus]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  change WP.spec (do
+    let parents ← alloc.vec.from_elem core.clone.CloneUsize root n
+    let (copiedWork, copiedParents) ←
+      spanning_tree.Tree.dfs_loop after parents 0#usize
+    ok (.Ok { parents := copiedParents, root }, rng', copiedWork)) _
   apply WP.spec_bind (alloc.vec.from_elem_spec core.clone.CloneUsize root n rfl)
   intro fresh hfresh
   have hfreshLen : fresh.val.length = cellCount carrier := by simp only [hfresh.1, List.length_replicate, hnval]

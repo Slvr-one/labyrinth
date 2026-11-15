@@ -45,7 +45,7 @@ namespace Labyrinth
         if ∃ edge ∈ remove.val, mutationCutChild v edge = u then u
         else mutationVirtualParent w (alloc.vec.Vec.deref v) u ⦄ := by
   classical
-  let touched := fun stop u => ∃ j, j < stop ∧ ∃ edge,
+  let touched := fun (stop u : Nat) => ∃ j, j < stop ∧ ∃ edge,
     remove.val[j]? = some edge ∧ mutationCutChild v edge = u
   let exactParents := fun (scratch : spanning_tree.Workspace) stop =>
     ∀ u, u < v.val.length → mutationVirtualParent scratch (alloc.vec.Vec.deref v) u =
@@ -170,7 +170,8 @@ namespace Labyrinth
       mutationVirtualParent out (alloc.vec.Vec.deref t.parents) u = parentAt (parents t) u := by
     intro u hu
     rw [hparent]
-    simp [parentAt, parents, hu]
+    simp only [alloc.vec.Vec.deref, Slice.from_val, parents, parentAt,
+      List.getElem?_map, List.getElem?_eq_getElem hu, Option.map_some, Option.getD_some]
   have hforest : MutationFunctionalForest t.parents.val.length
       (mutationVirtualParent out (alloc.vec.Vec.deref t.parents)) := by
     apply mutation_functional_forest_congr t.parents.val.length (parentAt (parents t))
@@ -342,13 +343,33 @@ namespace Labyrinth
     · by_cases hne : u ≠ v
       · have huAfter : u < after.length := by omega
         have hvAfter : v < after.length := by omega
-        have huBefore : u < (published.val.map (·.val)).length := by simpa using hu
-        have hvBefore : v < (published.val.map (·.val)).length := by simpa using hv
+        have hparentU : parentAt (published.val.map (·.val)) u = published.val[u].val := by
+          simp only [parentAt, List.getElem?_map, List.getElem?_eq_getElem hu,
+            Option.map_some, Option.getD_some]
+        have hparentV : parentAt (published.val.map (·.val)) v = published.val[v].val := by
+          simp only [parentAt, List.getElem?_map, List.getElem?_eq_getElem hv,
+            Option.map_some, Option.getD_some]
         have ha : parentEdge after u v ↔ parentAt after u = v ∨ parentAt after v = u := by
           simp [parentEdge, parentAt, huAfter, hvAfter, hne]
         have hb : parentEdge (published.val.map (·.val)) u v ↔
             parentAt (published.val.map (·.val)) u = v ∨ parentAt (published.val.map (·.val)) v = u := by
-          simp [parentEdge, parentAt, huBefore, hvBefore, hne]
+          constructor
+          · rintro ⟨_, _, _, huv | hvu⟩
+            · left
+              exact hparentU.trans (by
+                simpa only [List.getElem?_map, List.getElem?_eq_getElem hu,
+                  Option.map_some, Option.some.injEq] using huv)
+            · right
+              exact hparentV.trans (by
+                simpa only [List.getElem?_map, List.getElem?_eq_getElem hv,
+                  Option.map_some, Option.some.injEq] using hvu)
+          · rintro (huv | hvu)
+            · refine ⟨by simpa using hu, by simpa using hv, hne, Or.inl ?_⟩
+              simpa only [List.getElem?_map, List.getElem?_eq_getElem hu, Option.map_some,
+                Option.some.injEq] using hparentU.symm.trans huv
+            · refine ⟨by simpa using hu, by simpa using hv, hne, Or.inr ?_⟩
+              simpa only [List.getElem?_map, List.getElem?_eq_getElem hv, Option.map_some,
+                Option.some.injEq] using hparentV.symm.trans hvu
         rw [ha, hb, hdir u v hu hne, hdir v u hv hne.symm,
           ← mutation_removal_symmetric remove u v]
         tauto

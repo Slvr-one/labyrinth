@@ -108,7 +108,8 @@ namespace Labyrinth
         refine ⟨v, 0, rfl, ?_⟩
         by_cases hc : v = child
         · simp [cut, hc]
-        · simp [cut, hc, he, hfixed]
+        · simp only [cut, hc, ite_false]
+          simpa only [he] using hfixed
       | succ k ih =>
         intro v hv
         by_cases hc : v = child

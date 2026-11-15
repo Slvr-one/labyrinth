@@ -43,7 +43,8 @@ theorem constructor_dfs_input_of_carrier (carrier : topology.Carrier) (root : Na
       (alloc.vec.Vec.deref carrier.neighbors) root := by
   let os := alloc.vec.Vec.deref carrier.offsets
   let ns := alloc.vec.Vec.deref carrier.neighbors
-  have hcount : constructorDFSVertexCount os = cellCount carrier := rfl
+  have hcount : constructorDFSVertexCount os = cellCount carrier := by
+    simp [os, constructorDFSVertexCount, cellCount, alloc.vec.Vec.deref]
   have hoff (v : Nat) : constructorDFSOffset os v = (offsets carrier)[v]?.getD 0 := by
     simp [os, constructorDFSOffset, offsets, alloc.vec.Vec.deref]
   have hfirst : constructorDFSOffset os 0 = 0 := by rw [hoff, h.2.1]; rfl
@@ -58,11 +59,12 @@ theorem constructor_dfs_input_of_carrier (carrier : topology.Carrier) (root : Na
     induction path with
     | refl => exact .refl
     | tail _ edge ih => exact (Relation.ReflTransGen.single (hsym edge)).trans ih
+  change ConstructorDFSInput os ns root
   refine {
     nonempty := by simpa only [hcount] using h.1
     root_lt := by simpa only [hcount] using hr
     first := hfirst
-    last := by simpa only [hcount] using hlast
+    last := by simpa [ns, alloc.vec.Vec.deref, hcount] using hlast
     ordered := ?_
     bounded := ?_
     reachable := ?_ }
@@ -72,11 +74,14 @@ theorem constructor_dfs_input_of_carrier (carrier : topology.Carrier) (root : Na
     obtain ⟨slot, hslot⟩ := List.mem_iff_getElem?.mp hm
     obtain ⟨hb, _⟩ := List.getElem?_eq_some_iff.mp hslot
     obtain ⟨u, hu, hlo, hhi⟩ := constructor_dfs_slot_covered
-      (constructorDFSOffset os) (cellCount carrier) slot hfirst (by rw [hlast]; exact hb)
+      (constructorDFSOffset os) (cellCount carrier) slot hfirst (by
+        rw [hlast]
+        simpa [ns, alloc.vec.Vec.deref] using hb)
     have hedge : carrierEdge carrier u value.val :=
       (constructor_dfs_carrier_arc_iff carrier u value.val).mp
-        ⟨by simpa only [hcount] using hu, slot, value, hlo, hhi, hslot, rfl⟩
-    exact (h.2.2.2.2.1 u hu).2.2 value.val hedge.2 |>.1
+        ⟨by simpa [constructorDFSVertexCount, cellCount, alloc.vec.Vec.deref] using hu,
+          slot, value, hlo, hhi, hslot, rfl⟩
+    simpa only [hcount] using ((h.2.2.2.2.1 u hu).2.2 value.val hedge.2).1
   · intro v hv
     have hp := (hreverse (h.2.2.2.2.2.1 root hr)).trans
       (h.2.2.2.2.2.1 v (by simpa only [hcount] using hv))
@@ -113,7 +118,9 @@ theorem constructor_dfs_output_tree_valid (carrier : topology.Carrier) (root : U
   intro v hv hne
   have hvn : v < cellCount carrier := by simpa only [hlen] using hv
   obtain ⟨parent, slot, value, hpa, _hin, hlo, hhi, hval, he⟩ :=
-    hout.incoming v hvn (by simpa only [hroot] using hne)
+    hout.incoming v (by
+      simpa [constructorDFSVertexCount, cellCount, alloc.vec.Vec.deref] using hvn)
+      (by simpa only [hroot] using hne)
   have hlookup : (parents published)[v]? = some parent.val := by
     simp [parents, hcopy, hvn, hpa]
   have hparent : parent.val < cellCount carrier := by
@@ -122,8 +129,9 @@ theorem constructor_dfs_output_tree_valid (carrier : topology.Carrier) (root : U
     simpa only [← hp, hlen] using hb
   have hedge : carrierEdge carrier parent.val v :=
     (constructor_dfs_carrier_arc_iff carrier parent.val v).mp
-      ⟨hparent, slot.val, value, hlo, hhi, hval, he⟩
+      ⟨by simpa [constructorDFSVertexCount, cellCount, alloc.vec.Vec.deref] using hparent,
+        slot.val, value, hlo, hhi, hval, he⟩
   have hreverse := (hc.2.2.2.2.1 parent.val hparent).2.2 v hedge.2
-  simpa only [parentAt, hlookup, Option.getD_some] using And.intro hvn hreverse.2
+  simpa only [carrierEdge, parentAt, hlookup, Option.getD_some] using And.intro hvn hreverse.2
 
 end Labyrinth

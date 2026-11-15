@@ -107,6 +107,7 @@ theorem constructor_scene_select_spec (work : spanning_tree.Workspace)
           intro nextCount hnc
           have hnc' : nextCount.val = count.val + 1 := by simpa using hnc
           apply (WP.spec_ok _).mpr
+          dsimp only
           refine ⟨rfl, by simpa using hlen, ?_, ?_, ?_⟩
           · unfold constructorSceneSelectedIndex at hcount ⊢
             split at hcount <;> split <;> omega

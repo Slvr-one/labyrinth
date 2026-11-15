@@ -24,12 +24,11 @@ theorem constructor_depth_first_accepts {R : Type*} (adapter : tree.Rng R)
     unfold constructorDFSVertexCount at h
     omega
   unfold spanning_tree.depth_first
-  apply WP.spec_bind (Usize.sub_spec (x := Slice.len offsets) (y := 1#usize) (by
-    simp only [Slice.len, UScalar.ofNatCore_val_eq]
-    omega))
+  apply WP.spec_bind (Usize.sub_spec (x := Slice.len offsets) (y := 1#usize)
+    (by simpa using Nat.succ_le_of_lt hnonempty))
   intro n hn
   have hnval : n.val = constructorDFSVertexCount offsets := by
-    simpa only [Slice.len, UScalar.ofNatCore_val_eq, constructorDFSVertexCount] using hn.1
+    simpa only [Slice.len_val, UScalar.ofNatCore_val_eq, constructorDFSVertexCount] using hn.1
   apply WP.spec_bind (mutation_clear_edits_total work hvalid)
   intro cleared hclear
   obtain ⟨hcvalid, _hccount, _hcseen, _hcframes, hcpath, _hcparents, _hcincoming,
@@ -52,7 +51,29 @@ theorem constructor_depth_first_accepts {R : Type*} (adapter : tree.Rng R)
   rintro ⟨status, rng'⟩ ⟨frame, hstatus, hcell, hremaining, _hempty, hnext⟩
   dsimp only at hstatus
   rw [hstatus]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  change WP.spec (do
+    let (_, backFrame) ← initialized.frames.index_mut_usize 0#usize
+    let (_, backSeen) ← initialized.seen.index_mut_usize root
+    let (rng'', seen, frames, parents, incoming, reached, loopStatus) ←
+      spanning_tree.depth_first_loop1 adapter offsets neighbors rng'
+        (backSeen true) (backFrame frame) initialized.parents initialized.incoming
+        1#usize 1#usize (.Ok ())
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch loopStatus
+    match cf with
+    | .Continue _ =>
+      if reached != n then
+        ok (.Err .Disconnected, rng'',
+          { initialized with seen := seen, frames := frames, parents := parents,
+            incoming := incoming })
+      else
+        ok (.Ok (), rng'', { initialized with seen := seen, frames := frames,
+          parents := parents, incoming := incoming })
+    | .Break residual => do
+      let result ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (result, rng'', { initialized with seen := seen, frames := frames,
+        parents := parents, incoming := incoming })) _
   have hframes : initialized.frames.val.length = work.path.val.length := by
     rw [hivalid.2.1, hpath]
   have hseen : initialized.seen.val.length = work.path.val.length := by rw [hivalid.1, hpath]
@@ -85,7 +106,14 @@ theorem constructor_depth_first_accepts {R : Type*} (adapter : tree.Rng R)
   rintro ⟨rng'', seen, frames, parents, incoming, reached, status⟩ ⟨hstatus, visited, rank, hfinal⟩
   dsimp only at hstatus hfinal
   rw [hstatus]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  change WP.spec
+    (if reached != n then
+      ok (.Err .Disconnected, rng'',
+        { initialized with seen := seen, frames := frames, parents := parents,
+          incoming := incoming })
+    else
+      ok (.Ok (), rng'', { initialized with seen := seen, frames := frames,
+        parents := parents, incoming := incoming })) _
   obtain ⟨_hvisited, hreached, hall⟩ := constructor_dfs_stack_empty_all_seen hinput hfinal
   have heq : reached = n := (UScalar.eq_equiv _ _).mpr (hreached.trans hnval.symm)
   simp only [heq, bne_self_eq_false, Bool.false_eq_true, ite_false]

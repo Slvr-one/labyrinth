@@ -116,7 +116,7 @@ namespace Labyrinth
           have hcap := w.path.property
           omega
         have hsame := hunchanged u hu hoff
-        simp [mutationVirtualParent, hslot, hs, hsame]
+        simp [mutationVirtualParent, hslot, hs, hsame, alloc.vec.Vec.deref, Slice.from_val]
       · obtain ⟨hslotLt, node, hnode, hnodeVal⟩ := hslotActive
         have hip : slot.val < w.parents.val.length := by omega
         let value := w.parents.val[slot.val]

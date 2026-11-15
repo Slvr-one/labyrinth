@@ -15,7 +15,7 @@ instance (count bytes : Usize) : Decidable (constructorStorageFits count bytes) 
   inferInstanceAs (Decidable (count.val * bytes.val ≤ Usize.max ∧
     count.val * bytes.val ≤ (IScalar.hcast .Usize core.num.Isize.MAX).val))
 
-private theorem constructor_checked_mul_some
+theorem constructor_checked_mul_some
     (x y : Usize) (h : x.val * y.val ≤ Usize.max) :
     ∃ z, Usize.checked_mul x y = some z ∧ z.val = x.val * y.val := by
   have hm := Usize.checked_mul_bv_spec x y
@@ -25,7 +25,7 @@ private theorem constructor_checked_mul_some
     simp only [he] at hm
     exact ⟨z, rfl, hm.2.1⟩
 
-private theorem constructor_check_storage_eq (count bytes : Usize) :
+theorem constructor_check_storage_eq (count bytes : Usize) :
     topology.check_storage count bytes =
       ok (if constructorStorageFits count bytes then .Ok () else .Err .Overflow) := by
   have hm := Usize.checked_mul_bv_spec count bytes

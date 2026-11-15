@@ -56,8 +56,11 @@ namespace Labyrinth
     · obtain ⟨k, hk⟩ := hreach
       cases k with
       | zero =>
-        have he : a.val = root := hk
-        exact ⟨0, by simpa only [he, hfixed] using hab.symm⟩
+        have ha : a.val = root := by
+          simpa only [Function.iterate_zero_apply] using hk
+        exact ⟨0, by
+          simp only [Function.iterate_zero_apply]
+          exact hab.symm.trans ((congrArg next ha).trans hfixed)⟩
       | succ k =>
         exact ⟨k, by simpa only [Function.iterate_succ_apply, hab] using hk⟩
     · obtain ⟨k, hk⟩ := hreach
@@ -98,10 +101,14 @@ namespace Labyrinth
     constructor
     · rintro (hold | ⟨hxu, hyv⟩ | ⟨hyu, hxv⟩)
       · exact Or.inl hold
-      · exact Or.inr ⟨Or.inl ⟨hxu, hyv⟩,
-          by intro he; apply huv; exact Fin.ext (hxu.symm.trans (he.trans hyv))⟩
-      · exact Or.inr ⟨Or.inr ⟨hxv, hyu⟩,
-          by intro he; apply huv; exact Fin.ext (hyu.symm.trans (he.symm.trans hxv))⟩
+      · have hxu' : x = u := Fin.ext hxu
+        have hyv' : y = v := Fin.ext hyv
+        exact Or.inr ⟨Or.inl ⟨hxu', hyv'⟩, by
+          simpa only [hxu', hyv'] using huv⟩
+      · have hyu' : y = u := Fin.ext hyu
+        have hxv' : x = v := Fin.ext hxv
+        exact Or.inr ⟨Or.inr ⟨hxv', hyu'⟩, by
+          simpa only [hyu', hxv'] using huv.symm⟩
     · rintro (hold | ⟨hnew, _⟩)
       · exact Or.inl hold
       · rcases hnew with h | h

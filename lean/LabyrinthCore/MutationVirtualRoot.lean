@@ -99,15 +99,17 @@ namespace Labyrinth
             simp only [Bool.false_eq_true, ite_false]
             obtain ⟨hcell, hprefix⟩ := hwalking rfl
             apply spec_bind (mutation_workspace_parent_exact w (alloc.vec.Vec.deref t.parents)
-              cell hw (by dsimp [n] at hltCellNat; omega) hltCellNat)
+              cell hw (by dsimp [n] at hltCellNat; omega)
+              (by simpa only [alloc.vec.Vec.deref, Slice.from_val, n] using hltCellNat))
             intro parent hparent
             have hparentVal : parent.val = next cell.val := hparent
             by_cases heq : parent = cell
             · simp only [heq, ite_true, bind_ok]
               apply spec_bind (Usize.add_spec (x := steps) (y := 1#usize) (by
-                have := t.parents.property
-                dsimp [n] at hltStepsNat
-                scalar_tac))
+                change steps.val + 1 ≤ Usize.max
+                have hmax := t.parents.property
+                dsimp only [n] at hltStepsNat
+                omega))
               intro steps' hsteps'
               have hstepsVal : steps'.val = steps.val + 1 := by simpa using hsteps'
               simp only [spec_ok]
@@ -121,9 +123,10 @@ namespace Labyrinth
                 · exact (hprefix j (by omega)).1
             · simp only [heq, ite_false, bind_ok]
               apply spec_bind (Usize.add_spec (x := steps) (y := 1#usize) (by
-                have := t.parents.property
-                dsimp [n] at hltStepsNat
-                scalar_tac))
+                change steps.val + 1 ≤ Usize.max
+                have hmax := t.parents.property
+                dsimp only [n] at hltStepsNat
+                omega))
               intro steps' hsteps'
               have hstepsVal : steps'.val = steps.val + 1 := by simpa using hsteps'
               simp only [spec_ok]
@@ -153,7 +156,7 @@ namespace Labyrinth
   cases found with
   | false =>
     have hnot := hnotfound rfl
-    simpa [witness, next, n, hnot]
+    simp [witness, next, n, hnot]
   | true =>
     have hyes := hfound rfl
     have hexists : ∃ root, witness root := ⟨cell.val, hyes⟩

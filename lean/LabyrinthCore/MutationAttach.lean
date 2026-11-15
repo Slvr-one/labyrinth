@@ -89,11 +89,13 @@ namespace Labyrinth
           have hxBound : x.val < scratch.path.val.length := by
             rw [hpath]
             exact hbounded i (by omega) x hx
-          rw [hupdate x.val hxBound, if_neg hne]
+          rw [hupdate x.val hxBound]
+          simp only [hne, ite_false]
           exact hassigned i hi hiOld x prev hx hprev
       · intro u hu hoff
         have hne : u ≠ node.val := Ne.symm (hoff j.val hj (by omega) node hnodeGet)
-        rw [hupdate u (by simpa only [hpath] using hu), if_neg hne]
+        rw [hupdate u (by simpa only [hpath] using hu)]
+        simp only [hne, ite_false]
         exact hunchanged u hu (fun i hi hij x hx => hoff i hi (by omega) x hx)
     · have heq : j.val = count.val := by
         have hge : count.val ≤ j.val := Nat.le_of_not_lt hlt
@@ -101,6 +103,7 @@ namespace Labyrinth
       simpa [hlt, heq] using And.intro hvalid (And.intro hpath (And.intro hassigned hunchanged))
   · refine ⟨hw, rfl, by simp, by simpa using hcount, ?_, ?_⟩
     · intro i hi hil
+      change i < 1 at hil
       omega
     · intro u hu hoff
       rfl
@@ -157,7 +160,8 @@ namespace Labyrinth
         have he : used.val = k := by omega
         apply heq
         apply UScalar.eq_of_val_eq
-        simpa only [he, hreach] using hcurrent
+        rw [he] at hcurrent
+        exact hcurrent.trans hreach
       have hindex : used.val < scratch.path.val.length := by omega
       apply spec_bind (alloc.vec.Vec.index_mut_usize_spec scratch.path used hindex)
       rintro ⟨old, back⟩ ⟨_, hback⟩
@@ -169,7 +173,8 @@ namespace Labyrinth
         (scratch.path.set used current) hvalid (by simp)
       apply spec_bind (mutation_workspace_parent_exact
         { scratch with path := scratch.path.set used current } (alloc.vec.Vec.deref v)
-        current hnewValid (by simp; omega) (by simpa only [hn] using hcurrentBound))
+        current hnewValid (by simp; omega)
+          (by simpa only [alloc.vec.Vec.deref, Slice.from_val, hn] using hcurrentBound))
       intro parent hparent
       have hparentVal : parent.val = next current.val := by
         simpa only [mutationVirtualParent, next, hparents, hslots] using hparent
