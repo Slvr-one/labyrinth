@@ -11,10 +11,10 @@ open Aeneas Aeneas.Std Aeneas.Std.WP labyrinth_core
 
 namespace Labyrinth
 
-/-- Totality and publication framing for the actual sparse batch operation.  This is the
-outer operational theorem used by the structural refinement below: every internal walk
-terminates, errors retain the published tree, and reusable workspace shape stays valid. -/
-theorem mutation_edit_edges_total_frame
+/-- Totality, publication framing, and structural validity for the actual sparse batch
+operation. Every internal walk terminates, errors retain the published tree, and every
+successful result is a valid tree with exactly the requested edge edit. -/
+theorem mutation_edit_edges_tree_valid
     (c : topology.Carrier) (t : spanning_tree.Tree)
     (remove add : Slice topology.Edge) (w : spanning_tree.Workspace)
     (hc : CarrierValid c) (ht : TreeValid c t) (hw : WorkspaceValid w)
@@ -28,7 +28,8 @@ theorem mutation_edit_edges_total_frame
         out.2.1.root = t.root ∧ out.2.1.parents.val.length = t.parents.val.length ∧
         (∀ u v, parentEdge (parents out.2.1) u v ↔
           MutationEditedEdge (parents t) remove add u v) ∧
-        ∀ u v, parentEdge (parents out.2.1) u v → carrierEdge c u v) ⦄ := by
+        (∀ u v, parentEdge (parents out.2.1) u v → carrierEdge c u v) ∧
+        TreeValid c out.2.1) ⦄ := by
   classical
   have herrorReturn (error : topology.Error) (work : spanning_tree.Workspace)
       (hvalid : WorkspaceValid work) (hlength : work.path.val.length = w.path.val.length) :
@@ -44,7 +45,8 @@ theorem mutation_edit_edges_total_frame
             out.2.1.root = t.root ∧ out.2.1.parents.val.length = t.parents.val.length ∧
             (∀ u v, parentEdge (parents out.2.1) u v ↔
               MutationEditedEdge (parents t) remove add u v) ∧
-            ∀ u v, parentEdge (parents out.2.1) u v → carrierEdge c u v) ⦄ := by
+            (∀ u v, parentEdge (parents out.2.1) u v → carrierEdge c u v) ∧
+            TreeValid c out.2.1) ⦄ := by
     have hconvert : Result.ok (core.convert.FromSame.from error)
         ⦃ actual => actual = core.convert.FromSame.from error ⦄ := (spec_ok _).mpr rfl
     have hresidual :
@@ -169,17 +171,108 @@ theorem mutation_edit_edges_total_frame
               simpa only [parents, List.length_map] using hcutParents')
           have hresultEdges := mutation_committed_edit_edges_exact t.parents result cut attached
             remove add hresultLength hresultParents hcutEdges (hattachedEdges rfl)
+          have hfinalEdges : ∀ u v,
+              mutationFunctionalEdge t.parents.val.length
+                  (mutationVirtualParent attached (alloc.vec.Vec.deref t.parents)) u v ↔
+                MutationEditedEdge (parents t) remove add u v := by
+            intro u v
+            rw [hattachedEdges rfl u v, hcutEdges u v, mutation_added_before_full]
+            rfl
+          have hfinalTree := mutation_functional_edit_isTree c t remove add
+            (mutationVirtualParent attached (alloc.vec.Vec.deref t.parents))
+            hc ht hlengthNat hentries hfinalEdges hattachedGraph
+          have hresultParentLength :
+              (result.val.map (fun x : Usize => x.val)).length =
+                t.parents.val.length := by
+            simpa only [List.length_map] using hresultLength
+          have hresultRooted :
+              RootedTree (result.val.map (fun x : Usize => x.val)) t.root.val := by
+            apply mutation_functional_connected_rooted
+              (result.val.map (fun x : Usize => x.val)) t.root.val
+              (mutationVirtualParent attached (alloc.vec.Vec.deref t.parents))
+            · rw [hresultParentLength]
+              simpa only [parents, List.length_map] using ht.2.1.1
+            · intro u hu
+              rw [hresultParentLength] at hu ⊢
+              exact mutation_functional_forest_bounds t.parents.val.length
+                (mutationVirtualParent attached (alloc.vec.Vec.deref t.parents))
+                hattachedForest u hu
+            · exact hattachedRoot
+            · intro u hu
+              have hresult : u < result.val.length := by simpa only [List.length_map] using hu
+              simpa [parentAt, hresult] using hresultParents u (by
+                rw [← hresultParentLength]
+                exact hu)
+            · rw [hresultParentLength]
+              exact hfinalTree.connected
+          have hresultCarrier : ∀ u v,
+              parentEdge (parents (spanning_tree.Tree.mk result t.root)) u v →
+                carrierEdge c u v := by
+            intro u v hedge
+            apply mutation_edited_edge_carrier c t remove add hc ht hadd u v
+            exact (hresultEdges u v).mp (by simpa only [parents] using hedge)
+          have hresultValid : TreeValid c (spanning_tree.Tree.mk result t.root) := by
+            refine ⟨?_, hresultRooted, ?_⟩
+            · simpa only [parents, List.length_map, hresultLength] using ht.1
+            · intro u hu hnonroot
+              have hu' : u < (result.val.map (fun x : Usize => x.val)).length := by
+                simpa only [parents] using hu
+              have hnonroot' : u ≠ t.root.val := by simpa only using hnonroot
+              have hparentMem :
+                  parentAt (result.val.map (fun x : Usize => x.val)) u ∈
+                    result.val.map (fun x : Usize => x.val) := by
+                simp only [parentAt, List.getElem?_eq_getElem hu', Option.getD_some]
+                exact List.getElem_mem hu'
+              have hparentBound : parentAt (result.val.map (fun x : Usize => x.val)) u <
+                  (result.val.map (fun x : Usize => x.val)).length :=
+                hresultRooted.2.2.1 _ hparentMem
+              have huResult : u < result.val.length := by
+                simpa only [List.length_map] using hu'
+              have hparentGet :
+                  (result.val.map (fun x : Usize => x.val))[u]? =
+                    some (parentAt (result.val.map (fun x : Usize => x.val)) u) := by
+                simp [parentAt, huResult]
+              have hedge : parentEdge (result.val.map (fun x : Usize => x.val)) u
+                  (parentAt (result.val.map (fun x : Usize => x.val)) u) :=
+                ⟨hu', hparentBound,
+                  mutation_rooted_nonroot_parent_ne _ t.root.val u
+                    hresultRooted hu' hnonroot',
+                  Or.inl hparentGet⟩
+              apply hresultCarrier u (parentAt (result.val.map (fun x : Usize => x.val)) u)
+              simpa only [parents] using hedge
           refine ⟨hattachedValid,
             by simpa only using hattachedLength.trans (hcutPath ▸ hclearPath ▸ rfl),
             by simp, ?_⟩
           intro _
-          refine ⟨by simp, by simp [hresultLength],
-            by simpa only [parents] using hresultEdges, ?_⟩
-          intro u v hedge
-          apply mutation_edited_edge_carrier c t remove add hc ht hadd u v
-          exact (hresultEdges u v).mp (by simpa only [parents] using hedge)
+          exact ⟨by simp, by simp [hresultLength],
+            by simpa only [parents] using hresultEdges, hresultCarrier, hresultValid⟩
   · have hne : (Slice.len remove != Slice.len add) = true := by simp [hlength]
     simp only [hne, ite_true, spec_ok]
     simp [hw]
 
+
+/-- The original total/frame view, retained for callers that do not need the structural
+success refinement. -/
+theorem mutation_edit_edges_total_frame
+    (c : topology.Carrier) (t : spanning_tree.Tree)
+    (remove add : Slice topology.Edge) (w : spanning_tree.Workspace)
+    (hc : CarrierValid c) (ht : TreeValid c t) (hw : WorkspaceValid w)
+    (hcapacity : t.parents.val.length ≤ w.path.val.length)
+    (hedgeCapacity : c.edges.val.length ≤ w.edge_capacity.val) :
+    spanning_tree.Tree.edit_edges t c remove add w ⦃ out =>
+      WorkspaceValid out.2.2 ∧
+      out.2.2.path.val.length = w.path.val.length ∧
+      (∀ error, out.1 = core.result.Result.Err error → out.2.1 = t) ∧
+      (out.1 = core.result.Result.Ok () →
+        out.2.1.root = t.root ∧ out.2.1.parents.val.length = t.parents.val.length ∧
+        (∀ u v, parentEdge (parents out.2.1) u v ↔
+          MutationEditedEdge (parents t) remove add u v) ∧
+        ∀ u v, parentEdge (parents out.2.1) u v → carrierEdge c u v) ⦄ := by
+  apply spec_mono
+    (mutation_edit_edges_tree_valid c t remove add w hc ht hw hcapacity hedgeCapacity)
+  intro out h
+  refine ⟨h.1, h.2.1, h.2.2.1, ?_⟩
+  intro hok
+  have hs := h.2.2.2 hok
+  exact ⟨hs.1, hs.2.1, hs.2.2.1, hs.2.2.2.1⟩
 end Labyrinth

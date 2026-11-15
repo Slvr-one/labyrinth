@@ -24,3 +24,4 @@ import LabyrinthCore.ConstructorQuotientDFS
 #print axioms Labyrinth.constructor_tree_dfs_spec
 #print axioms Labyrinth.mutation_edit_edges_total_frame
 #print axioms Labyrinth.constructor_quotient_depth_first_accepts
+#print axioms Labyrinth.mutation_edit_edges_tree_valid
