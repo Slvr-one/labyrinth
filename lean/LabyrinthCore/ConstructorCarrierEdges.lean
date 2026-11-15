@@ -402,8 +402,9 @@ theorem constructor_carrier_from_filled_csr_accepts
         hedges hcapacity hseparated hlen hstarts hstops hfilled _ _).mpr hedge)
 
 /-- Every nonempty connected simple bounded input edge list is accepted by the
-actual edge-list constructor on representable allocations. -/
-theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topology.Edge)
+actual edge-list constructor on representable allocations, and the returned CSR has exactly
+the undirected input adjacency. -/
+theorem constructor_carrier_from_edges_accepts_exact (n : Usize) (edges : Slice topology.Edge)
     (hn : n ≠ 0#usize)
     (hedges : ∀ edge ∈ edges.val,
       edge.u.val < n.val ∧ edge.v.val < n.val ∧ edge.u ≠ edge.v)
@@ -414,7 +415,11 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
           (u = edge.v.val ∧ v = edge.u.val)) 0 v)
     (hwidth : constructorEdgesStorageFits n edges) :
     WP.spec (topology.Carrier.from_edges n edges) (fun result =>
-      ∃ carrier, result = .Ok carrier ∧ CarrierValid carrier) := by
+      ∃ carrier, result = .Ok carrier ∧ CarrierValid carrier ∧
+        cellCount carrier = n.val ∧
+        ∀ u v, carrierEdge carrier u v ↔
+          ∃ edge ∈ edges.val, (u = edge.u.val ∧ v = edge.v.val) ∨
+            (u = edge.v.val ∧ v = edge.u.val)) := by
   obtain ⟨hadd, htwice, hcountMax, hcountStorage, hneighborMax, hneighborStorage,
     hedgeStorage⟩ := hwidth
   obtain ⟨count, hchecked, hcount⟩ := constructor_checked_add_some n 1#usize (by
@@ -596,6 +601,32 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
     neighbors.val n.val offsets filled hnpos hedges hcapacity hseparated hsimple
     hoffsetsLength hfirst hlast hraw (fun _ _ => rfl)
     (fun cell hc => (hrows cell hc).symm) hfilled hconnected hcsrWidth)
+  rintro result ⟨carrier, hr, hc, hoffsets, hneighbors⟩
+  refine ⟨carrier, hr, hc, ?_, ?_⟩
+  · unfold cellCount
+    rw [hoffsets, hoffsetsLength]
+    omega
+  intro u v
+  rw [constructor_carrier_edge_iff, hoffsets, hneighbors]
+  exact constructor_filled_csr_adjacent edges.val starts neighbors.val n.val offsets filled
+    hedges hcapacity hseparated hoffsetsLength (fun _ _ => rfl)
+      (fun cell hc => (hrows cell hc).symm) hfilled u v
+  
+/-- Compatibility projection of exact edge-list acceptance to the public carrier invariant. -/
+theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topology.Edge)
+    (hn : n ≠ 0#usize)
+    (hedges : ∀ edge ∈ edges.val,
+      edge.u.val < n.val ∧ edge.v.val < n.val ∧ edge.u ≠ edge.v)
+    (hsimple : constructorEdgesSimple edges.val)
+    (hconnected : ∀ v, v < n.val →
+      Relation.ReflTransGen (fun u v =>
+        ∃ edge ∈ edges.val, (u = edge.u.val ∧ v = edge.v.val) ∨
+          (u = edge.v.val ∧ v = edge.u.val)) 0 v)
+    (hwidth : constructorEdgesStorageFits n edges) :
+    WP.spec (topology.Carrier.from_edges n edges) (fun result =>
+      ∃ carrier, result = .Ok carrier ∧ CarrierValid carrier) := by
+  apply WP.spec_mono
+    (constructor_carrier_from_edges_accepts_exact n edges hn hedges hsimple hconnected hwidth)
   rintro result ⟨carrier, hr, hc, _, _⟩
   exact ⟨carrier, hr, hc⟩
 

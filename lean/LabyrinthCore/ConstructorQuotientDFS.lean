@@ -340,4 +340,63 @@ theorem constructor_quotient_dfs_original_incoming
   obtain ⟨actual, original, _, hwitness⟩ := hfilled slot.val hoccupied
   exact ⟨(slot, original), hincoming, hwitness⟩
 
+/-- The exact incoming quotient slot also retains an original carrier edge whose endpoint
+classes are the actual parent and child chosen by DFS. -/
+theorem constructor_quotient_dfs_selected_witness
+    (carrier : topology.Carrier) (edges : List topology.Edge)
+    (label : Usize → Usize) (start : Usize → Nat) (rowOf : Nat → Usize)
+    (count root : Usize) (offsets : Slice Usize) (neighbors : alloc.vec.Vec Usize)
+    (witnesses : alloc.vec.Vec topology.Edge)
+    (before after : spanning_tree.Workspace)
+    (hcount : constructorDFSVertexCount offsets = count.val)
+    (hstart : ∀ row : Usize, row.val < count.val →
+      constructorDFSOffset offsets row.val = start row)
+    (hstop : ∀ row : Usize, row.val < count.val →
+      constructorDFSOffset offsets (row.val + 1) =
+        start row + constructorQuotientRowCount edges label row edges.length)
+    (hrows : ∀ row : Usize, row.val < count.val → ∀ slot,
+      start row ≤ slot →
+      slot < start row + constructorQuotientRowCount edges label row edges.length →
+        rowOf slot = row)
+    (hfilled : ∀ slot, constructorQuotientFilled edges label start count edges.length slot →
+      ∃ value original, neighbors.val[slot]? = some value ∧
+        witnesses.val[slot]? = some original ∧
+        constructorQuotientSlotWitness carrier label (rowOf slot) value original)
+    (hout : ConstructorDFSOutput offsets neighbors.slice root before after) :
+    ∀ node : Usize, node.val < count.val → node ≠ root →
+      ∃ parent slot original,
+        after.parents.val[node.val]? = some parent ∧
+        after.incoming.val[node.val]? = some slot ∧
+        witnesses.val[slot.val]? = some original ∧
+        constructorQuotientSlotWitness carrier label parent node original := by
+  intro node hnode hnonroot
+  obtain ⟨parent, slot, value, hparent, hincoming, hlo, hhi, hneighbor, hvalue⟩ :=
+    hout.incoming node.val (by simpa only [hcount] using hnode) (by
+      intro he
+      exact hnonroot ((UScalar.eq_equiv _ _).mpr he))
+  have hparentOutput :
+      (constructorDFSParents offsets after)[node.val]? = some parent.val := by
+    simp [constructorDFSParents, hcount, hnode, hparent]
+  have hparentBound : parent.val < count.val := by
+    have hparentList := hout.tree.2.2.1 parent.val
+      (List.mem_of_getElem? hparentOutput)
+    have hlength :
+        (constructorDFSParents offsets after).length ≤ count.val := by
+      simp [constructorDFSParents, hcount]
+    omega
+  have hoccupied :
+      constructorQuotientFilled edges label start count edges.length slot.val := by
+    exact ⟨parent, hparentBound, by simpa only [hstart parent hparentBound] using hlo,
+      by simpa only [hstop parent hparentBound] using hhi⟩
+  obtain ⟨actual, original, hactual, hwitness, hsemantic⟩ :=
+    hfilled slot.val hoccupied
+  have hactualValue : actual = value := Option.some.inj (hactual.symm.trans hneighbor)
+  have hvalueNode : value = node := (UScalar.eq_equiv _ _).mpr hvalue
+  have hrow : rowOf slot.val = parent :=
+    hrows parent hparentBound slot.val
+      (by simpa only [hstart parent hparentBound] using hlo)
+      (by simpa only [hstop parent hparentBound] using hhi)
+  refine ⟨parent, slot, original, hparent, hincoming, hwitness, ?_⟩
+  simpa only [hrow, hactualValue, hvalueNode] using hsemantic
+
 end Labyrinth

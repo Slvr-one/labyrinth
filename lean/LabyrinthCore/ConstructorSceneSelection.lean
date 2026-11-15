@@ -10,6 +10,23 @@ namespace Labyrinth
 /-- Number of nonroot component IDs strictly below an index. -/
 def constructorSceneSelectedIndex (required root index : Nat) : Nat :=
   required + index - (if root < index then 1 else 0)
+/-- Original edge stored at the incoming slot selected by quotient DFS, with a total fallback
+outside the proved nonroot component range. -/
+def constructorSceneChosenWitness (work : spanning_tree.Workspace)
+    (witnesses : alloc.vec.Vec topology.Edge) (node : Nat) : topology.Edge :=
+  let fallback : topology.Edge := { u := 0#usize, v := 0#usize }
+  match work.incoming.val[node]? with
+  | some slot => (witnesses.val[slot.val]?).getD fallback
+  | none => fallback
+
+theorem constructor_scene_chosen_witness_eq (work : spanning_tree.Workspace)
+    (witnesses : alloc.vec.Vec topology.Edge) (node : Nat)
+    (slot : Usize) (edge : topology.Edge)
+    (hincoming : work.incoming.val[node]? = some slot)
+    (hwitness : witnesses.val[slot.val]? = some edge) :
+    constructorSceneChosenWitness work witnesses node = edge := by
+  simp [constructorSceneChosenWitness, hincoming, hwitness]
+
 
 /-- Actual expansion copies one original witness per nonroot component and preserves the forest prefix.
 The witness hypothesis is precisely a bounded incoming slot lookup, allowing parallel quotient edges. -/
@@ -265,4 +282,50 @@ theorem constructor_scene_selected_from_outputs_spec (work : spanning_tree.Works
     omega
   exact constructor_scene_selected_actual_spec work required componentCount quotientRoot
     witnesses selected chosen hroot hincoming hwitness hcardinality
+
+/-- The incoming-slot theorem supplies the concrete witness function used by the actual selection
+loops, so no selected original edge is assumed. -/
+theorem constructor_scene_selected_from_dfs_output_spec (work : spanning_tree.Workspace)
+    (n : Usize) (required : Slice topology.Edge) (links : alloc.vec.Vec Usize)
+    (componentCount quotientRoot : Usize) (witnesses : alloc.vec.Vec topology.Edge)
+    (selected : alloc.vec.Vec topology.Edge)
+    (hroot : quotientRoot.val < componentCount.val)
+    (hincomingCapacity : componentCount.val ≤ work.incoming.val.length)
+    (hincoming : ∀ node : Usize, node.val < componentCount.val → node ≠ quotientRoot →
+      ∃ retained : Usize × topology.Edge,
+        work.incoming.val[node.val]? = some retained.1 ∧
+        witnesses.val[retained.1.val]? = some retained.2)
+    (hforestCount :
+      required.val.length + constructorSceneRootCount links = n.val)
+    (hcomponentCount :
+      componentCount.val = constructorSceneRootCount links)
+    (hselectedLength : selected.val.length = n.val - 1) :
+    WP.spec (do
+      let selected1 ← spanning_tree.Tree.scene_dfs_loop6 required 0#usize selected
+      spanning_tree.Tree.scene_dfs_loop7 work 0#usize componentCount witnesses
+        quotientRoot selected1 (Slice.len required)) (fun output =>
+      output.1 = work ∧ output.2.val.length = selected.val.length ∧
+      ∀ slot, slot < output.2.val.length →
+        (slot < required.val.length ∧
+          output.2.val[slot]? =
+            (required.val[slot]?).map constructorCanonicalEdge) ∨
+        ∃ node, node < componentCount.val ∧ node ≠ quotientRoot.val ∧
+          slot = constructorSceneSelectedIndex required.val.length quotientRoot.val node ∧
+          output.2.val[slot]? =
+            some (constructorSceneChosenWitness work witnesses node)) := by
+  have hwitness : ∀ node : Usize, node.val < componentCount.val → node ≠ quotientRoot →
+      ∃ slot : Usize, work.incoming.val[node.val]? = some slot ∧
+        slot.val < witnesses.val.length ∧
+        witnesses.val[slot.val]? =
+          some (constructorSceneChosenWitness work witnesses node.val) := by
+    intro node hnode hnonroot
+    obtain ⟨⟨slot, edge⟩, hslot, hedge⟩ := hincoming node hnode hnonroot
+    have hslotBound : slot.val < witnesses.val.length :=
+      (List.getElem?_eq_some_iff.mp hedge).1
+    refine ⟨slot, hslot, hslotBound, ?_⟩
+    simpa only [constructor_scene_chosen_witness_eq work witnesses node.val slot edge hslot hedge]
+      using hedge
+  exact constructor_scene_selected_from_outputs_spec work n required links componentCount
+    quotientRoot witnesses selected (constructorSceneChosenWitness work witnesses) hroot
+    hincomingCapacity hwitness hforestCount hcomponentCount hselectedLength
 end Labyrinth

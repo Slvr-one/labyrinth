@@ -139,12 +139,13 @@ specifications. Generic DFS accepts bounded, root-reachable directed CSR, includ
 arcs, under a total range-correct RNG contract. It proves all vertices discovered, a rooted
 parent tree and exact incoming original-slot witnesses. The public `Tree::dfs` specification
 returns `TreeValid` on valid carrier inputs with sufficient workspace and preserves RNG and
-workspace on invalid-root or insufficient-capacity rejection. The twenty-three production roots
+workspace on invalid-root or insufficient-capacity rejection. The twenty-four production roots
 listed in `Audit.lean` use only the standard axioms above.
 
 Checked helper composition now includes exact required-forest components, dense quotient
 labels, degree counting, occupied-slot witnesses, quotient reachability, actual quotient DFS
-acceptance, expansion connectivity and sparse batch attachment. The current handwritten library builds strictly; those helpers
+acceptance, expanded selected-carrier acceptance and sparse batch attachment. The current
+handwritten library builds strictly; those helpers
 do not yet establish complete constrained-constructor or
 scene-publication specifications. The full source-extraction/correspondence gate remains
 incomplete.
