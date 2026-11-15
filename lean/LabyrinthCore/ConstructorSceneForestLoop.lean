@@ -108,16 +108,12 @@ theorem constructor_scene_forest_loop_accepts (carrier : topology.Carrier)
         constructorMergedRank rank component winner loser,
         constructorMergedComponent component winner loser, ?_, ?_, ?_, ?_⟩, by omega⟩
       · change joinedLinks.val.length = links.val.length
-        simpa [hlinked] using hll
+        simpa [hlinked, alloc.vec.Vec.val] using hll
       · change joinedSizes.val.length = joinedLinks.val.length
-        simpa [hlinked, hsized] using hsl
-      · change constructorRankedLinks joinedLinks (constructorMergedRank rank component winner loser)
-        simpa only [hlinked] using hpreserved.1
-      · change constructorComponentLabels joinedLinks (constructorMergedComponent component winner loser)
-        simpa only [hlinked] using hpreserved.2
-      · change constructorComponentSizes vertices joinedLinks joinedSizes
-          (constructorMergedComponent component winner loser)
-        simpa only [hlinked, hsized] using hsizesPreserved
+        simpa [hlinked, hsized, alloc.vec.Vec.val] using hsl
+      · simpa only [hlinked] using hpreserved.1
+      · simpa only [hlinked] using hpreserved.2
+      · simpa only [hlinked, hsized] using hsizesPreserved
       · intro u v
         simpa only [hn'] using constructor_required_prefix_merge_iff required index.val edge hedgeLookup
           component winner loser hcomponent hchoice u v

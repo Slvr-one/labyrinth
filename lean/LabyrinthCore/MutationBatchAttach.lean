@@ -63,7 +63,7 @@ namespace Labyrinth
       exact hau.trans ((congrArg UScalar.val he).trans hbv.symm)
     · intro hne
       exact ⟨rootU.val, rootV.val, hrootU, hrootV, fun he => hne (UScalar.eq_of_val_eq he)⟩
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  simp only [bind_ok]
   by_cases heq : rootU = rootV
   · simp only [heq, ite_true]
     apply (spec_ok _).mpr
@@ -163,8 +163,8 @@ namespace Labyrinth
         simp only [core.result.Result.is_ok, bind_ok, Bool.false_eq_true, ite_false]
         apply (spec_ok _).mpr
         exact ⟨hvalid, hlength, hins, htree, hrootFixed, hgraph, by simp⟩
-      | Ok unit =>
-        cases unit
+      | Ok payload =>
+        cases payload
         simp only [core.result.Result.is_ok, bind_ok, ite_true]
         apply spec_bind (Slice.index_usize_spec add i hltNat)
         intro edge hedge
@@ -179,14 +179,16 @@ namespace Labyrinth
         rintro ⟨nextStatus, nextWork⟩
           ⟨⟨hnextValid, hnextLen, hnextWithin, hnextForest,
             hnextFixed, herrorFrame, hnewEdges⟩, hacceptance⟩
+        dsimp only at hnextValid hnextLen hnextWithin hnextForest hnextFixed herrorFrame hnewEdges hacceptance
         have hnextGraph : (mutationFunctionalGraph t.parents.val.length
             (mutationVirtualParent nextWork (alloc.vec.Vec.deref t.parents))).IsAcyclic := by
           cases nextStatus with
           | Err error =>
-            rw [herrorFrame error rfl]
+            have hframe : nextWork = scratch := herrorFrame error rfl
+            rw [hframe]
             exact hgraph
-          | Ok unit =>
-            cases unit
+          | Ok payload =>
+            cases payload
             obtain ⟨a, b, ha, hb, hne⟩ := hacceptance.mp rfl
             exact mutation_functional_attach_acyclic t.parents.val.length
               (mutationVirtualParent scratch (alloc.vec.Vec.deref t.parents))
@@ -200,7 +202,8 @@ namespace Labyrinth
         have hn : next.val = i.val + 1 := by simpa using hnext
         apply (spec_ok _).mpr
         refine ⟨⟨hnextValid, hnextLen.trans hlength, hnextWithin, hnextForest,
-          hnextFixed, hnextGraph, by omega, ?_⟩, by omega⟩
+          hnextFixed, hnextGraph, (by change next.val ≤ add.val.length; omega), ?_⟩,
+          (by change add.val.length - next.val < add.val.length - i.val; omega)⟩
         intro hok u v
         have hsplit : mutationAddedBefore add next.val u v ↔
             mutationAddedBefore add i.val u v ∨
@@ -230,6 +233,6 @@ namespace Labyrinth
       simpa only [exactEdges, he] using hexact hok
   · refine ⟨hw, rfl, hwithin, hforest, hfixed, hacyclic, by simp, ?_⟩
     intro _ u v
-    simp [exactEdges, mutationAddedBefore]
+    simp [mutationAddedBefore]
 
 end Labyrinth

@@ -122,13 +122,16 @@ theorem constructor_quotient_degrees_spec (components : alloc.vec.Vec Usize)
             have := edges.property
             omega
           apply WP.spec_bind (constructor_count_edge_accepts current.slice componentCount canonical
-            hcanonical.1 hcanonical.2.1 hcanonical.2.2 (by omega)
+            hcanonical.1 hcanonical.2.1 hcanonical.2.2 (by
+              simpa only [alloc.vec.Vec.val] using (show componentCount.val + 1 ≤ current.val.length by omega))
             degreeU degreeV hdu hdv hduw hdvw)
           rintro ⟨nextStatus, nextSlice⟩ hs
           dsimp only at hs
           obtain ⟨hok, hslen, nextU, nextV, hnu, hnv, hlu', hlv', hframe⟩ := hs
           apply (WP.spec_ok _).mpr
-          refine ⟨hok, by simpa only [hlen] using hslen, ?_⟩
+          refine ⟨hok, ?_, ?_⟩
+          · change nextSlice.val.length = counts.val.length
+            exact hslen.trans (by simpa only [alloc.vec.Vec.val] using hlen)
           intro j hj
           by_cases hju : j = canonical.u.val + 1
           · subst j
@@ -142,8 +145,12 @@ theorem constructor_quotient_degrees_spec (components : alloc.vec.Vec Usize)
                 canonical, or_true, ite_true] using hnv.trans (congrArg (· + 1) hdvc)
             · obtain ⟨value, hv, hc⟩ := hcounts j hj
               refine ⟨value, (hframe j hju hjv).trans hv, ?_⟩
+              have hju' : j ≠
+                  (constructorCanonicalEdge { u := label edge.u, v := label edge.v }).u.val + 1 := hju
+              have hjv' : j ≠
+                  (constructorCanonicalEdge { u := label edge.u, v := label edge.v }).v.val + 1 := hjv
               simpa only [constructorQuotientDegreeSlot, heLookup, hne, ite_false,
-                ← canonical, hju, hjv, false_or] using hc
+                hju', hjv', false_or] using hc
       apply WP.spec_bind hstep
       rintro ⟨newStatus, newCounts⟩ ⟨hok, hnewLen, hnewCounts⟩
       dsimp only at hok hnewLen hnewCounts

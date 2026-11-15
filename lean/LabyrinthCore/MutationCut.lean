@@ -81,8 +81,7 @@ namespace Labyrinth
       have hchoose : (if parent = edge.v then Result.ok edge.u else Result.ok edge.v) ⦃ child =>
           child.val = mutationCutChild v edge ∧ child.val < v.val.length ⦄ := by
         by_cases he : parent = edge.v
-        · have hev : parent.val = edge.v.val := congrArg UScalar.val he
-          simp [he, mutationCutChild, ← hp, hev, hu]
+        · simp [he, mutationCutChild, ← hp, hu]
         · have hne : parent.val ≠ edge.v.val := fun h => he (UScalar.eq_of_val_eq h)
           simp [he, mutationCutChild, ← hp, hne, hv]
       apply spec_bind hchoose

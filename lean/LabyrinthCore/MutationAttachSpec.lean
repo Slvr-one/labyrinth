@@ -108,7 +108,7 @@ namespace Labyrinth
     obtain ⟨expected, hexpected, hval⟩ := hpath i (by omega)
     have he : node = expected := Option.some.inj (hnode.symm.trans hexpected)
     rw [he, hval, hpreparedLen]
-    simpa only [next] using hbound i (by omega)
+    exact lt_of_lt_of_le (hbound i (by omega)) hcapacity
   have hunique : ∀ i j, i < count'.val → j < count'.val → ∀ x y,
       prepared.path.val[i]? = some x → prepared.path.val[j]? = some y → x.val = y.val → i = j := by
     intro i j hi hj x y hx hy he
@@ -270,7 +270,9 @@ namespace Labyrinth
     intro _ a b
     rcases hedge with ⟨rfl, rfl⟩ | ⟨rfl, rfl⟩
     · exact hedges a b
-    · simpa only [and_comm, or_left_comm, or_assoc] using hedges a b
+    · have h := hedges a b
+      simp only [Function.iterate_zero_apply] at h
+      tauto
   unfold spanning_tree.Tree.attach_virtual
   apply spec_bind (mutation_virtual_root_total t edge.u w hw hcapacity)
   rintro first ⟨hfirst, _⟩
@@ -286,12 +288,11 @@ namespace Labyrinth
     rintro second ⟨hsecond, _⟩
     cases second with
     | Err error =>
-      simp [core.result.Result.Insts.CoreOpsTry.branch,
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
+      simp [core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
         hw, hwithin, hforest, hrootFixed]
     | Ok rootV =>
       have hrootV := hsecond rootV rfl
-      simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+      simp only [bind_ok]
       by_cases heq : rootU = rootV
       · simp [heq, hw, hwithin, hforest, hrootFixed]
       · simp only [heq, ite_false]

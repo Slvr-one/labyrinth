@@ -142,9 +142,12 @@ returns `TreeValid` on valid carrier inputs with sufficient workspace and preser
 workspace on invalid-root or insufficient-capacity rejection. The sixteen production roots
 listed in `Audit.lean` use only the standard axioms above.
 
-Complete constrained-constructor, batch-edit/exchange, trace and scene-publication
-specifications remain unfinished. The full crate's extraction and strict Lean gate are not yet
-passing.
+Checked helper composition now includes exact required-forest components, dense quotient
+labels, degree counting, occupied-slot witnesses, quotient reachability, expansion connectivity
+and sparse batch attachment. The current handwritten library builds strictly; those helpers
+do not yet establish complete constrained-constructor, batch-edit/exchange, trace or
+scene-publication specifications. The full source-extraction/correspondence gate remains
+incomplete.
 The checked-in generated core model does not currently cover the full scene/planner source.
 The correspondence runner rejects model drift and unmodeled external-operation templates;
 it must not be treated as a phase-2 pass until the complete source/model/proof gate succeeds.

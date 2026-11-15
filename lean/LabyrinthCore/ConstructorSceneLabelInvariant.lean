@@ -61,7 +61,6 @@ theorem constructor_scene_labels_exact_fresh (n index count nextCount : Usize)
     (component : Usize → Usize) (components labels : alloc.vec.Vec Usize)
     (h : ConstructorSceneLabelsExact n component index.val components labels count)
     (hi : index.val < n.val) (hic : index.val < components.val.length)
-    (hr : (component index).val < n.val)
     (hrl : (component index).val < labels.val.length)
     (hempty : labels.val[(component index).val]? = some n)
     (hnext : nextCount.val = count.val + 1) :
@@ -74,7 +73,7 @@ theorem constructor_scene_labels_exact_fresh (n index count nextCount : Usize)
       (labels.set (component index) count).val[root.val]? = labels.val[root.val]? := by
     intro root he
     have hev : root.val ≠ (component index).val := fun hv => he ((UScalar.eq_equiv _ _).mpr hv)
-    simp [alloc.vec.Vec.set, hev, Ne.symm hev]
+    simp [alloc.vec.Vec.set, Ne.symm hev]
   have hnewLookup : (labels.set (component index) count).val[(component index).val]? = some count := by
     simp [alloc.vec.Vec.set, hrl]
   have hnoOldCount : ∀ root : Usize, root.val < n.val → labels.val[root.val]? ≠ some count := by

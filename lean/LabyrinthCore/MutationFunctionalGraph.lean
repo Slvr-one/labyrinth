@@ -101,14 +101,14 @@ namespace Labyrinth
     constructor
     · rintro (hold | ⟨hxu, hyv⟩ | ⟨hyu, hxv⟩)
       · exact Or.inl hold
-      · have hxu' : x = u := Fin.ext hxu
-        have hyv' : y = v := Fin.ext hyv
-        exact Or.inr ⟨Or.inl ⟨hxu', hyv'⟩, by
-          simpa only [hxu', hyv'] using huv⟩
-      · have hyu' : y = u := Fin.ext hyu
-        have hxv' : x = v := Fin.ext hxv
-        exact Or.inr ⟨Or.inr ⟨hxv', hyu'⟩, by
-          simpa only [hyu', hxv'] using huv.symm⟩
+      · have huvVal : u.val ≠ v.val := fun he => huv (Fin.ext he)
+        exact Or.inr ⟨Or.inl ⟨hxu, hyv⟩, by
+          intro hxy
+          exact huvVal (hxu.symm.trans ((congrArg Fin.val hxy).trans hyv))⟩
+      · have huvVal : u.val ≠ v.val := fun he => huv (Fin.ext he)
+        exact Or.inr ⟨Or.inr ⟨hxv, hyu⟩, by
+          intro hxy
+          exact huvVal (hyu.symm.trans ((congrArg Fin.val hxy).symm.trans hxv))⟩
     · rintro (hold | ⟨hnew, _⟩)
       · exact Or.inl hold
       · rcases hnew with h | h
