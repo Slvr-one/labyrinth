@@ -44,3 +44,6 @@ import LabyrinthCore.ConstructorQuotientDFS
 import LabyrinthCore.MutationTrace
 import LabyrinthCore.ConstructorSceneExpandedCarrier
 import LabyrinthCore.ConstructorOrientation
+import LabyrinthCore.ConstructorScenePrepare
+import LabyrinthCore.ConstructorSceneRejection
+import LabyrinthCore.ConstructorSceneTotalPrefix
