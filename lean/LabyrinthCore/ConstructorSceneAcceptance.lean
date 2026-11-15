@@ -89,6 +89,21 @@ theorem constructor_quotient_prefix_sum_le (edges : List topology.Edge)
       simpa only [hvalue, Option.getD_some] using heq
     _ ≤ 2 * edges.length :=
       constructor_quotient_degree_sum_le edges label count.val edges.length le_rfl hlabels
+
+/-- Degree slot zero stays the empty CSR sentinel because every real quotient row is stored at
+its one-based count slot. -/
+theorem constructor_quotient_degree_zero (edges : List topology.Edge)
+    (label : Usize → Usize) (processed : Nat) :
+    constructorQuotientDegreeSlot edges label 0 processed = 0 := by
+  induction processed with
+  | zero => rfl
+  | succ processed ih =>
+      simp only [constructorQuotientDegreeSlot, ih]
+      split
+      · rfl
+      · split
+        · rfl
+        · split_ifs <;> omega
 /-- Exact prefix offsets admit a single row owner for every slot in a quotient row. -/
 theorem constructor_quotient_row_owner (counts : List Usize) (offsets : Slice Usize)
     (count : Usize) (hlength : offsets.val.length = count.val + 1)
@@ -149,6 +164,26 @@ def ConstructorSceneAllocationFits (carrier : topology.Carrier) : Prop :=
   (n - 1) * 16 ≤ (IScalar.hcast .Usize core.num.Isize.MAX).val ∧
   ((n - 1) * 2) * 8 ≤ Usize.max ∧
   ((n - 1) * 2) * 8 ≤ (IScalar.hcast .Usize core.num.Isize.MAX).val
+
+/-- Exact successful state at the end of the literal quotient prefix/allocation guards.
+The generated constructor retains the prefixed offsets and final adjacency count; the original
+degree counts remain as the witness tying those values to the input carrier. -/
+def ConstructorScenePrefixSuccess (carrier : topology.Carrier)
+    (componentCount : Usize) (label : Usize → Usize)
+    (offsets : alloc.vec.Vec Usize) (adjacencyCount : Usize) : Prop :=
+  ∃ (countWidth : Usize) (counts : List Usize),
+    countWidth.val = counts.length ∧ counts.length = componentCount.val + 1 ∧
+    (∀ slot, slot < counts.length → ∃ value : Usize,
+      counts[slot]? = some value ∧ value.val =
+        constructorQuotientDegreeSlot carrier.edges.val label slot carrier.edges.val.length) ∧
+    offsets.val.length = counts.length ∧
+    (∀ slot, slot < offsets.val.length → ∃ value : Usize,
+      offsets.val[slot]? = some value ∧
+        value.val = constructorPrefixSum counts (slot + 1)) ∧
+    adjacencyCount.val = constructorPrefixSum counts counts.length ∧
+    constructorStorageFits countWidth 8#usize ∧
+    constructorStorageFits adjacencyCount 8#usize ∧
+    constructorStorageFits adjacencyCount 16#usize
 
 /-- A tree oriented over the expanded selected carrier is also a tree over the original carrier,
 provided every actual selected edge is an original carrier edge. -/

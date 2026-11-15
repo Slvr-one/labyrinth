@@ -45,7 +45,12 @@ const ATAN: [i64; 31] = [
 ];
 
 pub fn normalize(angle: i32) -> i32 {
-    angle.rem_euclid(TURN)
+    let remainder = angle % TURN;
+    if remainder < 0 {
+        remainder + TURN
+    } else {
+        remainder
+    }
 }
 
 pub(crate) fn angle_delta(from: i32, to: i32) -> i32 {
@@ -79,7 +84,8 @@ impl Arc {
     }
 
     pub(crate) fn swept(self, delta: i32) -> Self {
-        if self.length + delta.abs() >= TURN {
+        let distance = if delta < 0 { -delta } else { delta };
+        if self.length + distance >= TURN {
             return Self {
                 start: 0,
                 length: TURN,
@@ -87,7 +93,7 @@ impl Arc {
         }
         Self {
             start: normalize(self.start + delta.min(0)),
-            length: self.length + delta.abs(),
+            length: self.length + distance,
         }
     }
 
@@ -176,7 +182,7 @@ pub(crate) fn point(center: Point, radius: i32, angle: i32) -> Point {
 /// Renderers use this same checked, quantized circular projection for walls and occupants.
 pub fn project(center: Point, radius: i32, angle: i32) -> Result<Point, Error> {
     center.validate()?;
-    if !(0..=COORD_LIMIT).contains(&radius) {
+    if radius < 0 || radius > COORD_LIMIT {
         return Err(Error::InvalidGeometry);
     }
     let result = point(center, radius, angle);
@@ -289,7 +295,10 @@ impl Circle {
         {
             return Err(Error::InvalidGeometry);
         }
-        let ring_count = i32::try_from(spec.sectors.len()).map_err(|_| Error::Overflow)?;
+        if spec.sectors.len() > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let ring_count = spec.sectors.len() as i32;
         let outer = ring_count
             .checked_mul(spec.ring_width)
             .ok_or(Error::Overflow)?;
@@ -364,7 +373,8 @@ impl Circle {
             max_relative,
         } = spec.mode
         {
-            if !(0..=TURN / 8).contains(&amplitude) || !(0..=TURN / 4).contains(&max_relative) {
+            if amplitude < 0 || amplitude > TURN / 8 || max_relative < 0 || max_relative > TURN / 4
+            {
                 return Err(Error::InvalidGeometry);
             }
             let mut ring = 0;

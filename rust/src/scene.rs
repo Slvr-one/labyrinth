@@ -319,7 +319,7 @@ impl Layout {
             let mut column = 0;
             while column < grid_spec.columns {
                 let bounds = grid.bounds(column, row);
-                let mut removed = geometry.check(bounds).is_err();
+                let mut removed = !geometry.check(bounds).is_ok();
                 let mut i = 0;
                 while i < circles.len() {
                     if bounds.touches_disk(circles[i].center(), circles[i].outer + bands[i]) {
@@ -563,7 +563,11 @@ impl Layout {
     }
     /// All portals of a circle share the largest requested band and the same radial deformation.
     pub fn adapter_band(&self, circle: usize) -> Option<i32> {
-        self.bands.get(circle).copied()
+        if circle < self.bands.len() {
+            Some(self.bands[circle])
+        } else {
+            None
+        }
     }
 
     fn circle_of(&self, cell: usize) -> Option<usize> {
@@ -876,11 +880,27 @@ pub struct Route {
     pub cells: Vec<usize>,
 }
 
-#[derive(Clone, Copy, Default)]
+#[derive(Copy)]
 pub struct Edit<'a> {
     pub remove: &'a [Edge],
     pub add: &'a [Edge],
     pub routes: Option<&'a [Route]>,
+}
+
+impl Clone for Edit<'_> {
+    fn clone(&self) -> Self {
+        *self
+    }
+}
+
+impl Default for Edit<'_> {
+    fn default() -> Self {
+        Self {
+            remove: &[],
+            add: &[],
+            routes: None,
+        }
+    }
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -895,6 +915,18 @@ pub struct Retired {
     pub epoch: u64,
     pub terminated_walkers: usize,
     pub released_reservations: usize,
+}
+
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+enum PendingEpoch {
+    None,
+    Some(u64),
+}
+
+impl PendingEpoch {
+    fn is_some(self) -> bool {
+        matches!(self, Self::Some(_))
+    }
 }
 
 #[derive(Debug)]
@@ -916,15 +948,21 @@ pub struct Scene {
     suspended: bool,
     inactive: bool,
     latest_request: u64,
-    pending: Option<u64>,
+    pending: PendingEpoch,
     trail_revision: u64,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Copy)]
 struct RoutePublication<'tree, 'remove, 'add> {
     tree: Option<&'tree Tree>,
     remove: &'remove [Edge],
     add: &'add [Edge],
+}
+
+impl Clone for RoutePublication<'_, '_, '_> {
+    fn clone(&self) -> Self {
+        *self
+    }
 }
 
 fn check_routes(
@@ -939,7 +977,7 @@ fn check_routes(
     if routes.len() != layout.circles.len() {
         return Err(Error::InvalidGeometry);
     }
-    required.clear();
+    required.resize(0, Edge::new(0, 0));
     let publication = RoutePublication {
         tree,
         remove: edit.remove,
@@ -1052,7 +1090,8 @@ fn check_route_edge(
         }
     }
     if !required.contains(&edge) {
-        if required.len() == required.capacity() {
+        // Scene reserves this carrier-edge budget once and never shrinks the workspace.
+        if required.len() == layout.carrier.edges().len() {
             return Err(Error::InsufficientWorkspace);
         }
         required.push(edge);
@@ -1158,7 +1197,7 @@ impl Scene {
             suspended: false,
             inactive: false,
             latest_request: epoch,
-            pending: None,
+            pending: PendingEpoch::None,
             trail_revision: 0,
         })
     }
@@ -1450,7 +1489,7 @@ impl Scene {
         if let Some(routes) = edit.routes {
             let mut i = 0;
             while i < routes.len() {
-                self.routes[i].cells.clear();
+                self.routes[i].cells.resize(0, 0);
                 self.routes[i].cells.extend_from_slice(&routes[i].cells);
                 i += 1;
             }
@@ -1807,14 +1846,14 @@ impl Scene {
         let revision = self.check_stamp(stamp)?;
         let request = self.latest_request.checked_add(1).ok_or(Error::Overflow)?;
         self.latest_request = request;
-        self.pending = Some(request);
+        self.pending = PendingEpoch::Some(request);
         self.reanchor = true;
         self.stamp.revision = revision;
         Ok(request)
     }
 
     pub fn publish_layout(&mut self, request: u64, mut candidate: Self) -> Result<Retired, Error> {
-        if self.pending != Some(request)
+        if self.pending != PendingEpoch::Some(request)
             || self.latest_request != request
             || candidate.stamp.epoch != request
         {
@@ -1860,7 +1899,7 @@ impl Scene {
 
     /// A rejected replacement resumes only when the old swept corridors fit the new viewport.
     pub fn reject_layout(&mut self, request: u64, viewport: Rect) -> Result<Stamp, Error> {
-        if self.pending != Some(request) || self.latest_request != request {
+        if self.pending != PendingEpoch::Some(request) || self.latest_request != request {
             return Err(Error::StaleEpoch);
         }
         viewport.validate()?;
@@ -1876,7 +1915,7 @@ impl Scene {
             cell += 1;
         }
         status?;
-        self.pending = None;
+        self.pending = PendingEpoch::None;
         self.inactive = !fits;
         self.stamp.revision = revision;
         Ok(self.stamp)

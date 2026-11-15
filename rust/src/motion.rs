@@ -161,6 +161,19 @@ impl MotionWorkspace {
         self.to.push(from);
     }
 
+    fn check_route_endpoints(cells: &[usize], ends: [usize; 4]) -> Result<(), Error> {
+        let last = cells.len() - 1;
+        if ends[0] != cells[0]
+            || ends[1] != cells[1]
+            || ends[2] != cells[last - 1]
+            || ends[3] != cells[last]
+        {
+            Err(Error::InvalidTransition)
+        } else {
+            Ok(())
+        }
+    }
+
     fn check_scene(&self, scene: &Scene) -> Result<(), Error> {
         if self.epoch != scene.stamp().epoch {
             return Err(Error::StaleEpoch);
@@ -186,16 +199,7 @@ impl MotionWorkspace {
         status?;
         let mut r = 0;
         while r < self.routes.len() && status.is_ok() {
-            let route = &scene.routes()[r];
-            let last = route.cells.len() - 1;
-            let ends = self.endpoints[r];
-            if ends[0] != route.cells[0]
-                || ends[1] != route.cells[1]
-                || ends[2] != route.cells[last - 1]
-                || ends[3] != route.cells[last]
-            {
-                status = Err(Error::InvalidTransition);
-            }
+            status = Self::check_route_endpoints(&scene.routes()[r].cells, self.endpoints[r]);
             r += 1;
         }
         status
@@ -225,7 +229,8 @@ impl MotionWorkspace {
         let mut e = 0;
         while e < self.edges {
             let edge = scene.layout().carrier().edges()[e];
-            self.locked[e] = scene.tree().has_edge(edge) && scene.check_removal(edge).is_err();
+            self.locked[e] =
+                scene.tree().has_edge(edge) && matches!(scene.check_removal(edge), Err(_));
             e += 1;
         }
         let mut divisor = 1;
@@ -297,9 +302,21 @@ impl MotionWorkspace {
         found.ok_or(Error::InvalidCarrier)
     }
 
-    fn edge_admissible(&self, edge: Edge) -> Result<bool, Error> {
-        let index = self.edge_index(edge)?;
-        Ok(self.admissible[index])
+    // Keep shared inspection outside the planner's mutable-receiver loop context.
+    fn route_admissible(&self, cells: &[usize]) -> Result<bool, Error> {
+        let mut keep = true;
+        let mut i = 1;
+        let mut status = Ok(());
+        while i < cells.len() && keep && status.is_ok() {
+            let edge = Edge::new(cells[i - 1], cells[i]);
+            match self.edge_index(edge) {
+                Ok(index) => keep = self.admissible[index],
+                Err(error) => status = Err(error),
+            }
+            i += 1;
+        }
+        status?;
+        Ok(keep)
     }
 
     fn eligible(&self, scene: &Scene, circle: usize, cell: usize) -> bool {
@@ -407,7 +424,8 @@ impl MotionWorkspace {
         if self.parent[target] == usize::MAX {
             return Err(Error::InvalidForest);
         }
-        self.second.clear();
+        // Zero-length resize retains capacity and is constant-time for these no-drop elements.
+        self.second.resize(0, 0);
         let mut node = target;
         while node != source {
             if node & 1 == 0 {
@@ -440,10 +458,10 @@ impl MotionWorkspace {
         }
         let ends = self.endpoints[circle];
         self.flow_path(ends[1] * 2, target)?;
-        self.first.clear();
+        self.first.resize(0, 0);
         self.first.extend_from_slice(&self.second);
         self.flow_path(ends[2] * 2, target)?;
-        self.routes[circle].cells.clear();
+        self.routes[circle].cells.resize(0, 0);
         self.routes[circle].cells.push(ends[0]);
         let mut i = self.first.len();
         while i > 0 {
@@ -463,21 +481,9 @@ impl MotionWorkspace {
     }
 
     fn plan_route(&mut self, scene: &Scene, circle: usize) -> Result<(), Error> {
-        let mut keep = true;
-        let mut i = 1;
-        let mut status = Ok(());
-        while i < scene.routes()[circle].cells.len() && keep && status.is_ok() {
-            let a = scene.routes()[circle].cells[i - 1];
-            let b = scene.routes()[circle].cells[i];
-            match self.edge_admissible(Edge::new(a, b)) {
-                Ok(admissible) => keep = admissible,
-                Err(error) => status = Err(error),
-            }
-            i += 1;
-        }
-        status?;
+        let keep = self.route_admissible(&scene.routes()[circle].cells)?;
         if keep {
-            self.routes[circle].cells.clear();
+            self.routes[circle].cells.resize(0, 0);
             self.routes[circle]
                 .cells
                 .extend_from_slice(&scene.routes()[circle].cells);
@@ -494,11 +500,12 @@ impl MotionWorkspace {
         let mut v = 0;
         let mut status = Ok(());
         while v < self.cells && !found && status.is_ok() {
+            let kind = scene.layout().cells()[v];
             if let Cell::Sector {
                 circle: owner,
                 ring,
                 ..
-            } = scene.layout().cells()[v]
+            } = kind
             {
                 if owner == circle && ring + 1 < scene.layout().circles()[circle].ring_count() {
                     match self.route_through(scene, circle, v) {
@@ -548,8 +555,8 @@ impl MotionWorkspace {
     }
 
     fn plan(&mut self, scene: &Scene) -> Result<(), Error> {
-        self.remove.clear();
-        self.add.clear();
+        self.remove.resize(0, Edge { u: 0, v: 0 });
+        self.add.resize(0, Edge { u: 0, v: 0 });
         self.routes_changed = false;
         let mut e = 0;
         while e < self.edges {
