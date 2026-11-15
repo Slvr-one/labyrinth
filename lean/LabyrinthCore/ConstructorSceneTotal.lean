@@ -9,6 +9,154 @@ open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
 
 namespace Labyrinth
 
+private theorem constructor_scene_residual_continuation {R A : Type*} (rng : R)
+    (work : spanning_tree.Workspace) (residual : core.result.Result Never topology.Error)
+    (success : A → Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+      spanning_tree.Workspace)) :
+    (do
+      let prefixResult ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          A (core.convert.FromSame topology.Error) residual
+      match prefixResult with
+      | .Err error => ok (.Err error, rng, work)
+      | .Ok value => success value) =
+    (do
+      let result ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (result, rng, work)) := by
+  cases residual with
+  | Ok impossible => exact nomatch impossible
+  | Err error =>
+      unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      simp only [bind_ok]
+
+private def constructor_scene_after_prefix_program {R : Type*} (adapter : tree.Rng R)
+    (carrier : topology.Carrier) (required : Slice topology.Edge) (n root : Usize)
+    (rng : R) (work : spanning_tree.Workspace) (components : alloc.vec.Vec Usize)
+    (componentCount : Usize) (offsets : alloc.vec.Vec Usize) (adjacencyCount : Usize) :
+    Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+      spanning_tree.Workspace) := do
+  let neighbors ← alloc.vec.from_elem core.clone.CloneUsize 0#usize adjacencyCount
+  let e ← topology.Edge.new 0#usize 0#usize
+  let witnesses ← alloc.vec.from_elem topology.Edge.Insts.CoreCloneClone e adjacencyCount
+  let next ← alloc.vec.from_elem core.clone.CloneUsize 0#usize componentCount
+  let next1 ← spanning_tree.Tree.scene_dfs_loop4 0#usize componentCount offsets next
+  let (neighbors1, witnesses1) ←
+    spanning_tree.Tree.scene_dfs_loop5 0#usize components
+      (alloc.vec.Vec.deref carrier.edges) neighbors witnesses next1
+  let quotientRoot ← alloc.vec.Vec.index
+    (core.slice.index.SliceIndexUsizeSlice Usize) components root
+  let (dfsResult, rng1, work1) ← spanning_tree.depth_first adapter
+    (alloc.vec.Vec.deref offsets) (alloc.vec.Vec.deref neighbors1)
+    quotientRoot rng work
+  let dfsFlow ← core.result.Result.Insts.CoreOpsTry.branch dfsResult
+  match dfsFlow with
+  | .Break residual =>
+    let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+    ok (result, rng1, work1)
+  | .Continue _ =>
+    let selectedCount ← n - 1#usize
+    let selectedStorage ← topology.check_storage selectedCount 16#usize
+    let selectedFlow ← core.result.Result.Insts.CoreOpsTry.branch selectedStorage
+    match selectedFlow with
+    | .Break residual =>
+      let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (result, rng1, work1)
+    | .Continue _ =>
+      let selected ← alloc.vec.from_elem
+        topology.Edge.Insts.CoreCloneClone e selectedCount
+      let selected1 ← spanning_tree.Tree.scene_dfs_loop6 required 0#usize selected
+      let (work2, selected2) ← spanning_tree.Tree.scene_dfs_loop7 work1 0#usize
+        componentCount witnesses1 quotientRoot selected1 (Slice.len required)
+      let selectedSlice := alloc.vec.Vec.deref selected2
+      let expandedResult ← topology.Carrier.from_edges n selectedSlice
+      let expandedFlow ← core.result.Result.Insts.CoreOpsTry.branch expandedResult
+      match expandedFlow with
+      | .Break residual =>
+        let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (result, rng1, work2)
+      | .Continue expanded =>
+        let parents ← alloc.vec.from_elem core.clone.CloneUsize root n
+        let (work3, index) ← spanning_tree.Tree.scene_dfs_loop8 work2 n 0#usize
+        let (_, seenBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Bool) work3.seen root
+        let (_, pathBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Usize) work3.path 0#usize
+        let path := pathBack root
+        let seen := seenBack true
+        let (finalSeen, finalPath, finalParents) ←
+          spanning_tree.Tree.scene_dfs_loop9 seen path index expanded parents 1#usize
+        ok (core.result.Result.Ok ({ parents := finalParents, root } :
+          spanning_tree.Tree), rng1, { work3 with seen := finalSeen, path := finalPath })
+
+private def constructor_scene_after_prepare_program {R : Type*} (adapter : tree.Rng R)
+    (carrier : topology.Carrier) (required : Slice topology.Edge) (n root : Usize)
+    (rng : R) (work : spanning_tree.Workspace) (components : alloc.vec.Vec Usize)
+    (componentCount : Usize) :
+    Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+      spanning_tree.Workspace) := do
+  let prefixResult ← (do
+    let optionCount ← lift (Usize.checked_add componentCount 1#usize)
+    let countResult ← core.option.Option.ok_or optionCount topology.Error.Overflow
+    let countFlow ← core.result.Result.Insts.CoreOpsTry.branch countResult
+    match countFlow with
+    | .Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+    | .Continue count =>
+      let storageResult ← topology.check_storage count 8#usize
+      let storageFlow ← core.result.Result.Insts.CoreOpsTry.branch storageResult
+      match storageFlow with
+      | .Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+      | .Continue _ =>
+        let offsets ← alloc.vec.from_elem core.clone.CloneUsize 0#usize count
+        let edges ← topology.Carrier.impl.edges carrier
+        let (degreeStatus, counts) ← spanning_tree.Tree.scene_dfs_loop3 0#usize (.Ok ())
+          components componentCount offsets edges
+        let degreeFlow ← core.result.Result.Insts.CoreOpsTry.branch degreeStatus
+        match degreeFlow with
+        | .Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+        | .Continue _ =>
+          let (countSlice, countBack) ← lift (alloc.vec.Vec.deref_mut counts)
+          let (prefixStatus, prefixed) ← topology.prefix_offsets countSlice
+          let prefixFlow ← core.result.Result.Insts.CoreOpsTry.branch prefixStatus
+          match prefixFlow with
+          | .Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+          | .Continue _ =>
+            let prefixedCounts := countBack prefixed
+            let adjacencyCount ← alloc.vec.Vec.index
+              (core.slice.index.SliceIndexUsizeSlice Usize) prefixedCounts componentCount
+            let adjacencyStorage8 ← topology.check_storage adjacencyCount 8#usize
+            let adjacencyFlow8 ← core.result.Result.Insts.CoreOpsTry.branch adjacencyStorage8
+            match adjacencyFlow8 with
+            | .Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+            | .Continue _ =>
+              let adjacencyStorage16 ← topology.check_storage adjacencyCount 16#usize
+              let adjacencyFlow16 ←
+                core.result.Result.Insts.CoreOpsTry.branch adjacencyStorage16
+              match adjacencyFlow16 with
+              | .Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  (alloc.vec.Vec Usize × Usize) (core.convert.FromSame topology.Error) residual
+              | .Continue _ => ok (.Ok (prefixedCounts, adjacencyCount)))
+  match prefixResult with
+  | .Err error => ok (.Err error, rng, work)
+  | .Ok (offsets, adjacencyCount) =>
+    constructor_scene_after_prefix_program adapter carrier required n root rng work
+      components componentCount offsets adjacencyCount
+
 
 
 /-- Once validation, dense components, and the checked prefix segment have succeeded, the
@@ -432,8 +580,137 @@ theorem constructor_scene_after_prefix_total {R : Type*} (adapter : tree.Rng R)
     exact (WP.spec_ok _).mpr
       (Or.inr ⟨rfl, hdfs.2.valid, hnotAllocation⟩)
 
+private theorem constructor_scene_after_prepare_total {R : Type*} (adapter : tree.Rng R)
+    (hrng : constructorLegalRng adapter) (carrier : topology.Carrier)
+    (required : Slice topology.Edge) (n root : Usize) (rng : R)
+    (work : spanning_tree.Workspace) (links components : alloc.vec.Vec Usize)
+    (componentCount : Usize)
+    (hc : CarrierValid carrier) (hn : n.val = cellCount carrier)
+    (hroot : root.val < cellCount carrier)
+    (hw : WorkspaceValid work) (hcapacity : cellCount carrier ≤ work.path.val.length)
+    (hforest : ConstructorRequiredForest carrier required)
+    (hlinks : links.val.length = n.val)
+    (hcomponents : components.val.length = n.val)
+    (hforestCount : required.val.length + constructorSceneRootCount links = n.val)
+    (hpositive : 0 < componentCount.val)
+    (hcountBound : componentCount.val ≤ n.val)
+    (hbounded : ∀ node : Usize, node.val < n.val →
+      (constructorSceneComponentAt components node).val < componentCount.val)
+    (hdense : ∀ id : Usize, id.val < componentCount.val → ∃ node : Usize,
+      node.val < n.val ∧ constructorSceneComponentAt components node = id)
+    (hclasses : ∀ u v : Usize, u.val < n.val → v.val < n.val →
+      (constructorSceneComponentAt components u = constructorSceneComponentAt components v ↔
+        Relation.ReflTransGen
+          (constructorRequiredPrefixArc required required.val.length) u v))
+    (hcomponentCount : componentCount.val = constructorSceneRootCount links) :
+    WP.spec (constructor_scene_after_prepare_program adapter carrier required n root rng work
+      components componentCount)
+      (fun output =>
+        (∃ published, output.1 = .Ok published ∧ published.root = root ∧
+          TreeValid carrier published ∧ WorkspaceValid output.2.2 ∧
+          ∀ slot, slot < required.val.length → ∀ edge,
+            required.val[slot]? = some edge →
+            parentEdge (parents published) edge.u.val edge.v.val) ∨
+        output = (.Err topology.Error.Overflow, rng, work) ∨
+        (output.1 = .Err topology.Error.Overflow ∧ WorkspaceValid output.2.2 ∧
+          ¬ ConstructorSceneAllocationFits carrier)) := by
+  unfold constructor_scene_after_prepare_program
+  have hcomponentLookup : ∀ node : Usize, node.val < components.val.length →
+      components.val[node.val]? =
+        some (constructorSceneComponentAt components node) := by
+    intro node hnode
+    unfold constructorSceneComponentAt
+    rw [List.getElem?_eq_getElem hnode]
+    rfl
+  apply WP.spec_bind (constructor_scene_quotient_prefix_total carrier components componentCount
+    (constructorSceneComponentAt components) hc (by simpa only [hn] using hcomponents)
+    hcomponentLookup (fun node hnode => hbounded node (by
+      simpa only [hcomponents] using hnode)))
+  intro prefixResult hprefixResult
+  rcases hprefixResult with hprefixOverflow | hprefixSuccess
+  · rw [hprefixOverflow]
+    simp only [bind_ok]
+    exact (WP.spec_ok _).mpr (Or.inr (Or.inl rfl))
+  · obtain ⟨offsets, adjacencyCount, hprefixResult, hprefix⟩ := hprefixSuccess
+    rw [hprefixResult]
+    simp only [bind_ok]
+    apply WP.spec_mono
+      (show WP.spec
+          (constructor_scene_after_prefix_program adapter carrier required n root rng work
+            components componentCount offsets adjacencyCount) _ from by
+        simpa only [constructor_scene_after_prefix_program] using
+          (constructor_scene_after_prefix_total adapter hrng carrier required n root rng work
+            links components componentCount hc hn hroot hw hcapacity hforest hlinks hcomponents
+            hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount offsets
+            adjacencyCount hprefix))
+    intro output houtput
+    exact houtput.elim Or.inl (fun h => Or.inr (Or.inr h))
+
+private theorem constructor_scene_after_prepare_accepts {R : Type*} (adapter : tree.Rng R)
+    (hrng : constructorLegalRng adapter) (carrier : topology.Carrier)
+    (required : Slice topology.Edge) (n root : Usize) (rng : R)
+    (work : spanning_tree.Workspace) (links components : alloc.vec.Vec Usize)
+    (componentCount : Usize)
+    (hc : CarrierValid carrier) (hn : n.val = cellCount carrier)
+    (hroot : root.val < cellCount carrier)
+    (hw : WorkspaceValid work) (hcapacity : cellCount carrier ≤ work.path.val.length)
+    (hforest : ConstructorRequiredForest carrier required)
+    (hlinks : links.val.length = n.val)
+    (hcomponents : components.val.length = n.val)
+    (hforestCount : required.val.length + constructorSceneRootCount links = n.val)
+    (hpositive : 0 < componentCount.val)
+    (hcountBound : componentCount.val ≤ n.val)
+    (hbounded : ∀ node : Usize, node.val < n.val →
+      (constructorSceneComponentAt components node).val < componentCount.val)
+    (hdense : ∀ id : Usize, id.val < componentCount.val → ∃ node : Usize,
+      node.val < n.val ∧ constructorSceneComponentAt components node = id)
+    (hclasses : ∀ u v : Usize, u.val < n.val → v.val < n.val →
+      (constructorSceneComponentAt components u = constructorSceneComponentAt components v ↔
+        Relation.ReflTransGen
+          (constructorRequiredPrefixArc required required.val.length) u v))
+    (hcomponentCount : componentCount.val = constructorSceneRootCount links)
+    (hallocation : ConstructorSceneAllocationFits carrier) :
+    WP.spec (constructor_scene_after_prepare_program adapter carrier required n root rng work
+      components componentCount)
+      (fun output => ∃ published,
+        output.1 = .Ok published ∧ published.root = root ∧
+        TreeValid carrier published ∧ WorkspaceValid output.2.2 ∧
+        ∀ slot, slot < required.val.length → ∀ edge,
+          required.val[slot]? = some edge →
+          parentEdge (parents published) edge.u.val edge.v.val) := by
+  unfold constructor_scene_after_prepare_program
+  have hcomponentLookup : ∀ node : Usize, node.val < components.val.length →
+      components.val[node.val]? =
+        some (constructorSceneComponentAt components node) := by
+    intro node hnode
+    unfold constructorSceneComponentAt
+    rw [List.getElem?_eq_getElem hnode]
+    rfl
+  apply WP.spec_bind (constructor_scene_quotient_prefix_accepts carrier components
+    componentCount (constructorSceneComponentAt components) hc
+    (by simpa only [hn] using hcomponents) hcomponentLookup
+    (fun node hnode => hbounded node (by simpa only [hcomponents] using hnode))
+    (by simpa only [hn] using hcountBound) hallocation)
+  intro prefixResult hprefixResult
+  obtain ⟨offsets, adjacencyCount, hprefixResult, hprefix⟩ := hprefixResult
+  rw [hprefixResult]
+  simp only [bind_ok]
+  apply WP.spec_mono
+    (show WP.spec
+        (constructor_scene_after_prefix_program adapter carrier required n root rng work
+          components componentCount offsets adjacencyCount) _ from by
+      simpa only [constructor_scene_after_prefix_program] using
+        (constructor_scene_after_prefix_total adapter hrng carrier required n root rng work
+          links components componentCount hc hn hroot hw hcapacity hforest hlinks hcomponents
+          hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount offsets
+          adjacencyCount hprefix))
+  intro output houtput
+  rcases houtput with hsuccess | hoverflow
+  · exact hsuccess
+  · exact False.elim (hoverflow.2.2 hallocation)
+
 /-- The complete valid-guard branch of `scene_dfs`: prefix overflow preserves the caller
-frame, while selected/publication overflow retains the exact DFS-advanced frame. -/
+frame, while selected/publication overflow returns a workspace proved valid. -/
 theorem constructor_scene_dfs_guarded {R : Type*} (adapter : tree.Rng R)
     (hrng : constructorLegalRng adapter) (carrier : topology.Carrier)
     (required : Slice topology.Edge) (root : Usize) (rng : R)
@@ -474,39 +751,43 @@ theorem constructor_scene_dfs_guarded {R : Type*} (adapter : tree.Rng R)
     change ¬ n.val ≤ required.val.length
     omega
   simp only [hrequiredGuard, ite_false]
-  apply WP.spec_bind (constructor_scene_prepare_accepts carrier n required hc hn hforest)
-  intro prepared hprepared
-  obtain ⟨links, components, componentCount, rank, component, hpreparedResult,
-    hlinks, hcomponents, hforestCount, _hrank, _hcomponentLabels, hpositive,
-    hcountBound, hbounded, hdense, hclasses, hcomponentCount⟩ := hprepared
-  rw [hpreparedResult]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
-  have hcomponentLookup : ∀ node : Usize, node.val < components.val.length →
-      components.val[node.val]? =
-        some (constructorSceneComponentAt components node) := by
-    intro node hnode
-    unfold constructorSceneComponentAt
-    rw [List.getElem?_eq_getElem hnode]
-    rfl
-  apply WP.spec_bind (constructor_scene_quotient_prefix_total carrier components componentCount
-    (constructorSceneComponentAt components) hc (by simpa only [hn] using hcomponents)
-    hcomponentLookup (fun node hnode => hbounded node (by simpa only [hcomponents] using hnode)))
-  intro prefixResult hprefixResult
-  rcases hprefixResult with hprefixOverflow | hprefixSuccess
-  · rw [hprefixOverflow]
-    simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
-    exact (WP.spec_ok _).mpr (Or.inr (Or.inl rfl))
-  · obtain ⟨offsets, adjacencyCount, hprefixResult, hprefix⟩ := hprefixSuccess
-    rw [hprefixResult]
-    simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
-    apply WP.spec_mono
-      (constructor_scene_after_prefix_total adapter hrng carrier required n root rng work links
-        components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
-        hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount offsets
-        adjacencyCount hprefix)
-    intro output houtput
-    exact houtput.elim Or.inl (fun h => Or.inr (Or.inr h))
+  have hwrapped := WP.spec_bind
+    (Pₖ := fun output =>
+      (∃ published, output.1 = .Ok published ∧ published.root = root ∧
+        TreeValid carrier published ∧ WorkspaceValid output.2.2 ∧
+        ∀ slot, slot < required.val.length → ∀ edge,
+          required.val[slot]? = some edge →
+          parentEdge (parents published) edge.u.val edge.v.val) ∨
+      output = (.Err topology.Error.Overflow, rng, work) ∨
+      (output.1 = .Err topology.Error.Overflow ∧ WorkspaceValid output.2.2 ∧
+        ¬ ConstructorSceneAllocationFits carrier))
+    (k := fun prepared =>
+      match prepared with
+      | .Ok (_, components, componentCount) =>
+        constructor_scene_after_prepare_program adapter carrier required n root rng work
+          components componentCount
+      | .Err residual => do
+        let result ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (result, rng, work))
+    (constructor_scene_prepare_accepts carrier n required hc hn hforest) (by
+      intro prepared hprepared
+      obtain ⟨links, components, componentCount, rank, component, hpreparedResult,
+        hlinks, hcomponents, hforestCount, _hrank, _hcomponentLabels, hpositive,
+        hcountBound, hbounded, hdense, hclasses, hcomponentCount⟩ := hprepared
+      rw [hpreparedResult]
+      simp only [bind_ok]
+      exact constructor_scene_after_prepare_total adapter hrng carrier required n root rng work
+        links components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
+        hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount)
+  simp only [constructor_scene_after_prepare_program, constructor_scene_after_prefix_program,
+    topology.Carrier.impl.edges, core.result.Result.Insts.CoreOpsTry.branch, Std.bind_assoc,
+    bind_ok, uncurry, constructor_scene_residual_continuation] at hwrapped
+  apply Eq.mp ?_ hwrapped
+  apply congrArg₂ WP.spec
+  · congr 1
+  · rfl
 
 /-- With every input-size allocation guard representable, the literal outer `scene_dfs`
 publishes a valid original-carrier tree containing every required edge. -/
@@ -548,42 +829,45 @@ theorem constructor_scene_dfs_accepts {R : Type*} (adapter : tree.Rng R)
     change ¬ n.val ≤ required.val.length
     omega
   simp only [hrequiredGuard, ite_false]
-  apply WP.spec_bind (constructor_scene_prepare_accepts carrier n required hc hn hforest)
-  intro prepared hprepared
-  obtain ⟨links, components, componentCount, rank, component, hpreparedResult,
-    hlinks, hcomponents, hforestCount, _hrank, _hcomponentLabels, hpositive,
-    hcountBound, hbounded, hdense, hclasses, hcomponentCount⟩ := hprepared
-  rw [hpreparedResult]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
-  have hcomponentLookup : ∀ node : Usize, node.val < components.val.length →
-      components.val[node.val]? =
-        some (constructorSceneComponentAt components node) := by
-    intro node hnode
-    unfold constructorSceneComponentAt
-    rw [List.getElem?_eq_getElem hnode]
-    rfl
-  apply WP.spec_bind (constructor_scene_quotient_prefix_accepts carrier components
-    componentCount (constructorSceneComponentAt components) hc
-    (by simpa only [hn] using hcomponents) hcomponentLookup
-    (fun node hnode => hbounded node (by simpa only [hcomponents] using hnode))
-    (by simpa only [hn] using hcountBound) hallocation)
-  intro prefixResult hprefixResult
-  obtain ⟨offsets, adjacencyCount, hprefixResult, hprefix⟩ := hprefixResult
-  rw [hprefixResult]
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
-  apply WP.spec_mono
-    (constructor_scene_after_prefix_total adapter hrng carrier required n root rng work links
-      components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
-      hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount offsets
-      adjacencyCount hprefix)
-  intro output houtput
-  rcases houtput with hsuccess | hoverflow
-  · exact hsuccess
-  · exact False.elim (hoverflow.2.2 hallocation)
+  have hwrapped := WP.spec_bind
+    (Pₖ := fun output => ∃ published,
+      output.1 = .Ok published ∧ published.root = root ∧
+      TreeValid carrier published ∧ WorkspaceValid output.2.2 ∧
+      ∀ slot, slot < required.val.length → ∀ edge,
+        required.val[slot]? = some edge →
+        parentEdge (parents published) edge.u.val edge.v.val)
+    (k := fun prepared =>
+      match prepared with
+      | .Ok (_, components, componentCount) =>
+        constructor_scene_after_prepare_program adapter carrier required n root rng work
+          components componentCount
+      | .Err residual => do
+        let result ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (result, rng, work))
+    (constructor_scene_prepare_accepts carrier n required hc hn hforest) (by
+      intro prepared hprepared
+      obtain ⟨links, components, componentCount, rank, component, hpreparedResult,
+        hlinks, hcomponents, hforestCount, _hrank, _hcomponentLabels, hpositive,
+        hcountBound, hbounded, hdense, hclasses, hcomponentCount⟩ := hprepared
+      rw [hpreparedResult]
+      simp only [bind_ok]
+      exact constructor_scene_after_prepare_accepts adapter hrng carrier required n root rng work
+        links components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
+        hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount hallocation)
+  simp only [constructor_scene_after_prepare_program, constructor_scene_after_prefix_program,
+    topology.Carrier.impl.edges, core.result.Result.Insts.CoreOpsTry.branch, Std.bind_assoc,
+    bind_ok, uncurry, constructor_scene_residual_continuation] at hwrapped
+  apply Eq.mp ?_ hwrapped
+  apply congrArg₂ WP.spec
+  · congr 1
+  · rfl
 
 /-- The complete actual scene constructor is total at every representable input width.
 Guard failures preserve the original RNG and workspace. Allocation overflow before quotient DFS
-also preserves that frame; every later overflow returns the actual advanced RNG/workspace. -/
+also preserves that frame; for later overflow this contract records validity of the returned
+workspace, not extensional equality with an intermediate DFS frame. -/
 theorem constructor_scene_dfs_spec {R : Type*} (adapter : tree.Rng R)
     (hrng : constructorLegalRng adapter) (carrier : topology.Carrier)
     (required : Slice topology.Edge) (root : Usize) (rng : R)

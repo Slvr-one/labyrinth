@@ -162,6 +162,7 @@ theorem constructor_scene_quotient_prefix_total
         rcases hprefix.2.2 with hprefixOk | hprefixOverflow
         · have hprefixOk' : prefixStatus = .Ok () := by simpa only using hprefixOk
           subst prefixStatus
+          dsimp only
           simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
           have hprefixedLength : prefixed.val.length = componentCount.val + 1 := by
             rw [hprefix.1]
@@ -218,6 +219,7 @@ theorem constructor_scene_quotient_prefix_total
         · have hprefixOverflow' : prefixStatus = .Err topology.Error.Overflow := by
             simpa only using hprefixOverflow
           subst prefixStatus
+          dsimp only
           simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
             core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
           exact constructor_scene_prefix_overflow_return _
@@ -296,8 +298,10 @@ theorem constructor_scene_quotient_prefix_accepts
           ConstructorScenePrefixSuccess carrier componentCount label offsets adjacencyCount) := by
   rcases hallocation with
     ⟨ha1, ha2, ha3, ha4, ha5, ha6, ha7, ha8, _ha9, _ha10, _ha11, _ha12⟩
+  have hcomponentCountSucc : componentCount.val + 1 ≤ Usize.max := by omega
   obtain ⟨count, hcount, hcountValueRaw⟩ :=
-    constructor_checked_add_some componentCount 1#usize (by omega)
+    constructor_checked_add_some componentCount 1#usize (by
+      simpa only [UScalar.ofNatCore_val_eq] using hcomponentCountSucc)
   have hcountValue : count.val = componentCount.val + 1 := by
     simpa only [UScalar.ofNatCore_val_eq] using hcountValueRaw
   have hcountFits : constructorStorageFits count 8#usize := by
@@ -357,6 +361,7 @@ theorem constructor_scene_quotient_prefix_accepts
   rintro ⟨prefixStatus, prefixed⟩ hprefix
   have hprefixOk : prefixStatus = .Ok () := hprefix.1
   subst prefixStatus
+  dsimp only
   simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
   have hprefixedLength : prefixed.val.length = componentCount.val + 1 := by
     rw [hprefix.2.1, hdegrees.2.1, hoffsetsLength]
