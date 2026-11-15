@@ -4,6 +4,7 @@ import LabyrinthCore.MutationRerootSpec
 import LabyrinthCore.ConstructorCarrierEdges
 import LabyrinthCore.ConstructorDepthFirstTree
 import LabyrinthCore.MutationEditEdges
+import LabyrinthCore.ConstructorQuotientDFS
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -22,3 +23,4 @@ import LabyrinthCore.MutationEditEdges
 #print axioms Labyrinth.constructor_tree_dfs_insufficient_workspace
 #print axioms Labyrinth.constructor_tree_dfs_spec
 #print axioms Labyrinth.mutation_edit_edges_total_frame
+#print axioms Labyrinth.constructor_quotient_depth_first_accepts
