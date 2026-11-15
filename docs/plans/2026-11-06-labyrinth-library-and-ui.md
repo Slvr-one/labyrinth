@@ -1,7 +1,7 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
-- **Date:** 2026-11-06
-- **Status:** APPROVED PLAN — phase 1 accepted; phase 2 incomplete and paused by owner on 2026-11-15
+- **Date:** 2026-11-06; reconciled 2026-11-15
+- **Status:** PLAN REFRESH — documentation only; phase 1 accepted; phase 2 incomplete; renewed owner approval is required before any implementation
 - **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
 - **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
@@ -32,13 +32,80 @@ claimed crossings must exist in the topology and rendered geometry.
 - Oversee each phase with actual execution and carry validation through the Portfolio UI.
 - Documentation commits/PRs are authorized. Implementation-plan approval, merging, and live
   deployment are separate gates.
-- The owner accepted phase 1 on 2026-11-14 with its documented partial-correctness limits
-  and authorized phase 2. Each subsequent phase retains its manual acceptance gate;
-  merge and deployment approvals remain separate.
-- On 2026-11-15 the owner requested progress persistence and a stop after in-flight workers
-  froze their work. This is not phase-2 acceptance or permission to begin phases 3–5.
+- The owner accepted phase 1 on 2026-11-14 with its documented partial-correctness limits.
+  The former phase-2 implementation grant and later source-first execution grant are historical;
+  the latest ruling requires all related plans to be ready and explicitly approved before any
+  further implementation.
+- The earlier source-first selection remains the proposed phase-2 execution order: narrow source
+  refactors, checked casts, carrier-edge logical-budget equivalence, and real pure-body inclusion.
+  It is not current permission to edit source, proofs, configuration, models, or toolchain pins.
+- Every phase retains its manual acceptance gate. Merge, deployment, publication, and any new
+  standard-model patch remain separate owner gates.
 
-### Paused checkpoint — 2026-11-15
+### Current planning-only approval gate — 2026-11-15
+
+This refresh reconciles plans and preserved evidence only. No implementation, proof repair,
+configuration change, build, test, lint, formatter run, code-review round, merge, deployment,
+model change, toolchain change, or install is authorized. Documentation verification and plan
+review may proceed. No prior implementation grant supplies consent after
+this gate. All related plans must be ready and the owner must explicitly approve resumption before
+any implementation starts.
+
+The independent Portfolio presentation plan may be approved and executed separately from
+Labyrinth phase 5 once the all-plans readiness gate is satisfied. Its completion must not be
+reported as Rust/Wasm integration or connected-maze acceptance.
+
+### Current phase-2 evidence and limits
+
+- The preserved source-first snapshot
+  [`a7d20a4`](https://github.com/Slvr-one/labyrinth/commit/a7d20a459fd701125c7c967fe02e5f3b5e7fc81c)
+  on `work/resume-pure-extraction-20261115` passed `cargo fmt --check`, strict Clippy,
+  `cargo test` with 53 tests (2 unit, 1 allocation, 25 scene, 5 parent, 20 structural),
+  documentation, and the actual both-mode `phase2_trace` before the freeze. The allocation test
+  covers path reversal and atomic batches. The earlier 96-production-event zero-allocation
+  instrument was not rerun on this snapshot; that result remains historical checkpoint evidence
+  and is not refreshed by inference. These are native snapshot results, not Lean or full-scene
+  acceptance.
+- Whole-crate Charon included the real shared-slice `Default`, `Option::default`, and
+  `Result::is_err` bodies. Two narrow motion-helper context joins then passed far enough for
+  Aeneas to fail later at `rust/src/motion.rs:502` with
+  `Not allowed to expand enumerations with several variants`. The
+  [source-first recipe and limits](https://github.com/Slvr-one/labyrinth/blob/a7d20a459fd701125c7c967fe02e5f3b5e7fc81c/docs/research/2026-11-15-source-first-extraction-config.md)
+  give the reproduction configuration; immutable execution logs remain in the task record.
+  There is no blanket complete-translation claim. The snapshot's additional let-kind refactor is
+  only a proposal for the next approved source-first attempt; it is not implemented.
+- Earlier strict lead-module checks passed `ConstructorSceneTotalPrefix`,
+  `ConstructorSceneAcceptance` including `carrierOverflow`, and
+  `ConstructorSceneSelectedConnectivity`. The latest checked `ConstructorSceneQuotientPrefix`
+  draft still failed simplification/scalar normalization. A subsequent final repair of
+  `ConstructorSceneQuotientPrefix` and `ConstructorSceneTotal` is preserved, unverified, in
+  [`49d1a91`](https://github.com/Slvr-one/labyrinth/commit/49d1a91780a80b19166599b6295adb9acfe2b2b0)
+  on `work/resume-constructor-20261115`.
+- No full outer theorem pass, final axiom audit, final review, complete scene correspondence,
+  Lean acceptance, Wasm parity, Portfolio integration, or phase-2 manual acceptance is claimed.
+  Exact post-DFS overflow behavior, including the RNG and workspace-frame relationship, remains
+  a mandatory explicit obligation; worker-only workspace validity does not complete it.
+
+### Related PRs, branches, dependencies, and state
+
+| Surface | Preserved revision | Dependency and present state |
+|---|---|---|
+| This plan refresh | `docs/planning-approval-20261115`, based on `e20c959` | Documentation only; owner approval of the reconciled plan set is the next gate |
+| [Research and baseline plan](https://github.com/Slvr-one/labyrinth/pull/1) | Existing research/plan stack | Historical planning dependency; open and unmerged |
+| [Phase-1 correspondence](https://github.com/Slvr-one/labyrinth/pull/2) | Existing phase-1 implementation stack | Phase 1 manually accepted with stated limits; open and unmerged |
+| [Phase-2 runtime and checked proofs](https://github.com/Slvr-one/labyrinth/pull/3) | Checked code checkpoint `7fcec28`; docs checkpoint `e20c959` | Depends on phase 1; phase 2 incomplete, open, and unmerged |
+| [Source-first draft](https://github.com/Slvr-one/labyrinth/commit/a7d20a459fd701125c7c967fe02e5f3b5e7fc81c) | `work/resume-pure-extraction-20261115` | Native-passing snapshot; later Aeneas failure above; not accepted or merged |
+| [Outer-proof draft](https://github.com/Slvr-one/labyrinth/commit/49d1a91780a80b19166599b6295adb9acfe2b2b0) | `work/resume-constructor-20261115` | Final repair unchecked; no full outer/axiom/review pass |
+| [Portfolio presentation planning](https://github.com/Slvr-one/portfolio/pull/6) | Documentation-only PR; not the layout implementation branch | Owns overview/story/technology/scroll/mode plan; awaiting approval |
+| [Portfolio layout draft](https://github.com/Slvr-one/portfolio/commit/c29386041d38fe01076c5203d92070e21554add2) | `work/portfolio-layout-20261115` | Preserved footer/wordmark draft only; not accepted or merged |
+| [Portfolio CI prerequisite draft](https://github.com/Slvr-one/portfolio/commit/bf1b9bae6b988562bfc7e86dd3b4bdcbc322c0b9) | `fix/pin-wrangler-deploy-20261115` | Preserved draft only; no merge/deploy or credential decision |
+| [Atlas program/index](https://github.com/NavadaAI/Atlas/pull/317) | Existing program/index record | Lead reconciles canonical links and approval state; no duplicate implementation plan |
+
+### Historical paused checkpoint — 2026-11-15
+
+The following checkpoint records the earlier freeze and remains historical evidence. The current
+planning-only gate and evidence above supersede it as the current status; they do not erase its
+passing subsets or limitations.
 
 The [phase-2 draft](https://github.com/Slvr-one/labyrinth/pull/3) contains the native runtime
 and checked structural proof increments. At the
@@ -87,7 +154,30 @@ Aeneas's direction is Rust → Charon LLBC → functional Lean definitions → h
 Matching independently written Lean/Rust types does not establish correspondence. Mathlib
 provides tree/unique-path mathematics, not correctness of this DFS constructor.
 
-## Architecture and contracts
+### Translation boundary and proposed source-first route
+
+When renewed approval is granted, begin only with the previously selected source-first scope:
+the named `check_route_endpoints` and `route_admissible` control-flow refactors, checked private
+casts, carrier-edge logical-budget equivalence, and inclusion of audited real pure bodies. Preserve
+observable order, errors, allocations, public APIs, and the unrestricted whole-crate extraction
+root. Do not add lint exceptions, opaque/external substitutes, storage redesign, broad body
+inclusion, or a toolchain change.
+
+The carrier-edge budget argument must be proved against the actual generated scene function:
+the accumulated required edges are duplicate-free and drawn from the carrier, and the newly
+admitted edge is in the carrier but not yet accumulated. This makes the logical guard equivalent
+on reachable states. Native reservation and no-allocation evidence separately establish retained
+workspace capacity. The current slice-only Lean `Vec` model cannot express allocator capacity,
+so neither the logical proof nor the model may be described as a capacity theorem.
+
+Keep idiomatic `Vec::clear` behavior and public traits. The pinned formatter abstraction is already
+accepted; phase 2 does not require concrete `Debug` text or a formatter redesign. If future
+`Option<T>::Debug` support is required, it must preserve actual `None`/`Some` branching and delegate
+to the existing formatter primitives, not introduce a new Option-specific unconditional-success
+or no-op model. Any new standard-model patch requires a separately approved exact source revision,
+regenerated registry identity, behavior-level specification, and its own owner gate.
+
+## Design and contracts
 
 ### One navigable topology
 
@@ -405,8 +495,8 @@ it is not permission to silently switch to unconnected abstract proofs or tests-
 ### Phase 2 — unified topology, transitions, and structural proofs
 
 **Files:** `rust/src/grid.rs`, `polar.rs`, `topology.rs`, `spanning_tree.rs`, `walker.rs`,
-`shatter.rs`; consumer-behavior tests; matching Lean definitions/proofs for graph representation,
-DFS, reroot, step, operation traces, and portal-transition constraints.
+`motion.rs`, `scene.rs`, `shatter.rs`; consumer-behavior tests; matching Lean definitions/proofs
+for graph representation, DFS, reroot, step, operation traces, and portal-transition constraints.
 
 Build the combined carrier and global tree, both configurable ring modes, crossing reservations,
 and strict epoch/revision publication. Factor visual fragmentation from topology mutation.
@@ -423,9 +513,24 @@ The safety contract is independent of RNG quality and applies to every accepted 
 - [ ] Both motion modes retain connected admissible doorways across sector-boundary events.
 - [ ] No per-step neighbor allocation or whole-graph rebuild/copy in a render tick.
 
+**Current automated evidence, not phase acceptance:**
+- The preserved source-first snapshot passed the native format/strict-Clippy/53-test/docs and
+  actual both-mode trace gate detailed above. Its one allocation test has the stated narrow scope;
+  the historical 96-event zero-allocation instrument was not rerun on this snapshot.
+- Checked structural subsets include the carrier constructors, generic/public DFS, core mutations,
+  accepted finite trace prefixes, total prefix, acceptance including carrier overflow, and selected
+  connectivity. They do not compose the full outer scene theorem or publication protocol.
+- Automated acceptance remains open until unrestricted extraction produces no external templates,
+  the actual full-scene functions and all outer obligations pass strict Lean and the final axiom
+  audit, and the exact post-DFS overflow RNG/workspace frame is proved. The preserved final
+  quotient/total repair is unchecked, and the current Aeneas run fails at the later multi-variant
+  enumeration expansion in `motion.rs:502`.
+
 **Manual acceptance:** inspect source-to-theorem mapping and native transition traces; all
 required circular regions are connected, not decorative overlays. This does not yet satisfy
 browser acceptance.
+The current manual gate is unaccepted: there is no complete source-to-theorem scene mapping,
+full-scene Lean acceptance, fresh final review, or owner sign-off.
 
 ### Phase 3 — solvers, metrics, and the full first-milestone proof suite
 
@@ -516,12 +621,13 @@ fall back to the disconnected implementation.
 interior traversal, and exit behavior. Production publication requires separate approval,
 verified credentials, and a live smoke on the published revision. Local success is not live success.
 
-**Later presentation queue:** after the layout work, explore content entrance/loading motion,
-using the owner's Ronacher reference as a research input rather than an already-inspected spec.
-The [Portfolio-owned ordered backlog](https://github.com/Slvr-one/portfolio/blob/3525378a306b7ce84fdca087e7c9e5717a1af5a3/docs/design/labyrinth/README.md#ordered-follow-ups--paused-2026-11-15)
-tracks moving social/email links to the footer, removing the redundant on-page site heading
-and reclaiming its space, then animation options. These changes are recorded, not implemented;
-they neither bypass earlier phase gates nor expand the current paused phase-2 work.
+**Independent Portfolio presentation plan:** [Portfolio PR 6](https://github.com/Slvr-one/portfolio/pull/6)
+owns the professional, uncluttered overview/story/technology/scroll/mode plan, including the
+footer/wordmark layout direction and any researched entrance/loading motion. Its preserved
+implementation snapshot is `work/portfolio-layout-20261115` at `c293860`; it is a draft, not
+accepted or merged. Do not duplicate that full UI specification here or create another competing
+plan. It may later receive separate implementation approval without claiming Rust/Wasm phase-5
+delivery, connected-maze acceptance, merge authority, or publication authority.
 
 ## Execution and ownership
 
@@ -536,6 +642,47 @@ Portfolio integration uses a separate ordered PR depending on the tested library
 Progress reports distinguish planned, source implemented, proof checked, built, locally integrated,
 review-ready and live states. Report the next failing/unverified gate, not just completed tasks.
 No board is required or implicitly authorized.
+
+## Renewed approval, AUQ choices, and next steps
+
+No selection is recorded by this refresh. The lead must present these unresolved choices in AUQ
+with context, options, and a recommendation before implementation:
+
+1. Approve or revise the complete reconciled plan set and the proposed source-first execution
+   order. Proposed default: approve only the narrow source-first scope above; keep every phase,
+   property, automated gate, and manual gate unchanged.
+2. Decide whether and when to approve the independent Portfolio PR 6 presentation plan after
+   all related plans are ready. Its implementation, merge, and production publication are
+   distinct decisions and do not satisfy phase 5.
+3. If an approved source-first attempt demonstrates that a standard-model patch is still needed,
+   choose an exact pinned patch/revision and ownership route in a new AUQ decision. Proposed
+   default now: no model patch, pin change, storage redesign, or formatter expansion.
+4. After complete phase-2 automated evidence and fresh review exist, accept or reject the
+   phase-2 manual gate. No phase 3 work starts before that decision.
+
+After renewed approval, execute in this order:
+
+1. Establish exact source/proof revisions and disjoint ownership, then run two independent lanes
+   in parallel: source-first translation and outer constructor proofs over the already generated
+   checked core. The additional let-kind change is a proposal to assess, not pre-approved code.
+2. In the source lane, settle approved edits before native and unrestricted Charon/Aeneas checks.
+   Stop only the dependent scene work on a demonstrated missing model; bring any exact model/pin
+   change back to the owner rather than narrowing roots or disabling checks.
+3. In the constructor lane, start from the checked frontier plus the preserved `49d1a91` repair;
+   check quotient prefix/totality and prove the exact post-DFS overflow RNG/workspace frame.
+   A failed scene extraction does not hold these independent core obligations.
+4. Once actual full-scene generated functions compile without external templates, prove the
+   carrier-budget equivalence and remaining scene/publication contracts. Keep native capacity/
+   no-allocation evidence separate from logical content proofs. After both lanes settle, run the
+   complete integrated phase-2 gate on that exact revision: unrestricted Rust→Charon→Aeneas
+   extraction; independent regenerated-definition byte matching; strict Lean build and axiom
+   audit for every production root; native fmt, strict Clippy, tests and docs; actual traversal
+   traces in both modes; and refreshed production allocation instrumentation. Historical or
+   per-lane results do not replace this integrated gate. Then run fresh review and present the
+   still-separate manual acceptance packet.
+5. Only after phase-2 manual acceptance continue the retained order: full solver/metric proof
+   suite, Wasm parity/costs, and actual Portfolio autonomous-crossing integration. Each phase keeps
+   its own automated and manual gate; merge and deployment remain separate.
 
 ## Non-goals, migration, and rollback
 
