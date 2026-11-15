@@ -9,6 +9,7 @@ import LabyrinthCore.MutationTrace
 import LabyrinthCore.ConstructorSceneExpandedCarrier
 import LabyrinthCore.ConstructorOrientation
 import LabyrinthCore.ConstructorSceneRejection
+import LabyrinthCore.ConstructorSceneAcceptance
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -36,3 +37,4 @@ import LabyrinthCore.ConstructorSceneRejection
 #print axioms Labyrinth.constructor_scene_expanded_carrier_accepts
 #print axioms Labyrinth.constructor_scene_orientation_accepts
 #print axioms Labyrinth.constructor_scene_rejects_invalid_forest
+#print axioms Labyrinth.constructor_scene_publish_accepts
