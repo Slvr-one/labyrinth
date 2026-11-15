@@ -5,6 +5,7 @@ public import LabyrinthCore.ConstructorQuotientCursor
 public import LabyrinthCore.ConstructorQuotientDFS
 public import LabyrinthCore.ConstructorSceneExpandedCarrier
 public import LabyrinthCore.ConstructorOrientation
+public import LabyrinthCore.ConstructorSceneTotalPrefix
 @[expose] public section
 
 open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
@@ -89,6 +90,21 @@ theorem constructor_quotient_prefix_sum_le (edges : List topology.Edge)
       simpa only [hvalue, Option.getD_some] using heq
     _ ≤ 2 * edges.length :=
       constructor_quotient_degree_sum_le edges label count.val edges.length le_rfl hlabels
+
+/-- Degree slot zero stays the empty CSR sentinel because every real quotient row is stored at
+its one-based count slot. -/
+theorem constructor_quotient_degree_zero (edges : List topology.Edge)
+    (label : Usize → Usize) (processed : Nat) :
+    constructorQuotientDegreeSlot edges label 0 processed = 0 := by
+  induction processed with
+  | zero => rfl
+  | succ processed ih =>
+      simp only [constructorQuotientDegreeSlot, ih]
+      split
+      · rfl
+      · split
+        · rfl
+        · simp
 /-- Exact prefix offsets admit a single row owner for every slot in a quotient row. -/
 theorem constructor_quotient_row_owner (counts : List Usize) (offsets : Slice Usize)
     (count : Usize) (hlength : offsets.val.length = count.val + 1)
@@ -149,6 +165,78 @@ def ConstructorSceneAllocationFits (carrier : topology.Carrier) : Prop :=
   (n - 1) * 16 ≤ (IScalar.hcast .Usize core.num.Isize.MAX).val ∧
   ((n - 1) * 2) * 8 ≤ Usize.max ∧
   ((n - 1) * 2) * 8 ≤ (IScalar.hcast .Usize core.num.Isize.MAX).val
+
+private theorem constructor_scene_carrier_overflow_return :
+    WP.spec (do
+      let actual ← ok (core.convert.FromSame.from topology.Error.Overflow)
+      ok (.Err actual : core.result.Result topology.Carrier topology.Error))
+      (fun result => result = .Err topology.Error.Overflow) := by
+  have hconvert : WP.spec
+      (ok (core.convert.FromSame.from topology.Error.Overflow))
+      (fun actual => actual = topology.Error.Overflow) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hconvert
+  intro actual hactual
+  rw [hactual]
+  exact (WP.spec_ok _).mpr rfl
+
+/-- If one of the allocation widths checked by `from_edges` does not fit, the literal
+selected-carrier call returns exactly `Overflow`; endpoint validation is not reached. -/
+theorem constructor_scene_expanded_carrier_overflow (n : Usize)
+    (selected : alloc.vec.Vec topology.Edge) (hn : n ≠ 0#usize)
+    (hwidth : ¬ constructorEdgesStorageFits n selected.slice) :
+    WP.spec (topology.Carrier.from_edges n selected.slice)
+      (fun result => result = .Err topology.Error.Overflow) := by
+  unfold topology.Carrier.from_edges
+  simp only [hn, ite_false]
+  cases hadd : Usize.checked_add n 1#usize with
+  | none =>
+      simp only [lift, bind_ok, core.option.Option.ok_or,
+        core.result.Result.Insts.CoreOpsTry.branch,
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+      exact constructor_scene_carrier_overflow_return
+  | some count =>
+      have ha := Usize.checked_add_bv_spec n 1#usize
+      simp only [hadd] at ha
+      have hcount : count.val = n.val + 1 := by
+        simpa only [UScalar.ofNatCore_val_eq] using ha.2.1
+      cases hmul : Usize.checked_mul (Slice.len selected.slice) 2#usize with
+      | none =>
+          simp only [lift, bind_ok, core.option.Option.ok_or,
+            core.result.Result.Insts.CoreOpsTry.branch,
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+          exact constructor_scene_carrier_overflow_return
+      | some twice =>
+          have hm := Usize.checked_mul_bv_spec (Slice.len selected.slice) 2#usize
+          simp only [hmul] at hm
+          have htwice : twice.val = selected.val.length * 2 := by
+            simpa only [Slice.len_val, UScalar.ofNatCore_val_eq,
+              alloc.vec.Vec.slice, alloc.vec.Vec.val] using hm.2.1
+          simp only [lift, bind_ok, core.option.Option.ok_or,
+            core.result.Result.Insts.CoreOpsTry.branch, constructor_check_storage_eq]
+          by_cases hc : constructorStorageFits count 8#usize
+          · simp only [hc, ite_true, bind_ok]
+            by_cases ht : constructorStorageFits twice 8#usize
+            · simp only [ht, ite_true, bind_ok]
+              by_cases he : constructorStorageFits (Slice.len selected.slice) 16#usize
+              · have hc' := hc
+                have ht' := ht
+                simp only [constructorStorageFits, hcount, UScalar.ofNatCore_val_eq] at hc'
+                simp only [constructorStorageFits, htwice, UScalar.ofNatCore_val_eq] at ht'
+                exact False.elim (hwidth
+                  ⟨by omega, by simpa only [alloc.vec.Vec.slice, alloc.vec.Vec.val] using
+                    (show selected.val.length * 2 ≤ Usize.max by omega),
+                    hc'.1, hc'.2, by simpa only [alloc.vec.Vec.slice, alloc.vec.Vec.val] using
+                    ht'.1, by simpa only [alloc.vec.Vec.slice, alloc.vec.Vec.val] using ht'.2,
+                    he⟩)
+              · simp only [he, ite_false, bind_ok,
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+                exact constructor_scene_carrier_overflow_return
+            · simp only [ht, ite_false, bind_ok,
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+              exact constructor_scene_carrier_overflow_return
+          · simp only [hc, ite_false, bind_ok,
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+            exact constructor_scene_carrier_overflow_return
 
 /-- A tree oriented over the expanded selected carrier is also a tree over the original carrier,
 provided every actual selected edge is an original carrier edge. -/

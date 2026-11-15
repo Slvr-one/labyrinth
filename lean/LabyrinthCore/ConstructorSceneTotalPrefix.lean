@@ -1,10 +1,32 @@
 module
 public import LabyrinthCore.ConstructorPrefixOffsets
+public import LabyrinthCore.ConstructorQuotientDegrees
+public import LabyrinthCore.Constructors
 @[expose] public section
 
 open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
 
 namespace Labyrinth
+
+/-- Exact successful state at the end of the literal quotient prefix/allocation guards.
+`counts` is retained existentially because the generated constructor keeps only the prefixed
+offset vector. -/
+def ConstructorScenePrefixSuccess (carrier : topology.Carrier)
+    (componentCount : Usize) (label : Usize → Usize)
+    (offsets : alloc.vec.Vec Usize) (adjacencyCount : Usize) : Prop :=
+  ∃ (countWidth : Usize) (counts : List Usize),
+    countWidth.val = counts.length ∧ counts.length = componentCount.val + 1 ∧
+    (∀ slot, slot < counts.length → ∃ value : Usize,
+      counts[slot]? = some value ∧ value.val =
+        constructorQuotientDegreeSlot carrier.edges.val label slot carrier.edges.val.length) ∧
+    offsets.val.length = counts.length ∧
+    (∀ slot, slot < offsets.val.length → ∃ value : Usize,
+      offsets.val[slot]? = some value ∧
+        value.val = constructorPrefixSum counts (slot + 1)) ∧
+    adjacencyCount.val = constructorPrefixSum counts counts.length ∧
+    constructorStorageFits countWidth 8#usize ∧
+    constructorStorageFits adjacencyCount 8#usize ∧
+    constructorStorageFits adjacencyCount 16#usize
 
 /-- The literal checked prefix-sum operation is total on every nonempty representable slice.
 It preserves the slice length, returns only success or the checked-add `Overflow`, and a success
