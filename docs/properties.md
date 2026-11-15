@@ -134,7 +134,15 @@ every undirected tree edge is preserved, errors leave the tree unchanged, and su
 exactly when the requested root is in bounds and path capacity is sufficient. Its axiom audit
 contains only `propext`, `Classical.choice` and `Quot.sound`.
 
-Complete carrier, DFS, constrained-constructor, batch-edit/exchange, trace and scene-publication
+Both carrier constructors now have checked totality/soundness and valid-input acceptance
+specifications. Generic DFS accepts bounded, root-reachable directed CSR, including parallel
+arcs, under a total range-correct RNG contract. It proves all vertices discovered, a rooted
+parent tree and exact incoming original-slot witnesses. The public `Tree::dfs` specification
+returns `TreeValid` on valid carrier inputs with sufficient workspace and preserves RNG and
+workspace on invalid-root or insufficient-capacity rejection. The sixteen production roots
+listed in `Audit.lean` use only the standard axioms above.
+
+Complete constrained-constructor, batch-edit/exchange, trace and scene-publication
 specifications remain unfinished. The full crate's extraction and strict Lean gate are not yet
 passing.
 The checked-in generated core model does not currently cover the full scene/planner source.

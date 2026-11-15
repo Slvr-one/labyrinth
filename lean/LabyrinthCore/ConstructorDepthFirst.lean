@@ -51,29 +51,17 @@ theorem constructor_depth_first_accepts {R : Type*} (adapter : tree.Rng R)
   rintro ⟨status, rng'⟩ ⟨frame, hstatus, hcell, hremaining, _hempty, hnext⟩
   dsimp only at hstatus
   rw [hstatus]
-  change WP.spec (do
-    let (_, backFrame) ← initialized.frames.index_mut_usize 0#usize
-    let (_, backSeen) ← initialized.seen.index_mut_usize root
-    let (rng'', seen, frames, parents, incoming, reached, loopStatus) ←
-      spanning_tree.depth_first_loop1 adapter offsets neighbors rng'
-        (backSeen true) (backFrame frame) initialized.parents initialized.incoming
-        1#usize 1#usize (.Ok ())
-    let cf ← core.result.Result.Insts.CoreOpsTry.branch loopStatus
-    match cf with
-    | .Continue _ =>
-      if reached != n then
-        ok (.Err .Disconnected, rng'',
-          { initialized with seen := seen, frames := frames, parents := parents,
-            incoming := incoming })
-      else
-        ok (.Ok (), rng'', { initialized with seen := seen, frames := frames,
-          parents := parents, incoming := incoming })
-    | .Break residual => do
-      let result ←
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-          Unit (core.convert.FromSame topology.Error) residual
-      ok (result, rng'', { initialized with seen := seen, frames := frames,
-        parents := parents, incoming := incoming })) _
+  dsimp only
+  have hbranch : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (core.result.Result.Ok frame :
+          core.result.Result spanning_tree.Frame topology.Error))
+      (fun cf => cf = .Continue frame) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hbranch
+  intro cf hcf
+  subst cf
+  dsimp only
+  simp only [alloc.vec.Vec.index_mut_slice_index]
   have hframes : initialized.frames.val.length = work.path.val.length := by
     rw [hivalid.2.1, hpath]
   have hseen : initialized.seen.val.length = work.path.val.length := by rw [hivalid.1, hpath]
@@ -104,16 +92,15 @@ theorem constructor_depth_first_accepts {R : Type*} (adapter : tree.Rng R)
     (initialized.frames.set 0#usize frame) initialized.parents initialized.incoming 1#usize 1#usize
     {root.val} (fun _ => 0) (by simpa only [UScalar.ofNatCore_val_eq] using hstart))
   rintro ⟨rng'', seen, frames, parents, incoming, reached, status⟩ ⟨hstatus, visited, rank, hfinal⟩
-  dsimp only at hstatus hfinal
   rw [hstatus]
-  change WP.spec
-    (if reached != n then
-      ok (.Err .Disconnected, rng'',
-        { initialized with seen := seen, frames := frames, parents := parents,
-          incoming := incoming })
-    else
-      ok (.Ok (), rng'', { initialized with seen := seen, frames := frames,
-        parents := parents, incoming := incoming })) _
+  have hloopBranch : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (core.result.Result.Ok () : core.result.Result Unit topology.Error))
+      (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hloopBranch
+  intro loopCf hloopCf
+  subst loopCf
+  dsimp only
   obtain ⟨_hvisited, hreached, hall⟩ := constructor_dfs_stack_empty_all_seen hinput hfinal
   have heq : reached = n := (UScalar.eq_equiv _ _).mpr (hreached.trans hnval.symm)
   simp only [heq, bne_self_eq_false, Bool.false_eq_true, ite_false]

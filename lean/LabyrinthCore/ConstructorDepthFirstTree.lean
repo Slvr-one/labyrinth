@@ -22,8 +22,8 @@ theorem constructor_tree_dfs_accepts {R : Type*} (adapter : tree.Rng R)
   have hnonempty : 0 < carrier.offsets.val.length := by have := hc.1; unfold cellCount at this; omega
   unfold spanning_tree.Tree.dfs topology.Carrier.len
   apply WP.spec_bind (Usize.sub_spec (x := alloc.vec.Vec.len carrier.offsets) (y := 1#usize) (by
-    simp only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq]
-    omega))
+    simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq] using
+      (Nat.succ_le_iff.mpr hnonempty)))
   intro n hn
   have hnval : n.val = cellCount carrier := by
     simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq, cellCount] using hn.1
@@ -33,22 +33,35 @@ theorem constructor_tree_dfs_accepts {R : Type*} (adapter : tree.Rng R)
     change ¬ work.path.val.length < n.val
     rw [hnval]
     omega
+  have hedgeDeref : (alloc.vec.Vec.deref carrier.edges).val = carrier.edges.val := by
+    simp only [alloc.vec.Vec.deref, Slice.from_val]
+  have hedgeDerefLen : (alloc.vec.Vec.deref carrier.edges).val.length =
+      carrier.edges.val.length := congrArg List.length hedgeDeref
   have hedgeGuard : ¬ Slice.len (alloc.vec.Vec.deref carrier.edges) > work.edge_capacity := by
-    change ¬ work.edge_capacity.val < carrier.edges.val.length
-    omega
+    apply not_lt_of_ge
+    change (alloc.vec.Vec.deref carrier.edges).val.length ≤ work.edge_capacity.val
+    rw [hedgeDerefLen]
+    exact hedges
   simp only [spanning_tree.Workspace.ensure, hcells, hedgeGuard, ite_false,
     core.result.Result.Insts.CoreOpsTry.branch, bind_ok, topology.Carrier.storage]
+  have hrawCapacity : constructorDFSVertexCount (alloc.vec.Vec.deref carrier.offsets) ≤
+      work.path.val.length := by
+    simpa only [constructorDFSVertexCount, cellCount, alloc.vec.Vec.deref, Slice.from_val] using
+      hcapacity
   apply WP.spec_bind (constructor_depth_first_accepts adapter hrng
     (alloc.vec.Vec.deref carrier.offsets) (alloc.vec.Vec.deref carrier.neighbors) root rng work
-    (constructor_dfs_input_of_carrier carrier root.val hc hroot) hw hcapacity)
+    (constructor_dfs_input_of_carrier carrier root.val hc hroot) hw hrawCapacity)
   rintro ⟨status, rng', after⟩ ⟨hstatus, hout⟩
   dsimp only at hstatus hout
   rw [hstatus]
-  change WP.spec (do
-    let parents ← alloc.vec.from_elem core.clone.CloneUsize root n
-    let (copiedWork, copiedParents) ←
-      spanning_tree.Tree.dfs_loop after parents 0#usize
-    ok (.Ok { parents := copiedParents, root }, rng', copiedWork)) _
+  have hbranch : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (core.result.Result.Ok () : core.result.Result Unit topology.Error))
+      (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hbranch
+  intro cf hcf
+  subst cf
+  dsimp only
   apply WP.spec_bind (alloc.vec.from_elem_spec core.clone.CloneUsize root n rfl)
   intro fresh hfresh
   have hfreshLen : fresh.val.length = cellCount carrier := by simp only [hfresh.1, List.length_replicate, hnval]
@@ -58,7 +71,7 @@ theorem constructor_tree_dfs_accepts {R : Type*} (adapter : tree.Rng R)
   rintro ⟨copiedWork, copiedParents⟩ ⟨rfl, hcopy⟩
   apply (WP.spec_ok _).mpr
   refine ⟨{ parents := copiedParents, root }, rfl, rfl, ?_, hout.valid, hout.path, hout.edge_capacity⟩
-  exact constructor_dfs_output_tree_valid carrier root work after
+  exact constructor_dfs_output_tree_valid carrier root work copiedWork
     { parents := copiedParents, root } hc hcapacity hout (by simpa only [hfreshLen] using hcopy) rfl
 
 /-- Invalid roots return before touching workspace or RNG, and still terminate. -/
@@ -70,8 +83,8 @@ theorem constructor_tree_dfs_invalid_root {R : Type*} (adapter : tree.Rng R)
   have hnonempty : 0 < carrier.offsets.val.length := by have := hc.1; unfold cellCount at this; omega
   unfold spanning_tree.Tree.dfs topology.Carrier.len
   apply WP.spec_bind (Usize.sub_spec (x := alloc.vec.Vec.len carrier.offsets) (y := 1#usize) (by
-    simp only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq]
-    omega))
+    simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq] using
+      (Nat.succ_le_iff.mpr hnonempty)))
   intro n hn
   have hnval : n.val = cellCount carrier := by
     simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq, cellCount] using hn.1
@@ -90,26 +103,33 @@ theorem constructor_tree_dfs_insufficient_workspace {R : Type*} (adapter : tree.
   have hnonempty : 0 < carrier.offsets.val.length := by have := hc.1; unfold cellCount at this; omega
   unfold spanning_tree.Tree.dfs topology.Carrier.len
   apply WP.spec_bind (Usize.sub_spec (x := alloc.vec.Vec.len carrier.offsets) (y := 1#usize) (by
-    simp only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq]
-    omega))
+    simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq] using
+      (Nat.succ_le_iff.mpr hnonempty)))
   intro n hn
   have hnval : n.val = cellCount carrier := by
     simpa only [alloc.vec.Vec.len_val, UScalar.ofNatCore_val_eq, cellCount] using hn.1
   have hguard : ¬ root ≥ n := by change ¬ n.val ≤ root.val; rw [hnval]; omega
-  simp only [hguard, ite_false, topology.Carrier.impl.edges, bind_ok, spanning_tree.Workspace.ensure]
-  by_cases hcells : n > alloc.vec.Vec.len work.path
-  · simp only [hcells, ite_true, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
-      core.convert.FromSame]
-    exact (WP.spec_ok _).mpr rfl
-  · have hedgeGuard : Slice.len (alloc.vec.Vec.deref carrier.edges) > work.edge_capacity := by
-      change work.edge_capacity.val < carrier.edges.val.length
-      have hnot : ¬ work.path.val.length < cellCount carrier := by simpa only [hnval] using hcells
+  simp only [hguard, ite_false, topology.Carrier.impl.edges, bind_ok]
+  apply WP.spec_bind (mutation_workspace_ensure_total work n
+    (Slice.len (alloc.vec.Vec.deref carrier.edges)))
+  intro ensured hensured
+  have hedgeDeref : (alloc.vec.Vec.deref carrier.edges).val = carrier.edges.val := by
+    simp only [alloc.vec.Vec.deref, Slice.from_val]
+  have hedgeDerefLen : (alloc.vec.Vec.deref carrier.edges).val.length =
+      carrier.edges.val.length := congrArg List.length hedgeDeref
+  have herr : ensured = .Err topology.Error.InsufficientWorkspace := by
+    rw [hensured]
+    have hbad : ¬ (n.val ≤ work.path.val.length ∧
+        Slice.len (alloc.vec.Vec.deref carrier.edges) ≤ work.edge_capacity) := by
+      simp only [UScalar.le_equiv, Slice.len_val]
+      change ¬ (n.val ≤ work.path.val.length ∧
+        (alloc.vec.Vec.deref carrier.edges).val.length ≤ work.edge_capacity.val)
+      rw [hedgeDerefLen]
+      rw [hnval]
       omega
-    simp only [hcells, hedgeGuard, ite_false, ite_true, core.result.Result.Insts.CoreOpsTry.branch,
-      bind_ok, core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
-      core.convert.FromSame]
-    exact (WP.spec_ok _).mpr rfl
+    simp only [hbad, ite_false]
+  simp [herr, core.result.Result.Insts.CoreOpsTry.branch,
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
 
 /-- Every valid carrier and reusable workspace has a total constructor result under legal RNG.
 Rejected guards return the original arguments; successful publication is a full carrier tree. -/

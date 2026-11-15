@@ -70,17 +70,31 @@ theorem constructor_carrier_from_edges_spec (n : Usize) (edges : Slice topology.
     rintro ⟨degrees, status⟩ hdegrees
     cases status with
     | Err error =>
-      simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual, WP.spec_ok]
+      have hbranch : WP.spec
+          (core.result.Result.Insts.CoreOpsTry.branch
+            (.Err error : core.result.Result Unit topology.Error))
+          (fun cf => cf = .Break (.Err error)) := (WP.spec_ok _).mpr rfl
+      apply WP.spec_bind hbranch
+      intro cf hcf
+      subst cf
+      unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      exact constructor_edges_error_return _
     | Ok value =>
       cases value
       obtain ⟨hdegreesLength, hedges, hdegreesContents⟩ := hdegrees rfl
       have hdegreeLen : degrees.val.length = n.val + 1 := hdegreesLength.trans hcountsLength
       have hsum : constructorPrefixSum degrees.val degrees.val.length = 2 * edges.val.length :=
         constructor_degrees_prefix_sum n.val edges.val degrees.slice hdegreeLen hedges
-          hdegreesContents
-      simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-        alloc.vec.Vec.deref_mut, lift]
+          (by
+            intro j hj
+            exact hdegreesContents j (by change j < degrees.val.length at hj; omega))
+      have hbranch : WP.spec
+          (core.result.Result.Insts.CoreOpsTry.branch
+            (.Ok () : core.result.Result Unit topology.Error))
+          (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+      apply WP.spec_bind hbranch
+      intro cf hcf
+      subst cf
       apply WP.spec_bind (constructor_prefix_offsets_spec degrees.slice (by
         change 0 < degrees.val.length
         omega) (by
@@ -88,7 +102,15 @@ theorem constructor_carrier_from_edges_spec (n : Usize) (edges : Slice topology.
         rw [hsum]
         omega))
       rintro ⟨prefixStatus, summed⟩ ⟨hprefixStatus, hsummedLength, hsummed⟩
-      simp only [hprefixStatus, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+      change prefixStatus = .Ok () at hprefixStatus
+      rw [hprefixStatus]
+      have hbranchPrefix : WP.spec
+          (core.result.Result.Insts.CoreOpsTry.branch
+            (.Ok () : core.result.Result Unit topology.Error))
+          (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+      apply WP.spec_bind hbranchPrefix
+      intro cf hcf
+      subst cf
       apply WP.spec_bind (alloc.vec.from_elem_spec core.clone.CloneUsize 0#usize n rfl)
       intro cursor hcursor
       let offsets : alloc.vec.Vec Usize := ⟨summed⟩
@@ -116,6 +138,7 @@ theorem constructor_carrier_from_edges_spec (n : Usize) (edges : Slice topology.
         obtain ⟨value, hv, he⟩ := hsummed j (by change j < degrees.val.length; omega)
         change summed.val[j]? = some value at hv
         change (summed.val[j]?.getD 0#usize).val = _
+        change value.val = constructorPrefixSum degrees.val (j + 1) at he
         simpa only [hv, Option.getD_some] using he
       obtain ⟨_, hlast, hrows, hmono⟩ := constructor_degree_offsets_layout n.val edges.val
         degrees.val offsets.val hdegreeLen hedges hnumericCounts hnumericOffsets
@@ -187,22 +210,22 @@ theorem constructor_carrier_from_edges_total_spec (n : Usize) (edges : Slice top
           simp only [lift, bind_ok, core.option.Option.ok_or,
             core.result.Result.Insts.CoreOpsTry.branch, constructor_check_storage_eq]
           by_cases hc : constructorStorageFits count 8#usize
-          · simp only [hc, ite_true, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+          · simp only [hc, ite_true, bind_ok]
             by_cases ht : constructorStorageFits twice 8#usize
-            · simp only [ht, ite_true, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+            · simp only [ht, ite_true, bind_ok]
               by_cases he : constructorStorageFits (Slice.len edges) 16#usize
               · have hc' := hc
                 have ht' := ht
                 simp only [constructorStorageFits, hcount, UScalar.ofNatCore_val_eq] at hc'
                 simp only [constructorStorageFits, htwice, UScalar.ofNatCore_val_eq] at ht'
                 exact False.elim (hwidth ⟨by omega, by omega, hc'.1, hc'.2, ht'.1, ht'.2, he⟩)
-              · simp only [he, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+              · simp only [he, ite_false, bind_ok,
                   core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
                 exact constructor_edges_error_return _
-            · simp only [ht, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+            · simp only [ht, ite_false, bind_ok,
                 core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
               exact constructor_edges_error_return _
-          · simp only [hc, ite_false, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+          · simp only [hc, ite_false, bind_ok,
               core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
             exact constructor_edges_error_return _
 
@@ -427,9 +450,18 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
   have hdegreeLen : degrees.val.length = n.val + 1 := hdegreesLength.trans hcountsLength
   have hsum : constructorPrefixSum degrees.val degrees.val.length = 2 * edges.val.length :=
     constructor_degrees_prefix_sum n.val edges.val degrees.slice hdegreeLen hedges
-      hdegreesContents
-  simp only [hstatus, core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-    alloc.vec.Vec.deref_mut, lift]
+      (by
+        intro j hj
+        exact hdegreesContents j (by change j < degrees.val.length at hj; omega))
+  change status = .Ok () at hstatus
+  rw [hstatus]
+  have hbranch : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (.Ok () : core.result.Result Unit topology.Error))
+      (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hbranch
+  intro cf hcf
+  subst cf
   apply WP.spec_bind (constructor_prefix_offsets_spec degrees.slice (by
     change 0 < degrees.val.length
     omega) (by
@@ -437,7 +469,15 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
     rw [hsum]
     omega))
   rintro ⟨prefixStatus, summed⟩ ⟨hprefixStatus, hsummedLength, hsummed⟩
-  simp only [hprefixStatus, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  change prefixStatus = .Ok () at hprefixStatus
+  rw [hprefixStatus]
+  have hbranchPrefix : WP.spec
+      (core.result.Result.Insts.CoreOpsTry.branch
+        (.Ok () : core.result.Result Unit topology.Error))
+      (fun cf => cf = .Continue ()) := (WP.spec_ok _).mpr rfl
+  apply WP.spec_bind hbranchPrefix
+  intro cf hcf
+  subst cf
   apply WP.spec_bind (alloc.vec.from_elem_spec core.clone.CloneUsize 0#usize n rfl)
   intro cursor hcursor
   let offsets : alloc.vec.Vec Usize := ⟨summed⟩
@@ -466,6 +506,7 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
     obtain ⟨value, hv, he⟩ := hsummed j (by change j < degrees.val.length; omega)
     change summed.val[j]? = some value at hv
     change (summed.val[j]?.getD 0#usize).val = _
+    change value.val = constructorPrefixSum degrees.val (j + 1) at he
     simpa only [hv, Option.getD_some] using he
   obtain ⟨hfirstNat, hlastNat, hrows, hmono⟩ := constructor_degree_offsets_layout n.val edges.val
     degrees.val offsets.val hdegreeLen hedges hnumericCounts hnumericOffsets
@@ -526,6 +567,7 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
     simpa only [heq] using hlook
   have hraw : constructorRawRows (alloc.vec.Vec.deref offsets)
       (alloc.vec.Vec.deref filled) := by
+    simp only [constructorRawRows, alloc.vec.Vec.deref, Slice.from_val]
     intro cell hc
     change cell < offsets.val.length - 1 at hc
     have hcn : cell < n.val := by omega
@@ -544,9 +586,11 @@ theorem constructor_carrier_from_edges_accepts (n : Usize) (edges : Slice topolo
       omega
   have hcsrWidth : constructorCsrStorageFits offsets filled := by
     have he := hedgeStorage
-    simp [constructorStorageFits] at he
+    have hedgeLen : (Slice.len edges).val = edges.val.length := by simp
+    simp only [constructorStorageFits, hedgeLen, UScalar.ofNatCore_val_eq] at he
+    have hhalf : edges.val.length * 2 / 2 = edges.val.length := by omega
     simp only [constructorCsrStorageFits, hoffsetsLength, Nat.add_sub_cancel,
-      hfilledLength, Nat.mul_div_cancel]
+      hfilledLength, hhalf]
     exact ⟨by omega, by omega, he.1, he.2⟩
   apply WP.spec_mono (constructor_carrier_from_filled_csr_accepts edges.val starts
     neighbors.val n.val offsets filled hnpos hedges hcapacity hseparated hsimple

@@ -1,6 +1,8 @@
 import LabyrinthCore.Spec
 import LabyrinthCore.ConstructorTreeInterpretation
 import LabyrinthCore.MutationRerootSpec
+import LabyrinthCore.ConstructorCarrierEdges
+import LabyrinthCore.ConstructorDepthFirstTree
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -9,3 +11,12 @@ import LabyrinthCore.MutationRerootSpec
 #print axioms Labyrinth.constructor_treeValid_isTree
 #print axioms Labyrinth.mutation_reroot_success
 #print axioms Labyrinth.mutation_reroot_preserves
+#print axioms Labyrinth.constructor_carrier_from_csr_spec
+#print axioms Labyrinth.constructor_carrier_from_csr_accepts
+#print axioms Labyrinth.constructor_carrier_from_edges_total_spec
+#print axioms Labyrinth.constructor_carrier_from_edges_accepts
+#print axioms Labyrinth.constructor_depth_first_accepts
+#print axioms Labyrinth.constructor_tree_dfs_accepts
+#print axioms Labyrinth.constructor_tree_dfs_invalid_root
+#print axioms Labyrinth.constructor_tree_dfs_insufficient_workspace
+#print axioms Labyrinth.constructor_tree_dfs_spec
