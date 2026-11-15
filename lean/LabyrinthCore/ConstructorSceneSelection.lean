@@ -1,5 +1,6 @@
 module
 public import LabyrinthCore.ConstructorSceneInitialize
+public import LabyrinthCore.ConstructorSceneComponents
 @[expose] public section
 
 open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
@@ -149,4 +150,119 @@ theorem constructor_scene_select_spec (work : spanning_tree.Workspace)
   · exact ⟨rfl, by simp, rfl, by simp [constructorSceneSelectedIndex],
       fun _ _ => rfl, fun _ h => by simp at h⟩
 
+
+/-- Every slot after the required prefix and before the final selection count belongs to one
+nonroot component. -/
+theorem constructor_scene_selected_index_surjective (start root count slot : Nat)
+    (hroot : root < count) (hstart : start ≤ slot)
+    (hstop : slot < start + count - 1) :
+    ∃ index, index < count ∧ index ≠ root ∧
+      constructorSceneSelectedIndex start root index = slot := by
+  by_cases hbefore : slot < start + root
+  · refine ⟨slot - start, by omega, by omega, ?_⟩
+    unfold constructorSceneSelectedIndex
+    split <;> omega
+  · refine ⟨slot - start + 1, by omega, by omega, ?_⟩
+    unfold constructorSceneSelectedIndex
+    split <;> omega
+
+/-- The two actual selection loops fill exactly the required prefix followed by one retained
+original witness for every nonroot quotient component. The cardinality equation rules out
+uninitialized tail entries in the allocated `n - 1` vector. -/
+theorem constructor_scene_selected_actual_spec (work : spanning_tree.Workspace)
+    (required : Slice topology.Edge) (componentCount quotientRoot : Usize)
+    (witnesses : alloc.vec.Vec topology.Edge) (selected : alloc.vec.Vec topology.Edge)
+    (chosen : Nat → topology.Edge)
+    (hroot : quotientRoot.val < componentCount.val)
+    (hincoming : componentCount.val ≤ work.incoming.val.length)
+    (hwitness : ∀ node : Usize, node.val < componentCount.val → node ≠ quotientRoot →
+      ∃ slot : Usize, work.incoming.val[node.val]? = some slot ∧
+        slot.val < witnesses.val.length ∧ witnesses.val[slot.val]? = some (chosen node.val))
+    (hcardinality :
+      required.val.length + componentCount.val - 1 = selected.val.length) :
+    WP.spec (do
+      let selected1 ← spanning_tree.Tree.scene_dfs_loop6 required 0#usize selected
+      spanning_tree.Tree.scene_dfs_loop7 work 0#usize componentCount witnesses
+        quotientRoot selected1 (Slice.len required)) (fun output =>
+      output.1 = work ∧ output.2.val.length = selected.val.length ∧
+      ∀ slot, slot < output.2.val.length →
+        (slot < required.val.length ∧
+          output.2.val[slot]? =
+            (required.val[slot]?).map constructorCanonicalEdge) ∨
+        ∃ node, node < componentCount.val ∧ node ≠ quotientRoot.val ∧
+          slot = constructorSceneSelectedIndex required.val.length quotientRoot.val node ∧
+          output.2.val[slot]? = some (chosen node)) := by
+  have hcopyCapacity : required.val.length ≤ selected.val.length := by omega
+  apply WP.spec_bind
+    (constructor_scene_required_copy_spec required selected hcopyCapacity)
+  intro copied hcopy
+  have hselectCapacity :
+      (Slice.len required).val + componentCount.val - 1 ≤ copied.val.length := by
+    simpa only [Slice.len_val, hcopy.1] using hcardinality.le
+  apply WP.spec_mono
+    (constructor_scene_select_spec work componentCount quotientRoot (Slice.len required)
+      witnesses copied chosen hroot hincoming hwitness hselectCapacity)
+  intro output hout
+  obtain ⟨hwork, hlength, hprefix, hchosen⟩ := hout
+  have hfinalLength : output.2.val.length = selected.val.length :=
+    hlength.trans hcopy.1
+  refine ⟨hwork, hfinalLength, ?_⟩
+  intro slot hslot
+  by_cases hrequired : slot < required.val.length
+  · exact Or.inl ⟨hrequired,
+      (hprefix slot (by simpa only [Slice.len_val] using hrequired)).trans
+        (hcopy.2.1 slot hrequired)⟩
+  · have hstart : required.val.length ≤ slot := by omega
+    have hstop : slot < required.val.length + componentCount.val - 1 := by
+      rw [hcardinality]
+      simpa only [hfinalLength] using hslot
+    obtain ⟨node, hnode, hnonroot, hindex⟩ :=
+      constructor_scene_selected_index_surjective required.val.length quotientRoot.val
+        componentCount.val slot hroot hstart hstop
+    have hwidth : node < 2 ^ UScalarTy.Usize.numBits :=
+      lt_trans hnode componentCount.hBounds
+    let actualNode : Usize := UScalar.ofNatCore node hwidth
+    have hactualNode : actualNode.val = node := by
+      simp only [actualNode, UScalar.ofNatCore_val_eq]
+    have hactualNonroot : actualNode ≠ quotientRoot := by
+      intro he
+      exact hnonroot (by simpa only [hactualNode] using congrArg UScalar.val he)
+    have hselected := hchosen actualNode (by simpa only [hactualNode] using hnode)
+      hactualNonroot
+    exact Or.inr ⟨node, hnode, hnonroot, hindex.symm,
+      by simpa only [Slice.len_val, hactualNode, hindex] using hselected⟩
+
+/-- The actual forest and dense-label outputs discharge the selection size equation; callers do
+not assume a final selected-edge cardinality. -/
+theorem constructor_scene_selected_from_outputs_spec (work : spanning_tree.Workspace)
+    (n : Usize) (required : Slice topology.Edge) (links : alloc.vec.Vec Usize)
+    (componentCount quotientRoot : Usize) (witnesses : alloc.vec.Vec topology.Edge)
+    (selected : alloc.vec.Vec topology.Edge) (chosen : Nat → topology.Edge)
+    (hroot : quotientRoot.val < componentCount.val)
+    (hincoming : componentCount.val ≤ work.incoming.val.length)
+    (hwitness : ∀ node : Usize, node.val < componentCount.val → node ≠ quotientRoot →
+      ∃ slot : Usize, work.incoming.val[node.val]? = some slot ∧
+        slot.val < witnesses.val.length ∧ witnesses.val[slot.val]? = some (chosen node.val))
+    (hforestCount :
+      required.val.length + constructorSceneRootCount links = n.val)
+    (hcomponentCount :
+      componentCount.val = constructorSceneRootCount links)
+    (hselectedLength : selected.val.length = n.val - 1) :
+    WP.spec (do
+      let selected1 ← spanning_tree.Tree.scene_dfs_loop6 required 0#usize selected
+      spanning_tree.Tree.scene_dfs_loop7 work 0#usize componentCount witnesses
+        quotientRoot selected1 (Slice.len required)) (fun output =>
+      output.1 = work ∧ output.2.val.length = selected.val.length ∧
+      ∀ slot, slot < output.2.val.length →
+        (slot < required.val.length ∧
+          output.2.val[slot]? =
+            (required.val[slot]?).map constructorCanonicalEdge) ∨
+        ∃ node, node < componentCount.val ∧ node ≠ quotientRoot.val ∧
+          slot = constructorSceneSelectedIndex required.val.length quotientRoot.val node ∧
+          output.2.val[slot]? = some (chosen node)) := by
+  have hcardinality :
+      required.val.length + componentCount.val - 1 = selected.val.length := by
+    omega
+  exact constructor_scene_selected_actual_spec work required componentCount quotientRoot
+    witnesses selected chosen hroot hincoming hwitness hcardinality
 end Labyrinth

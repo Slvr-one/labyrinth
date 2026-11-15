@@ -297,4 +297,47 @@ theorem constructor_quotient_depth_first_accepts {R : Type*} (adapter : tree.Rng
   constructor_depth_first_accepts adapter hrng offsets neighbors.slice root rng work
     hinput hvalid hcapacity
 
+/-- Every nonroot quotient parent chosen by the actual DFS points to the retained original edge
+stored at that exact incoming slot. -/
+theorem constructor_quotient_dfs_original_incoming
+    (edges : List topology.Edge) (label : Usize → Usize) (start : Usize → Nat)
+    (count root : Usize) (offsets : Slice Usize) (neighbors : alloc.vec.Vec Usize)
+    (witnesses : alloc.vec.Vec topology.Edge)
+    (before after : spanning_tree.Workspace)
+    (hcount : constructorDFSVertexCount offsets = count.val)
+    (hstart : ∀ row : Usize, row.val < count.val →
+      constructorDFSOffset offsets row.val = start row)
+    (hstop : ∀ row : Usize, row.val < count.val →
+      constructorDFSOffset offsets (row.val + 1) =
+        start row + constructorQuotientRowCount edges label row edges.length)
+    (hfilled : ∀ slot, constructorQuotientFilled edges label start count edges.length slot →
+      ∃ value original, neighbors.val[slot]? = some value ∧
+        witnesses.val[slot]? = some original)
+    (hout : ConstructorDFSOutput offsets neighbors.slice root before after) :
+    ∀ node : Usize, node.val < count.val → node ≠ root →
+      ∃ selected : Usize × topology.Edge,
+        after.incoming.val[node.val]? = some selected.1 ∧
+        witnesses.val[selected.1.val]? = some selected.2 := by
+  intro node hnode hnonroot
+  obtain ⟨parent, slot, value, hparentLookup, hincoming, hlo, hhi, _, _⟩ :=
+    hout.incoming node.val (by simpa only [hcount] using hnode) (by
+      intro he
+      exact hnonroot ((UScalar.eq_equiv _ _).mpr he))
+  have hparentOutput :
+      (constructorDFSParents offsets after)[node.val]? = some parent.val := by
+    simp [constructorDFSParents, hcount, hnode, hparentLookup]
+  have hparentBound : parent.val < count.val := by
+    have hparentList := hout.tree.2.2.1 parent.val
+      (List.mem_of_getElem? hparentOutput)
+    have hlength :
+        (constructorDFSParents offsets after).length ≤ count.val := by
+      simp [constructorDFSParents, hcount]
+    omega
+  have hoccupied :
+      constructorQuotientFilled edges label start count edges.length slot.val := by
+    exact ⟨parent, hparentBound, by simpa only [hstart parent hparentBound] using hlo,
+      by simpa only [hstop parent hparentBound] using hhi⟩
+  obtain ⟨actual, original, _, hwitness⟩ := hfilled slot.val hoccupied
+  exact ⟨(slot, original), hincoming, hwitness⟩
+
 end Labyrinth

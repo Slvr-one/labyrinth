@@ -5,6 +5,7 @@ import LabyrinthCore.ConstructorCarrierEdges
 import LabyrinthCore.ConstructorDepthFirstTree
 import LabyrinthCore.MutationEditEdges
 import LabyrinthCore.ConstructorQuotientDFS
+import LabyrinthCore.MutationTrace
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -25,3 +26,7 @@ import LabyrinthCore.ConstructorQuotientDFS
 #print axioms Labyrinth.mutation_edit_edges_total_frame
 #print axioms Labyrinth.constructor_quotient_depth_first_accepts
 #print axioms Labyrinth.mutation_edit_edges_tree_valid
+#print axioms Labyrinth.mutation_exchange_tree_valid
+#print axioms Labyrinth.mutation_operation_preserves
+#print axioms Labyrinth.mutation_accepted_trace_prefix_valid
+#print axioms Labyrinth.mutation_edit_edges_preserves_disjoint

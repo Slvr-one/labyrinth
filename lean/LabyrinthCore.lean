@@ -41,3 +41,4 @@ import LabyrinthCore.MutationEditModel
 import LabyrinthCore.MutationEditEdges
 import LabyrinthCore.ConstructorQuotientCSR
 import LabyrinthCore.ConstructorQuotientDFS
+import LabyrinthCore.MutationTrace

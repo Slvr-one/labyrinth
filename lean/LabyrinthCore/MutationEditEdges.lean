@@ -275,4 +275,35 @@ theorem mutation_edit_edges_total_frame
   intro hok
   have hs := h.2.2.2 hok
   exact ⟨hs.1, hs.2.1, hs.2.2.1, hs.2.2.2.1⟩
+
+/-- A successful actual batch preserves every protected input tree edge that is disjoint
+from the genuine removal list. This is the route-edge corollary of the exact edit equation;
+it does not assume anything about the result graph. -/
+theorem mutation_edit_edges_preserves_disjoint
+    (c : topology.Carrier) (t : spanning_tree.Tree)
+    (remove add protectedEdges : Slice topology.Edge) (w : spanning_tree.Workspace)
+    (hc : CarrierValid c) (ht : TreeValid c t) (hw : WorkspaceValid w)
+    (hcapacity : t.parents.val.length ≤ w.path.val.length)
+    (hedgeCapacity : c.edges.val.length ≤ w.edge_capacity.val)
+    (hprotected : ∀ edge ∈ protectedEdges.val,
+      parentEdge (parents t) edge.u.val edge.v.val)
+    (hdisjoint : ∀ edge ∈ protectedEdges.val,
+      ¬ mutationRemoval remove edge.u.val edge.v.val) :
+    spanning_tree.Tree.edit_edges t c remove add w ⦃ out =>
+      WorkspaceValid out.2.2 ∧
+      (∀ error, out.1 = core.result.Result.Err error → out.2.1 = t) ∧
+      (out.1 = core.result.Result.Ok () →
+        TreeValid c out.2.1 ∧
+        ∀ edge ∈ protectedEdges.val,
+          parentEdge (parents out.2.1) edge.u.val edge.v.val) ⦄ := by
+  apply spec_mono
+    (mutation_edit_edges_tree_valid c t remove add w hc ht hw hcapacity hedgeCapacity)
+  intro out hout
+  refine ⟨hout.1, hout.2.2.1, ?_⟩
+  intro hok
+  have hs := hout.2.2.2 hok
+  refine ⟨hs.2.2.2.2, ?_⟩
+  intro edge hedge
+  apply (hs.2.2.1 edge.u.val edge.v.val).mpr
+  exact Or.inl ⟨hprotected edge hedge, hdisjoint edge hedge⟩
 end Labyrinth
