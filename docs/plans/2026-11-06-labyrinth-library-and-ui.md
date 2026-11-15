@@ -1,7 +1,7 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
 - **Date:** 2026-11-06
-- **Status:** APPROVED PLAN — phase 1 accepted; phase 2 in progress
+- **Status:** APPROVED PLAN — phase 1 accepted; phase 2 incomplete and paused by owner on 2026-11-15
 - **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
 - **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
@@ -35,13 +35,39 @@ claimed crossings must exist in the topology and rendered geometry.
 - The owner accepted phase 1 on 2026-11-14 with its documented partial-correctness limits
   and authorized phase 2. Each subsequent phase retains its manual acceptance gate;
   merge and deployment approvals remain separate.
+- On 2026-11-15 the owner requested progress persistence and a stop after in-flight workers
+  froze their work. This is not phase-2 acceptance or permission to begin phases 3–5.
+
+### Paused checkpoint — 2026-11-15
+
+The [phase-2 draft](https://github.com/Slvr-one/labyrinth/pull/3) contains the native runtime
+and checked structural proof increments. At the
+[checked publication checkpoint](https://github.com/Slvr-one/labyrinth/commit/7fcec288b97c63754992bf9e46df6435740c4789),
+the imported Lean library builds and 27 audited roots use only standard Lean axioms.
+Native evidence covers 53 tests, seeded grid→polar-interior→different-portal→grid traces in
+both modes, and zero allocations in the measured initialized production planning scenarios.
+These results do not establish complete scene correspondence, Wasm parity or UI acceptance.
+
+- [x] Actual carrier constructors, generic/public DFS, core mutations and accepted trace-prefix
+  contracts checked; lower constrained-constructor stages and literal publication helper checked.
+- [ ] Complete the literal outer `scene_dfs` acceptance, totality and exact error-frame proofs.
+- [ ] Resolve complete-source extraction/model support under an owner-approved direction, then
+  prove scene route, reservation, shatter and epoch/revision publication behavior.
+- [ ] Complete fresh phase-2 review and owner manual acceptance before the next phase.
+
+The [frozen unfinished-source snapshot](https://github.com/Slvr-one/labyrinth/commit/8f083f8e439f9eac373137de01c811a363fa4754)
+is not a passing build: the outer proof references missing `constructor_scene_dfs_guarded`,
+prefix-predicate/import consolidation is unfinished, and Rust extraction-compatibility edits
+conflict with strict Clippy. No lint allowance, trusted-model extension, storage redesign or
+toolchain upgrade was approved. Investigations found no ready upstream upgrade; the follow-up
+model-extension/storage-redesign decision was cancelled and remains open.
 
 ## Existing state and corrections
 
-The website still uses JavaScript. The reviewed library base had LICENSE only. Phase 1 now
-contains a `no_std` parent-update operation, generated Lean and a checked partial-correctness
-theorem; [proof coverage and limitations](../properties.md) distinguish this from a completed
-maze library or structural proof suite.
+The website still uses JavaScript. Phase 1 established representative Rust→Lean partial
+correctness; phase 2 now has native implementation and checked structural increments.
+The checkpoint above and [proof coverage and limitations](../properties.md) distinguish
+those results from the still-incomplete full scene and first-milestone proof suite.
 
 The grid uses a parent array. Initialization is randomized DFS, not uniform spanning-tree
 sampling. `reroot` reverses a target-to-root path without changing undirected passages.
@@ -489,6 +515,13 @@ fall back to the disconnected implementation.
 **Manual acceptance:** owner reviews both configurable motion modes and the visible entering,
 interior traversal, and exit behavior. Production publication requires separate approval,
 verified credentials, and a live smoke on the published revision. Local success is not live success.
+
+**Later presentation queue:** after the layout work, explore content entrance/loading motion,
+using the owner's Ronacher reference as a research input rather than an already-inspected spec.
+The [Portfolio-owned ordered backlog](https://github.com/Slvr-one/portfolio/blob/3525378a306b7ce84fdca087e7c9e5717a1af5a3/docs/design/labyrinth/README.md#ordered-follow-ups--paused-2026-11-15)
+tracks moving social/email links to the footer, removing the redundant on-page site heading
+and reclaiming its space, then animation options. These changes are recorded, not implemented;
+they neither bypass earlier phase gates nor expand the current paused phase-2 work.
 
 ## Execution and ownership
 
