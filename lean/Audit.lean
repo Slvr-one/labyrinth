@@ -7,6 +7,7 @@ import LabyrinthCore.MutationEditEdges
 import LabyrinthCore.ConstructorQuotientDFS
 import LabyrinthCore.MutationTrace
 import LabyrinthCore.ConstructorSceneExpandedCarrier
+import LabyrinthCore.ConstructorOrientation
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -32,3 +33,4 @@ import LabyrinthCore.ConstructorSceneExpandedCarrier
 #print axioms Labyrinth.mutation_accepted_trace_prefix_valid
 #print axioms Labyrinth.mutation_edit_edges_preserves_disjoint
 #print axioms Labyrinth.constructor_scene_expanded_carrier_accepts
+#print axioms Labyrinth.constructor_scene_orientation_accepts
