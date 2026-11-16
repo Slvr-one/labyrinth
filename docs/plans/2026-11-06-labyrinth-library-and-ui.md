@@ -1,7 +1,7 @@
 # Labyrinth library, verification, and connected UI implementation plan
 
-- **Date:** 2026-11-06; reconciled 2026-11-15
-- **Status:** PLAN REFRESH — documentation only; phase 1 accepted; phase 2 incomplete; renewed owner approval is required before any implementation
+- **Date:** 2026-11-06; reconciled 2026-11-16
+- **Status:** PLANS APPROVED; separate scoped start granted for phase 2 and independent Portfolio presentation/CI; phase 1 accepted; phase 2 incomplete; merge and release held
 - **Research:** [reviewed algorithm and verification findings](../research/2026-11-06-algorithm-and-verification.md)
 - **Tracking:** [formal model and extraction work](https://linear.app/navada/issue/NAV-1063/labyrinth-algorithm-formal-lean-4-model-and-rust-extraction-plan)
 
@@ -33,23 +33,24 @@ claimed crossings must exist in the topology and rendered geometry.
 - Documentation commits/PRs are authorized. Implementation-plan approval, merging, and live
   deployment are separate gates.
 - The owner accepted phase 1 on 2026-11-14 with its documented partial-correctness limits.
-  The former phase-2 implementation grant and later source-first execution grant are historical;
-  the latest ruling requires all related plans to be ready and explicitly approved before any
-  further implementation.
-- The earlier source-first selection remains the proposed phase-2 execution order: narrow source
-  refactors, checked casts, carrier-edge logical-budget equivalence, and real pure-body inclusion.
-  It is not current permission to edit source, proofs, configuration, models, or toolchain pins.
+- On 2026-11-16 the owner approved the reconciled plans while keeping implementation paused,
+  then separately authorized phase-2 and independent Portfolio presentation/CI execution.
+- Source-first is the approved phase-2 order: narrow source refactors, checked casts,
+  carrier-edge logical-budget equivalence and real pure-body inclusion. This does not grant
+  new standard models, toolchain changes, storage redesign or lint exceptions.
 - Every phase retains its manual acceptance gate. Merge, deployment, publication, and any new
   standard-model patch remain separate owner gates.
 
-### Current planning-only approval gate — 2026-11-15
+### Current scoped start — 2026-11-16
 
-This refresh reconciles plans and preserved evidence only. No implementation, proof repair,
-configuration change, build, test, lint, formatter run, code-review round, merge, deployment,
-model change, toolchain change, or install is authorized. Documentation verification and plan
-review may proceed. No prior implementation grant supplies consent after
-this gate. All related plans must be ready and the owner must explicitly approve resumption before
-any implementation starts.
+The plan set is approved; the later AUQ start selected Portfolio presentation/CI and library
+phase 2. Separate native workers own source-first extraction, checked-core constructor proofs
+and Portfolio presentation. Scoped commits, non-default branch pushes and PR updates are
+authorized. The earlier planning hold is historical, not the current execution gate.
+
+Merge/default-branch pushes, production release, secret/cloud changes, new standard models
+or toolchain changes, story disclosure and manual phase acceptance remain separately gated.
+No compiler/runtime or review result is established by this documentation status update.
 
 The independent Portfolio presentation plan may be approved and executed separately from
 Labyrinth phase 5 once the all-plans readiness gate is satisfied. Its completion must not be
@@ -90,13 +91,13 @@ reported as Rust/Wasm integration or connected-maze acceptance.
 
 | Surface | Preserved revision | Dependency and present state |
 |---|---|---|
-| This plan refresh | `docs/planning-approval-20261115`, based on `e20c959` | Documentation only; owner approval of the reconciled plan set is the next gate |
+| This plan refresh | `docs/planning-approval-20261115`, based on `e20c959` | Documentation only; plans approved and separate scoped execution start granted |
 | [Research and baseline plan](https://github.com/Slvr-one/labyrinth/pull/1) | Existing research/plan stack | Historical planning dependency; open and unmerged |
 | [Phase-1 correspondence](https://github.com/Slvr-one/labyrinth/pull/2) | Existing phase-1 implementation stack | Phase 1 manually accepted with stated limits; open and unmerged |
 | [Phase-2 runtime and checked proofs](https://github.com/Slvr-one/labyrinth/pull/3) | Checked code checkpoint `7fcec28`; docs checkpoint `e20c959` | Depends on phase 1; phase 2 incomplete, open, and unmerged |
 | [Source-first draft](https://github.com/Slvr-one/labyrinth/commit/a7d20a459fd701125c7c967fe02e5f3b5e7fc81c) | `work/resume-pure-extraction-20261115` | Native-passing snapshot; later Aeneas failure above; not accepted or merged |
 | [Outer-proof draft](https://github.com/Slvr-one/labyrinth/commit/49d1a91780a80b19166599b6295adb9acfe2b2b0) | `work/resume-constructor-20261115` | Final repair unchecked; no full outer/axiom/review pass |
-| [Portfolio presentation planning](https://github.com/Slvr-one/portfolio/pull/6) | Documentation-only PR; not the layout implementation branch | Owns overview/story/technology/scroll/mode plan; awaiting approval |
+| [Portfolio presentation planning](https://github.com/Slvr-one/portfolio/pull/6) | Documentation-only PR; not the layout implementation branch | Approved overview/story/technology/scroll/mode plan; separate presentation/CI execution authorized |
 | [Portfolio layout draft](https://github.com/Slvr-one/portfolio/commit/c29386041d38fe01076c5203d92070e21554add2) | `work/portfolio-layout-20261115` | Preserved footer/wordmark draft only; not accepted or merged |
 | [Portfolio CI prerequisite draft](https://github.com/Slvr-one/portfolio/commit/bf1b9bae6b988562bfc7e86dd3b4bdcbc322c0b9) | `fix/pin-wrangler-deploy-20261115` | Preserved draft only; no merge/deploy or credential decision |
 | [Atlas program/index](https://github.com/NavadaAI/Atlas/pull/317) | Existing program/index record | Lead reconciles canonical links and approval state; no duplicate implementation plan |
@@ -156,7 +157,7 @@ provides tree/unique-path mathematics, not correctness of this DFS constructor.
 
 ### Translation boundary and proposed source-first route
 
-When renewed approval is granted, begin only with the previously selected source-first scope:
+Under the scoped start, begin only with the previously selected source-first scope:
 the named `check_route_endpoints` and `route_admissible` control-flow refactors, checked private
 casts, carrier-edge logical-budget equivalence, and inclusion of audited real pure bodies. Preserve
 observable order, errors, allocations, public APIs, and the unrestricted whole-crate extraction
@@ -643,24 +644,24 @@ Progress reports distinguish planned, source implemented, proof checked, built, 
 review-ready and live states. Report the next failing/unverified gate, not just completed tasks.
 No board is required or implicitly authorized.
 
-## Renewed approval, AUQ choices, and next steps
+## Approved plans, AUQ choices, and next steps
 
-No selection is recorded by this refresh. The lead must present these unresolved choices in AUQ
-with context, options, and a recommendation before implementation:
+The owner approved the full reconciled plan set on 2026-11-16 with implementation still
+paused, then separately selected both Portfolio presentation/CI and library phase-2 execution.
+Do not request the same plan approval again. Commits, owned non-default pushes and PR updates
+are authorized; merge and production release are not.
 
-1. Approve or revise the complete reconciled plan set and the proposed source-first execution
-   order. Proposed default: approve only the narrow source-first scope above; keep every phase,
-   property, automated gate, and manual gate unchanged.
-2. Decide whether and when to approve the independent Portfolio PR 6 presentation plan after
-   all related plans are ready. Its implementation, merge, and production publication are
-   distinct decisions and do not satisfy phase 5.
-3. If an approved source-first attempt demonstrates that a standard-model patch is still needed,
-   choose an exact pinned patch/revision and ownership route in a new AUQ decision. Proposed
-   default now: no model patch, pin change, storage redesign, or formatter expansion.
-4. After complete phase-2 automated evidence and fresh review exist, accept or reject the
+Remaining owner decisions:
+
+1. If a source-first attempt demonstrates that a standard-model patch is still needed, choose
+   an exact pinned patch/revision and ownership route in a new AUQ decision. No model patch,
+   pin change, storage redesign or formatter expansion is authorized now.
+2. After complete phase-2 automated evidence and fresh review exist, accept or reject the
    phase-2 manual gate. No phase 3 work starts before that decision.
+3. Inspect Portfolio's local stories, visual cues, optional entrance and view controls before
+   disclosure, visual acceptance or the exact production release decision.
 
-After renewed approval, execute in this order:
+Execute the authorized work in this order:
 
 1. Establish exact source/proof revisions and disjoint ownership, then run two independent lanes
    in parallel: source-first translation and outer constructor proofs over the already generated
