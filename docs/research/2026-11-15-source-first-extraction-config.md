@@ -67,4 +67,61 @@ This is a program-scoped equivalence argument, not capacity reconstruction in Le
 
 The required formal obligation is an induction over the actual generated full-scene `check_routes`/`check_route_edge` functions proving `NoDup(R)`, `R ⊆ E`, and equivalence of the logical carrier-edge guard to the former physical-capacity guard on every reachable publication path. That result must feed the generated scene constructor/publication correctness proofs and preserve the functions' actual error order.
 
-The diagnostic Aeneas run failed to join motion contexts and produced no Lean output. The two source helper refactors address only those observed joins; they do not establish complete translation. Full unrestricted extraction may still stop on missing `Vec::clear`, `Option<T>::Debug`, or another demonstrated model dependency. If the generated full-scene functions do not compile, record this obligation as **blocked on the exact missing generated model/body**. Do not substitute an abstract-only capacity theorem, a hand-written stand-in scene function, narrowed roots, opaque bodies, or a completion claim.
+The initial diagnostic failed motion-context joining. The narrow helpers and local enum binding below now allow unrestricted generation, but an eight-operation external template remains. The full-scene proof obligation is therefore **blocked on the exact missing generated model/body**, not complete. Do not substitute abstract-only capacity theorems, stand-in scene functions, narrowed roots or external axioms.
+
+## Local enum scrutinee
+
+`MotionWorkspace::plan_route` binds the copied `Cell` to `kind` before its sector match, following
+the existing `eligible` pattern. This separates the indexed scene borrow from enum
+expansion and the later mutable `route_through` call. The index expression is still
+evaluated exactly once at the same loop position; sector filtering, route attempts,
+first-error propagation and vector operations are unchanged. `Cell` is already `Copy`;
+the binding introduces no clone or allocation.
+
+The 2026-11-16 lead run completed unrestricted Charon/Aeneas generation with this binding.
+It still emits an external template for signed abs/remainder, inclusive-range membership,
+Option Debug/copied/clone/equality and Vec clear; zero-template acceptance fails.
+Native fmt, strict Clippy, 53 tests, docs and both actual traversal traces passed.
+The separate production-allocation instrument and full-scene Lean acceptance are not established.
+
+## Full-source extraction invocation
+
+Run from the checkout root. Set `LABYRINTH_TOOLCHAINS` to the existing pinned installation
+and `OUT` to an absolute diagnostic directory outside the source tree:
+
+```sh
+: "${LABYRINTH_TOOLCHAINS:?set the pinned toolchain directory}"
+: "${OUT:?set an absolute diagnostic output directory}"
+export CARGO_HOME="$LABYRINTH_TOOLCHAINS/cargo"
+export RUSTUP_HOME="$LABYRINTH_TOOLCHAINS/rustup"
+export ELAN_HOME="$LABYRINTH_TOOLCHAINS/elan"
+export PATH="$LABYRINTH_TOOLCHAINS/bin:$CARGO_HOME/bin:$ELAN_HOME/bin:$PATH"
+mkdir -p "$OUT/lean"
+export CARGO_TARGET_DIR="$OUT/cargo-target"
+(
+  cd rust
+  charon cargo --preset=aeneas --dest-file="$OUT/labyrinth_core.llbc" \
+    '--include=core::slice::{impl core::default::Default for &Slice<_>}::default' \
+    '--include=core::option::{impl core::default::Default for core::option::Option<_>}::default' \
+    '--include=core::result::_::is_err'
+) >"$OUT/charon.log" 2>&1 &&
+aeneas -backend lean -split-files -abort-on-error -warnings-as-errors \
+  -no-progress-bar -dest "$OUT/lean" -subdir LabyrinthCore \
+  "$OUT/labyrinth_core.llbc" >"$OUT/aeneas.log" 2>&1
+```
+
+Pins remain those in `toolchain-pins.json`: Charon
+`8cae8fd1905946de61147a65ecdd7122cc6b491b`, Aeneas
+`87cfe2f5d663afd0a1fba154d41178f7a4420bb2`, Rust `nightly-2026-09-17`
+and Lean `v4.35.0`. The completed run retained unrestricted roots, all production modules
+and the three diagnosed real bodies. Process exit zero does not satisfy the extraction
+gate while an external template remains.
+
+Only complete generation without `LabyrinthCore/FunsExternal_Template.lean` can
+advance generated-scene proof integration. Preserve the complete generated output,
+including pure-body dependencies, and reconcile `Types.lean`/`Funs.lean` and their
+imports with the proof checkout before its strict Lean build and axiom audit.
+`scripts/check-phase1.py` remains the unchanged phase-1 gate; its plain extraction
+command does not apply these inclusion patterns and its checked-in-model comparison
+is not evidence for the new full-scene output. Missing bodies or interpreter failures
+remain blockers, not permission to narrow roots or introduce a model patch.

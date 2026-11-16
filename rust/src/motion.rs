@@ -498,11 +498,12 @@ impl MotionWorkspace {
         let mut v = 0;
         let mut status = Ok(());
         while v < self.cells && !found && status.is_ok() {
+            let kind = scene.layout().cells()[v];
             if let Cell::Sector {
                 circle: owner,
                 ring,
                 ..
-            } = scene.layout().cells()[v]
+            } = kind
             {
                 if owner == circle && ring + 1 < scene.layout().circles()[circle].ring_count() {
                     match self.route_through(scene, circle, v) {
