@@ -48,3 +48,4 @@ import LabyrinthCore.ConstructorScenePrepare
 import LabyrinthCore.ConstructorSceneRejection
 import LabyrinthCore.ConstructorSceneTotalPrefix
 import LabyrinthCore.ConstructorSceneAcceptance
+import LabyrinthCore.ConstructorSceneTotal

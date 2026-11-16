@@ -159,21 +159,28 @@ theorem constructor_scene_quotient_prefix_total
           rw [hdegrees.2.1, hoffsetsLength]
           omega))
         rintro ⟨prefixStatus, prefixed⟩ hprefix
+        change prefixed.val.length = counts.val.length ∧
+          (prefixStatus = .Ok () → ∀ j, j < counts.val.length → ∃ value : Usize,
+            prefixed.val[j]? = some value ∧
+              value.val = constructorPrefixSum counts.val (j + 1)) ∧
+          (prefixStatus = .Ok () ∨ prefixStatus = .Err topology.Error.Overflow) at hprefix
         rcases hprefix.2.2 with hprefixOk | hprefixOverflow
         · have hprefixOk' : prefixStatus = .Ok () := by simpa only using hprefixOk
           subst prefixStatus
-          dsimp only
-          simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+          simp only [uncurry, bind_ok]
           have hprefixedLength : prefixed.val.length = componentCount.val + 1 := by
             rw [hprefix.1]
             rw [hdegrees.2.1, hoffsetsLength]
           apply WP.spec_bind (alloc.vec.Vec.index_usize_spec
-            ({ slice := prefixed } : alloc.vec.Vec Usize) componentCount (by omega))
+            ({ slice := prefixed } : alloc.vec.Vec Usize) componentCount (by
+              change componentCount.val < prefixed.val.length
+              omega))
           intro adjacencyCount hadjacency
           have hadjacencyLookup : prefixed.val[componentCount.val]? = some adjacencyCount := by
-            rw [List.getElem?_eq_getElem (by omega), hadjacency]
+            rw [List.getElem?_eq_getElem (by omega)]
+            simpa only [alloc.vec.Vec.val] using congrArg some hadjacency.symm
           obtain ⟨last, hlast, hlastValue⟩ :=
-            hprefix.2.1 hprefixOk componentCount.val (by omega)
+            hprefix.2.1 rfl componentCount.val (by omega)
           have hadjacencyValue :
               adjacencyCount.val = constructorPrefixSum counts.val counts.val.length := by
             have heq : adjacencyCount = last :=
@@ -187,46 +194,48 @@ theorem constructor_scene_quotient_prefix_total
           by_cases hfits8 : constructorStorageFits adjacencyCount 8#usize
           · have hstorage8Ok : storage8 = .Ok () := by
               simpa only [hfits8, ite_true] using hstorage8
-            simp only [hstorage8Ok, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+            simp only [hstorage8Ok, bind_ok]
             apply WP.spec_bind (constructor_check_storage_spec adjacencyCount 16#usize)
             intro storage16 hstorage16
             by_cases hfits16 : constructorStorageFits adjacencyCount 16#usize
             · have hstorage16Ok : storage16 = .Ok () := by
                 simpa only [hfits16, ite_true] using hstorage16
-              simp only [hstorage16Ok, core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+              simp only [hstorage16Ok, bind_ok]
               apply (WP.spec_ok _).mpr
-              refine Or.inr ⟨prefixed, adjacencyCount, rfl, count, counts.val, ?_, ?_, ?_, ?_,
+              refine Or.inr ⟨({ slice := prefixed } : alloc.vec.Vec Usize),
+                adjacencyCount, rfl, count, counts.val, ?_, ?_, ?_, ?_,
                 ?_, ?_, ?_, hfits8, hfits16⟩
               · rw [hdegrees.2.1, hoffsetsLength, hcountValue]
               · rw [hdegrees.2.1, hoffsetsLength]
               · exact hdegreeCounts
               · exact hprefixedLength.trans (by rw [hdegrees.2.1, hoffsetsLength])
-              · exact hprefix.2.1 hprefixOk
+              · intro slot hslot
+                change slot < prefixed.val.length at hslot
+                have hslotCounts : slot < counts.val.length := by
+                  rw [← hprefix.1]
+                  exact hslot
+                simpa only [alloc.vec.Vec.val] using hprefix.2.1 rfl slot hslotCounts
               · exact hadjacencyValue
               · exact hcountFits
             · have hstorage16Error : storage16 = .Err .Overflow := by
                 simpa only [hfits16, ite_false] using hstorage16
-              simp only [hstorage16Error,
-                core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+              simp only [hstorage16Error, bind_ok,
                 core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
               exact constructor_scene_prefix_overflow_return _
           · have hstorage8Error : storage8 = .Err .Overflow := by
               simpa only [hfits8, ite_false] using hstorage8
-            simp only [hstorage8Error,
-              core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+            simp only [hstorage8Error, bind_ok,
               core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
             exact constructor_scene_prefix_overflow_return _
         · have hprefixOverflow' : prefixStatus = .Err topology.Error.Overflow := by
             simpa only using hprefixOverflow
           subst prefixStatus
-          dsimp only
-          simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+          simp only [uncurry, bind_ok,
             core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
           exact constructor_scene_prefix_overflow_return _
       · have hcountStorageError : countStorage = .Err .Overflow := by
           simpa only [hcountFits, ite_false] using hcountStorage
-        simp only [hcountStorageError,
-          core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
+        simp only [hcountStorageError, bind_ok,
           core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
         exact constructor_scene_prefix_overflow_return _
 
@@ -359,17 +368,23 @@ theorem constructor_scene_quotient_prefix_accepts
     rw [hdegrees.2.1, hoffsetsLength]
     omega) hprefixWidth)
   rintro ⟨prefixStatus, prefixed⟩ hprefix
+  change prefixStatus = .Ok () ∧ prefixed.val.length = counts.val.length ∧
+    (∀ j, j < counts.val.length → ∃ value : Usize,
+      prefixed.val[j]? = some value ∧
+        value.val = constructorPrefixSum counts.val (j + 1)) at hprefix
   have hprefixOk : prefixStatus = .Ok () := hprefix.1
   subst prefixStatus
-  dsimp only
-  simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+  simp only [uncurry, bind_ok]
   have hprefixedLength : prefixed.val.length = componentCount.val + 1 := by
     rw [hprefix.2.1, hdegrees.2.1, hoffsetsLength]
   apply WP.spec_bind (alloc.vec.Vec.index_usize_spec
-    ({ slice := prefixed } : alloc.vec.Vec Usize) componentCount (by omega))
+    ({ slice := prefixed } : alloc.vec.Vec Usize) componentCount (by
+      change componentCount.val < prefixed.val.length
+      omega))
   intro adjacencyCount hadjacency
   have hadjacencyLookup : prefixed.val[componentCount.val]? = some adjacencyCount := by
-    rw [List.getElem?_eq_getElem (by omega), hadjacency]
+    rw [List.getElem?_eq_getElem (by omega)]
+    simpa only [alloc.vec.Vec.val] using congrArg some hadjacency.symm
   obtain ⟨last, hlast, hlastValue⟩ := hprefix.2.2 componentCount.val (by omega)
   have hadjacencyValue :
       adjacencyCount.val = constructorPrefixSum counts.val counts.val.length := by
@@ -390,16 +405,21 @@ theorem constructor_scene_quotient_prefix_accepts
   have hfits16 : constructorStorageFits adjacencyCount 16#usize := by
     simp only [constructorStorageFits, UScalar.ofNatCore_val_eq]
     constructor <;> omega
-  simp only [constructor_check_storage_eq, hfits8, hfits16, ite_true, bind_ok,
-    core.result.Result.Insts.CoreOpsTry.branch]
+  simp only [hfits8, hfits16, ite_true, bind_ok]
   apply (WP.spec_ok _).mpr
-  refine ⟨prefixed, adjacencyCount, rfl, count, counts.val, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
+  refine ⟨({ slice := prefixed } : alloc.vec.Vec Usize),
+    adjacencyCount, rfl, count, counts.val, ?_, ?_, ?_, ?_, ?_, ?_, ?_,
     hfits8, hfits16⟩
   · rw [hdegrees.2.1, hoffsetsLength, hcountValue]
   · rw [hdegrees.2.1, hoffsetsLength]
   · exact hdegreeCounts
   · exact hprefixedLength.trans (by rw [hdegrees.2.1, hoffsetsLength])
-  · exact hprefix.2.2
+  · intro slot hslot
+    change slot < prefixed.val.length at hslot
+    have hslotCounts : slot < counts.val.length := by
+      rw [← hprefix.2.1]
+      exact hslot
+    simpa only [alloc.vec.Vec.val] using hprefix.2.2 slot hslotCounts
   · exact hadjacencyValue
   · exact hcountFits
 end Labyrinth
