@@ -14,26 +14,107 @@ private theorem constructor_scene_residual_continuation {R : Type*} {A : Type} (
     (work : spanning_tree.Workspace) (residual : core.result.Result Never topology.Error)
     (success : A → Result (core.result.Result spanning_tree.Tree topology.Error × R ×
       spanning_tree.Workspace)) :
-    (show Result (core.result.Result spanning_tree.Tree topology.Error × R ×
-      spanning_tree.Workspace) from do
+    ((do
       let prefixResult ←
         core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
           A (core.convert.FromSame topology.Error) residual
       match prefixResult with
       | .Err error => ok (.Err error, rng, work)
-      | .Ok value => success value) =
-    (show Result (core.result.Result spanning_tree.Tree topology.Error × R ×
-      spanning_tree.Workspace) from do
+      | .Ok value => success value) :
+        Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+          spanning_tree.Workspace)) =
+    ((do
       let result ←
         core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
           spanning_tree.Tree (core.convert.FromSame topology.Error) residual
-      ok (result, rng, work)) := by
+      ok (result, rng, work)) :
+        Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+          spanning_tree.Workspace)) := by
   cases residual with
   | Ok impossible => exact nomatch impossible
   | Err error =>
       unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
       simp only [bind_tc_eq, bind_ok]
 
+private theorem constructor_scene_publish_attach_rng_eq {R : Type*}
+    (n root : Usize) (selected : alloc.vec.Vec topology.Edge)
+    (work : spanning_tree.Workspace) (rng : R) :
+    Std.bind (do
+      let result ← topology.Carrier.from_edges n selected.slice
+      let flow ← core.result.Result.Insts.CoreOpsTry.branch result
+      match flow with
+      | .Continue expanded =>
+        let parents ← alloc.vec.from_elem core.clone.CloneUsize root n
+        let (work1, index) ← spanning_tree.Tree.scene_dfs_loop8 work n 0#usize
+        let (_, seenBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Bool) work1.seen root
+        let (_, pathBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Usize) work1.path 0#usize
+        let (finalSeen, finalPath, finalParents) ←
+          spanning_tree.Tree.scene_dfs_loop9 (seenBack true) (pathBack root)
+            index expanded parents 1#usize
+        ok (core.result.Result.Ok ({ parents := finalParents, root } : spanning_tree.Tree),
+          { work1 with seen := finalSeen, path := finalPath })
+      | .Break residual =>
+        let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (result, work))
+      (fun output => ok (output.1, rng, output.2)) =
+    (do
+      let result ← topology.Carrier.from_edges n selected.slice
+      let flow ← core.result.Result.Insts.CoreOpsTry.branch result
+      match flow with
+      | .Continue expanded =>
+        let parents ← alloc.vec.from_elem core.clone.CloneUsize root n
+        let (work1, index) ← spanning_tree.Tree.scene_dfs_loop8 work n 0#usize
+        let (_, seenBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Bool) work1.seen root
+        let (_, pathBack) ← alloc.vec.Vec.index_mut
+          (core.slice.index.SliceIndexUsizeSlice Usize) work1.path 0#usize
+        let (finalSeen, finalPath, finalParents) ←
+          spanning_tree.Tree.scene_dfs_loop9 (seenBack true) (pathBack root)
+            index expanded parents 1#usize
+        ok (core.result.Result.Ok ({ parents := finalParents, root } : spanning_tree.Tree),
+          rng, { work1 with seen := finalSeen, path := finalPath })
+      | .Break residual =>
+        let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (result, rng, work)) := by
+  conv_lhs => rw [Std.bind_assoc]
+  apply congrArg (Std.bind (topology.Carrier.from_edges n selected.slice))
+  funext result
+  conv_lhs => rw [Std.bind_assoc]
+  apply congrArg (Std.bind (core.result.Result.Insts.CoreOpsTry.branch result))
+  funext flow
+  cases flow with
+  | Break residual => simp only [Std.bind_assoc, bind_ok]
+  | Continue expanded =>
+      conv_lhs => simp only [Std.bind_assoc]
+      apply congrArg (Std.bind (alloc.vec.from_elem core.clone.CloneUsize root n))
+      funext parents
+      apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop8 work n 0#usize))
+      funext value
+      rcases value with ⟨work1, index⟩
+      dsimp only [uncurry]
+      try (conv_lhs => rw [Std.bind_assoc])
+      apply congrArg (Std.bind (alloc.vec.Vec.index_mut
+        (core.slice.index.SliceIndexUsizeSlice Bool) work1.seen root))
+      funext value
+      rcases value with ⟨_, seenBack⟩
+      dsimp only [uncurry]
+      try (conv_lhs => rw [Std.bind_assoc])
+      apply congrArg (Std.bind (alloc.vec.Vec.index_mut
+        (core.slice.index.SliceIndexUsizeSlice Usize) work1.path 0#usize))
+      funext value
+      rcases value with ⟨_, pathBack⟩
+      dsimp only [uncurry]
+      try (conv_lhs => rw [Std.bind_assoc])
+      apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop9
+        (seenBack true) (pathBack root) index expanded parents 1#usize))
+      funext value
+      rcases value with ⟨finalSeen, finalPath, finalParents⟩
+      dsimp only [uncurry]
+      exact bind_ok _ _
 
 private theorem constructor_scene_deref_eq_slice {A : Type*} (vector : alloc.vec.Vec A) :
     vector.deref = vector.slice := by
@@ -165,6 +246,294 @@ private def constructor_scene_after_prepare_program {R : Type*} (adapter : tree.
   | .Ok (offsets, adjacencyCount) =>
     constructor_scene_after_prefix_program adapter carrier required n root rng work
       components componentCount offsets adjacencyCount
+
+private def constructor_scene_program {R : Type*} (adapter : tree.Rng R)
+    (carrier : topology.Carrier) (required : Slice topology.Edge) (root : Usize)
+    (rng : R) (work : spanning_tree.Workspace) :
+    Result (core.result.Result spanning_tree.Tree topology.Error × R ×
+      spanning_tree.Workspace) := do
+  let n ← topology.Carrier.len carrier
+  if root >= n then ok (.Err .InvalidIndex, rng, work)
+  else
+    let edges ← topology.Carrier.impl.edges carrier
+    let ensured ← spanning_tree.Workspace.ensure work n (Slice.len edges)
+    let flow ← core.result.Result.Insts.CoreOpsTry.branch ensured
+    match flow with
+    | .Break residual =>
+      let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (result, rng, work)
+    | .Continue _ =>
+      if Slice.len required >= n then ok (.Err .InvalidForest, rng, work)
+      else
+        let prepared ← constructorScenePrepareProgram carrier n required
+        match prepared with
+        | .Ok (_, components, componentCount) =>
+          constructor_scene_after_prepare_program adapter carrier required n root rng work
+            components componentCount
+        | .Err residual =>
+          let result ← core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+          ok (result, rng, work)
+
+
+set_option maxHeartbeats 1000000 in
+private theorem constructor_scene_program_eq {R : Type*} (adapter : tree.Rng R)
+    (carrier : topology.Carrier) (required : Slice topology.Edge) (root : Usize)
+    (rng : R) (work : spanning_tree.Workspace) :
+    constructor_scene_program adapter carrier required root rng work =
+      spanning_tree.Tree.scene_dfs adapter carrier required root rng work := by
+  unfold constructor_scene_program spanning_tree.Tree.scene_dfs
+  apply congrArg (Std.bind (topology.Carrier.len carrier))
+  funext n
+  by_cases hroot : root >= n
+  · simp only [hroot, ite_true]
+  · simp only [hroot, ite_false, topology.Carrier.impl.edges, bind_ok]
+    apply congrArg (Std.bind
+      (spanning_tree.Workspace.ensure work n (Slice.len (alloc.vec.Vec.deref carrier.edges))))
+    funext ensured
+    cases ensured with
+    | Err error =>
+        simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+    | Ok ready =>
+        cases ready
+        simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok]
+        by_cases hrequired : Slice.len required >= n
+        · simp only [hrequired, ite_true]
+        · simp only [hrequired, ite_false]
+          conv_lhs => erw [Std.bind_assoc]
+          apply congrArg (Std.bind (alloc.vec.from_elem core.clone.CloneUsize 0#usize n))
+          funext links
+          conv_lhs => erw [Std.bind_assoc]
+          apply congrArg (Std.bind (alloc.vec.from_elem core.clone.CloneUsize 1#usize n))
+          funext sizes
+          conv_lhs => erw [Std.bind_assoc]
+          apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop0 n links 0#usize))
+          funext links1
+          conv_lhs => erw [Std.bind_assoc]
+          apply congrArg (Std.bind
+            (spanning_tree.Tree.scene_dfs_loop1 carrier required links1 sizes 0#usize (.Ok ())))
+          funext value
+          cases value with
+          | mk links2' status' =>
+            cases status' with
+            | Err error =>
+                simp only [uncurry_apply_pair, core.result.Result.Insts.CoreOpsTry.branch, bind_ok, bind_tc_ok]
+            | Ok ready =>
+              cases ready
+              conv_lhs => dsimp
+              simp only [uncurry_apply_pair, core.result.Result.Insts.CoreOpsTry.branch, bind_tc_eq, bind_ok]
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind
+                (alloc.vec.from_elem core.clone.CloneUsize 0#usize n))
+              funext components
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind (alloc.vec.from_elem core.clone.CloneUsize n n))
+              funext labels
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop2 n links2'
+                0#usize components labels 0#usize))
+              funext value
+              rcases value with ⟨components1, componentCount⟩
+              simp only [bind_ok]
+              unfold constructor_scene_after_prepare_program
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind (lift (Usize.checked_add componentCount 1#usize)))
+              funext optionCount
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind
+                (core.option.Option.ok_or optionCount topology.Error.Overflow))
+              funext countResult
+              conv_lhs => erw [Std.bind_assoc]
+              apply congrArg (Std.bind (core.result.Result.Insts.CoreOpsTry.branch countResult))
+              funext countFlow
+              cases countFlow with
+              | Break residual =>
+                  dsimp
+                  cases residual with
+                  | Ok impossible => exact nomatch impossible
+                  | Err error =>
+                      unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      simp only [bind_tc_eq, bind_ok]
+              | Continue count =>
+                  conv_lhs => erw [Std.bind_assoc]
+                  apply congrArg (Std.bind (topology.check_storage count 8#usize))
+                  funext storageResult
+                  conv_lhs => erw [Std.bind_assoc]
+                  apply congrArg (Std.bind
+                    (core.result.Result.Insts.CoreOpsTry.branch storageResult))
+                  funext storageFlow
+                  cases storageFlow with
+                  | Break residual =>
+                      dsimp
+                      cases residual with
+                      | Ok impossible => exact nomatch impossible
+                      | Err error =>
+                          unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          simp only [bind_tc_eq, bind_ok]
+                  | Continue _ =>
+                      conv_lhs => erw [Std.bind_assoc]
+                      apply congrArg (Std.bind
+                        (alloc.vec.from_elem core.clone.CloneUsize 0#usize count))
+                      funext offsets
+                      simp only [topology.Carrier.impl.edges, bind_ok]
+                      conv_lhs => erw [Std.bind_assoc]
+                      apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop3
+                        0#usize (.Ok ()) components1 componentCount offsets
+                        (alloc.vec.Vec.deref carrier.edges)))
+                      funext value
+                      rcases value with ⟨degreeStatus, counts⟩
+                      conv_lhs => erw [Std.bind_assoc]
+                      apply congrArg (Std.bind
+                        (core.result.Result.Insts.CoreOpsTry.branch degreeStatus))
+                      funext degreeFlow
+                      cases degreeFlow with
+                      | Break residual =>
+                          dsimp
+                          cases residual with
+                          | Ok impossible => exact nomatch impossible
+                          | Err error =>
+                              unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              simp only [bind_tc_eq, bind_ok]
+                      | Continue _ =>
+                          conv_lhs => erw [Std.bind_assoc]
+                          apply congrArg (Std.bind (lift (alloc.vec.Vec.deref_mut counts)))
+                          funext value
+                          rcases value with ⟨countSlice, countBack⟩
+                          conv_lhs => erw [Std.bind_assoc]
+                          apply congrArg (Std.bind (topology.prefix_offsets countSlice))
+                          funext value
+                          rcases value with ⟨prefixStatus, prefixed⟩
+                          conv_lhs => erw [Std.bind_assoc]
+                          apply congrArg (Std.bind
+                            (core.result.Result.Insts.CoreOpsTry.branch prefixStatus))
+                          funext prefixFlow
+                          cases prefixFlow with
+                          | Break residual =>
+                              dsimp
+                              cases residual with
+                              | Ok impossible => exact nomatch impossible
+                              | Err error =>
+                                  unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                  simp only [bind_tc_eq, bind_ok]
+                          | Continue _ =>
+                              conv_lhs => erw [Std.bind_assoc]
+                              apply congrArg (Std.bind (alloc.vec.Vec.index
+                                (core.slice.index.SliceIndexUsizeSlice Usize)
+                                (countBack prefixed) componentCount))
+                              funext adjacencyCount
+                              conv_lhs => erw [Std.bind_assoc]
+                              apply congrArg (Std.bind
+                                (topology.check_storage adjacencyCount 8#usize))
+                              funext adjacencyStorage8
+                              conv_lhs => erw [Std.bind_assoc]
+                              apply congrArg (Std.bind
+                                (core.result.Result.Insts.CoreOpsTry.branch adjacencyStorage8))
+                              funext adjacencyFlow8
+                              cases adjacencyFlow8 with
+                              | Break residual =>
+                                  dsimp
+                                  cases residual with
+                                  | Ok impossible => exact nomatch impossible
+                                  | Err error =>
+                                      unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                      simp only [bind_tc_eq, bind_ok]
+                              | Continue _ =>
+                                  conv_lhs => erw [Std.bind_assoc]
+                                  apply congrArg (Std.bind
+                                    (topology.check_storage adjacencyCount 16#usize))
+                                  funext adjacencyStorage16
+                                  conv_lhs => erw [Std.bind_assoc]
+                                  apply congrArg (Std.bind
+                                    (core.result.Result.Insts.CoreOpsTry.branch adjacencyStorage16))
+                                  funext adjacencyFlow16
+                                  cases adjacencyFlow16 with
+                                  | Break residual =>
+                                      dsimp
+                                      cases residual with
+                                      | Ok impossible => exact nomatch impossible
+                                      | Err error =>
+                                          unfold core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                          simp only [bind_tc_eq, bind_ok]
+                                  | Continue _ =>
+                                      dsimp
+                                      simp only [bind_ok]
+                                      unfold constructor_scene_after_prefix_program
+                                      conv_lhs => erw [Std.bind_assoc]
+                                      conv_rhs => erw [Std.bind_assoc]
+                                      apply congrArg (Std.bind
+                                        (List.clone core.clone.CloneUsize.clone
+                                          (List.replicate (↑adjacencyCount) 0#usize)))
+                                      funext neighbors
+                                      simp only [bind_ok]
+                                      apply congrArg (Std.bind (topology.Edge.new 0#usize 0#usize))
+                                      funext e
+                                      apply congrArg (Std.bind
+                                        (alloc.vec.from_elem topology.Edge.Insts.CoreCloneClone e adjacencyCount))
+                                      funext witnesses
+                                      apply congrArg (Std.bind
+                                        (alloc.vec.from_elem core.clone.CloneUsize 0#usize componentCount))
+                                      funext next
+                                      apply congrArg (Std.bind
+                                        (spanning_tree.Tree.scene_dfs_loop4 0#usize componentCount
+                                          (countBack prefixed) next))
+                                      funext next1
+                                      congr
+                                      funext neighbors1 witnesses1
+                                      apply congrArg (Std.bind
+                                        (alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Usize)
+                                          components1 root))
+                                      funext quotientRoot
+                                      apply congrArg (Std.bind
+                                        (spanning_tree.depth_first adapter (alloc.vec.Vec.deref (countBack prefixed))
+                                          (alloc.vec.Vec.deref neighbors1) quotientRoot rng work))
+                                      congr
+                                      funext dfsResult
+                                      funext pair
+                                      cases pair with
+                                      | mk rng1 work1 =>
+                                        apply congrArg (Std.bind
+                                          (core.result.Result.Insts.CoreOpsTry.branch dfsResult))
+                                        funext dfsFlow
+                                        cases dfsFlow with
+                                        | Break residual =>
+                                            dsimp
+                                        | Continue _ =>
+                                            apply congrArg (Std.bind (n - 1#usize))
+                                            funext selectedCount
+                                            apply congrArg (Std.bind
+                                              (topology.check_storage selectedCount 16#usize))
+                                            funext selectedStorage
+                                            apply congrArg (Std.bind
+                                              (core.result.Result.Insts.CoreOpsTry.branch selectedStorage))
+                                            funext selectedFlow
+                                            cases selectedFlow with
+                                            | Break residual =>
+                                                dsimp
+                                            | Continue _ =>
+                                                apply congrArg (Std.bind
+                                                  (alloc.vec.from_elem topology.Edge.Insts.CoreCloneClone e
+                                                    selectedCount))
+                                                funext selected
+                                                apply congrArg (Std.bind
+                                                  (spanning_tree.Tree.scene_dfs_loop6 required 0#usize selected))
+                                                funext selected1
+                                                congr
+                                                funext work2 selected2
+                                                apply congrArg (Std.bind
+                                                  (topology.Carrier.from_edges n (alloc.vec.Vec.deref selected2)))
+                                                funext expandedResult
+                                                apply congrArg (Std.bind
+                                                  (core.result.Result.Insts.CoreOpsTry.branch expandedResult))
+                                                funext expandedFlow
+                                                cases expandedFlow with
+                                                | Break residual =>
+                                                    dsimp
+                                                | Continue expanded =>
+                                                    apply congrArg (Std.bind
+                                                      (alloc.vec.from_elem core.clone.CloneUsize root n))
+                                                    funext parents
+                                                    congr
 
 
 
@@ -537,38 +906,111 @@ theorem constructor_scene_after_prefix_total {R : Type*} (adapter : tree.Rng R)
       rw [hn] at this
       omega
     have hlength : finalSelected.val.length + 1 = n.val := by omega
+    have hdfsCapacity : n.val ≤ dfsWork.path.val.length := by
+      rw [hdfs.2.path, hn]
+      exact hcapacity
+    rw [constructor_scene_deref_eq_slice finalSelected]
     by_cases hwidth : constructorEdgesStorageFits n finalSelected.slice
-    · apply WP.spec_bind (constructor_scene_publish_accepts carrier required n root finalSelected
-        dfsWork hc hn hroot hselectedEdges hselectedCarrier hselectedConnected hlength
-        hprefixSelected hwidth hdfs.2.valid (by simpa only [hn] using hcapacity))
-      rintro ⟨publishedResult, finalWork⟩ hpublished
-      obtain ⟨published, hresult, hpublishedRoot, htree, hwork, _hframes, _hparents,
-        _hincoming, _hslots, _hnodes, _heditCount, _hedgeCapacity, hrequired⟩ := hpublished
-      rw [hresult]
-      exact (WP.spec_ok _).mpr (Or.inl
-        ⟨published, rfl, hpublishedRoot, htree, hwork, hrequired⟩)
+    · have hpublished := WP.spec_bind
+        (Pₖ := fun output =>
+          (∃ published, output.1 = .Ok published ∧ published.root = root ∧
+            TreeValid carrier published ∧ WorkspaceValid output.2.2 ∧
+            ∀ slot, slot < required.val.length → ∀ edge,
+              required.val[slot]? = some edge →
+              parentEdge (parents published) edge.u.val edge.v.val) ∨
+          (output.1 = .Err topology.Error.Overflow ∧ WorkspaceValid output.2.2 ∧
+            ¬ ConstructorSceneAllocationFits carrier ∧
+            ConstructorScenePostDFSFrame adapter carrier required root rng work
+              output.2.1 output.2.2))
+        (k := fun output : core.result.Result spanning_tree.Tree topology.Error ×
+          spanning_tree.Workspace => ok (output.1, rng1, output.2))
+        (constructor_scene_publish_accepts carrier required n root finalSelected
+          dfsWork hc hn hroot (by simpa only [hn] using hselectedEdges)
+          hselectedCarrier hselectedConnected hlength hprefixSelected hwidth
+          hdfs.2.valid hdfsCapacity) (by
+        rintro ⟨publishedResult, finalWork⟩ hpublished
+        obtain ⟨published, hresult, hpublishedRoot, htree, hwork, _hframes, _hparents,
+          _hincoming, _hslots, _hnodes, _heditCount, _hedgeCapacity, hrequired⟩ := hpublished
+        rw [hresult]
+        exact (WP.spec_ok _).mpr (Or.inl
+          ⟨published, rfl, hpublishedRoot, htree, hwork, hrequired⟩))
+      refine Eq.mp ?_ hpublished
+      apply congrArg₂ WP.spec
+      · conv_lhs => erw [Std.bind_assoc]
+        apply congrArg (Std.bind (topology.Carrier.from_edges n finalSelected.slice))
+        funext expandedResult
+        conv_lhs => erw [Std.bind_assoc]
+        apply congrArg (Std.bind
+          (core.result.Result.Insts.CoreOpsTry.branch expandedResult))
+        funext expandedFlow
+        cases expandedFlow with
+        | Break residual =>
+            dsimp
+            conv_lhs => erw [Std.bind_assoc]
+            simp only [bind_ok]
+        | Continue expanded =>
+            dsimp
+            conv_lhs => erw [Std.bind_assoc]
+            apply congrArg (Std.bind (alloc.vec.from_elem core.clone.CloneUsize root n))
+            funext parents
+            conv_lhs => erw [Std.bind_assoc]
+            apply congrArg (Std.bind (spanning_tree.Tree.scene_dfs_loop8 dfsWork n 0#usize))
+            funext workIndex
+            cases workIndex with
+            | mk work3 index =>
+                conv_lhs => erw [Std.bind_assoc]
+                apply congrArg (Std.bind
+                  (alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool) work3.seen root))
+                funext seenPair
+                conv_lhs => erw [Std.bind_assoc]
+                cases seenPair with
+                | mk _ seenBack' =>
+                    apply congrArg (Std.bind
+                      (alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Usize)
+                        work3.path 0#usize))
+                    funext pathPair
+                    cases pathPair with
+                    | mk _ pathBack' =>
+                        conv_lhs => erw [Std.bind_assoc]
+                        apply congrArg (Std.bind
+                          (spanning_tree.Tree.scene_dfs_loop9 (seenBack' true) (pathBack' root) index
+                            expanded parents 1#usize))
+                        funext result
+                        cases result with
+                        | mk seen' rest =>
+                            cases rest with
+                            | mk path' parents' =>
+                                simp only [bind_ok, uncurry_apply_pair]
+      · rfl
     · apply WP.spec_bind
         (constructor_scene_expanded_carrier_overflow n finalSelected hnzero hwidth)
       intro expandedResult hexpanded
       rw [hexpanded]
-      simp only [core.result.Result.Insts.CoreOpsTry.branch, bind_ok,
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+      simp only [bind_ok,
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
+        bind_tc_eq]
       have hnotAllocation : ¬ ConstructorSceneAllocationFits carrier := by
         intro hallocation
         rcases hallocation with
           ⟨ha1, ha2, ha3, _ha4, _ha5, _ha6, _ha7, _ha8, ha9, ha10, ha11, ha12⟩
         apply hwidth
-        simp only [constructorEdgesStorageFits, alloc.vec.Vec.slice, alloc.vec.Vec.val,
-          hn, hselectedLength]
+        have hselectedSliceLength :
+            finalSelected.slice.val.length = cellCount carrier - 1 := by
+          change finalSelected.val.length = cellCount carrier - 1
+          rw [hselectedLength, hn]
+        unfold constructorEdgesStorageFits
+        rw [hselectedSliceLength, hn]
         refine ⟨ha1, by omega, ha2, ha3, ha11, ha12, ?_⟩
-        simp only [constructorStorageFits, Slice.len_val, UScalar.ofNatCore_val_eq]
+        simp only [constructorStorageFits, Slice.len_val, hselectedSliceLength,
+          UScalar.ofNatCore_val_eq]
         exact ⟨ha9, ha10⟩
       exact (WP.spec_ok _).mpr
         (Or.inr ⟨rfl, hdfs.2.valid, hnotAllocation, hframe⟩)
   · have hselectedStorageError : selectedStorage = .Err .Overflow := by
       simpa only [hselectedFits, ite_false] using hselectedStorage
     simp only [hselectedStorageError, bind_ok,
-      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual]
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
+      bind_tc_eq]
     have hnotAllocation : ¬ ConstructorSceneAllocationFits carrier := by
       intro hallocation
       rcases hallocation with
@@ -739,7 +1181,8 @@ theorem constructor_scene_dfs_guarded {R : Type*} (adapter : tree.Rng R)
           ¬ ConstructorSceneAllocationFits carrier ∧
           ConstructorScenePostDFSFrame adapter carrier required root rng work
             output.2.1 output.2.2)) := by
-  unfold spanning_tree.Tree.scene_dfs
+  rw [← constructor_scene_program_eq]
+  unfold constructor_scene_program
   apply WP.spec_bind (mutation_carrier_len_total carrier hc)
   intro n hn
   have hrootGuard : ¬ root >= n := by
@@ -795,21 +1238,7 @@ theorem constructor_scene_dfs_guarded {R : Type*} (adapter : tree.Rng R)
       exact constructor_scene_after_prepare_total adapter hrng carrier required n root rng work
         links components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
         hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount hprepareRun)
-  apply Eq.mp ?_ hwrapped
-  apply congrArg₂ WP.spec
-  · simp only [constructor_scene_after_prepare_program, constructor_scene_after_prefix_program,
-      topology.Carrier.impl.edges, core.result.Result.Insts.CoreOpsTry.branch,
-      Std.bind_assoc, uncurry]
-    repeat' first
-    | with_reducible rfl
-    | with_reducible apply constructor_scene_residual_continuation
-    | with_reducible apply congrArg (Std.bind _)
-    | funext
-    | dsimp only [uncurry]
-    | split
-    | rw [bind_ok]
-    | rw [Std.bind_assoc]
-  · rfl
+  exact hwrapped
 
 set_option maxHeartbeats 1000000 in
 /-- With every input-size allocation guard representable, the literal outer `scene_dfs`
@@ -831,7 +1260,8 @@ theorem constructor_scene_dfs_accepts {R : Type*} (adapter : tree.Rng R)
         ∀ slot, slot < required.val.length → ∀ edge,
           required.val[slot]? = some edge →
           parentEdge (parents published) edge.u.val edge.v.val) := by
-  unfold spanning_tree.Tree.scene_dfs
+  rw [← constructor_scene_program_eq]
+  unfold constructor_scene_program
   apply WP.spec_bind (mutation_carrier_len_total carrier hc)
   intro n hn
   have hrootGuard : ¬ root >= n := by
@@ -883,21 +1313,7 @@ theorem constructor_scene_dfs_accepts {R : Type*} (adapter : tree.Rng R)
         links components componentCount hc hn hroot hw hcapacity.1 hforest hlinks hcomponents
         hforestCount hpositive hcountBound hbounded hdense hclasses hcomponentCount hallocation
         hprepareRun)
-  apply Eq.mp ?_ hwrapped
-  apply congrArg₂ WP.spec
-  · simp only [constructor_scene_after_prepare_program, constructor_scene_after_prefix_program,
-      topology.Carrier.impl.edges, core.result.Result.Insts.CoreOpsTry.branch,
-      Std.bind_assoc, uncurry]
-    repeat' first
-    | with_reducible rfl
-    | with_reducible apply constructor_scene_residual_continuation
-    | with_reducible apply congrArg (Std.bind _)
-    | funext
-    | dsimp only [uncurry]
-    | split
-    | rw [bind_ok]
-    | rw [Std.bind_assoc]
-  · rfl
+  exact hwrapped
 
 /-- The actual scene constructor is total at every representable input width.
 Guard and pre-DFS errors preserve the caller frame. Post-DFS overflow preserves exactly
