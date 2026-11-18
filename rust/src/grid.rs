@@ -207,12 +207,16 @@ impl Grid {
         }
         let count = spec.columns.checked_mul(spec.rows).ok_or(Error::Overflow)?;
         check_storage(count, const { core::mem::size_of::<Option<usize>>() })?;
-        let width = i32::try_from(spec.columns)
-            .map_err(|_| Error::Overflow)?
+        if spec.columns > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let width = (spec.columns as i32)
             .checked_mul(spec.cell_size)
             .ok_or(Error::Overflow)?;
-        let height = i32::try_from(spec.rows)
-            .map_err(|_| Error::Overflow)?
+        if spec.rows > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let height = (spec.rows as i32)
             .checked_mul(spec.cell_size)
             .ok_or(Error::Overflow)?;
         Point {
