@@ -58,32 +58,35 @@ impl MotionWorkspace {
     ///
     /// # Errors
     /// Returns [`Error::Overflow`] when network or route capacities cannot be represented.
-    pub fn new(scene: &Scene) -> Result<Self, Error> {
-        let cells = scene.layout().cells().len();
-        let edges = scene.layout().carrier().edges().len();
+    pub fn new(current: &Scene) -> Result<Self, Error> {
+        let cells = current.layout().cells().len();
+        let edges = current.layout().carrier().edges().len();
         let (nodes, arc_count) = network_sizes(cells, edges)?;
         let offset_count = nodes + 1;
         let route_cells = cells
-            .checked_mul(scene.routes().len())
+            .checked_mul(current.routes().len())
             .ok_or(Error::Overflow)?;
         check_storage(route_cells, const { core::mem::size_of::<usize>() })?;
         check_storage(cells, const { core::mem::size_of::<Edge>() })?;
         check_storage(
-            scene.routes().len(),
+            current.routes().len(),
             const { core::mem::size_of::<Route>() },
         )?;
         check_storage(
-            scene.routes().len(),
+            current.routes().len(),
             const { core::mem::size_of::<[usize; 4]>() },
         )?;
-        check_storage(scene.phases().len(), const { core::mem::size_of::<i32>() })?;
+        check_storage(
+            current.phases().len(),
+            const { core::mem::size_of::<i32>() },
+        )?;
         let mut work = Self {
-            epoch: scene.stamp().epoch,
+            epoch: current.stamp().epoch,
             cells,
             edges,
-            endpoints: Vec::with_capacity(scene.routes().len()),
-            steps: vec![0; scene.phases().len()],
-            routes: Vec::with_capacity(scene.routes().len()),
+            endpoints: Vec::with_capacity(current.routes().len()),
+            steps: vec![0; current.phases().len()],
+            routes: Vec::with_capacity(current.routes().len()),
             routes_changed: false,
             remove: Vec::with_capacity(cells),
             add: Vec::with_capacity(cells),
@@ -101,8 +104,8 @@ impl MotionWorkspace {
             second: Vec::with_capacity(cells),
         };
         let mut i = 0;
-        while i < scene.routes().len() {
-            let route = &scene.routes()[i];
+        while i < current.routes().len() {
+            let route = &current.routes()[i];
             let last = route.cells.len() - 1;
             work.endpoints.push([
                 route.cells[0],
@@ -125,7 +128,7 @@ impl MotionWorkspace {
         }
         let mut e = 0;
         while e < edges {
-            let edge = scene.layout().carrier().edges()[e];
+            let edge = current.layout().carrier().edges()[e];
             work.arc_pair(edge.u * 2 + 1, edge.v * 2);
             work.arc_pair(edge.v * 2 + 1, edge.u * 2);
             e += 1;
@@ -174,14 +177,14 @@ impl MotionWorkspace {
         }
     }
 
-    fn check_scene(&self, scene: &Scene) -> Result<(), Error> {
-        if self.epoch != scene.stamp().epoch {
+    fn check_scene(&self, current: &Scene) -> Result<(), Error> {
+        if self.epoch != current.stamp().epoch {
             return Err(Error::StaleEpoch);
         }
-        if self.cells != scene.layout().cells().len()
-            || self.edges != scene.layout().carrier().edges().len()
-            || self.steps.len() != scene.phases().len()
-            || self.routes.len() != scene.routes().len()
+        if self.cells != current.layout().cells().len()
+            || self.edges != current.layout().carrier().edges().len()
+            || self.steps.len() != current.phases().len()
+            || self.routes.len() != current.routes().len()
         {
             return Err(Error::InsufficientWorkspace);
         }
@@ -189,7 +192,7 @@ impl MotionWorkspace {
         let mut e = 0;
         let mut status = Ok(());
         while e < self.edges && status.is_ok() {
-            let edge = scene.layout().carrier().edges()[e];
+            let edge = current.layout().carrier().edges()[e];
             let a = self.cells * 4 + e * 4;
             if self.from[a] != edge.u * 2 + 1 || self.to[a] != edge.v * 2 {
                 status = Err(Error::InvalidCarrier);
@@ -199,7 +202,7 @@ impl MotionWorkspace {
         status?;
         let mut r = 0;
         while r < self.routes.len() && status.is_ok() {
-            status = Self::check_route_endpoints(&scene.routes()[r].cells, self.endpoints[r]);
+            status = Self::check_route_endpoints(&current.routes()[r].cells, self.endpoints[r]);
             r += 1;
         }
         status
@@ -207,13 +210,13 @@ impl MotionWorkspace {
 
     pub(crate) fn advance(
         &mut self,
-        scene: &mut Scene,
+        current: &mut Scene,
         expected: Stamp,
         requested: &[i32],
     ) -> Result<MotionAdvance, Error> {
         // Validate the original request before subdivision, including holds and twist groups.
-        scene.prepare_motion(expected, requested)?;
-        self.check_scene(scene)?;
+        current.prepare_motion(expected, requested)?;
+        self.check_scene(current)?;
         let mut maximum = 0;
         let mut i = 0;
         while i < requested.len() {
@@ -222,14 +225,14 @@ impl MotionWorkspace {
         }
         if maximum == 0 {
             return Ok(MotionAdvance {
-                event: scene.motion(expected, requested, Edit::default())?,
+                event: current.motion(expected, requested, Edit::default())?,
                 divisor: 1,
             });
         }
         let mut e = 0;
         while e < self.edges {
-            let edge = scene.layout().carrier().edges()[e];
-            self.locked[e] = scene.tree().has_edge(edge) && scene.check_removal(edge).is_err();
+            let edge = current.layout().carrier().edges()[e];
+            self.locked[e] = current.tree().has_edge(edge) && current.check_removal(edge).is_err();
             e += 1;
         }
         let mut divisor = 1;
@@ -242,9 +245,9 @@ impl MotionWorkspace {
                 self.steps[i] = requested[i] / divisor as i32;
                 i += 1;
             }
-            status = scene.prepare_motion(expected, &self.steps).map(|_| ());
+            status = current.prepare_motion(expected, &self.steps).map(|_| ());
             if status.is_ok() {
-                match self.plan(scene) {
+                match self.plan(current) {
                     Ok(()) => planned = true,
                     Err(Error::InvalidGeometry) => failure = Error::InvalidGeometry,
                     Err(Error::Disconnected) => failure = Error::Disconnected,
@@ -270,7 +273,7 @@ impl MotionWorkspace {
         if !planned {
             return Err(failure);
         }
-        let event = scene.motion(
+        let event = current.motion(
             expected,
             &self.steps,
             Edit {
@@ -318,9 +321,9 @@ impl MotionWorkspace {
         Ok(keep)
     }
 
-    fn eligible(&self, scene: &Scene, circle: usize, cell: usize) -> bool {
+    fn eligible(&self, current: &Scene, circle: usize, cell: usize) -> bool {
         let ends = self.endpoints[circle];
-        let kind = scene.layout().cells()[cell];
+        let kind = current.layout().cells()[cell];
         match kind {
             Cell::Center { circle: owner } | Cell::Sector { circle: owner, .. } => owner == circle,
             Cell::Transition { .. } => cell == ends[1] || cell == ends[2],
@@ -328,7 +331,7 @@ impl MotionWorkspace {
         }
     }
 
-    fn reset_flow(&mut self, scene: &Scene, circle: usize, pivot: usize) {
+    fn reset_flow(&mut self, current: &Scene, circle: usize, pivot: usize) {
         let mut a = 0;
         while a < self.residual.len() {
             self.residual[a] = 0;
@@ -337,7 +340,7 @@ impl MotionWorkspace {
         let ends = self.endpoints[circle];
         let mut v = 0;
         while v < self.cells {
-            if self.eligible(scene, circle, v) {
+            if self.eligible(current, circle, v) {
                 self.residual[v * 4] = if v == pivot { 2 } else { 1 };
             }
             v += 1;
@@ -346,10 +349,10 @@ impl MotionWorkspace {
         self.residual[ends[2] * 4 + 2] = 1;
         let mut e = 0;
         while e < self.edges {
-            let edge = scene.layout().carrier().edges()[e];
+            let edge = current.layout().carrier().edges()[e];
             if self.admissible[e]
-                && self.eligible(scene, circle, edge.u)
-                && self.eligible(scene, circle, edge.v)
+                && self.eligible(current, circle, edge.u)
+                && self.eligible(current, circle, edge.v)
             {
                 self.residual[self.cells * 4 + e * 4] = 1;
                 self.residual[self.cells * 4 + e * 4 + 2] = 1;
@@ -438,8 +441,13 @@ impl MotionWorkspace {
         Ok(())
     }
 
-    fn route_through(&mut self, scene: &Scene, circle: usize, pivot: usize) -> Result<bool, Error> {
-        self.reset_flow(scene, circle, pivot);
+    fn route_through(
+        &mut self,
+        current: &Scene,
+        circle: usize,
+        pivot: usize,
+    ) -> Result<bool, Error> {
+        self.reset_flow(current, circle, pivot);
         let source = self.cells * 2;
         let target = pivot * 2 + 1;
         let mut units = 0;
@@ -478,13 +486,13 @@ impl MotionWorkspace {
         Ok(true)
     }
 
-    fn plan_route(&mut self, scene: &Scene, circle: usize) -> Result<(), Error> {
-        let keep = self.route_admissible(&scene.routes()[circle].cells)?;
+    fn plan_route(&mut self, current: &Scene, circle: usize) -> Result<(), Error> {
+        let keep = self.route_admissible(&current.routes()[circle].cells)?;
         if keep {
             self.routes[circle].cells.clear();
             self.routes[circle]
                 .cells
-                .extend_from_slice(&scene.routes()[circle].cells);
+                .extend_from_slice(&current.routes()[circle].cells);
             return Ok(());
         }
         let ends = self.endpoints[circle];
@@ -493,20 +501,20 @@ impl MotionWorkspace {
         if !self.admissible[entrance] || !self.admissible[exit] {
             return Err(Error::InvalidGeometry);
         }
-        let center = scene.layout().circles()[circle].center_cell();
-        let mut found = self.route_through(scene, circle, center)?;
+        let center = current.layout().circles()[circle].center_cell();
+        let mut found = self.route_through(current, circle, center)?;
         let mut v = 0;
         let mut status = Ok(());
         while v < self.cells && !found && status.is_ok() {
-            let kind = scene.layout().cells()[v];
+            let kind = current.layout().cells()[v];
             if let Cell::Sector {
                 circle: owner,
                 ring,
                 ..
             } = kind
             {
-                if owner == circle && ring + 1 < scene.layout().circles()[circle].ring_count() {
-                    match self.route_through(scene, circle, v) {
+                if owner == circle && ring + 1 < current.layout().circles()[circle].ring_count() {
+                    match self.route_through(current, circle, v) {
                         Ok(route) => found = route,
                         Err(error) => status = Err(error),
                     }
@@ -522,11 +530,11 @@ impl MotionWorkspace {
         }
     }
 
-    fn virtual_edge(&self, scene: &Scene, edge: Edge) -> bool {
-        self.add.contains(&edge) || (scene.tree().has_edge(edge) && !self.remove.contains(&edge))
+    fn virtual_edge(&self, current: &Scene, edge: Edge) -> bool {
+        self.add.contains(&edge) || (current.tree().has_edge(edge) && !self.remove.contains(&edge))
     }
 
-    fn tree_path(&mut self, scene: &Scene, source: usize, target: usize) -> bool {
+    fn tree_path(&mut self, current: &Scene, source: usize, target: usize) -> bool {
         self.clear_search(source);
         let mut read = 0;
         let mut written = 1;
@@ -539,7 +547,7 @@ impl MotionWorkspace {
                 if arc >= self.cells * 4 && arc & 1 == 0 {
                     let next = self.to[arc] / 2;
                     let edge = Edge::new(cell, next);
-                    if self.parent[next] == usize::MAX && self.virtual_edge(scene, edge) {
+                    if self.parent[next] == usize::MAX && self.virtual_edge(current, edge) {
                         self.parent[next] = cell;
                         self.queue[written] = next;
                         written += 1;
@@ -552,21 +560,21 @@ impl MotionWorkspace {
         self.parent[target] != usize::MAX
     }
 
-    fn plan(&mut self, scene: &Scene) -> Result<(), Error> {
+    fn plan(&mut self, current: &Scene) -> Result<(), Error> {
         self.remove.clear();
         self.add.clear();
         self.routes_changed = false;
         let mut e = 0;
         while e < self.edges {
-            let edge = scene.layout().carrier().edges()[e];
-            self.admissible[e] = scene.motion_edge(edge).is_ok();
+            let edge = current.layout().carrier().edges()[e];
+            self.admissible[e] = current.motion_edge(edge).is_ok();
             self.protected[e] = self.locked[e];
             e += 1;
         }
         let mut r = 0;
         let mut status = Ok(());
         while r < self.routes.len() && status.is_ok() {
-            status = self.plan_route(scene, r);
+            status = self.plan_route(current, r);
             let mut i = 1;
             while i < self.routes[r].cells.len() && status.is_ok() {
                 let edge = Edge::new(self.routes[r].cells[i - 1], self.routes[r].cells[i]);
@@ -582,8 +590,8 @@ impl MotionWorkspace {
         // Remove only endangered base edges. The remainder stays a forest, including reservations.
         let mut e = 0;
         while e < self.edges && status.is_ok() {
-            let edge = scene.layout().carrier().edges()[e];
-            if scene.tree().has_edge(edge) && !self.admissible[e] {
+            let edge = current.layout().carrier().edges()[e];
+            if current.tree().has_edge(edge) && !self.admissible[e] {
                 if self.protected[e] {
                     status = Err(Error::Occupied);
                 } else {
@@ -599,8 +607,8 @@ impl MotionWorkspace {
             let mut i = 1;
             while i < self.routes[r].cells.len() && status.is_ok() {
                 let edge = Edge::new(self.routes[r].cells[i - 1], self.routes[r].cells[i]);
-                if !self.virtual_edge(scene, edge) {
-                    if self.tree_path(scene, edge.u, edge.v) {
+                if !self.virtual_edge(current, edge) {
+                    if self.tree_path(current, edge.u, edge.v) {
                         let mut cell = edge.v;
                         let mut cut = None;
                         while cell != edge.u && cut.is_none() && status.is_ok() {
@@ -635,10 +643,10 @@ impl MotionWorkspace {
         // Complete the forest with admissible carrier edges without replacing any remaining branch.
         let mut e = 0;
         while e < self.edges && self.add.len() < self.remove.len() {
-            let edge = scene.layout().carrier().edges()[e];
+            let edge = current.layout().carrier().edges()[e];
             if self.admissible[e]
-                && !self.virtual_edge(scene, edge)
-                && !self.tree_path(scene, edge.u, edge.v)
+                && !self.virtual_edge(current, edge)
+                && !self.tree_path(current, edge.u, edge.v)
             {
                 self.add.push(edge);
             }

@@ -42,7 +42,7 @@ pub struct Portal {
 
 #[derive(Debug)]
 pub struct Layout {
-    grid: Grid,
+    cell_grid: Grid,
     cells: Vec<Cell>,
     circles: Vec<Circle>,
     portals: Vec<Portal>,
@@ -225,11 +225,11 @@ fn check_circle_extent(
 
 fn resolve_portal(
     spec: PortalSpec,
-    grid: &Grid,
+    cell_grid: &Grid,
     portals: &[Portal],
     transition_cell: usize,
 ) -> Result<Portal, Error> {
-    let grid_cell = grid
+    let grid_cell = cell_grid
         .cell(spec.column, spec.row)
         .ok_or(Error::InvalidGeometry)?;
     let mut conflict = false;
@@ -273,7 +273,7 @@ impl Layout {
         if grid_spec.cell_size < margin * 2 {
             return Err(Error::InvalidGeometry);
         }
-        let mut grid = Grid::new(grid_spec)?;
+        let mut cell_grid = Grid::new(grid_spec)?;
         check_storage(specs.len(), const { core::mem::size_of::<Circle>() })?;
         check_storage(portal_specs.len(), const { core::mem::size_of::<Portal>() })?;
         let mut circles = Vec::with_capacity(specs.len());
@@ -318,7 +318,7 @@ impl Layout {
         while row < grid_spec.rows {
             let mut column = 0;
             while column < grid_spec.columns {
-                let bounds = grid.bounds(column, row);
+                let bounds = cell_grid.bounds(column, row);
                 let mut removed = geometry.check(bounds).is_err();
                 let mut i = 0;
                 while i < circles.len() {
@@ -328,7 +328,7 @@ impl Layout {
                     i += 1;
                 }
                 if !removed {
-                    grid.retain(column, row, cells.len());
+                    cell_grid.retain(column, row, cells.len());
                     cells.push(Cell::Grid {
                         column,
                         row,
@@ -363,7 +363,7 @@ impl Layout {
         let mut portals = Vec::with_capacity(portal_specs.len());
         let mut i = 0;
         while i < portal_specs.len() && status.is_ok() {
-            match resolve_portal(portal_specs[i], &grid, &portals, cells.len()) {
+            match resolve_portal(portal_specs[i], &cell_grid, &portals, cells.len()) {
                 Ok(portal) => {
                     cells.push(Cell::Transition { portal: i });
                     portals.push(portal);
@@ -384,10 +384,10 @@ impl Layout {
         let mut cell = 0;
         while cell < cells.len() {
             if let Cell::Grid { column, row, .. } = cells[cell] {
-                if let Some(right) = grid.cell(column + 1, row) {
+                if let Some(right) = cell_grid.cell(column + 1, row) {
                     push_edge(&mut edges, cell, right);
                 }
-                if let Some(down) = grid.cell(column, row + 1) {
+                if let Some(down) = cell_grid.cell(column, row + 1) {
                     push_edge(&mut edges, cell, down);
                 }
             }
@@ -444,7 +444,7 @@ impl Layout {
         }
         let carrier = Carrier::from_edges(cells.len(), &edges)?;
         let layout = Self {
-            grid,
+            cell_grid,
             cells,
             circles,
             portals,
@@ -541,7 +541,7 @@ impl Layout {
     }
 
     pub fn grid(&self) -> &Grid {
-        &self.grid
+        &self.cell_grid
     }
     pub fn cells(&self) -> &[Cell] {
         &self.cells
@@ -922,7 +922,7 @@ pub struct Scene {
 
 #[derive(Clone, Copy)]
 struct RoutePublication<'tree, 'remove, 'add> {
-    tree: Option<&'tree Tree>,
+    current_tree: Option<&'tree Tree>,
     remove: &'remove [Edge],
     add: &'add [Edge],
 }
@@ -932,7 +932,7 @@ fn check_routes(
     routes: &[Route],
     phases: &[i32],
     next: &[i32],
-    tree: Option<&Tree>,
+    current_tree: Option<&Tree>,
     edit: Edit<'_>,
     required: &mut Vec<Edge>,
 ) -> Result<(), Error> {
@@ -941,7 +941,7 @@ fn check_routes(
     }
     required.clear();
     let publication = RoutePublication {
-        tree,
+        current_tree,
         remove: edit.remove,
         add: edit.add,
     };
@@ -1044,9 +1044,9 @@ fn check_route_edge(
         None => return Ok(()),
     };
     layout.doorway(edge, phases, next)?;
-    if let Some(tree) = publication.tree {
+    if let Some(current) = publication.current_tree {
         if !contains(publication.add, edge)
-            && (!tree.has_edge(edge) || contains(publication.remove, edge))
+            && (!current.has_edge(edge) || contains(publication.remove, edge))
         {
             return Err(Error::InvalidTransition);
         }
@@ -1105,7 +1105,7 @@ impl Scene {
         }
         let live = Carrier::from_edges(count, &live_edges)?;
         let mut work = Workspace::new(count, layout.carrier.edges().len())?;
-        let tree = Tree::scene_dfs(&live, &required, 0, rng, &mut work)?;
+        let global_tree = Tree::scene_dfs(&live, &required, 0, rng, &mut work)?;
         let mut saved_routes = Vec::with_capacity(routes.len());
         let mut i = 0;
         while i < routes.len() {
@@ -1145,7 +1145,7 @@ impl Scene {
             next_phases,
             holds: vec![0; layout.transforms],
             layout,
-            tree,
+            tree: global_tree,
             work,
             routes: saved_routes,
             required,
@@ -1238,15 +1238,15 @@ impl Scene {
             .world(self.layout.frame_pose(cell, &self.phases), &self.phases))
     }
 
-    pub fn walker_pose(&self, walker: usize) -> Result<Point, Error> {
-        let walker = self.walkers.get(walker).ok_or(Error::InvalidIndex)?;
-        match walker.state {
+    pub fn walker_pose(&self, walker_index: usize) -> Result<Point, Error> {
+        let occupant = self.walkers.get(walker_index).ok_or(Error::InvalidIndex)?;
+        match occupant.state {
             WalkerState::Terminated => Err(Error::InvalidTransition),
             WalkerState::Crossing(crossing) => Ok(self.layout.world(
                 crossing.path.pose(crossing.elapsed, crossing.duration),
                 &self.phases,
             )),
-            _ => self.cell_pose(walker.cell),
+            _ => self.cell_pose(occupant.cell),
         }
     }
 
@@ -1284,8 +1284,8 @@ impl Scene {
         if token.epoch != self.stamp.epoch {
             return Err(Error::StaleEpoch);
         }
-        let walker = self.walkers.get(token.walker).ok_or(Error::InvalidIndex)?;
-        match &walker.state {
+        let occupant = self.walkers.get(token.walker).ok_or(Error::InvalidIndex)?;
+        match &occupant.state {
             WalkerState::Crossing(crossing) if crossing.reservation == token => Ok(crossing),
             _ => Err(Error::InvalidTransition),
         }
@@ -1294,12 +1294,12 @@ impl Scene {
     pub fn begin_crossing(
         &mut self,
         stamp: Stamp,
-        walker: usize,
+        walker_index: usize,
         target: usize,
         duration: u32,
     ) -> Result<Reservation, Error> {
         let revision = self.check_stamp(stamp)?;
-        let occupant = *self.walkers.get(walker).ok_or(Error::InvalidIndex)?;
+        let occupant = *self.walkers.get(walker_index).ok_or(Error::InvalidIndex)?;
         if occupant.state != WalkerState::Ready || duration == 0 {
             return Err(Error::InvalidTransition);
         }
@@ -1314,7 +1314,7 @@ impl Scene {
         let path = oriented_path(door.path, occupant.cell == edge.u);
         let token = Reservation {
             epoch: self.stamp.epoch,
-            walker,
+            walker: walker_index,
             serial: revision,
         };
         let crossing = Crossing {
@@ -1329,7 +1329,7 @@ impl Scene {
             holds: door.holds,
         };
         acquire_holds(&mut self.holds, door.holds);
-        self.walkers[walker].state = WalkerState::Crossing(crossing);
+        self.walkers[walker_index].state = WalkerState::Crossing(crossing);
         self.stamp.revision = revision;
         Ok(token)
     }
@@ -1507,12 +1507,12 @@ impl Scene {
     pub fn carve(
         &mut self,
         stamp: Stamp,
-        walker: usize,
+        walker_index: usize,
         target: usize,
         edit: Edit<'_>,
     ) -> Result<Stamp, Error> {
         self.check_stamp(stamp)?;
-        let occupant = self.walkers.get(walker).ok_or(Error::InvalidIndex)?;
+        let occupant = self.walkers.get(walker_index).ok_or(Error::InvalidIndex)?;
         if occupant.state != WalkerState::Ready {
             return Err(Error::Occupied);
         }
