@@ -46,3 +46,12 @@ import LabyrinthCore.ConstructorSceneTotal
 #print axioms Labyrinth.constructor_scene_dfs_guarded
 #print axioms Labyrinth.constructor_scene_dfs_accepts
 #print axioms Labyrinth.constructor_scene_dfs_spec
+#print axioms core.num.I32.rem_euclid
+#print axioms core.num.I32.abs
+#print axioms core.ops.range.RangeInclusive.contains
+#print axioms core.option.Option.Insts.CoreFmtDebug.fmt
+#print axioms core.option.OptionShared0T.copied
+#print axioms core.option.Option.Insts.CoreCloneClone.clone
+#print axioms core.option.Option.Insts.CoreCmpPartialEqOption.eq
+#print axioms alloc.vec.Vec.clear
+#print axioms Aeneas.Std.I32.div

@@ -57,6 +57,13 @@ the actual crate into temporary Lean files. They must byte-match the checked-in 
 definitions before `lake build` checks them with warnings treated as errors. Drift fails the
 gate without overwriting the model that the owner inspects.
 
+Extraction passes the three Charon `--include` patterns
+(`core::slice::{impl core::default::Default for &Slice<_>}::default`,
+`core::option::{impl core::default::Default for core::option::Option<_>}::default`,
+`core::result::_::is_err`) and the Aeneas flag `-all-computable`. The generated
+`FunsExternal_Template.lean` must list exactly the eight modeled externals; the repo
+`lean/LabyrinthCore/FunsExternal.lean` supplies their definitions.
+
 The theorem's imported axioms must be drawn only from `propext`, `Classical.choice`, and
 `Quot.sound`; an unrecognized audit result also fails. A separate Lean fixture relying on an
 application-defined axiom exercises this rejection.
@@ -91,6 +98,21 @@ and standard-library models, imported Lean/Mathlib infrastructure, and the Lean 
 The Lean theorem checks the generated functional model; it does not independently certify
 those translators, native machine code, LLVM, Wasm compilation, browser bindings, or allocation
 failure. Source-revision/version checks are not a reproducible-build attestation of tool binaries.
+
+The extraction runs on stock Aeneas `87cfe2f5` with no fork or patch. Stock Aeneas leaves eight
+external operations as templates (`alloc.vec.Vec.clear`, `core.num.I32.abs`,
+`core.num.I32.rem_euclid`, `core.ops.range.RangeInclusive.contains`, and the `Option`
+`clone`, `eq`, `Debug::fmt` and `copied` models). The repo-owned
+[`FunsExternal.lean`](../lean/LabyrinthCore/FunsExternal.lean) defines them, plus
+`Aeneas.Std.I32.div`, which stock Aeneas prints for overflow-unchecked signed division but Std
+does not define. That is nine real definitions and no application axioms. Model limits:
+
+1. Stock `IScalar.rem` returns `BitVec.srem`, so `MIN % -1 = ok 0` where Rust panics; the same
+   holds for `core.num.I32.rem_euclid`. Every signed remainder in the crate has a positive
+   constant divisor (`polar.rs` `rem_euclid(TURN)` and `% (TURN / 4)`), so this is unreachable here.
+2. `Vec::clear` is content-level: the model `Vec` has no capacity.
+3. `Option` `Debug::fmt` preserves the branch relative to the existing formatter abstraction and
+   makes no claim about the produced text.
 
 The executed native target is `aarch64-apple-darwin`, with 64-bit `usize`. The generated model
 uses Aeneas `Usize`; this is not evidence of 32-bit Wasm parity. Width-sensitive arithmetic
@@ -159,8 +181,9 @@ root/length preservation, exact removed/added edge sets, carrier membership and 
 check: each recorded prefix remains valid, and individual errors leave publication unchanged.
 Protected input tree edges disjoint from the actual removal list are preserved by successful
 edits; this does not prove the separate scene guards establish that disjointness.
-The checked-in generated core model does not currently cover the full scene/planner source.
-The correspondence runner rejects model drift and unmodeled external-operation templates;
+The checked-in generated model now covers the full crate, extracted by stock Aeneas.
+The correspondence runner rejects model drift, requires the template's external set to equal the
+eight modeled operations, and rejects any axiom in the generated files or `FunsExternal.lean`;
 it must not be treated as a phase-2 pass until the complete source/model/proof gate succeeds.
 
 No phase-2 manual acceptance, merge, Wasm result, browser result or deployment is claimed.

@@ -40,8 +40,31 @@ def run(args, cwd, *, env=None, expect_failure=False):
     return result
 
 
+EXPECTED_EXTERNALS = [
+    "alloc.vec.Vec.clear",
+    "core.num.I32.abs",
+    "core.num.I32.rem_euclid",
+    "core.ops.range.RangeInclusive.contains",
+    "core.option.Option.Insts.CoreCloneClone.clone",
+    "core.option.Option.Insts.CoreCmpPartialEqOption.eq",
+    "core.option.Option.Insts.CoreFmtDebug.fmt",
+    "core.option.OptionShared0T.copied",
+]
+AXIOM_DECLARATION = re.compile(r"^\s*axiom\b", re.MULTILINE)
+
+
 def extract(root, destination):
-    run(["charon", "cargo", "--preset=aeneas"], root / "rust")
+    run(
+        [
+            "charon",
+            "cargo",
+            "--preset=aeneas",
+            "--include=core::slice::{impl core::default::Default for &Slice<_>}::default",
+            "--include=core::option::{impl core::default::Default for core::option::Option<_>}::default",
+            "--include=core::result::_::is_err",
+        ],
+        root / "rust",
+    )
     run(
         [
             "aeneas",
@@ -51,6 +74,7 @@ def extract(root, destination):
             "-abort-on-error",
             "-warnings-as-errors",
             "-no-progress-bar",
+            "-all-computable",
             "-dest",
             str(destination),
             "-subdir",
@@ -59,8 +83,23 @@ def extract(root, destination):
         ],
         root,
     )
-    if (destination / "LabyrinthCore/FunsExternal_Template.lean").exists():
-        raise SystemExit("Extraction requires an unmodeled external Rust operation")
+    generated = destination / "LabyrinthCore"
+    template = (generated / "FunsExternal_Template.lean").read_text()
+    names = sorted(re.findall(r"^axiom (\S+)", template, re.MULTILINE))
+    if names != EXPECTED_EXTERNALS:
+        raise SystemExit(
+            "Extraction external templates differ from the modeled set: " + repr(names)
+        )
+    for module in ("Types.lean", "Funs.lean"):
+        if AXIOM_DECLARATION.search((generated / module).read_text()):
+            raise SystemExit(f"Generated {module} declares an axiom")
+
+
+def check_repo_externals(root):
+    if AXIOM_DECLARATION.search(
+        (root / "lean/LabyrinthCore/FunsExternal.lean").read_text()
+    ):
+        raise SystemExit("Repo FunsExternal.lean declares an axiom")
 
 
 def check_axioms(output, expected):
@@ -106,6 +145,7 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-model-") as generated:
         actual = destination / "LabyrinthCore" / module
         if actual.read_bytes() != expected.read_bytes():
             raise SystemExit(f"Generated Lean differs from checked-in {module}")
+check_repo_externals(ROOT)
 run(["lake", "build"], ROOT / "lean")
 audit_source = (ROOT / "lean/Audit.lean").read_text()
 expected_theorems = re.findall(
@@ -140,6 +180,10 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-negative-") as scratch:
         ROOT / "lean/LabyrinthCore/Spec.lean",
         negative / "lean/LabyrinthCore/Spec.lean",
     )
+    shutil.copyfile(
+        ROOT / "lean/LabyrinthCore/FunsExternal.lean",
+        negative / "lean/LabyrinthCore/FunsExternal.lean",
+    )
     axiom_fixture = negative / "lean/AxiomGuard.lean"
     axiom_fixture.write_text(
         "axiom unapproved_axiom : False\n"
@@ -159,7 +203,7 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-negative-") as scratch:
     compiled = negative / "compiled"
     (compiled / "LabyrinthCore").mkdir(parents=True)
     negative_env = ENV | {"LEAN_PATH": str(compiled) + os.pathsep + lean_path}
-    for module in ("Types", "Funs"):
+    for module in ("Types", "FunsExternal", "Funs"):
         run(
             [
                 "lean",
