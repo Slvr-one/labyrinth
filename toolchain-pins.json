@@ -1,0 +1,7 @@
+{
+  "aeneas": "87cfe2f5d663afd0a1fba154d41178f7a4420bb2",
+  "charon": "8cae8fd1905946de61147a65ecdd7122cc6b491b",
+  "rust": "nightly-2026-09-17",
+  "lean": "leanprover/lean4:v4.35.0",
+  "mathlib": "56a005855ea17e0b0958f73ec801ae140b0a1679"
+}

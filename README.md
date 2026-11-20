@@ -4,8 +4,12 @@ A planned Rust/Wasm maze library with Lean 4 verification, licensed under Apache
 
 ## Status
 
-Research only. No library implementation, Lean proofs, or Wasm package exists yet.
-The website effect remains JavaScript.
+Phase 1 has a checked Rust-to-Lean feasibility operation and an incorrect-update rejection gate.
+The full maze library, structural/solver proofs and Wasm package are not complete; the website
+effect remains JavaScript.
+
+- [Exact proof coverage, trust assumptions and reproduction](docs/properties.md)
+- [Pinned toolchain revisions](toolchain-pins.json)
 
 ## Research
 
