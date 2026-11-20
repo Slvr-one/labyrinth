@@ -25,7 +25,7 @@ charon cargo --preset=aeneas --dest-file="$DEST" \
   '--include=core::result::_::is_err'
 ```
 
-Evidence: `../../../diagnostics/pure-std-llbc-20261115T200819911194Z/charon.log` and `result.json`. Whole-crate roots remained unrestricted, all three targeted methods had one transparent structured LLBC body, and the slice default additionally produced its promoted constant. The result establishes body availability only, not successful Aeneas translation or a proof.
+Evidence: the diagnostic run's `charon.log` and `result.json` (local, not checked in). Whole-crate roots remained unrestricted, all three targeted methods had one transparent structured LLBC body, and the slice default additionally produced its promoted constant. The result establishes body availability only, not successful Aeneas translation or a proof.
 
 The exact pinned Rust bodies are source-backed:
 
@@ -35,7 +35,7 @@ The exact pinned Rust bodies are source-backed:
 
 ## Further source-first candidates
 
-Any further inclusion must be diagnosed one body at a time with the same unrestricted roots. The operation-specific generated name patterns and pinned sources below are candidates, not tested Charon CLI syntax and not approved model changes:
+Any further inclusion must be diagnosed one body at a time with the same unrestricted roots. The operation-specific generated name patterns and pinned sources below are candidates, not tested Charon CLI syntax and not adopted model changes:
 
 | Operation-specific generated pattern | Pinned Rust body | Required behavior inventory before inclusion |
 |---|---|---|
@@ -48,7 +48,7 @@ Any further inclusion must be diagnosed one body at a time with the same unrestr
 
 These are taken from the Aeneas-generated missing-operation inventory. Before use, translate each generated pattern to Charon's Rust-pattern grammar, run an isolated body diagnostic, and record its exact dependency closure. Never broaden an include to `core::option`, `core::ops::range`, `core::num`, or another module.
 
-`Vec::clear` is intentionally not a transparent-body candidate: its Rust body mutates raw allocation state and drops through pointers, while the pinned Lean `Vec` contains only a slice. Keep idiomatic `.clear()` in production source; a future content-level mapping and separate native allocation evidence require explicit owner approval. `Option<T>::Debug` likewise needs faithful branch/delegation through the existing formatter abstraction, not an unconditional-success shortcut.
+`Vec::clear` is intentionally not a transparent-body candidate: its Rust body mutates raw allocation state and drops through pointers, while the pinned Lean `Vec` contains only a slice. Keep idiomatic `.clear()` in production source; a future content-level mapping needs separate native allocation evidence. `Option<T>::Debug` likewise needs faithful branch/delegation through the existing formatter abstraction, not an unconditional-success shortcut.
 
 ## Carrier-edge budget equivalence
 
@@ -78,7 +78,7 @@ evaluated exactly once at the same loop position; sector filtering, route attemp
 first-error propagation and vector operations are unchanged. `Cell` is already `Copy`;
 the binding introduces no clone or allocation.
 
-The 2026-11-16 lead run completed unrestricted Charon/Aeneas generation with this binding.
+A 2026-11-16 run completed unrestricted Charon/Aeneas generation with this binding.
 It still emits an external template for signed abs/remainder, inclusive-range membership,
 Option Debug/copied/clone/equality and Vec clear; zero-template acceptance fails.
 Native fmt, strict Clippy, 53 tests, docs and both actual traversal traces passed.
