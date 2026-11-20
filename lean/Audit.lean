@@ -1,3 +1,40 @@
 import LabyrinthCore.Spec
+import LabyrinthCore.ConstructorTreeInterpretation
+import LabyrinthCore.MutationRerootSpec
+import LabyrinthCore.ConstructorCarrierEdges
+import LabyrinthCore.ConstructorDepthFirstTree
+import LabyrinthCore.MutationEditEdges
+import LabyrinthCore.ConstructorQuotientDFS
+import LabyrinthCore.MutationTrace
+import LabyrinthCore.ConstructorSceneExpandedCarrier
+import LabyrinthCore.ConstructorOrientation
+import LabyrinthCore.ConstructorSceneRejection
+import LabyrinthCore.ConstructorSceneAcceptance
 
 #print axioms set_parent_spec
+#print axioms Labyrinth.constructor_parentGraph_adj_iff
+#print axioms Labyrinth.constructor_rooted_connected
+#print axioms Labyrinth.constructor_rooted_isTree
+#print axioms Labyrinth.constructor_treeValid_isTree
+#print axioms Labyrinth.mutation_reroot_success
+#print axioms Labyrinth.mutation_reroot_preserves
+#print axioms Labyrinth.constructor_carrier_from_csr_spec
+#print axioms Labyrinth.constructor_carrier_from_csr_accepts
+#print axioms Labyrinth.constructor_carrier_from_edges_total_spec
+#print axioms Labyrinth.constructor_carrier_from_edges_accepts
+#print axioms Labyrinth.constructor_depth_first_accepts
+#print axioms Labyrinth.constructor_tree_dfs_accepts
+#print axioms Labyrinth.constructor_tree_dfs_invalid_root
+#print axioms Labyrinth.constructor_tree_dfs_insufficient_workspace
+#print axioms Labyrinth.constructor_tree_dfs_spec
+#print axioms Labyrinth.mutation_edit_edges_total_frame
+#print axioms Labyrinth.constructor_quotient_depth_first_accepts
+#print axioms Labyrinth.mutation_edit_edges_tree_valid
+#print axioms Labyrinth.mutation_exchange_tree_valid
+#print axioms Labyrinth.mutation_operation_preserves
+#print axioms Labyrinth.mutation_accepted_trace_prefix_valid
+#print axioms Labyrinth.mutation_edit_edges_preserves_disjoint
+#print axioms Labyrinth.constructor_scene_expanded_carrier_accepts
+#print axioms Labyrinth.constructor_scene_orientation_accepts
+#print axioms Labyrinth.constructor_scene_rejects_invalid_forest
+#print axioms Labyrinth.constructor_scene_publish_accepts

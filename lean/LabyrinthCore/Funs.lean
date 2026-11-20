@@ -21,6 +21,3608 @@ set_option maxRecDepth 2048
 
 namespace labyrinth_core
 
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 9:9-9:14
+    Visibility: public -/
+def spanning_tree.Frame.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Frame) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.cell
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.next
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.remaining
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Frame") (toStr
+    "cell") dyn (toStr "next") dyn1 (toStr "remaining") dyn2
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:9-9:14 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Frame
+  := {
+  fmt := spanning_tree.Frame.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}::clone]:
+    Source: 'src/spanning_tree.rs', lines 9:16-9:21
+    Visibility: public -/
+def spanning_tree.Frame.Insts.CoreCloneClone.clone
+  (self : spanning_tree.Frame) : Result spanning_tree.Frame := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:16-9:21 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreCloneClone : core.clone.Clone
+  spanning_tree.Frame := {
+  clone := spanning_tree.Frame.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::Copy for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:23-9:27 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreMarkerCopy : core.marker.Copy
+  spanning_tree.Frame := {
+  cloneInst := spanning_tree.Frame.Insts.CoreCloneClone
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 16:9-16:14
+    Visibility: public -/
+def spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Workspace) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.seen
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugVec spanning_tree.Frame.Insts.CoreFmtDebug)
+      self.frames
+  let dyn2 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.path
+  let dyn3 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
+  let dyn4 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.incoming
+  let dyn5 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_slots
+  let dyn6 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_nodes
+  let dyn7 := Dyn.mk _ core.fmt.DebugUsize self.edit_count
+  let dyn8 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.edge_capacity
+  let values :=
+    Array.to_slice
+      (Array.make 9#usize [
+        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8
+        ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 9#usize [
+        toStr "seen", toStr "frames", toStr "path", toStr "parents", toStr
+        "incoming", toStr "edit_slots", toStr "edit_nodes", toStr "edit_count",
+        toStr "edge_capacity"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Workspace") s values
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}]
+    Source: 'src/spanning_tree.rs', lines 16:9-16:14 -/
+@[reducible]
+def spanning_tree.Workspace.Insts.CoreFmtDebug : core.fmt.Debug
+  spanning_tree.Workspace := {
+  fmt := spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::topology::check_storage]:
+    Source: 'src/topology.rs', lines 65:0-73:1 -/
+def topology.check_storage
+  (count : Std.Usize) (element_bytes : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let o ← lift (Usize.checked_mul count element_bytes)
+  let r ← core.option.Option.ok_or o topology.Error.Overflow
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let i ← lift (IScalar.hcast .Usize core.num.Isize.MAX)
+    if val > i
+    then ok (core.result.Result.Err topology.Error.Overflow)
+    else ok (core.result.Result.Ok ())
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::new]:
+    Source: 'src/spanning_tree.rs', lines 34:4-54:5
+    Visibility: public -/
+def spanning_tree.Workspace.new
+  (cell_count : Std.Usize) (edge_count : Std.Usize) :
+  Result (core.result.Result spanning_tree.Workspace topology.Error)
+  := do
+  if cell_count = 0#usize
+  then ok (core.result.Result.Err topology.Error.InvalidSize)
+  else
+    let r ← topology.check_storage cell_count 8#usize
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let r1 ← topology.check_storage cell_count 24#usize
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let r2 ← topology.check_storage edge_count 16#usize
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let o ← lift (Usize.checked_mul edge_count 2#usize)
+          let r3 ← core.option.Option.ok_or o topology.Error.Overflow
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue val =>
+            let r4 ← topology.check_storage val 8#usize
+            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+            match cf4 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let v ←
+                alloc.vec.from_elem core.clone.CloneBool false cell_count
+              let v1 ←
+                alloc.vec.from_elem spanning_tree.Frame.Insts.CoreCloneClone
+                  { cell := 0#usize, next := 0#usize, remaining := 0#usize }
+                  cell_count
+              let v2 ←
+                alloc.vec.from_elem core.clone.CloneUsize 0#usize cell_count
+              let v3 ←
+                alloc.vec.from_elem core.clone.CloneUsize core.num.Usize.MAX
+                  cell_count
+              ok (core.result.Result.Ok
+                {
+                  seen := v,
+                  frames := v1,
+                  path := v2,
+                  parents := v2,
+                  incoming := v2,
+                  edit_slots := v3,
+                  edit_nodes := v2,
+                  edit_count := 0#usize,
+                  edge_capacity := edge_count
+                })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                spanning_tree.Workspace (core.convert.FromSame topology.Error)
+                residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              spanning_tree.Workspace (core.convert.FromSame topology.Error)
+              residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Workspace (core.convert.FromSame topology.Error)
+            residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Workspace (core.convert.FromSame topology.Error)
+          residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        spanning_tree.Workspace (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::ensure]:
+    Source: 'src/spanning_tree.rs', lines 56:4-61:5 -/
+def spanning_tree.Workspace.ensure
+  (self : spanning_tree.Workspace) (cells : Std.Usize) (edges : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.path
+  if cells > i
+  then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+  else
+    if edges > self.edge_capacity
+    then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+    else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 65:8-68:9 -/
+@[rust_loop_body]
+def spanning_tree.Workspace.clear_edits_loop.body
+  (self : spanning_tree.Workspace) (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize) ((alloc.vec.Vec
+    Bool) × (alloc.vec.Vec spanning_tree.Frame) × (alloc.vec.Vec Std.Usize)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize))
+  := do
+  if i < self.edit_count
+  then
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.edit_nodes i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.edit_slots i1
+    let i2 ← i + 1#usize
+    let v := index_mut_back core.num.Usize.MAX
+    ok (cont ({ self with edit_slots := v }, i2))
+  else
+    ok (done (self.seen, self.frames, self.path, self.parents, self.incoming,
+      self.edit_slots, self.edit_nodes, self.edge_capacity))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 65:8-68:9 -/
+@[rust_loop]
+def spanning_tree.Workspace.clear_edits_loop
+  (self : spanning_tree.Workspace) (i : Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize)
+  := do
+  loop
+    (fun (self1, i1) => spanning_tree.Workspace.clear_edits_loop.body self1 i1)
+    (self, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]:
+    Source: 'src/spanning_tree.rs', lines 63:4-70:5 -/
+def spanning_tree.Workspace.clear_edits
+  (self : spanning_tree.Workspace) : Result spanning_tree.Workspace := do
+  let (v, v1, v2, v3, v4, v5, v6, i) ←
+    spanning_tree.Workspace.clear_edits_loop self 0#usize
+  ok
+    {
+      seen := v,
+      frames := v1,
+      path := v2,
+      parents := v3,
+      incoming := v4,
+      edit_slots := v5,
+      edit_nodes := v6,
+      edit_count := 0#usize,
+      edge_capacity := i
+    }
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::parent]:
+    Source: 'src/spanning_tree.rs', lines 72:4-79:5 -/
+def spanning_tree.Workspace.parent
+  (self : spanning_tree.Workspace) (published : Slice Std.Usize)
+  (cell : Std.Usize) :
+  Result Std.Usize
+  := do
+  let slot ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.edit_slots cell
+  if slot = core.num.Usize.MAX
+  then Slice.index_usize published cell
+  else
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.parents slot
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::set_parent]:
+    Source: 'src/spanning_tree.rs', lines 81:4-90:5 -/
+def spanning_tree.Workspace.set_parent
+  (self : spanning_tree.Workspace) (cell : Std.Usize) (parent : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  let slot ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.edit_slots cell
+  let (v, v1, i, slot1) ←
+    if slot = core.num.Usize.MAX
+    then
+      do
+      let i1 ← self.edit_count + 1#usize
+      let (_, index_mut_back) ←
+        alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+          Std.Usize) self.edit_slots cell
+      let (_, index_mut_back1) ←
+        alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+          Std.Usize) self.edit_nodes self.edit_count
+      let v2 := index_mut_back1 cell
+      let v3 := index_mut_back self.edit_count
+      ok (v3, v2, i1, self.edit_count)
+    else ok (self.edit_slots, self.edit_nodes, self.edit_count, slot)
+  let (_, index_mut_back) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.parents slot1
+  let v2 := index_mut_back parent
+  ok
+    {
+      self
+        with
+        parents := v2, edit_slots := v, edit_nodes := v1, edit_count := i
+    }
+
+/-- [labyrinth_core::spanning_tree::enter]:
+    Source: 'src/spanning_tree.rs', lines 93:0-108:1 -/
+def spanning_tree.enter
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (cell : Std.Usize) (rng : R) :
+  Result ((core.result.Result spanning_tree.Frame topology.Error) × R)
+  := do
+  let i ← cell + 1#usize
+  let i1 ← Slice.index_usize offsets i
+  let i2 ← Slice.index_usize offsets cell
+  let degree ← i1 - i2
+  if degree > 0#usize
+  then
+    let (choice, rng1) ← treeRngInst.next_below rng degree
+    if choice >= degree
+    then ok (core.result.Result.Err topology.Error.InvalidChoice, rng1)
+    else
+      let next ← i2 + choice
+      ok (core.result.Result.Ok { cell, next, remaining := degree }, rng1)
+  else
+    ok (core.result.Result.Ok { cell, next := i2, remaining := degree }, rng)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 120:4-125:5 -/
+@[rust_loop_body]
+def spanning_tree.depth_first_loop0.body
+  (root : Std.Usize) (n : Std.Usize) (work : spanning_tree.Workspace)
+  (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    spanning_tree.Workspace)
+  := do
+  if i < n
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        work.seen i
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let (_, index_mut_back2) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.incoming i
+    let i1 ← i + 1#usize
+    let v := index_mut_back2 0#usize
+    let v1 := index_mut_back1 root
+    let v2 := index_mut_back false
+    ok (cont ({ work with seen := v2, parents := v1, incoming := v }, i1))
+  else ok (done work)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 120:4-125:5 -/
+@[rust_loop]
+def spanning_tree.depth_first_loop0
+  (root : Std.Usize) (work : spanning_tree.Workspace) (n : Std.Usize)
+  (i : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  loop
+    (fun (work1, i1) => spanning_tree.depth_first_loop0.body root n work1 i1)
+    (work, i)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 131:4-158:5 -/
+@[rust_loop_body]
+def spanning_tree.depth_first_loop1.body
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
+  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize × Std.Usize × (core.result.Result Unit
+    topology.Error)) (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize × (core.result.Result Unit topology.Error)))
+  := do
+  if depth > 0#usize
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i ← depth - 1#usize
+      let frame ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          spanning_tree.Frame) v1 i
+      if frame.remaining = 0#usize
+      then ok (cont (rng, v, v1, v2, v3, reached, i, status))
+      else
+        let neighbor ← Slice.index_usize neighbors frame.next
+        let next ← frame.next + 1#usize
+        let i1 ← frame.cell + 1#usize
+        let i2 ← Slice.index_usize offsets i1
+        let next1 ←
+          if next = i2
+          then Slice.index_usize offsets frame.cell
+          else ok next
+        let (f, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            spanning_tree.Frame) v1 i
+        let v4 := index_mut_back { f with next := next1 }
+        let (f1, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            spanning_tree.Frame) v4 i
+        let i3 ← f1.remaining - 1#usize
+        let b1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v
+            neighbor
+        if b1
+        then
+          let v5 := index_mut_back1 { f1 with remaining := i3 }
+          ok (cont (rng, v, v5, v2, v3, reached, depth, status))
+        else
+          let (r, rng1) ←
+            spanning_tree.enter treeRngInst offsets neighbor rng
+          match r with
+          | core.result.Result.Ok child_frame =>
+            let (_, index_mut_back2) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v2 neighbor
+            let (_, index_mut_back3) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v3 neighbor
+            let (_, index_mut_back4) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Bool) v neighbor
+            let v5 := index_mut_back1 { f1 with remaining := i3 }
+            let (_, index_mut_back5) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                spanning_tree.Frame) v5 depth
+            let depth1 ← depth + 1#usize
+            let reached1 ← reached + 1#usize
+            let v6 := index_mut_back5 child_frame
+            let v7 := index_mut_back4 true
+            let v8 := index_mut_back3 frame.next
+            let v9 := index_mut_back2 frame.cell
+            ok (cont (rng1, v7, v6, v9, v8, reached1, depth1, status))
+          | core.result.Result.Err error =>
+            let v5 := index_mut_back1 { f1 with remaining := i3 }
+            ok (cont (rng1, v, v5, v2, v3, reached, depth,
+              core.result.Result.Err error))
+    else ok (done (rng, v, v1, v2, v3, reached, status))
+  else ok (done (rng, v, v1, v2, v3, reached, status))
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 131:4-158:5 -/
+@[rust_loop]
+def spanning_tree.depth_first_loop1
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
+  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize ×
+    (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (rng1, v4, v5, v6, v7, reached1, depth1, status1) =>
+      spanning_tree.depth_first_loop1.body treeRngInst offsets neighbors rng1
+      v4 v5 v6 v7 reached1 depth1 status1)
+    (rng, v, v1, v2, v3, reached, depth, status)
+
+/-- [labyrinth_core::spanning_tree::depth_first]:
+    Source: 'src/spanning_tree.rs', lines 110:0-164:1 -/
+def spanning_tree.depth_first
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (root : Std.Usize) (rng : R)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × R ×
+    spanning_tree.Workspace)
+  := do
+  let i := Slice.len offsets
+  let n ← i - 1#usize
+  let work1 ← spanning_tree.Workspace.clear_edits work
+  let work2 ← spanning_tree.depth_first_loop0 root work1 n 0#usize
+  let (r, rng1) ← spanning_tree.enter treeRngInst offsets root rng
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        spanning_tree.Frame) work2.frames 0#usize
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        work2.seen root
+    let v := index_mut_back1 true
+    let v1 := index_mut_back val
+    let (rng2, v2, v3, v4, v5, reached, status) ←
+      spanning_tree.depth_first_loop1 treeRngInst offsets neighbors rng1 v v1
+        work2.parents work2.incoming 1#usize 1#usize (core.result.Result.Ok ())
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      if reached != n
+      then
+        ok (core.result.Result.Err topology.Error.Disconnected, rng2,
+          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
+          })
+      else
+        ok (core.result.Result.Ok (), rng2,
+          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
+          })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r1, rng2,
+        { work2 with seen := v2, frames := v3, parents := v4, incoming := v5 })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r1, rng1, work2)
+
+/-- [labyrinth_core::spanning_tree::representative]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 168:4-170:5 -/
+@[rust_loop_body]
+def spanning_tree.representative_loop.body
+  (links : Slice Std.Usize) (cell : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i ← Slice.index_usize links cell
+  if i != cell
+  then ok (cont i)
+  else ok (done cell)
+
+/-- [labyrinth_core::spanning_tree::representative]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 168:4-170:5 -/
+@[rust_loop]
+def spanning_tree.representative_loop
+  (links : Slice Std.Usize) (cell : Std.Usize) : Result Std.Usize := do
+  loop
+    (fun cell1 => spanning_tree.representative_loop.body links cell1)
+    cell
+
+/-- [labyrinth_core::spanning_tree::representative]:
+    Source: 'src/spanning_tree.rs', lines 166:0-172:1 -/
+@[reducible]
+def spanning_tree.representative
+  (links : Slice Std.Usize) (start : Std.Usize) : Result Std.Usize := do
+  spanning_tree.representative_loop links start
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::len]:
+    Source: 'src/topology.rs', lines 267:4-269:5
+    Visibility: public -/
+def topology.Carrier.len (self : topology.Carrier) : Result Std.Usize := do
+  let i := alloc.vec.Vec.len self.offsets
+  i - 1#usize
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::neighbors]:
+    Source: 'src/topology.rs', lines 276:4-281:5
+    Visibility: public -/
+def topology.Carrier.impl.neighbors
+  (self : topology.Carrier) (cell : Std.Usize) : Result (Slice Std.Usize) := do
+  let i ← topology.Carrier.len self
+  if cell >= i
+  then ok (Array.to_slice (Std.Array.empty Std.Usize))
+  else
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.offsets cell
+    let i2 ← cell + 1#usize
+    let i3 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.offsets i2
+    alloc.vec.Vec.index (core.slice.index.SliceIndexRangeUsizeSlice Std.Usize)
+      self.neighbors { start := i1, «end» := i3 }
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop body 0:
+    Source: 'src/topology.rs', lines 289:8-291:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.contains_edge_loop.body
+  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i2 := Slice.len row
+  if i1 < i2
+  then
+    let i3 ← Slice.index_usize row i1
+    if i3 != i
+    then let i4 ← i1 + 1#usize
+         ok (cont i4)
+    else ok (done i1)
+  else ok (done i1)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop 0:
+    Source: 'src/topology.rs', lines 289:8-291:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.contains_edge_loop
+  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun i2 => topology.Carrier.contains_edge_loop.body i row i2)
+    i1
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]:
+    Source: 'src/topology.rs', lines 283:4-293:5
+    Visibility: public -/
+def topology.Carrier.contains_edge
+  (self : topology.Carrier) (edge : topology.Edge) : Result Bool := do
+  let i ← topology.Carrier.len self
+  if edge.u >= i
+  then ok false
+  else
+    if edge.v >= i
+    then ok false
+    else
+      if edge.u = edge.v
+      then ok false
+      else
+        let row ← topology.Carrier.impl.neighbors self edge.u
+        let i1 ← topology.Carrier.contains_edge_loop edge.v row 0#usize
+        let i2 := Slice.len row
+        ok (i1 < i2)
+
+/-- [labyrinth_core::spanning_tree::join_required]:
+    Source: 'src/spanning_tree.rs', lines 174:0-194:1 -/
+def spanning_tree.join_required
+  (carrier : topology.Carrier) (links : Slice Std.Usize)
+  (sizes : Slice Std.Usize) (edge : topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize) ×
+    (Slice Std.Usize))
+  := do
+  let b ← topology.Carrier.contains_edge carrier edge
+  if b
+  then
+    let u ← spanning_tree.representative links edge.u
+    let v ← spanning_tree.representative links edge.v
+    if u = v
+    then ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
+    else
+      let i ← Slice.index_usize sizes u
+      let i1 ← Slice.index_usize sizes v
+      let (u1, v1) ← if i < i1
+                       then ok (core.mem.swap u v)
+                       else ok (u, v)
+      let links1 ← Slice.update links v1 u1
+      let i2 ← Slice.index_usize sizes v1
+      let i3 ← Slice.index_usize sizes u1
+      let i4 ← i3 + i2
+      let sizes1 ← Slice.update sizes u1 i4
+      ok (core.result.Result.Ok (), links1, sizes1)
+  else ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
+
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 196:9-196:14
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Tree) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.root
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Tree") (toStr
+    "parents") dyn (toStr "root") dyn1
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 196:9-196:14 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Tree
+  := {
+  fmt := spanning_tree.Tree.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::StructuralPartialEq for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 196:16-196:25 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq spanning_tree.Tree := {
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}::eq]:
+    Source: 'src/spanning_tree.rs', lines 196:16-196:25
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
+  (self : spanning_tree.Tree) (other : spanning_tree.Tree) : Result Bool := do
+  let b ←
+    alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize self.parents
+      other.parents
+  if b
+  then ok (self.root = other.root)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 196:16-196:25 -/
+@[reducible]
+impl_def spanning_tree.Tree.Insts.CoreCmpPartialEqTree : core.cmp.PartialEq
+  spanning_tree.Tree spanning_tree.Tree := {
+  eq := spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    spanning_tree.Tree.Insts.CoreCmpPartialEqTree
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}::assert_fields_are_eq]:
+    Source: 'src/spanning_tree.rs', lines 196:27-196:29
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : spanning_tree.Tree) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 196:27-196:29 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreCmpEq : core.cmp.Eq spanning_tree.Tree := {
+  partialEqInst := spanning_tree.Tree.Insts.CoreCmpPartialEqTree
+  assert_fields_are_eq :=
+    spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::storage]:
+    Source: 'src/topology.rs', lines 299:4-301:5 -/
+def topology.Carrier.storage
+  (self : topology.Carrier) :
+  Result ((Slice Std.Usize) × (Slice Std.Usize))
+  := do
+  let s := alloc.vec.Vec.deref self.offsets
+  let s1 := alloc.vec.Vec.deref self.neighbors
+  ok (s, s1)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::edges]:
+    Source: 'src/topology.rs', lines 295:4-297:5
+    Visibility: public -/
+def topology.Carrier.impl.edges
+  (self : topology.Carrier) : Result (Slice topology.Edge) := do
+  ok (alloc.vec.Vec.deref self.edges)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 221:8-224:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.dfs_loop.body
+  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize)
+    (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize)))
+  := do
+  let i1 := alloc.vec.Vec.len parents
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        parents i
+    let i3 ← i + 1#usize
+    let parents1 := index_mut_back i2
+    ok (cont (parents1, i3))
+  else ok (done (work, parents))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 221:8-224:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.dfs_loop
+  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (parents1, i1) => spanning_tree.Tree.dfs_loop.body work parents1 i1)
+    (parents, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]:
+    Source: 'src/spanning_tree.rs', lines 207:4-226:5
+    Visibility: public -/
+def spanning_tree.Tree.dfs
+  {R : Type _} (treeRngInst : tree.Rng R) (carrier : topology.Carrier)
+  (root : Std.Usize) (rng : R) (work : spanning_tree.Workspace) :
+  Result ((core.result.Result spanning_tree.Tree topology.Error) × R ×
+    spanning_tree.Workspace)
+  := do
+  let i ← topology.Carrier.len carrier
+  if root >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, rng, work)
+  else
+    let s ← topology.Carrier.impl.edges carrier
+    let i1 := Slice.len s
+    let r ← spanning_tree.Workspace.ensure work i i1
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let (offsets, neighbors) ← topology.Carrier.storage carrier
+      let (r1, rng1, work1) ←
+        spanning_tree.depth_first treeRngInst offsets neighbors root rng work
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let parents ← alloc.vec.from_elem core.clone.CloneUsize root i
+        let (work2, parents1) ←
+          spanning_tree.Tree.dfs_loop work1 parents 0#usize
+        ok (core.result.Result.Ok { parents := parents1, root }, rng1, work2)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r2 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (r2, rng1, work1)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (r1, rng, work)
+
+/-- [labyrinth_core::topology::validate_row_entry]: loop body 0:
+    Source: 'src/topology.rs', lines 122:4-124:5 -/
+@[rust_loop_body]
+def topology.validate_row_entry_loop0.body
+  (neighbors : Slice Std.Usize) (index : Std.Usize) (neighbor : Std.Usize)
+  (j : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  if j < index
+  then
+    let i ← Slice.index_usize neighbors j
+    if i != neighbor
+    then let j1 ← j + 1#usize
+         ok (cont j1)
+    else ok (done j)
+  else ok (done j)
+
+/-- [labyrinth_core::topology::validate_row_entry]: loop 0:
+    Source: 'src/topology.rs', lines 122:4-124:5 -/
+@[rust_loop]
+def topology.validate_row_entry_loop0
+  (neighbors : Slice Std.Usize) (index : Std.Usize) (neighbor : Std.Usize)
+  (j : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun j1 => topology.validate_row_entry_loop0.body neighbors index neighbor
+      j1)
+    j
+
+/-- [labyrinth_core::topology::validate_row_entry]: loop body 1:
+    Source: 'src/topology.rs', lines 129:4-131:5 -/
+@[rust_loop_body]
+def topology.validate_row_entry_loop1.body
+  (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
+  (neighbor : Std.Usize) (j : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i ← neighbor + 1#usize
+  let i1 ← Slice.index_usize offsets i
+  if j < i1
+  then
+    let i2 ← Slice.index_usize neighbors j
+    if i2 != cell
+    then let j1 ← j + 1#usize
+         ok (cont j1)
+    else ok (done j)
+  else ok (done j)
+
+/-- [labyrinth_core::topology::validate_row_entry]: loop 1:
+    Source: 'src/topology.rs', lines 129:4-131:5 -/
+@[rust_loop]
+def topology.validate_row_entry_loop1
+  (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
+  (neighbor : Std.Usize) (j : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun j1 => topology.validate_row_entry_loop1.body offsets neighbors cell
+      neighbor j1)
+    j
+
+/-- [labyrinth_core::topology::validate_row_entry]:
+    Source: 'src/topology.rs', lines 108:0-136:1 -/
+def topology.validate_row_entry
+  (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
+  (index : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let neighbor ← Slice.index_usize neighbors index
+  let i := Slice.len offsets
+  let i1 ← i - 1#usize
+  if neighbor >= i1
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    if neighbor = cell
+    then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+    else
+      let j ← Slice.index_usize offsets cell
+      let j1 ← topology.validate_row_entry_loop0 neighbors index neighbor j
+      if j1 < index
+      then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+      else
+        let j2 ← Slice.index_usize offsets neighbor
+        let j3 ←
+          topology.validate_row_entry_loop1 offsets neighbors cell neighbor j2
+        let i2 ← neighbor + 1#usize
+        let i3 ← Slice.index_usize offsets i2
+        if j3 = i3
+        then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+        else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Edge}::new]:
+    Source: 'src/topology.rs', lines 56:4-62:5
+    Visibility: public -/
+def topology.Edge.new
+  (u : Std.Usize) (v : Std.Usize) : Result topology.Edge := do
+  if u <= v
+  then ok { u, v }
+  else ok { u := v, v := u }
+
+/-- [labyrinth_core::topology::{impl core::clone::Clone for labyrinth_core::topology::Edge}::clone]:
+    Source: 'src/topology.rs', lines 49:16-49:21
+    Visibility: public -/
+def topology.Edge.Insts.CoreCloneClone.clone
+  (self : topology.Edge) : Result topology.Edge := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::clone::Clone for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:16-49:21 -/
+@[reducible]
+def topology.Edge.Insts.CoreCloneClone : core.clone.Clone topology.Edge := {
+  clone := topology.Edge.Insts.CoreCloneClone.clone
+}
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 0:
+    Source: 'src/topology.rs', lines 201:8-205:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop0.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize) (valid_offsets : Bool) :
+  Result (ControlFlow (Std.Usize × Bool) Bool)
+  := do
+  if u < n
+  then
+    if valid_offsets
+    then
+      let i ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          offsets u
+      let i1 ← u + 1#usize
+      let i2 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          offsets i1
+      let valid_offsets1 ←
+        if i <= i2
+        then
+          do
+          let i3 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) offsets i1
+          let i4 := alloc.vec.Vec.len neighbors
+          ok (i3 <= i4)
+        else ok false
+      ok (cont (i1, valid_offsets1))
+    else ok (done valid_offsets)
+  else ok (done valid_offsets)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 0:
+    Source: 'src/topology.rs', lines 201:8-205:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop0
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize) (valid_offsets : Bool) :
+  Result Bool
+  := do
+  loop
+    (fun (u1, valid_offsets1) => topology.Carrier.from_csr_loop0.body offsets
+      neighbors n u1 valid_offsets1)
+    (u, valid_offsets)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 2:
+    Source: 'src/topology.rs', lines 213:12-216:13
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop1_loop0.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 ← u + 1#usize
+  let i2 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      offsets i1
+  if i < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let s := alloc.vec.Vec.deref offsets
+      let s1 := alloc.vec.Vec.deref neighbors
+      let status1 ← topology.validate_row_entry s s1 u i
+      let i3 ← i + 1#usize
+      ok (cont (status1, i3))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 2:
+    Source: 'src/topology.rs', lines 213:12-216:13
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop1_loop0
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => topology.Carrier.from_csr_loop1_loop0.body offsets
+      neighbors u status1 i1)
+    (status, i)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 1:
+    Source: 'src/topology.rs', lines 211:8-218:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop1.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error))
+    (Std.Usize × (core.result.Result Unit topology.Error)))
+  := do
+  if u < n
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          offsets u
+      let status1 ←
+        topology.Carrier.from_csr_loop1_loop0 offsets neighbors u status i
+      let u1 ← u + 1#usize
+      ok (cont (u1, status1))
+    else ok (done (u, status))
+  else ok (done (u, status))
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 1:
+    Source: 'src/topology.rs', lines 211:8-218:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop1
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (Std.Usize × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (u1, status1) => topology.Carrier.from_csr_loop1.body offsets
+      neighbors n u1 status1)
+    (u, status)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 4:
+    Source: 'src/topology.rs', lines 230:12-239:13
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop2_loop0.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (seen : alloc.vec.Vec Bool) (stack : alloc.vec.Vec Std.Usize)
+  (depth : Std.Usize) (reached : Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × Std.Usize × Std.Usize) ((alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × Std.Usize × Std.Usize))
+  := do
+  let i1 ← u + 1#usize
+  let i2 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      offsets i1
+  if i < i2
+  then
+    let v ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        neighbors i
+    let b ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) seen v
+    let (seen1, stack1, depth1, reached1) ←
+      if b
+      then ok (seen, stack, depth, reached)
+      else
+        do
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+            seen v
+        let (_, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) stack depth
+        let depth2 ← depth + 1#usize
+        let reached2 ← reached + 1#usize
+        let stack2 := index_mut_back1 v
+        let seen2 := index_mut_back true
+        ok (seen2, stack2, depth2, reached2)
+    let i3 ← i + 1#usize
+    ok (cont (seen1, stack1, depth1, reached1, i3))
+  else ok (done (seen, stack, depth, reached))
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 4:
+    Source: 'src/topology.rs', lines 230:12-239:13
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop2_loop0
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (seen : alloc.vec.Vec Bool) (stack : alloc.vec.Vec Std.Usize)
+  (depth : Std.Usize) (reached : Std.Usize) (i : Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) × Std.Usize ×
+    Std.Usize)
+  := do
+  loop
+    (fun (seen1, stack1, depth1, reached1, i1) =>
+      topology.Carrier.from_csr_loop2_loop0.body offsets neighbors u seen1
+      stack1 depth1 reached1 i1)
+    (seen, stack, depth, reached, i)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 3:
+    Source: 'src/topology.rs', lines 226:8-240:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop2.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (seen : alloc.vec.Vec Bool) (stack : alloc.vec.Vec Std.Usize)
+  (depth : Std.Usize) (reached : Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize × Std.Usize) Std.Usize)
+  := do
+  if depth > 0#usize
+  then
+    let depth1 ← depth - 1#usize
+    let u1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        stack depth1
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        offsets u1
+    let (seen1, stack1, depth2, reached1) ←
+      topology.Carrier.from_csr_loop2_loop0 offsets neighbors u1 seen stack
+        depth1 reached i
+    ok (cont (u1, seen1, stack1, depth2, reached1))
+  else ok (done reached)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 3:
+    Source: 'src/topology.rs', lines 226:8-240:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop2
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (seen : alloc.vec.Vec Bool) (stack : alloc.vec.Vec Std.Usize)
+  (depth : Std.Usize) (reached : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun (u1, seen1, stack1, depth1, reached1) =>
+      topology.Carrier.from_csr_loop2.body offsets neighbors u1 seen1 stack1
+      depth1 reached1)
+    (u, seen, stack, depth, reached)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 6:
+    Source: 'src/topology.rs', lines 250:12-257:13
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop3_loop0.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (edges : alloc.vec.Vec topology.Edge) (count : Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize × Std.Usize)
+    ((alloc.vec.Vec topology.Edge) × Std.Usize))
+  := do
+  let i1 ← u + 1#usize
+  let i2 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      offsets i1
+  if i < i2
+  then
+    let v ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        neighbors i
+    let (edges1, count1) ←
+      if u < v
+      then
+        do
+        let e ← topology.Edge.new u v
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            topology.Edge) edges count
+        let count2 ← count + 1#usize
+        let edges2 := index_mut_back e
+        ok (edges2, count2)
+      else ok (edges, count)
+    let i3 ← i + 1#usize
+    ok (cont (edges1, count1, i3))
+  else ok (done (edges, count))
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 6:
+    Source: 'src/topology.rs', lines 250:12-257:13
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop3_loop0
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (u : Std.Usize) (edges : alloc.vec.Vec topology.Edge) (count : Std.Usize)
+  (i : Std.Usize) :
+  Result ((alloc.vec.Vec topology.Edge) × Std.Usize)
+  := do
+  loop
+    (fun (edges1, count1, i1) => topology.Carrier.from_csr_loop3_loop0.body
+      offsets neighbors u edges1 count1 i1)
+    (edges, count, i)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 5:
+    Source: 'src/topology.rs', lines 248:8-259:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_csr_loop3.body
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize) (edges : alloc.vec.Vec topology.Edge)
+  (count : Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  if u < n
+  then
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        offsets u
+    let (edges1, count1) ←
+      topology.Carrier.from_csr_loop3_loop0 offsets neighbors u edges count i
+    let u1 ← u + 1#usize
+    ok (cont (u1, edges1, count1))
+  else ok (done edges)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 5:
+    Source: 'src/topology.rs', lines 248:8-259:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_csr_loop3
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (n : Std.Usize) (u : Std.Usize) (edges : alloc.vec.Vec topology.Edge)
+  (count : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (u1, edges1, count1) => topology.Carrier.from_csr_loop3.body offsets
+      neighbors n u1 edges1 count1)
+    (u, edges, count)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]:
+    Source: 'src/topology.rs', lines 191:4-265:5
+    Visibility: public -/
+def topology.Carrier.from_csr
+  (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize) :
+  Result (core.result.Result topology.Carrier topology.Error)
+  := do
+  let i := alloc.vec.Vec.len offsets
+  if i < 2#usize
+  then ok (core.result.Result.Err topology.Error.InvalidSize)
+  else
+    let i1 := alloc.vec.Vec.len offsets
+    let n ← i1 - 1#usize
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        offsets 0#usize
+    if i2 != 0#usize
+    then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+    else
+      let i3 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          offsets n
+      let i4 := alloc.vec.Vec.len neighbors
+      if i3 != i4
+      then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+      else
+        let valid_offsets ←
+          topology.Carrier.from_csr_loop0 offsets neighbors n 0#usize true
+        if valid_offsets
+        then
+          let (u, status) ←
+            topology.Carrier.from_csr_loop1 offsets neighbors n 0#usize
+              (core.result.Result.Ok ())
+          let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+          match cf with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let r ← topology.check_storage n 8#usize
+            let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r
+            match cf1 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let seen ← alloc.vec.from_elem core.clone.CloneBool false n
+              let stack ← alloc.vec.from_elem core.clone.CloneUsize 0#usize n
+              let (_, index_mut_back) ←
+                alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                  Bool) seen 0#usize
+              let seen1 := index_mut_back true
+              let reached ←
+                topology.Carrier.from_csr_loop2 offsets neighbors u seen1 stack
+                  1#usize 1#usize
+              if reached != n
+              then ok (core.result.Result.Err topology.Error.Disconnected)
+              else
+                let i5 := alloc.vec.Vec.len neighbors
+                let i6 ← i5 / 2#usize
+                let r1 ← topology.check_storage i6 16#usize
+                let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r1
+                match cf2 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let e ← topology.Edge.new 0#usize 0#usize
+                  let i7 := alloc.vec.Vec.len neighbors
+                  let i8 ← i7 / 2#usize
+                  let edges ←
+                    alloc.vec.from_elem topology.Edge.Insts.CoreCloneClone e i8
+                  let edges1 ←
+                    topology.Carrier.from_csr_loop3 offsets neighbors n 0#usize
+                      edges 0#usize
+                  ok (core.result.Result.Ok
+                    { offsets, neighbors, edges := edges1 })
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    topology.Carrier (core.convert.FromSame topology.Error)
+                    residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                topology.Carrier (core.convert.FromSame topology.Error)
+                residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              topology.Carrier (core.convert.FromSame topology.Error) residual
+        else ok (core.result.Result.Err topology.Error.InvalidCarrier)
+
+/-- [labyrinth_core::topology::prefix_offsets]: loop body 0:
+    Source: 'src/topology.rs', lines 98:4-104:5 -/
+@[rust_loop_body]
+def topology.prefix_offsets_loop.body
+  (offsets : Slice Std.Usize) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow ((Slice Std.Usize) × Std.Usize × (core.result.Result
+    Unit topology.Error)) ((core.result.Result Unit topology.Error) × (Slice
+    Std.Usize)))
+  := do
+  let i1 := Slice.len offsets
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← Slice.index_usize offsets i
+      let i3 ← i - 1#usize
+      let i4 ← Slice.index_usize offsets i3
+      let o ← lift (Usize.checked_add i2 i4)
+      match o with
+      | none =>
+        let i5 ← i + 1#usize
+        ok (cont (offsets, i5, core.result.Result.Err topology.Error.Overflow))
+      | some sum =>
+        let s ← Slice.update offsets i sum
+        let i5 ← i + 1#usize
+        ok (cont (s, i5, status))
+    else ok (done (status, offsets))
+  else ok (done (status, offsets))
+
+/-- [labyrinth_core::topology::prefix_offsets]: loop 0:
+    Source: 'src/topology.rs', lines 98:4-104:5 -/
+@[rust_loop]
+def topology.prefix_offsets_loop
+  (offsets : Slice Std.Usize) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize))
+  := do
+  loop
+    (fun (offsets1, i1, status1) => topology.prefix_offsets_loop.body offsets1
+      i1 status1)
+    (offsets, i, status)
+
+/-- [labyrinth_core::topology::prefix_offsets]:
+    Source: 'src/topology.rs', lines 95:0-106:1 -/
+@[reducible]
+def topology.prefix_offsets
+  (offsets : Slice Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize))
+  := do
+  topology.prefix_offsets_loop offsets 1#usize (core.result.Result.Ok ())
+
+/-- [labyrinth_core::topology::count_edge]:
+    Source: 'src/topology.rs', lines 75:0-93:1 -/
+def topology.count_edge
+  (offsets : Slice Std.Usize) (cell_count : Std.Usize) (edge : topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize))
+  := do
+  if edge.u >= cell_count
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, offsets)
+  else
+    if edge.v >= cell_count
+    then ok (core.result.Result.Err topology.Error.InvalidIndex, offsets)
+    else
+      if edge.u = edge.v
+      then ok (core.result.Result.Err topology.Error.InvalidCarrier, offsets)
+      else
+        let i ← edge.u + 1#usize
+        let i1 ← Slice.index_usize offsets i
+        let o ← lift (Usize.checked_add i1 1#usize)
+        let r ← core.option.Option.ok_or o topology.Error.Overflow
+        let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+        match cf with
+        | core.ops.control_flow.ControlFlow.Continue val =>
+          let offsets1 ← Slice.update offsets i val
+          let i2 ← edge.v + 1#usize
+          let i3 ← Slice.index_usize offsets1 i2
+          let o1 ← lift (Usize.checked_add i3 1#usize)
+          let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+          let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+          match cf1 with
+          | core.ops.control_flow.ControlFlow.Continue val1 =>
+            let offsets2 ← Slice.update offsets1 i2 val1
+            ok (core.result.Result.Ok (), offsets2)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                Unit (core.convert.FromSame topology.Error) residual
+            ok (r2, offsets1)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r1 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              Unit (core.convert.FromSame topology.Error) residual
+          ok (r1, offsets)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 0:
+    Source: 'src/topology.rs', lines 162:8-165:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_edges_loop0.body
+  (cell_count : Std.Usize) (edges : Slice topology.Edge)
+  (offsets : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize ×
+    (core.result.Result Unit topology.Error)) ((alloc.vec.Vec Std.Usize) ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let i1 := Slice.len edges
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let (s, deref_mut_back) ← lift (alloc.vec.Vec.deref_mut offsets)
+      let e ← Slice.index_usize edges i
+      let (status1, s1) ← topology.count_edge s cell_count e
+      let i2 ← i + 1#usize
+      let offsets1 := deref_mut_back s1
+      ok (cont (offsets1, i2, status1))
+    else ok (done (offsets, status))
+  else ok (done (offsets, status))
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 0:
+    Source: 'src/topology.rs', lines 162:8-165:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_edges_loop0
+  (cell_count : Std.Usize) (edges : Slice topology.Edge)
+  (offsets : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result ((alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (offsets1, i1, status1) => topology.Carrier.from_edges_loop0.body
+      cell_count edges offsets1 i1 status1)
+    (offsets, i, status)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 1:
+    Source: 'src/topology.rs', lines 170:8-173:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_edges_loop1.body
+  (cell_count : Std.Usize) (offsets : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (next : alloc.vec.Vec Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Std.Usize)) (alloc.vec.Vec
+    Std.Usize))
+  := do
+  if i < cell_count
+  then
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        offsets i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next i
+    let i2 ← i + 1#usize
+    let next1 := index_mut_back i1
+    ok (cont (i2, next1))
+  else ok (done next)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 1:
+    Source: 'src/topology.rs', lines 170:8-173:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_edges_loop1
+  (cell_count : Std.Usize) (offsets : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (next : alloc.vec.Vec Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (i1, next1) => topology.Carrier.from_edges_loop1.body cell_count
+      offsets i1 next1)
+    (i, next)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 2:
+    Source: 'src/topology.rs', lines 176:8-183:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.from_edges_loop2.body
+  (edges : Slice topology.Edge) (i : Std.Usize)
+  (next : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize)) (alloc.vec.Vec Std.Usize))
+  := do
+  let i1 := Slice.len edges
+  if i < i1
+  then
+    let edge ← Slice.index_usize edges i
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next edge.u
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        neighbors i2
+    let (i3, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next edge.u
+    let i4 ← i3 + 1#usize
+    let neighbors1 := index_mut_back edge.v
+    let next1 := index_mut_back1 i4
+    let i5 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next1 edge.v
+    let (_, index_mut_back2) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        neighbors1 i5
+    let (i6, index_mut_back3) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next1 edge.v
+    let i7 ← i6 + 1#usize
+    let i8 ← i + 1#usize
+    let next2 := index_mut_back3 i7
+    let neighbors2 := index_mut_back2 edge.u
+    ok (cont (i8, next2, neighbors2))
+  else ok (done neighbors)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 2:
+    Source: 'src/topology.rs', lines 176:8-183:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.from_edges_loop2
+  (edges : Slice topology.Edge) (i : Std.Usize)
+  (next : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (i1, next1, neighbors1) => topology.Carrier.from_edges_loop2.body
+      edges i1 next1 neighbors1)
+    (i, next, neighbors)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]:
+    Source: 'src/topology.rs', lines 150:4-185:5
+    Visibility: public -/
+def topology.Carrier.from_edges
+  (cell_count : Std.Usize) (edges : Slice topology.Edge) :
+  Result (core.result.Result topology.Carrier topology.Error)
+  := do
+  if cell_count = 0#usize
+  then ok (core.result.Result.Err topology.Error.InvalidSize)
+  else
+    let o ← lift (Usize.checked_add cell_count 1#usize)
+    let r ← core.option.Option.ok_or o topology.Error.Overflow
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let i := Slice.len edges
+      let o1 ← lift (Usize.checked_mul i 2#usize)
+      let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let r2 ← topology.check_storage val 8#usize
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let r3 ← topology.check_storage val1 8#usize
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let i1 := Slice.len edges
+            let r4 ← topology.check_storage i1 16#usize
+            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+            match cf4 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let offsets ←
+                alloc.vec.from_elem core.clone.CloneUsize 0#usize val
+              let (offsets1, status) ←
+                topology.Carrier.from_edges_loop0 cell_count edges offsets
+                  0#usize (core.result.Result.Ok ())
+              let cf5 ← core.result.Result.Insts.CoreOpsTry.branch status
+              match cf5 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let (s, deref_mut_back) ←
+                  lift (alloc.vec.Vec.deref_mut offsets1)
+                let (r5, s1) ← topology.prefix_offsets s
+                let cf6 ← core.result.Result.Insts.CoreOpsTry.branch r5
+                match cf6 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let next ←
+                    alloc.vec.from_elem core.clone.CloneUsize 0#usize
+                      cell_count
+                  let offsets2 := deref_mut_back s1
+                  let next1 ←
+                    topology.Carrier.from_edges_loop1 cell_count offsets2
+                      0#usize next
+                  let neighbors ←
+                    alloc.vec.from_elem core.clone.CloneUsize 0#usize val1
+                  let neighbors1 ←
+                    topology.Carrier.from_edges_loop2 edges 0#usize next1
+                      neighbors
+                  topology.Carrier.from_csr offsets2 neighbors1
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    topology.Carrier (core.convert.FromSame topology.Error)
+                    residual
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  topology.Carrier (core.convert.FromSame topology.Error)
+                  residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                topology.Carrier (core.convert.FromSame topology.Error)
+                residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              topology.Carrier (core.convert.FromSame topology.Error) residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            topology.Carrier (core.convert.FromSame topology.Error) residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          topology.Carrier (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        topology.Carrier (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 251:8-254:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop0.body
+  (n : Std.Usize) (links : alloc.vec.Vec Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) (alloc.vec.Vec
+    Std.Usize))
+  := do
+  if i < n
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        links i
+    let i1 ← i + 1#usize
+    let links1 := index_mut_back i
+    ok (cont (links1, i1))
+  else ok (done links)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 251:8-254:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop0
+  (n : Std.Usize) (links : alloc.vec.Vec Std.Usize) (i : Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (links1, i1) => spanning_tree.Tree.scene_dfs_loop0.body n links1 i1)
+    (links, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 257:8-260:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop1.body
+  (carrier : topology.Carrier) (required : Slice topology.Edge)
+  (links : alloc.vec.Vec Std.Usize) (sizes : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize)
+    × Std.Usize × (core.result.Result Unit topology.Error)) ((alloc.vec.Vec
+    Std.Usize) × (core.result.Result Unit topology.Error)))
+  := do
+  let i1 := Slice.len required
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let (s, deref_mut_back) ← lift (alloc.vec.Vec.deref_mut links)
+      let (s1, deref_mut_back1) ← lift (alloc.vec.Vec.deref_mut sizes)
+      let e ← Slice.index_usize required i
+      let (status1, s2, s3) ← spanning_tree.join_required carrier s s1 e
+      let i2 ← i + 1#usize
+      let sizes1 := deref_mut_back1 s3
+      let links1 := deref_mut_back s2
+      ok (cont (links1, sizes1, i2, status1))
+    else ok (done (links, status))
+  else ok (done (links, status))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 257:8-260:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop1
+  (carrier : topology.Carrier) (required : Slice topology.Edge)
+  (links : alloc.vec.Vec Std.Usize) (sizes : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) (status : core.result.Result Unit topology.Error) :
+  Result ((alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (links1, sizes1, i1, status1) =>
+      spanning_tree.Tree.scene_dfs_loop1.body carrier required links1 sizes1 i1
+      status1)
+    (links, sizes, i, status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 2:
+    Source: 'src/spanning_tree.rs', lines 266:8-274:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop2.body
+  (n : Std.Usize) (links : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (components : alloc.vec.Vec Std.Usize) (labels : alloc.vec.Vec Std.Usize)
+  (component_count : Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize) ((alloc.vec.Vec Std.Usize) × Std.Usize))
+  := do
+  if i < n
+  then
+    let s := alloc.vec.Vec.deref links
+    let representative ← spanning_tree.representative s i
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        labels representative
+    let (labels1, component_count1) ←
+      if i1 = n
+      then
+        do
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) labels representative
+        let component_count2 ← component_count + 1#usize
+        let labels2 := index_mut_back component_count
+        ok (labels2, component_count2)
+      else ok (labels, component_count)
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        labels1 representative
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        components i
+    let i3 ← i + 1#usize
+    let components1 := index_mut_back i2
+    ok (cont (i3, components1, labels1, component_count1))
+  else ok (done (components, component_count))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 2:
+    Source: 'src/spanning_tree.rs', lines 266:8-274:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop2
+  (n : Std.Usize) (links : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (components : alloc.vec.Vec Std.Usize) (labels : alloc.vec.Vec Std.Usize)
+  (component_count : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × Std.Usize)
+  := do
+  loop
+    (fun (i1, components1, labels1, component_count1) =>
+      spanning_tree.Tree.scene_dfs_loop2.body n links i1 components1 labels1
+      component_count1)
+    (i, components, labels, component_count)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 3:
+    Source: 'src/spanning_tree.rs', lines 280:8-287:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop3.body
+  (components : alloc.vec.Vec Std.Usize) (component_count : Std.Usize)
+  (edges : Slice topology.Edge) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error)
+  (offsets : alloc.vec.Vec Std.Usize) :
+  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error) ×
+    (alloc.vec.Vec Std.Usize)) ((core.result.Result Unit topology.Error) ×
+    (alloc.vec.Vec Std.Usize)))
+  := do
+  let i1 := Slice.len edges
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let e ← Slice.index_usize edges i
+      let u ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          components e.u
+      let v ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          components e.v
+      let (status1, offsets1) ←
+        if u != v
+        then
+          do
+          let (s, deref_mut_back) ← lift (alloc.vec.Vec.deref_mut offsets)
+          let e1 ← topology.Edge.new u v
+          let (status2, s1) ← topology.count_edge s component_count e1
+          let offsets2 := deref_mut_back s1
+          ok (status2, offsets2)
+        else ok (status, offsets)
+      let i2 ← i + 1#usize
+      ok (cont (i2, status1, offsets1))
+    else ok (done (status, offsets))
+  else ok (done (status, offsets))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 3:
+    Source: 'src/spanning_tree.rs', lines 280:8-287:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop3
+  (i : Std.Usize) (status : core.result.Result Unit topology.Error)
+  (components : alloc.vec.Vec Std.Usize) (component_count : Std.Usize)
+  (offsets : alloc.vec.Vec Std.Usize) (edges : Slice topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    Std.Usize))
+  := do
+  loop
+    (fun (i1, status1, offsets1) => spanning_tree.Tree.scene_dfs_loop3.body
+      components component_count edges i1 status1 offsets1)
+    (i, status, offsets)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 4:
+    Source: 'src/spanning_tree.rs', lines 297:8-300:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop4.body
+  (component_count : Std.Usize) (offsets : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) (next : alloc.vec.Vec Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Std.Usize)) (alloc.vec.Vec
+    Std.Usize))
+  := do
+  if i < component_count
+  then
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        offsets i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        next i
+    let i2 ← i + 1#usize
+    let next1 := index_mut_back i1
+    ok (cont (i2, next1))
+  else ok (done next)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 4:
+    Source: 'src/spanning_tree.rs', lines 297:8-300:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop4
+  (i : Std.Usize) (component_count : Std.Usize)
+  (offsets : alloc.vec.Vec Std.Usize) (next : alloc.vec.Vec Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (i1, next1) => spanning_tree.Tree.scene_dfs_loop4.body component_count
+      offsets i1 next1)
+    (i, next)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 5:
+    Source: 'src/spanning_tree.rs', lines 302:8-315:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop5.body
+  (components : alloc.vec.Vec Std.Usize) (edges : Slice topology.Edge)
+  (i : Std.Usize) (neighbors : alloc.vec.Vec Std.Usize)
+  (witnesses : alloc.vec.Vec topology.Edge) (next : alloc.vec.Vec Std.Usize) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    topology.Edge) × (alloc.vec.Vec Std.Usize)) ((alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec topology.Edge)))
+  := do
+  let i1 := Slice.len edges
+  if i < i1
+  then
+    let edge ← Slice.index_usize edges i
+    let u ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        components edge.u
+    let v ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        components edge.v
+    let (neighbors1, witnesses1, next1) ←
+      if u != v
+      then
+        do
+        let i2 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            next u
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) neighbors i2
+        let (_, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            topology.Edge) witnesses i2
+        let (i3, index_mut_back2) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) next u
+        let i4 ← i3 + 1#usize
+        let neighbors2 := index_mut_back v
+        let next2 := index_mut_back2 i4
+        let i5 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            next2 v
+        let (_, index_mut_back3) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) neighbors2 i5
+        let witnesses2 := index_mut_back1 edge
+        let (_, index_mut_back4) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            topology.Edge) witnesses2 i5
+        let (i6, index_mut_back5) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) next2 v
+        let i7 ← i6 + 1#usize
+        let next3 := index_mut_back5 i7
+        let witnesses3 := index_mut_back4 edge
+        let neighbors3 := index_mut_back3 u
+        ok (neighbors3, witnesses3, next3)
+      else ok (neighbors, witnesses, next)
+    let i2 ← i + 1#usize
+    ok (cont (i2, neighbors1, witnesses1, next1))
+  else ok (done (neighbors, witnesses))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 5:
+    Source: 'src/spanning_tree.rs', lines 302:8-315:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop5
+  (i : Std.Usize) (components : alloc.vec.Vec Std.Usize)
+  (edges : Slice topology.Edge) (neighbors : alloc.vec.Vec Std.Usize)
+  (witnesses : alloc.vec.Vec topology.Edge) (next : alloc.vec.Vec Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec topology.Edge))
+  := do
+  loop
+    (fun (i1, neighbors1, witnesses1, next1) =>
+      spanning_tree.Tree.scene_dfs_loop5.body components edges i1 neighbors1
+      witnesses1 next1)
+    (i, neighbors, witnesses, next)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 6:
+    Source: 'src/spanning_tree.rs', lines 321:8-324:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop6.body
+  (required : Slice topology.Edge) (i : Std.Usize)
+  (selected : alloc.vec.Vec topology.Edge) :
+  Result (ControlFlow (Std.Usize × (alloc.vec.Vec topology.Edge))
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let i1 := Slice.len required
+  if i < i1
+  then
+    let e ← Slice.index_usize required i
+    let e1 ← topology.Edge.new e.u e.v
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        topology.Edge) selected i
+    let i2 ← i + 1#usize
+    let selected1 := index_mut_back e1
+    ok (cont (i2, selected1))
+  else ok (done selected)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 6:
+    Source: 'src/spanning_tree.rs', lines 321:8-324:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop6
+  (required : Slice topology.Edge) (i : Std.Usize)
+  (selected : alloc.vec.Vec topology.Edge) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (i1, selected1) => spanning_tree.Tree.scene_dfs_loop6.body required i1
+      selected1)
+    (i, selected)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 7:
+    Source: 'src/spanning_tree.rs', lines 327:8-333:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop7.body
+  (component_count : Std.Usize) (witnesses : alloc.vec.Vec topology.Edge)
+  (quotient_root : Std.Usize) (work : spanning_tree.Workspace) (i : Std.Usize)
+  (selected : alloc.vec.Vec topology.Edge) (selected_count : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize × (alloc.vec.Vec
+    topology.Edge) × Std.Usize) (spanning_tree.Workspace × (alloc.vec.Vec
+    topology.Edge)))
+  := do
+  if i < component_count
+  then
+    let (work1, selected1, selected_count1) ←
+      if i != quotient_root
+      then
+        do
+        let i1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            work.incoming i
+        let e ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            topology.Edge) witnesses i1
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            topology.Edge) selected selected_count
+        let selected_count2 ← selected_count + 1#usize
+        let selected2 := index_mut_back e
+        ok (work, selected2, selected_count2)
+      else ok (work, selected, selected_count)
+    let i1 ← i + 1#usize
+    ok (cont (work1, i1, selected1, selected_count1))
+  else ok (done (work, selected))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 7:
+    Source: 'src/spanning_tree.rs', lines 327:8-333:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop7
+  (work : spanning_tree.Workspace) (i : Std.Usize)
+  (component_count : Std.Usize) (witnesses : alloc.vec.Vec topology.Edge)
+  (quotient_root : Std.Usize) (selected : alloc.vec.Vec topology.Edge)
+  (selected_count : Std.Usize) :
+  Result (spanning_tree.Workspace × (alloc.vec.Vec topology.Edge))
+  := do
+  loop
+    (fun (work1, i1, selected1, selected_count1) =>
+      spanning_tree.Tree.scene_dfs_loop7.body component_count witnesses
+      quotient_root work1 i1 selected1 selected_count1)
+    (work, i, selected, selected_count)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 8:
+    Source: 'src/spanning_tree.rs', lines 337:8-340:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop8.body
+  (n : Std.Usize) (work : spanning_tree.Workspace) (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    (spanning_tree.Workspace × Std.Usize))
+  := do
+  if i < n
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        work.seen i
+    let i1 ← i + 1#usize
+    let v := index_mut_back false
+    ok (cont ({ work with seen := v }, i1))
+  else ok (done (work, i))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 8:
+    Source: 'src/spanning_tree.rs', lines 337:8-340:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop8
+  (work : spanning_tree.Workspace) (n : Std.Usize) (i : Std.Usize) :
+  Result (spanning_tree.Workspace × Std.Usize)
+  := do
+  loop
+    (fun (work1, i1) => spanning_tree.Tree.scene_dfs_loop8.body n work1 i1)
+    (work, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 10:
+    Source: 'src/spanning_tree.rs', lines 349:12-358:13
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop9_loop0.body
+  (cell : Std.Usize) (row : Slice Std.Usize) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (parents : alloc.vec.Vec Std.Usize) (depth : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × (alloc.vec.Vec Std.Usize) × Std.Usize) ((alloc.vec.Vec Bool)
+    × (alloc.vec.Vec Std.Usize) × Std.Usize × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize))
+  := do
+  let i1 := Slice.len row
+  if i < i1
+  then
+    let neighbor ← Slice.index_usize row i
+    let b ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v
+        neighbor
+    let (v2, v3, parents1, depth1) ←
+      if b
+      then ok (v, v1, parents, depth)
+      else
+        do
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+            v neighbor
+        let (_, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) parents neighbor
+        let (_, index_mut_back2) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) v1 depth
+        let depth2 ← depth + 1#usize
+        let v4 := index_mut_back2 neighbor
+        let parents2 := index_mut_back1 cell
+        let v5 := index_mut_back true
+        ok (v5, v4, parents2, depth2)
+    let i2 ← i + 1#usize
+    ok (cont (v2, v3, i2, parents1, depth1))
+  else ok (done (v, v1, i, parents, depth))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 10:
+    Source: 'src/spanning_tree.rs', lines 349:12-358:13
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop9_loop0
+  (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (parents : alloc.vec.Vec Std.Usize) (depth : Std.Usize) (cell : Std.Usize)
+  (row : Slice Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) × Std.Usize ×
+    (alloc.vec.Vec Std.Usize) × Std.Usize)
+  := do
+  loop
+    (fun (v2, v3, i1, parents1, depth1) =>
+      spanning_tree.Tree.scene_dfs_loop9_loop0.body cell row v2 v3 i1 parents1
+      depth1)
+    (v, v1, i, parents, depth)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 9:
+    Source: 'src/spanning_tree.rs', lines 344:8-359:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.scene_dfs_loop9.body
+  (expanded : topology.Carrier) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (parents : alloc.vec.Vec Std.Usize) (depth : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × (alloc.vec.Vec Std.Usize) × Std.Usize) ((alloc.vec.Vec Bool)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize)))
+  := do
+  if depth > 0#usize
+  then
+    let depth1 ← depth - 1#usize
+    let cell ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v1
+        depth1
+    let row ← topology.Carrier.impl.neighbors expanded cell
+    let (v2, v3, i1, parents1, depth2) ←
+      spanning_tree.Tree.scene_dfs_loop9_loop0 v v1 0#usize parents depth1 cell
+        row
+    ok (cont (v2, v3, i1, parents1, depth2))
+  else ok (done (v, v1, parents))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 9:
+    Source: 'src/spanning_tree.rs', lines 344:8-359:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.scene_dfs_loop9
+  (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (expanded : topology.Carrier) (parents : alloc.vec.Vec Std.Usize)
+  (depth : Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize))
+  := do
+  loop
+    (fun (v2, v3, i1, parents1, depth1) =>
+      spanning_tree.Tree.scene_dfs_loop9.body expanded v2 v3 i1 parents1
+      depth1)
+    (v, v1, i, parents, depth)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]:
+    Source: 'src/spanning_tree.rs', lines 233:4-361:5
+    Visibility: public -/
+def spanning_tree.Tree.scene_dfs
+  {R : Type _} (treeRngInst : tree.Rng R) (carrier : topology.Carrier)
+  (required : Slice topology.Edge) (root : Std.Usize) (rng : R)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result spanning_tree.Tree topology.Error) × R ×
+    spanning_tree.Workspace)
+  := do
+  let n ← topology.Carrier.len carrier
+  if root >= n
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, rng, work)
+  else
+    let s ← topology.Carrier.impl.edges carrier
+    let i := Slice.len s
+    let r ← spanning_tree.Workspace.ensure work n i
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let i1 := Slice.len required
+      if i1 >= n
+      then ok (core.result.Result.Err topology.Error.InvalidForest, rng, work)
+      else
+        let links ← alloc.vec.from_elem core.clone.CloneUsize 0#usize n
+        let sizes ← alloc.vec.from_elem core.clone.CloneUsize 1#usize n
+        let links1 ← spanning_tree.Tree.scene_dfs_loop0 n links 0#usize
+        let (links2, status) ←
+          spanning_tree.Tree.scene_dfs_loop1 carrier required links1 sizes
+            0#usize (core.result.Result.Ok ())
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let components ←
+            alloc.vec.from_elem core.clone.CloneUsize 0#usize n
+          let labels ← alloc.vec.from_elem core.clone.CloneUsize n n
+          let (components1, component_count) ←
+            spanning_tree.Tree.scene_dfs_loop2 n links2 0#usize components
+              labels 0#usize
+          let o ← lift (Usize.checked_add component_count 1#usize)
+          let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r1
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue val =>
+            let r2 ← topology.check_storage val 8#usize
+            let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r2
+            match cf3 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let offsets ←
+                alloc.vec.from_elem core.clone.CloneUsize 0#usize val
+              let edges ← topology.Carrier.impl.edges carrier
+              let (status1, offsets1) ←
+                spanning_tree.Tree.scene_dfs_loop3 0#usize status components1
+                  component_count offsets edges
+              let cf4 ← core.result.Result.Insts.CoreOpsTry.branch status1
+              match cf4 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let (s1, deref_mut_back) ←
+                  lift (alloc.vec.Vec.deref_mut offsets1)
+                let (r3, s2) ← topology.prefix_offsets s1
+                let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                match cf5 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let offsets2 := deref_mut_back s2
+                  let adjacency_count ←
+                    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                      Std.Usize) offsets2 component_count
+                  let r4 ← topology.check_storage adjacency_count 8#usize
+                  let cf6 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                  match cf6 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    let r5 ← topology.check_storage adjacency_count 16#usize
+                    let cf7 ← core.result.Result.Insts.CoreOpsTry.branch r5
+                    match cf7 with
+                    | core.ops.control_flow.ControlFlow.Continue _ =>
+                      let neighbors ←
+                        alloc.vec.from_elem core.clone.CloneUsize 0#usize
+                          adjacency_count
+                      let e ← topology.Edge.new 0#usize 0#usize
+                      let witnesses ←
+                        alloc.vec.from_elem topology.Edge.Insts.CoreCloneClone
+                          e adjacency_count
+                      let next ←
+                        alloc.vec.from_elem core.clone.CloneUsize 0#usize
+                          component_count
+                      let next1 ←
+                        spanning_tree.Tree.scene_dfs_loop4 0#usize
+                          component_count offsets2 next
+                      let (neighbors1, witnesses1) ←
+                        spanning_tree.Tree.scene_dfs_loop5 0#usize components1
+                          edges neighbors witnesses next1
+                      let quotient_root ←
+                        alloc.vec.Vec.index
+                          (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+                          components1 root
+                      let s3 := alloc.vec.Vec.deref offsets2
+                      let s4 := alloc.vec.Vec.deref neighbors1
+                      let (r6, rng1, work1) ←
+                        spanning_tree.depth_first treeRngInst s3 s4
+                          quotient_root rng work
+                      let cf8 ← core.result.Result.Insts.CoreOpsTry.branch r6
+                      match cf8 with
+                      | core.ops.control_flow.ControlFlow.Continue _ =>
+                        let i2 ← n - 1#usize
+                        let r7 ← topology.check_storage i2 16#usize
+                        let cf9 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r7
+                        match cf9 with
+                        | core.ops.control_flow.ControlFlow.Continue _ =>
+                          let selected ←
+                            alloc.vec.from_elem
+                              topology.Edge.Insts.CoreCloneClone e i2
+                          let selected1 ←
+                            spanning_tree.Tree.scene_dfs_loop6 required 0#usize
+                              selected
+                          let selected_count := Slice.len required
+                          let (work2, selected2) ←
+                            spanning_tree.Tree.scene_dfs_loop7 work1 0#usize
+                              component_count witnesses1 quotient_root
+                              selected1 selected_count
+                          let s5 := alloc.vec.Vec.deref selected2
+                          let r8 ← topology.Carrier.from_edges n s5
+                          let cf10 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r8
+                          match cf10 with
+                          | core.ops.control_flow.ControlFlow.Continue val1 =>
+                            let parents ←
+                              alloc.vec.from_elem core.clone.CloneUsize root n
+                            let (work3, i3) ←
+                              spanning_tree.Tree.scene_dfs_loop8 work2 n
+                                0#usize
+                            let (_, index_mut_back) ←
+                              alloc.vec.Vec.index_mut
+                                (core.slice.index.SliceIndexUsizeSlice Bool)
+                                work3.seen root
+                            let (_, index_mut_back1) ←
+                              alloc.vec.Vec.index_mut
+                                (core.slice.index.SliceIndexUsizeSlice
+                                Std.Usize) work3.path 0#usize
+                            let v := index_mut_back1 root
+                            let v1 := index_mut_back true
+                            let (v2, v3, parents1) ←
+                              spanning_tree.Tree.scene_dfs_loop9 v1 v i3 val1
+                                parents 1#usize
+                            ok (core.result.Result.Ok
+                              { parents := parents1, root }, rng1,
+                              { work3 with seen := v2, path := v3 })
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            let r9 ←
+                              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                spanning_tree.Tree (core.convert.FromSame
+                                topology.Error) residual
+                            ok (r9, rng1, work2)
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          let r8 ←
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              spanning_tree.Tree (core.convert.FromSame
+                              topology.Error) residual
+                          ok (r8, rng1, work1)
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        let r7 ←
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            spanning_tree.Tree (core.convert.FromSame
+                            topology.Error) residual
+                        ok (r7, rng1, work1)
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      let r6 ←
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          spanning_tree.Tree (core.convert.FromSame
+                          topology.Error) residual
+                      ok (r6, rng, work)
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    let r5 ←
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        spanning_tree.Tree (core.convert.FromSame
+                        topology.Error) residual
+                    ok (r5, rng, work)
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r4 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      spanning_tree.Tree (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r4, rng, work)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r3 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    spanning_tree.Tree (core.convert.FromSame topology.Error)
+                    residual
+                ok (r3, rng, work)
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r3 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  spanning_tree.Tree (core.convert.FromSame topology.Error)
+                  residual
+              ok (r3, rng, work)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                spanning_tree.Tree (core.convert.FromSame topology.Error)
+                residual
+            ok (r2, rng, work)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r1 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              spanning_tree.Tree (core.convert.FromSame topology.Error)
+              residual
+          ok (r1, rng, work)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (r1, rng, work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::parents]:
+    Source: 'src/spanning_tree.rs', lines 363:4-365:5
+    Visibility: public -/
+def spanning_tree.Tree.impl.parents
+  (self : spanning_tree.Tree) : Result (Slice Std.Usize) := do
+  ok (alloc.vec.Vec.deref self.parents)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::root]:
+    Source: 'src/spanning_tree.rs', lines 367:4-369:5
+    Visibility: public -/
+def spanning_tree.Tree.impl.root
+  (self : spanning_tree.Tree) : Result Std.Usize := do
+  ok self.root
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::has_edge]:
+    Source: 'src/spanning_tree.rs', lines 371:4-376:5
+    Visibility: public -/
+def spanning_tree.Tree.has_edge
+  (self : spanning_tree.Tree) (edge : topology.Edge) : Result Bool := do
+  let i := alloc.vec.Vec.len self.parents
+  if edge.u < i
+  then
+    let i1 := alloc.vec.Vec.len self.parents
+    if edge.v < i1
+    then
+      if edge.u != edge.v
+      then
+        let i2 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            self.parents edge.u
+        if i2 = edge.v
+        then ok true
+        else
+          let i3 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) self.parents edge.v
+          ok (i3 = edge.u)
+      else ok false
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 390:8-394:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.reroot_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (n : Std.Usize)
+  (work : spanning_tree.Workspace) (cell : Std.Usize) (count : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize × Std.Usize)
+    (spanning_tree.Workspace × Std.Usize × Std.Usize))
+  := do
+  if cell < n
+  then
+    if count < n
+    then
+      if cell != i
+      then
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) work.path count
+        let count1 ← count + 1#usize
+        let cell1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            v cell
+        let v1 := index_mut_back cell
+        ok (cont ({ work with path := v1 }, cell1, count1))
+      else ok (done (work, cell, count))
+    else ok (done (work, cell, count))
+  else ok (done (work, cell, count))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 390:8-394:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.reroot_loop0
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize)
+  (work : spanning_tree.Workspace) (n : Std.Usize) (cell : Std.Usize)
+  (count : Std.Usize) :
+  Result (spanning_tree.Workspace × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun (work1, cell1, count1) => spanning_tree.Tree.reroot_loop0.body v i n
+      work1 cell1 count1)
+    (work, cell, count)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 401:8-404:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.reroot_loop1.body
+  (v : alloc.vec.Vec Std.Usize) (count : Std.Usize)
+  (v1 : alloc.vec.Vec Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) (alloc.vec.Vec
+    Std.Usize))
+  := do
+  if i < count
+  then
+    let i1 ← i - 1#usize
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        i1
+    let i3 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        v1 i3
+    let i4 ← i + 1#usize
+    let v2 := index_mut_back i2
+    ok (cont (v2, i4))
+  else ok (done v1)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 401:8-404:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.reroot_loop1
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (count : Std.Usize) (i : Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (v2, i1) => spanning_tree.Tree.reroot_loop1.body v1 count v2 i1)
+    (v, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]:
+    Source: 'src/spanning_tree.rs', lines 382:4-408:5
+    Visibility: public -/
+def spanning_tree.Tree.reroot
+  (self : spanning_tree.Tree) (new_root : Std.Usize)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Tree ×
+    spanning_tree.Workspace)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  if new_root >= n
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, self, work)
+  else
+    let r ← spanning_tree.Workspace.ensure work n 0#usize
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let (work1, cell, count) ←
+        spanning_tree.Tree.reroot_loop0 self.parents self.root work n new_root
+          0#usize
+      if cell >= n
+      then ok (core.result.Result.Err topology.Error.InvalidTree, self, work1)
+      else
+        if count >= n
+        then
+          ok (core.result.Result.Err topology.Error.InvalidTree, self, work1)
+        else
+          let (_, index_mut_back) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) work1.path count
+          let count1 ← count + 1#usize
+          let v := index_mut_back cell
+          let v1 ←
+            spanning_tree.Tree.reroot_loop1 self.parents v count1 1#usize
+          let (_, index_mut_back1) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v1 new_root
+          let v2 := index_mut_back1 new_root
+          ok (core.result.Result.Ok (), { parents := v2, root := new_root },
+            { work1 with path := v })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r1, self, work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 580:8-584:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.check_carrier_loop.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (cell : Std.Usize) (valid : Bool) :
+  Result (ControlFlow (Std.Usize × Bool) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if cell < i1
+  then
+    if valid
+    then
+      let valid1 ←
+        if cell = i
+        then ok true
+        else
+          do
+          let i2 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v cell
+          let e ← topology.Edge.new cell i2
+          topology.Carrier.contains_edge carrier e
+      let cell1 ← cell + 1#usize
+      ok (cont (cell1, valid1))
+    else ok (done valid)
+  else ok (done valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 580:8-584:9 -/
+@[rust_loop]
+def spanning_tree.Tree.check_carrier_loop
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (cell : Std.Usize) (valid : Bool) :
+  Result Bool
+  := do
+  loop
+    (fun (cell1, valid1) => spanning_tree.Tree.check_carrier_loop.body v i
+      carrier cell1 valid1)
+    (cell, valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]:
+    Source: 'src/spanning_tree.rs', lines 571:4-590:5 -/
+def spanning_tree.Tree.check_carrier
+  (self : spanning_tree.Tree) (carrier : topology.Carrier) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.parents
+  let i1 ← topology.Carrier.len carrier
+  if i != i1
+  then ok (core.result.Result.Err topology.Error.InvalidTree)
+  else
+    let i2 := alloc.vec.Vec.len self.parents
+    if self.root >= i2
+    then ok (core.result.Result.Err topology.Error.InvalidTree)
+    else
+      let i3 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.parents self.root
+      if i3 != self.root
+      then ok (core.result.Result.Err topology.Error.InvalidTree)
+      else
+        let valid ←
+          spanning_tree.Tree.check_carrier_loop self.parents self.root carrier
+            0#usize true
+        if valid
+        then ok (core.result.Result.Ok ())
+        else ok (core.result.Result.Err topology.Error.InvalidTree)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 555:8-563:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.virtual_root_loop.body
+  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
+  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
+  Result (ControlFlow (Std.Usize × Std.Usize × Bool) (Std.Usize × Bool))
+  := do
+  let i := alloc.vec.Vec.len self.parents
+  if steps < i
+  then
+    let i1 := alloc.vec.Vec.len self.parents
+    if cell < i1
+    then
+      if found
+      then ok (done (cell, found))
+      else
+        let s := alloc.vec.Vec.deref self.parents
+        let parent ← spanning_tree.Workspace.parent work s cell
+        let (cell1, found1) ←
+          if parent = cell
+          then ok (cell, true)
+          else ok (parent, found)
+        let steps1 ← steps + 1#usize
+        ok (cont (cell1, steps1, found1))
+    else ok (done (cell, found))
+  else ok (done (cell, found))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 555:8-563:9 -/
+@[rust_loop]
+def spanning_tree.Tree.virtual_root_loop
+  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
+  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
+  Result (Std.Usize × Bool)
+  := do
+  loop
+    (fun (cell1, steps1, found1) => spanning_tree.Tree.virtual_root_loop.body
+      self work cell1 steps1 found1)
+    (cell, steps, found)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]:
+    Source: 'src/spanning_tree.rs', lines 551:4-569:5 -/
+def spanning_tree.Tree.virtual_root
+  (self : spanning_tree.Tree) (start : Std.Usize)
+  (work : spanning_tree.Workspace) :
+  Result (core.result.Result Std.Usize topology.Error)
+  := do
+  let (cell, found) ←
+    spanning_tree.Tree.virtual_root_loop self work start 0#usize false
+  if found
+  then ok (core.result.Result.Ok cell)
+  else ok (core.result.Result.Err topology.Error.InvalidTree)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 532:8-536:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.attach_virtual_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (n : Std.Usize) (component_root : Std.Usize)
+  (work : spanning_tree.Workspace) (cell : Std.Usize) (count : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize × Std.Usize)
+    (spanning_tree.Workspace × Std.Usize × Std.Usize))
+  := do
+  if cell < n
+  then
+    if count < n
+    then
+      if cell != component_root
+      then
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) work.path count
+        let count1 ← count + 1#usize
+        let v1 := index_mut_back cell
+        let s := alloc.vec.Vec.deref v
+        let cell1 ←
+          spanning_tree.Workspace.parent { work with path := v1 } s cell
+        ok (cont ({ work with path := v1 }, cell1, count1))
+      else ok (done (work, cell, count))
+    else ok (done (work, cell, count))
+  else ok (done (work, cell, count))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 532:8-536:9 -/
+@[rust_loop]
+def spanning_tree.Tree.attach_virtual_loop0
+  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
+  (n : Std.Usize) (component_root : Std.Usize) (cell : Std.Usize)
+  (count : Std.Usize) :
+  Result (spanning_tree.Workspace × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun (work1, cell1, count1) => spanning_tree.Tree.attach_virtual_loop0.body
+      v n component_root work1 cell1 count1)
+    (work, cell, count)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 543:8-546:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.attach_virtual_loop1.body
+  (count : Std.Usize) (work : spanning_tree.Workspace) (j : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    spanning_tree.Workspace)
+  := do
+  if j < count
+  then
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.path j
+    let i1 ← j - 1#usize
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.path i1
+    let work1 ← spanning_tree.Workspace.set_parent work i i2
+    let j1 ← j + 1#usize
+    ok (cont (work1, j1))
+  else ok (done work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 543:8-546:9 -/
+@[rust_loop]
+def spanning_tree.Tree.attach_virtual_loop1
+  (work : spanning_tree.Workspace) (count : Std.Usize) (j : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  loop
+    (fun (work1, j1) => spanning_tree.Tree.attach_virtual_loop1.body count
+      work1 j1)
+    (work, j)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]:
+    Source: 'src/spanning_tree.rs', lines 518:4-549:5 -/
+def spanning_tree.Tree.attach_virtual
+  (self : spanning_tree.Tree) (edge : topology.Edge)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Workspace)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  let r ← spanning_tree.Tree.virtual_root self edge.u work
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let r1 ← spanning_tree.Tree.virtual_root self edge.v work
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      if val = val1
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, work)
+      else
+        let (inside, outside, component_root) ←
+          if val = self.root
+          then ok (edge.v, edge.u, val1)
+          else ok (edge.u, edge.v, val)
+        let (work1, cell, count) ←
+          spanning_tree.Tree.attach_virtual_loop0 self.parents work n
+            component_root inside 0#usize
+        if cell >= n
+        then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
+        else
+          if count >= n
+          then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
+          else
+            let (_, index_mut_back) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) work1.path count
+            let count1 ← count + 1#usize
+            let v := index_mut_back cell
+            let work2 ←
+              spanning_tree.Tree.attach_virtual_loop1 { work1 with path := v }
+                count1 1#usize
+            let work3 ←
+              spanning_tree.Workspace.set_parent work2 inside outside
+            ok (core.result.Result.Ok (), work3)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r2, work)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r1, work)
+
+/-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}::eq]:
+    Source: 'src/topology.rs', lines 49:29-49:38
+    Visibility: public -/
+def topology.Edge.Insts.CoreCmpPartialEqEdge.eq
+  (self : topology.Edge) (other : topology.Edge) : Result Bool := do
+  if self.u = other.u
+  then ok (self.v = other.v)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:29-49:38 -/
+@[reducible]
+impl_def topology.Edge.Insts.CoreCmpPartialEqEdge : core.cmp.PartialEq
+  topology.Edge topology.Edge := {
+  eq := topology.Edge.Insts.CoreCmpPartialEqEdge.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    topology.Edge.Insts.CoreCmpPartialEqEdge
+}
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 498:8-502:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.check_edit_loop0.body
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
+  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < index
+  then
+    if duplicate
+    then ok (done duplicate)
+    else
+      let e ← Slice.index_usize remove j
+      let e1 ← topology.Edge.new e.u e.v
+      let b ←
+        topology.Edge.Insts.CoreCmpPartialEqEdge.eq e1 { u := i, v := i1 }
+      let duplicate1 ←
+        if b
+        then ok true
+        else
+          do
+          let e2 ← Slice.index_usize add j
+          let e3 ← topology.Edge.new e2.u e2.v
+          topology.Edge.Insts.CoreCmpPartialEqEdge.eq e3 { u := i2, v := i3 }
+      let j1 ← j + 1#usize
+      ok (cont (duplicate1, j1))
+  else ok (done duplicate)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 498:8-502:9 -/
+@[rust_loop]
+def spanning_tree.Tree.check_edit_loop0
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
+  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (duplicate1, j1) => spanning_tree.Tree.check_edit_loop0.body remove
+      add index i i1 i2 i3 duplicate1 j1)
+    (duplicate, j)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 508:12-510:13 -/
+@[rust_loop_body]
+def spanning_tree.Tree.check_edit_loop1.body
+  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
+  (j : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i2 := Slice.len remove
+  if j < i2
+  then
+    let e ← Slice.index_usize remove j
+    let e1 ← topology.Edge.new e.u e.v
+    let b ←
+      core.cmp.PartialEq.ne.trait_default
+        topology.Edge.Insts.CoreCmpPartialEqEdge e1 { u := i, v := i1 }
+    if b
+    then let j1 ← j + 1#usize
+         ok (cont j1)
+    else ok (done j)
+  else ok (done j)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 508:12-510:13 -/
+@[rust_loop]
+def spanning_tree.Tree.check_edit_loop1
+  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
+  (j : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun j1 => spanning_tree.Tree.check_edit_loop1.body remove i i1 j1)
+    j
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]:
+    Source: 'src/spanning_tree.rs', lines 480:4-516:5 -/
+def spanning_tree.Tree.check_edit
+  (self : spanning_tree.Tree) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  let e ← Slice.index_usize remove index
+  let removal ← topology.Edge.new e.u e.v
+  let e1 ← Slice.index_usize add index
+  let addition ← topology.Edge.new e1.u e1.v
+  if removal.u >= n
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    if removal.v >= n
+    then ok (core.result.Result.Err topology.Error.InvalidIndex)
+    else
+      if addition.u >= n
+      then ok (core.result.Result.Err topology.Error.InvalidIndex)
+      else
+        if addition.v >= n
+        then ok (core.result.Result.Err topology.Error.InvalidIndex)
+        else
+          let b ← spanning_tree.Tree.has_edge self removal
+          if b
+          then
+            let b1 ← topology.Carrier.contains_edge carrier addition
+            if b1
+            then
+              let duplicate ←
+                spanning_tree.Tree.check_edit_loop0 remove add index 
+                  removal.u removal.v addition.u addition.v false 0#usize
+              if duplicate
+              then ok (core.result.Result.Err topology.Error.InvalidTransition)
+              else
+                let b2 ← spanning_tree.Tree.has_edge self addition
+                if b2
+                then
+                  let j ←
+                    spanning_tree.Tree.check_edit_loop1 remove addition.u
+                      addition.v 0#usize
+                  let i := Slice.len remove
+                  if j = i
+                  then
+                    ok (core.result.Result.Err
+                      topology.Error.InvalidTransition)
+                  else ok (core.result.Result.Ok ())
+                else ok (core.result.Result.Ok ())
+            else ok (core.result.Result.Err topology.Error.InvalidTransition)
+          else ok (core.result.Result.Err topology.Error.InvalidTransition)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 453:8-456:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error))
+    (core.result.Result Unit topology.Error))
+  := do
+  let i2 := Slice.len remove
+  if i1 < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let status1 ←
+        spanning_tree.Tree.check_edit { parents := v, root := i } carrier
+          remove add i1
+      let i3 ← i1 + 1#usize
+      ok (cont (i3, status1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 453:8-456:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop0
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (i2, status1) => spanning_tree.Tree.edit_edges_loop0.body v i carrier
+      remove add i2 status1)
+    (i1, status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 460:8-465:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop1.body
+  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    spanning_tree.Workspace)
+  := do
+  let i1 := Slice.len remove
+  if i < i1
+  then
+    let edge ← Slice.index_usize remove i
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        edge.u
+    let child ← if i2 = edge.v
+                  then ok edge.u
+                  else ok edge.v
+    let work1 ← spanning_tree.Workspace.set_parent work child child
+    let i3 ← i + 1#usize
+    ok (cont (work1, i3))
+  else ok (done work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 460:8-465:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop1
+  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  loop
+    (fun (work1, i1) => spanning_tree.Tree.edit_edges_loop1.body v remove work1
+      i1)
+    (work, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 2:
+    Source: 'src/spanning_tree.rs', lines 467:8-470:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop2.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize ×
+    (core.result.Result Unit topology.Error)) (spanning_tree.Workspace ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let i2 := Slice.len add
+  if i1 < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let e ← Slice.index_usize add i1
+      let (status1, work1) ←
+        spanning_tree.Tree.attach_virtual { parents := v, root := i } e work
+      let i3 ← i1 + 1#usize
+      ok (cont (work1, i3, status1))
+    else ok (done (work, status))
+  else ok (done (work, status))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 2:
+    Source: 'src/spanning_tree.rs', lines 467:8-470:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop2
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (spanning_tree.Workspace × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (work1, i2, status1) => spanning_tree.Tree.edit_edges_loop2.body v i
+      add work1 i2 status1)
+    (work, i1, status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 3:
+    Source: 'src/spanning_tree.rs', lines 473:8-476:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop3.body
+  (work : spanning_tree.Workspace) (v : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) ((alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × Std.Usize))
+  := do
+  if i < work.edit_count
+  then
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.edit_nodes i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        v i2
+    let i3 ← i + 1#usize
+    let v1 := index_mut_back i1
+    ok (cont (v1, i3))
+  else
+    ok (done (v, work.seen, work.frames, work.path, work.parents,
+      work.incoming, work.edit_slots, work.edit_nodes, work.edit_count,
+      work.edge_capacity))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 3:
+    Source: 'src/spanning_tree.rs', lines 473:8-476:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop3
+  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
+  (i : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun (v1, i1) => spanning_tree.Tree.edit_edges_loop3.body work v1 i1)
+    (v, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]:
+    Source: 'src/spanning_tree.rs', lines 438:4-478:5
+    Visibility: public -/
+def spanning_tree.Tree.edit_edges
+  (self : spanning_tree.Tree) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Tree ×
+    spanning_tree.Workspace)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  let s ← topology.Carrier.impl.edges carrier
+  let i := Slice.len s
+  let r ← spanning_tree.Workspace.ensure work n i
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let r1 ← spanning_tree.Tree.check_carrier self carrier
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let i1 := Slice.len remove
+      let i2 := Slice.len add
+      if i1 != i2
+      then
+        ok (core.result.Result.Err topology.Error.InvalidTransition, self,
+          work)
+      else
+        let i3 := Slice.len remove
+        if i3 >= n
+        then
+          ok (core.result.Result.Err topology.Error.InvalidTransition, self,
+            work)
+        else
+          let status ←
+            spanning_tree.Tree.edit_edges_loop0 self.parents self.root carrier
+              remove add 0#usize (core.result.Result.Ok ())
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let work1 ← spanning_tree.Workspace.clear_edits work
+            let work2 ←
+              spanning_tree.Tree.edit_edges_loop1 self.parents remove work1
+                0#usize
+            let (work3, status1) ←
+              spanning_tree.Tree.edit_edges_loop2 self.parents self.root add
+                work2 0#usize status
+            let cf3 ← core.result.Result.Insts.CoreOpsTry.branch status1
+            match cf3 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let (v, v1, v2, v3, v4, v5, v6, v7, i4, i5) ←
+                spanning_tree.Tree.edit_edges_loop3 self.parents work3 0#usize
+              ok (core.result.Result.Ok (), { self with parents := v },
+                {
+                  seen := v1,
+                  frames := v2,
+                  path := v3,
+                  parents := v4,
+                  incoming := v5,
+                  edit_slots := v6,
+                  edit_nodes := v7,
+                  edit_count := i4,
+                  edge_capacity := i5
+                })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r2 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  Unit (core.convert.FromSame topology.Error) residual
+              ok (r2, self, work3)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                Unit (core.convert.FromSame topology.Error) residual
+            ok (r2, self, work)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r2, self, work)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r1, self, work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::exchange]:
+    Source: 'src/spanning_tree.rs', lines 415:4-430:5
+    Visibility: public -/
+def spanning_tree.Tree.exchange
+  (self : spanning_tree.Tree) (carrier : topology.Carrier)
+  (cut_child : Std.Usize) (attach : topology.Edge)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Tree ×
+    spanning_tree.Workspace)
+  := do
+  let i := alloc.vec.Vec.len self.parents
+  if cut_child >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, self, work)
+  else
+    if cut_child = self.root
+    then
+      ok (core.result.Result.Err topology.Error.InvalidTransition, self, work)
+    else
+      let i1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.parents cut_child
+      let cut ← topology.Edge.new cut_child i1
+      let s ← lift (Array.to_slice (Array.make 1#usize [ cut ]))
+      let s1 ← lift (Array.to_slice (Array.make 1#usize [ attach ]))
+      spanning_tree.Tree.edit_edges self carrier s s1 work
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 604:12-607:13
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.validate_loop0_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (n : Std.Usize)
+  (cell : Std.Usize) (steps : Std.Usize) :
+  Result (ControlFlow (Std.Usize × Std.Usize) Std.Usize)
+  := do
+  if cell != i
+  then
+    if cell < n
+    then
+      if steps < n
+      then
+        let cell1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            v cell
+        let steps1 ← steps + 1#usize
+        ok (cont (cell1, steps1))
+      else ok (done cell)
+    else ok (done cell)
+  else ok (done cell)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 604:12-607:13
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.validate_loop0_loop0
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (n : Std.Usize)
+  (cell : Std.Usize) (steps : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun (cell1, steps1) => spanning_tree.Tree.validate_loop0_loop0.body v i n
+      cell1 steps1)
+    (cell, steps)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 601:8-610:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.validate_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (n : Std.Usize)
+  (start : Std.Usize) (valid : Bool) :
+  Result (ControlFlow (Std.Usize × Bool) Bool)
+  := do
+  if start < n
+  then
+    if valid
+    then
+      let cell ← spanning_tree.Tree.validate_loop0_loop0 v i n start 0#usize
+      let start1 ← start + 1#usize
+      ok (cont (start1, cell = i))
+    else ok (done valid)
+  else ok (done valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 601:8-610:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.validate_loop0
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (n : Std.Usize)
+  (start : Std.Usize) (valid : Bool) :
+  Result Bool
+  := do
+  loop
+    (fun (start1, valid1) => spanning_tree.Tree.validate_loop0.body v i n
+      start1 valid1)
+    (start, valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]:
+    Source: 'src/spanning_tree.rs', lines 596:4-616:5
+    Visibility: public -/
+def spanning_tree.Tree.validate
+  (self : spanning_tree.Tree) (carrier : topology.Carrier) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let r ← spanning_tree.Tree.check_carrier self carrier
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let n := alloc.vec.Vec.len self.parents
+    let valid ←
+      spanning_tree.Tree.validate_loop0 self.parents self.root n 0#usize true
+    if valid
+    then ok (core.result.Result.Ok ())
+    else ok (core.result.Result.Err topology.Error.InvalidTree)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Error}::fmt]:
+    Source: 'src/topology.rs', lines 7:9-7:14
+    Visibility: public -/
+def topology.Error.Insts.CoreFmtDebug.fmt
+  (self : topology.Error) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | topology.Error.InvalidSize =>
+    core.fmt.Formatter.write_str f (toStr "InvalidSize")
+  | topology.Error.InvalidIndex =>
+    core.fmt.Formatter.write_str f (toStr "InvalidIndex")
+  | topology.Error.InvalidCarrier =>
+    core.fmt.Formatter.write_str f (toStr "InvalidCarrier")
+  | topology.Error.Disconnected =>
+    core.fmt.Formatter.write_str f (toStr "Disconnected")
+  | topology.Error.InvalidChoice =>
+    core.fmt.Formatter.write_str f (toStr "InvalidChoice")
+  | topology.Error.InvalidForest =>
+    core.fmt.Formatter.write_str f (toStr "InvalidForest")
+  | topology.Error.InvalidTree =>
+    core.fmt.Formatter.write_str f (toStr "InvalidTree")
+  | topology.Error.InvalidTransition =>
+    core.fmt.Formatter.write_str f (toStr "InvalidTransition")
+  | topology.Error.InsufficientWorkspace =>
+    core.fmt.Formatter.write_str f (toStr "InsufficientWorkspace")
+  | topology.Error.Overflow =>
+    core.fmt.Formatter.write_str f (toStr "Overflow")
+  | topology.Error.StaleEpoch =>
+    core.fmt.Formatter.write_str f (toStr "StaleEpoch")
+  | topology.Error.StaleRevision =>
+    core.fmt.Formatter.write_str f (toStr "StaleRevision")
+  | topology.Error.Occupied =>
+    core.fmt.Formatter.write_str f (toStr "Occupied")
+  | topology.Error.InvalidGeometry =>
+    core.fmt.Formatter.write_str f (toStr "InvalidGeometry")
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:9-7:14 -/
+@[reducible]
+def topology.Error.Insts.CoreFmtDebug : core.fmt.Debug topology.Error := {
+  fmt := topology.Error.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::topology::{impl core::clone::Clone for labyrinth_core::topology::Error}::clone]:
+    Source: 'src/topology.rs', lines 7:16-7:21
+    Visibility: public -/
+def topology.Error.Insts.CoreCloneClone.clone
+  (self : topology.Error) : Result topology.Error := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::clone::Clone for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:16-7:21 -/
+@[reducible]
+def topology.Error.Insts.CoreCloneClone : core.clone.Clone topology.Error := {
+  clone := topology.Error.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::marker::Copy for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:23-7:27 -/
+@[reducible]
+def topology.Error.Insts.CoreMarkerCopy : core.marker.Copy topology.Error := {
+  cloneInst := topology.Error.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::marker::StructuralPartialEq for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:29-7:38 -/
+@[reducible]
+def topology.Error.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq topology.Error := {
+}
+
+/-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Error> for labyrinth_core::topology::Error}::eq]:
+    Source: 'src/topology.rs', lines 7:29-7:38
+    Visibility: public -/
+def topology.Error.Insts.CoreCmpPartialEqError.eq
+  (self : topology.Error) (other : topology.Error) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  ok (self1 = other1)
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Error> for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:29-7:38 -/
+@[reducible]
+impl_def topology.Error.Insts.CoreCmpPartialEqError : core.cmp.PartialEq
+  topology.Error topology.Error := {
+  eq := topology.Error.Insts.CoreCmpPartialEqError.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    topology.Error.Insts.CoreCmpPartialEqError
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 7:40-7:42 -/
+@[reducible]
+impl_def topology.Error.Insts.CoreCmpEq : core.cmp.Eq topology.Error := {
+  partialEqInst := topology.Error.Insts.CoreCmpPartialEqError
+  assert_fields_are_eq := core.cmp.Eq.assert_fields_are_eq.default
+    topology.Error.Insts.CoreCmpEq
+}
+
+/-- [labyrinth_core::topology::{impl core::fmt::Display for labyrinth_core::topology::Error}::fmt]:
+    Source: 'src/topology.rs', lines 26:4-44:5
+    Visibility: public -/
+def topology.Error.Insts.CoreFmtDisplay.fmt
+  (self : topology.Error) (formatter : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let message ←
+    match self with
+    | topology.Error.InvalidSize => ok (toStr "invalid size")
+    | topology.Error.InvalidIndex => ok (toStr "invalid index")
+    | topology.Error.InvalidCarrier => ok (toStr "invalid carrier")
+    | topology.Error.Disconnected => ok (toStr "disconnected carrier")
+    | topology.Error.InvalidChoice =>
+      ok (toStr "random choice outside its bound")
+    | topology.Error.InvalidForest => ok (toStr "invalid required forest")
+    | topology.Error.InvalidTree => ok (toStr "invalid rooted tree")
+    | topology.Error.InvalidTransition => ok (toStr "invalid tree transition")
+    | topology.Error.InsufficientWorkspace =>
+      ok (toStr "insufficient workspace")
+    | topology.Error.Overflow => ok (toStr "size or arithmetic overflow")
+    | topology.Error.StaleEpoch => ok (toStr "stale epoch")
+    | topology.Error.StaleRevision => ok (toStr "stale revision")
+    | topology.Error.Occupied => ok (toStr "occupied passage")
+    | topology.Error.InvalidGeometry => ok (toStr "invalid geometry")
+  core.fmt.Formatter.write_str formatter message
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Display for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 25:0-45:1 -/
+@[reducible]
+def topology.Error.Insts.CoreFmtDisplay : core.fmt.Display topology.Error := {
+  fmt := topology.Error.Insts.CoreFmtDisplay.fmt
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::error::Error for labyrinth_core::topology::Error}]
+    Source: 'src/topology.rs', lines 47:0-47:36 -/
+@[reducible]
+def topology.Error.Insts.CoreErrorError : core.error.Error topology.Error := {
+  fmtDebugInst := topology.Error.Insts.CoreFmtDebug
+  fmtDisplayInst := topology.Error.Insts.CoreFmtDisplay
+}
+
+/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}::fmt]:
+    Source: 'src/topology.rs', lines 49:9-49:14
+    Visibility: public -/
+def topology.Edge.Insts.CoreFmtDebug.fmt
+  (self : topology.Edge) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.u
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.v
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Edge") (toStr "u")
+    dyn (toStr "v") dyn1
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:9-49:14 -/
+@[reducible]
+def topology.Edge.Insts.CoreFmtDebug : core.fmt.Debug topology.Edge := {
+  fmt := topology.Edge.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::marker::Copy for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:23-49:27 -/
+@[reducible]
+def topology.Edge.Insts.CoreMarkerCopy : core.marker.Copy topology.Edge := {
+  cloneInst := topology.Edge.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::marker::StructuralPartialEq for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:29-49:38 -/
+@[reducible]
+def topology.Edge.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq topology.Edge := {
+}
+
+/-- [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Edge}::assert_fields_are_eq]:
+    Source: 'src/topology.rs', lines 49:40-49:42
+    Visibility: public -/
+def topology.Edge.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : topology.Edge) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:40-49:42 -/
+@[reducible]
+def topology.Edge.Insts.CoreCmpEq : core.cmp.Eq topology.Edge := {
+  partialEqInst := topology.Edge.Insts.CoreCmpPartialEqEdge
+  assert_fields_are_eq := topology.Edge.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}::fmt]:
+    Source: 'src/topology.rs', lines 138:9-138:14
+    Visibility: public -/
+def topology.Carrier.Insts.CoreFmtDebug.fmt
+  (self : topology.Carrier) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.offsets
+  let dyn1 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.neighbors
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec
+      topology.Edge.Insts.CoreFmtDebug)) self.edges
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Carrier") (toStr
+    "offsets") dyn (toStr "neighbors") dyn1 (toStr "edges") dyn2
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}]
+    Source: 'src/topology.rs', lines 138:9-138:14 -/
+@[reducible]
+def topology.Carrier.Insts.CoreFmtDebug : core.fmt.Debug topology.Carrier := {
+  fmt := topology.Carrier.Insts.CoreFmtDebug.fmt
+}
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::marker::StructuralPartialEq for labyrinth_core::topology::Carrier}]
+    Source: 'src/topology.rs', lines 138:16-138:25 -/
+@[reducible]
+def topology.Carrier.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq topology.Carrier := {
+}
+
+/-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Carrier> for labyrinth_core::topology::Carrier}::eq]:
+    Source: 'src/topology.rs', lines 138:16-138:25
+    Visibility: public -/
+def topology.Carrier.Insts.CoreCmpPartialEqCarrier.eq
+  (self : topology.Carrier) (other : topology.Carrier) : Result Bool := do
+  let b ←
+    alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize self.offsets
+      other.offsets
+  if b
+  then
+    let b1 ←
+      alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize
+        self.neighbors other.neighbors
+    if b1
+    then
+      alloc.vec.partial_eq.PartialEqVec.eq
+        topology.Edge.Insts.CoreCmpPartialEqEdge self.edges other.edges
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Carrier> for labyrinth_core::topology::Carrier}]
+    Source: 'src/topology.rs', lines 138:16-138:25 -/
+@[reducible]
+impl_def topology.Carrier.Insts.CoreCmpPartialEqCarrier : core.cmp.PartialEq
+  topology.Carrier topology.Carrier := {
+  eq := topology.Carrier.Insts.CoreCmpPartialEqCarrier.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    topology.Carrier.Insts.CoreCmpPartialEqCarrier
+}
+
+/-- [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Carrier}::assert_fields_are_eq]:
+    Source: 'src/topology.rs', lines 138:27-138:29
+    Visibility: public -/
+def topology.Carrier.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : topology.Carrier) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Carrier}]
+    Source: 'src/topology.rs', lines 138:27-138:29 -/
+@[reducible]
+def topology.Carrier.Insts.CoreCmpEq : core.cmp.Eq topology.Carrier := {
+  partialEqInst := topology.Carrier.Insts.CoreCmpPartialEqCarrier
+  assert_fields_are_eq := topology.Carrier.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::is_empty]:
+    Source: 'src/topology.rs', lines 271:4-273:5
+    Visibility: public -/
+def topology.Carrier.is_empty (self : topology.Carrier) : Result Bool := do
+  let i ← topology.Carrier.len self
+  ok (i = 0#usize)
+
 /-- [labyrinth_core::tree::{impl core::fmt::Debug for labyrinth_core::tree::Error}::fmt]:
     Source: 'src/tree.rs', lines 1:9-1:14
     Visibility: public -/
@@ -82,16 +3684,20 @@ def tree.Error.Insts.CoreCmpPartialEqError.eq
 /-- Trait implementation: [labyrinth_core::tree::{impl core::cmp::PartialEq<labyrinth_core::tree::Error> for labyrinth_core::tree::Error}]
     Source: 'src/tree.rs', lines 1:29-1:38 -/
 @[reducible]
-def tree.Error.Insts.CoreCmpPartialEqError : core.cmp.PartialEq tree.Error
+impl_def tree.Error.Insts.CoreCmpPartialEqError : core.cmp.PartialEq tree.Error
   tree.Error := {
   eq := tree.Error.Insts.CoreCmpPartialEqError.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    tree.Error.Insts.CoreCmpPartialEqError
 }
 
 /-- Trait implementation: [labyrinth_core::tree::{impl core::cmp::Eq for labyrinth_core::tree::Error}]
     Source: 'src/tree.rs', lines 1:40-1:42 -/
 @[reducible]
-def tree.Error.Insts.CoreCmpEq : core.cmp.Eq tree.Error := {
+impl_def tree.Error.Insts.CoreCmpEq : core.cmp.Eq tree.Error := {
   partialEqInst := tree.Error.Insts.CoreCmpPartialEqError
+  assert_fields_are_eq := core.cmp.Eq.assert_fields_are_eq.default
+    tree.Error.Insts.CoreCmpEq
 }
 
 /-- [labyrinth_core::tree::reaches]: loop body 0:

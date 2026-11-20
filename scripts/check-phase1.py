@@ -59,21 +59,32 @@ def extract(root, destination):
         ],
         root,
     )
+    if (destination / "LabyrinthCore/FunsExternal_Template.lean").exists():
+        raise SystemExit("Extraction requires an unmodeled external Rust operation")
 
 
-def check_axioms(output):
-    text = output.strip()
-    if text == "'set_parent_spec' does not depend on any axioms":
-        return
-    match = re.fullmatch(
-        r"'set_parent_spec' depends on axioms: \[(.*)\]", text, re.DOTALL
-    )
-    if match is None:
-        raise ValueError("Could not parse the Lean axiom audit")
-    names = {name.strip() for name in match[1].split(",") if name.strip()}
-    unexpected = names - {"propext", "Classical.choice", "Quot.sound"}
-    if unexpected:
-        raise ValueError("Unexpected theorem axioms: " + ", ".join(sorted(unexpected)))
+def check_axioms(output, expected):
+    audited = set()
+    end = 0
+    for match in re.finditer(
+        r"'([^']+)' (?:does not depend on any axioms|depends on axioms: \[([^\]]*)\])",
+        output,
+    ):
+        if output[end : match.start()].strip():
+            raise ValueError("Could not parse the Lean axiom audit")
+        theorem = match[1]
+        if theorem in audited:
+            raise ValueError("Duplicate theorem in the Lean axiom audit: " + theorem)
+        audited.add(theorem)
+        names = {name.strip() for name in (match[2] or "").split(",") if name.strip()}
+        unexpected = names - {"propext", "Classical.choice", "Quot.sound"}
+        if unexpected:
+            raise ValueError(
+                "Unexpected theorem axioms: " + ", ".join(sorted(unexpected))
+            )
+        end = match.end()
+    if output[end:].strip() or audited != set(expected):
+        raise ValueError("Incomplete or malformed Lean axiom audit")
 
 
 pins = json.loads((ROOT / "toolchain-pins.json").read_text())
@@ -96,10 +107,17 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-model-") as generated:
         if actual.read_bytes() != expected.read_bytes():
             raise SystemExit(f"Generated Lean differs from checked-in {module}")
 run(["lake", "build"], ROOT / "lean")
+audit_source = (ROOT / "lean/Audit.lean").read_text()
+expected_theorems = re.findall(
+    r"^#print axioms ([A-Za-z_][A-Za-z_0-9.]*)$", audit_source, re.MULTILINE
+)
+if not expected_theorems or len(expected_theorems) != len(set(expected_theorems)):
+    raise SystemExit("The axiom audit must list distinct production theorems")
 check_axioms(
     run(
         ["lake", "env", "lean", "-DwarningAsError=true", "Audit.lean"], ROOT / "lean"
-    ).stdout
+    ).stdout,
+    expected_theorems,
 )
 lean_path = run(["lake", "env", "printenv", "LEAN_PATH"], ROOT / "lean").stdout.strip()
 
@@ -130,7 +148,7 @@ with tempfile.TemporaryDirectory(prefix="labyrinth-negative-") as scratch:
     )
     audit = run(["lean", "-DwarningAsError=true", "AxiomGuard.lean"], negative / "lean")
     try:
-        check_axioms(audit.stdout)
+        check_axioms(audit.stdout, ["set_parent_spec"])
     except ValueError as error:
         if str(error) != "Unexpected theorem axioms: unapproved_axiom":
             raise

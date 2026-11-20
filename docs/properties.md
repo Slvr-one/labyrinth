@@ -1,4 +1,4 @@
-# Phase 1: actual Rust-to-Lean correspondence
+# Verification coverage and reproduction
 
 ## Scope
 
@@ -100,4 +100,65 @@ or verified by this feasibility operation.
 
 To review the correspondence by hand, read [`tree.rs`](../rust/src/tree.rs), its generated
 [`Funs.lean`](../lean/LabyrinthCore/Funs.lean), and
-[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together.
+[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together. Its limitations above still
+apply; phase-2 structural and transition proofs are not established by the phase-1 theorem.
+
+## Phase 2 — native checkpoint, formal gate incomplete
+
+The native crate now implements validated CSR carriers, ordinary DFS, required-forest
+contraction/quotient DFS/expansion, sparse tree edits, combined grid/polar layouts, reservations,
+shatter, suspension and epoch replacement. `Scene::advance_motion` performs production
+boundary-event planning with reusable flow/search storage and sparse edge proposals; the
+example no longer supplies a geometry-specific planner.
+
+Spinning admission uses conservative radius/clearance bounds and checks the chosen exterior
+portal pair over every quantized one-unit outer-ring sweep. Some geometrically feasible
+layouts can be rejected by these conservative bounds. Accepted proposals still pass the
+existing geometry, route, reservation and tree checks before publication. The returned
+positive subdivision divisor specifies the consumed phase increments; errors never represent
+a partially committed request.
+
+Native tests cover multiple circles, unequal ring counts/sectors, impossible spinning layouts,
+safe resized high-sector layouts, reserved crossings, stale workspaces and atomic rejection.
+The seeded native example traverses grid → polar interior → different portal → grid in both
+modes and completes three motion periods. Allocation instrumentation observed zero allocations
+after initialization for the exercised crossings, ticks and production planning events.
+These are execution results, not universal proofs or browser acceptance.
+
+Several handwritten proof foundations check, including the parent representation's
+interpretation as a connected acyclic graph and extracted validation/loop helpers. The extracted
+`mutation_reroot_preserves` theorem establishes totality for valid carriers, trees and workspaces:
+every undirected tree edge is preserved, errors leave the tree unchanged, and success occurs
+exactly when the requested root is in bounds and path capacity is sufficient. Its axiom audit
+contains only `propext`, `Classical.choice` and `Quot.sound`.
+
+Both carrier constructors now have checked totality/soundness and valid-input acceptance
+specifications. Generic DFS accepts bounded, root-reachable directed CSR, including parallel
+arcs, under a total range-correct RNG contract. It proves all vertices discovered, a rooted
+parent tree and exact incoming original-slot witnesses. The public `Tree::dfs` specification
+returns `TreeValid` on valid carrier inputs with sufficient workspace and preserves RNG and
+workspace on invalid-root or insufficient-capacity rejection. The twenty-seven production roots
+listed in `Audit.lean` use only the standard axioms above.
+
+Checked helper composition now includes exact required-forest components, dense quotient
+labels, degree counting, occupied-slot witnesses, quotient reachability, actual quotient DFS
+acceptance, expanded selected-carrier acceptance and sparse batch attachment. Literal
+orientation loops also prove all-cell reachability, exact parent/carrier edges, `TreeValid`
+publication and workspace preservation. The current handwritten library builds strictly;
+the outer constrained-constructor and scene-publication specifications remain unfinished.
+Required-forest validation and malformed-forest rejection also check, including unchanged
+RNG/workspace before quotient traversal. Prefix-offset totality covers checked-add overflow.
+The final selected-carrier/orientation publication helper preserves required edges and validity
+on the original carrier; connecting every stage in the outer constructor remains unfinished.
+The full source-extraction/correspondence gate remains incomplete.
+The actual `edit_edges` theorem checks totality, error atomicity, workspace reuse,
+root/length preservation, exact removed/added edge sets, carrier membership and successful
+`TreeValid` preservation. Actual exchange and accepted finite trace-prefix preservation also
+check: each recorded prefix remains valid, and individual errors leave publication unchanged.
+Protected input tree edges disjoint from the actual removal list are preserved by successful
+edits; this does not prove the separate scene guards establish that disjointness.
+The checked-in generated core model does not currently cover the full scene/planner source.
+The correspondence runner rejects model drift and unmodeled external-operation templates;
+it must not be treated as a phase-2 pass until the complete source/model/proof gate succeeds.
+
+No Wasm or browser result is claimed.
