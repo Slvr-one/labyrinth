@@ -10,6 +10,7 @@ import LabyrinthCore.ConstructorSceneExpandedCarrier
 import LabyrinthCore.ConstructorOrientation
 import LabyrinthCore.ConstructorSceneRejection
 import LabyrinthCore.ConstructorSceneAcceptance
+import LabyrinthCore.ConstructorSceneTotal
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -38,3 +39,10 @@ import LabyrinthCore.ConstructorSceneAcceptance
 #print axioms Labyrinth.constructor_scene_orientation_accepts
 #print axioms Labyrinth.constructor_scene_rejects_invalid_forest
 #print axioms Labyrinth.constructor_scene_publish_accepts
+#print axioms Labyrinth.constructor_scene_quotient_prefix_total
+#print axioms Labyrinth.constructor_scene_quotient_prefix_accepts
+#print axioms Labyrinth.constructor_scene_capture
+#print axioms Labyrinth.constructor_scene_after_prefix_total
+#print axioms Labyrinth.constructor_scene_dfs_guarded
+#print axioms Labyrinth.constructor_scene_dfs_accepts
+#print axioms Labyrinth.constructor_scene_dfs_spec
