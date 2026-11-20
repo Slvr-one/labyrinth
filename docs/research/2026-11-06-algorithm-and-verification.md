@@ -4,7 +4,7 @@ repository: Slvr-one/labyrinth
 git_commit: e12b7c61586fec44afb8024785347e56659dfe1d
 branch: research/labyrinth-verification
 topic: Existing maze algorithm and Rust-to-Lean verification prerequisites
-status: reviewed-for-planning
+status: reviewed
 tags: [research, maze, rust, lean, aeneas]
 ---
 
@@ -13,28 +13,26 @@ tags: [research, maze, rust, lean, aeneas]
 ## Question and current state
 
 What does the Portfolio maze actually implement, what can be reused for a standalone
-Rust/Wasm library with Lean proofs, and which claims in the pending plan need correction?
+Rust/Wasm library with Lean proofs, and which claims in the original proposal need correction?
 
 At the researched library revision, only LICENSE exists. There is no Rust crate, Lean
-package, proof, extraction pipeline, or Wasm artifact. The [existing plan](https://github.com/NavadaAI/Atlas/pull/317)
-is open, not landed; this research does not approve that plan or implement it.
+package, proof, extraction pipeline, or Wasm artifact.
 
-Scope recorded in that plan: a public Apache-2.0 library; Rust/Wasm; all listed structural,
-dynamic, solvability, solver, and difficulty properties in the first milestone. Integrating
-the library into Portfolio is a separate follow-on. No property is dropped by this research.
+Target scope: a public Apache-2.0 library; Rust/Wasm; all listed structural, dynamic,
+solvability, solver, and difficulty properties in the first milestone. Integrating the
+library into Portfolio is a separate phase. No property is dropped by this research.
 
 ## Sources and evidence levels
 
 - [Portfolio source](https://github.com/Slvr-one/portfolio/blob/b332b70a1df233ce4d3c5306f439f340a0b740d0/site/public/labyrinth.js)
   and [configuration](https://github.com/Slvr-one/portfolio/blob/b332b70a1df233ce4d3c5306f439f340a0b740d0/site/src/config.rs)
   are the implementation evidence. Portfolio is private; access is required for these links.
-- [Plan revision under review](https://github.com/NavadaAI/Atlas/blob/4ac687ab16d4e7bd95e49d1da3f632a03b0e1355/Docs/projects/labyrinth/NAV-1063-labyrinth-lean4-plan.md)
-  records intent, not implemented behavior. Access is required.
+- The original design proposal records intent, not implemented behavior.
 - Upstream code, toolchain pins, licenses, and registry metadata below are first-party
   documentation, not evidence that extraction works on this project.
 - Local smoke results below are sampled execution, not universal proofs.
-- Exa was unavailable. Research used first-party GitHub/raw pages, authenticated GitHub
-  API reads, and crates.io metadata. No external toolchain was installed.
+- Research used first-party GitHub/raw pages, authenticated GitHub API reads, and
+  crates.io metadata. No external toolchain was installed.
 
 ## Existing rectangular maze
 
@@ -82,7 +80,7 @@ walker selection; break deadlines and patch rectangles gate subsequent clicks. T
 contract must distinguish these inputs from maze topology rather than calling all current
 browser state independent.
 
-## Corrections required in the existing plan
+## Corrections to the original proposal
 
 | Current claim | Correction supported by source |
 |---|---|
@@ -150,7 +148,7 @@ establishing that the concrete representation induces an `IsTree` graph.
 
 The existing maze crates are useful references, not evidence that the full requested
 proof suite can be imported. In particular, amaze counts degree-zero or degree-one cells
-as dead ends, whereas the pending plan asks for degree exactly one.
+as dead ends, whereas the original proposal asks for degree exactly one.
 
 ## Executed checks
 
@@ -173,10 +171,9 @@ as dead ends, whereas the pending plan asks for degree exactly one.
 
 No Rust library tests, Lean builds, translation, theorem checks, Wasm build, or end-to-end
 proof were run. The environment lacks Lean/Lake/Elan, Charon/Aeneas, OPAM, and wasm-pack;
-Rust 1.98.1 and Cargo are present. No `hack/spec_metadata.sh` exists in these repos and
-labyrinth is not mapped to HumanLayer thoughts; metadata above was gathered directly.
+Rust 1.98.1 and Cargo are present.
 
-## Questions for the research/plan gate
+## Open design questions
 
 1. Are solve-rate and difficulty properties about a frozen abstract maze, or about a solver
    racing ongoing rewiring? The current source specifies neither. Start/exit, policy,
@@ -190,22 +187,12 @@ labyrinth is not mapped to HumanLayer thoughts; metadata above was gathered dire
    selecting it as the demonstrated correspondence mechanism. All required properties stay
    in scope; lack of local feasibility evidence is not permission to replace them with tests.
 
-## Owner review — 2026-11-06
+## Design requirements
 
-- Research accepted for a corrected implementation plan; implementation remains unapproved.
-- Solver analysis must cover both frozen and evolving mazes.
-- Overall delivery includes validation through the Portfolio UI, not just library/proof builds.
-  The reported inability of walkers to enter circular mazes is an acceptance failure.
-  Plan genuine grid-to-polar passage connectivity and traversal; do not simulate crossings
-  by drawing walkers over walls.
-- Portfolio integration remains a distinct phase/PR, but stays within the overseen delivery
-  through browser acceptance. The earlier separate-follow-on decision is not a stopping point.
-- Documentation commits and PRs are authorized. Merging and deployment remain separate gates.
-- The five-phase order was approved. Both spinning-doorway and bounded-twisting ring modes
-  must be configurable, alongside behavior tunables; valid passage/collision rules remain
-  enforced constraints.
-- The [canonical implementation plan](../plans/2026-11-06-labyrinth-library-and-ui.md)
-  replaces the earlier proposal as the detailed design, pending explicit implementation approval.
-- The detailed plan was subsequently approved, then execution was explicitly parked before
-  phase 1 started. Keep the approved scope and resume point; do not install tooling or begin
-  implementation until the owner resumes the work.
+- Solver analysis covers both frozen and evolving mazes.
+- Validation includes the Portfolio UI, not just library/proof builds. Walkers must be able
+  to enter circular mazes: the design needs genuine grid-to-polar passage connectivity and
+  traversal, not crossings simulated by drawing walkers over walls.
+- Portfolio integration is a distinct phase, validated through browser checks.
+- Both spinning-doorway and bounded-twisting ring modes are configurable, alongside behavior
+  tunables; valid passage/collision rules remain enforced constraints.
