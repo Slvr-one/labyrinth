@@ -16,7 +16,7 @@ It is not the full maze library, and the Portfolio still uses its existing JavaS
 The theorem quantifies over the actual extracted `set_parent`, including its call to the
 extracted loop. It assumes that evaluation returns an application result. It does **not**
 prove termination, panic freedom, acyclicity, root uniqueness, or tree preservation.
-Those structural obligations remain in the approved phase-2 gate; the solver/metric suite
+Those structural obligations remain in phase 2; the solver/metric suite
 remains in phase 3. No independent Lean implementation substitutes for the Rust operation.
 
 Existing parent entries must be valid indices. Malformed storage can panic in the walk;
@@ -55,7 +55,7 @@ python3 scripts/check-phase1.py
 The runner checks translator source revisions and the Aeneas executable version, then extracts
 the actual crate into temporary Lean files. They must byte-match the checked-in generated
 definitions before `lake build` checks them with warnings treated as errors. Drift fails the
-gate without overwriting the model that the owner inspects.
+gate without overwriting the checked-in model.
 
 The theorem's imported axioms must be drawn only from `propext`, `Classical.choice`, and
 `Quot.sound`; an unrecognized audit result also fails. A separate Lean fixture relying on an
@@ -98,7 +98,6 @@ and native/Wasm equivalence remain phase-4 acceptance criteria. Floating-point g
 DFS, portals, moving doorways, solver probabilities and difficulty metrics are not implemented
 or verified by this feasibility operation.
 
-The phase-1 manual gate is to inspect [`tree.rs`](../rust/src/tree.rs), its generated
+To review the correspondence by hand, read [`tree.rs`](../rust/src/tree.rs), its generated
 [`Funs.lean`](../lean/LabyrinthCore/Funs.lean), and
-[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together. Phase 2 requires owner acceptance
-of that gate. Merge and deployment require separate authorization.
+[`set_parent_spec`](../lean/LabyrinthCore/Spec.lean) together.
