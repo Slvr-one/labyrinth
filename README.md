@@ -4,28 +4,20 @@ A Rust maze core with connected grid/polar topology; Lean verification and Wasm 
 
 ## Status
 
-Phase 1 is manually accepted. Phase 2 has a native connected-scene implementation, production
-boundary-event planning, and handwritten structural proofs in progress. Native scenarios pass;
-the complete extraction/proof gate does not. This is not a verified library milestone.
-Solver/metric proofs, Wasm parity and Portfolio integration remain later gates; the website
-still uses its existing JavaScript.
+Phase 1 has a checked Rust-to-Lean feasibility operation. Phase 2 has a native connected-scene
+implementation, production boundary-event planning, and handwritten structural proofs in
+progress. Native scenarios pass; the complete extraction/proof gate does not. This is not a
+verified library milestone. Solver/metric proofs, Wasm parity and Portfolio integration remain
+later phases; the website still uses its existing JavaScript.
 
 - [Exact proof coverage, trust assumptions and reproduction](docs/properties.md)
 - [Pinned toolchain revisions](toolchain-pins.json)
 
-## Research and planning
+## Research
 
 - [Algorithm and verification research — 2026-11-06](docs/research/2026-11-06-algorithm-and-verification.md)
-  records the source behavior, toolchain prerequisites, sampled checks, and metric-definition
-  gaps. Research and the detailed plan are reviewed.
-- [Approved implementation plan — phase 2 in progress](docs/plans/2026-11-06-labyrinth-library-and-ui.md)
-  retains the full proof/metric scope, configurable ring modes, and connected grid-to-circle
-  walker traversal through final browser acceptance.
-- [Planning track](https://github.com/NavadaAI/Atlas/pull/317)
-  retains the original decisions and points to the canonical library documents; access is required.
-
-The owner accepted phase 1 and authorized phase 2 on 2026-11-14. Phase-2 manual acceptance,
-merging and deployment remain separate gates.
+  records the source behavior, toolchain prerequisites, sampled checks, metric-definition
+  gaps, and design requirements.
 
 ## Native trace
 
