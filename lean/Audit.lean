@@ -716,7 +716,7 @@ import LabyrinthCore.SceneGeometryLayoutTotal
 #print axioms Labyrinth.circle_new_ring_starts
 #print axioms Labyrinth.layout_new_loop0_ring_starts
 #print axioms Labyrinth.push_edge_spec
-#print axioms Labyrinth.sectorsFrom_of_ge'
+#print axioms Labyrinth.sectorsFrom_past_end
 #print axioms Labyrinth.layout_new_loop7_inner_total
 #print axioms Labyrinth.edges_cond_push
 #print axioms Labyrinth.layout_new_loop7_sectors_total

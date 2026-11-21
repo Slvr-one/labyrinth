@@ -31,7 +31,7 @@ theorem push_edge_spec (edges : alloc.vec.Vec topology.Edge) (u v : Std.Usize)
 
 /-! ### Loop 7: ring and sector adjacency -/
 
-theorem sectorsFrom_of_ge' (cs : List polar.Circle) (ci : Nat) (h : cs.length ≤ ci) :
+theorem sectorsFrom_past_end (cs : List polar.Circle) (ci : Nat) (h : cs.length ≤ ci) :
     sectorsFrom cs ci = 0 := by
   unfold sectorsFrom
   rw [List.drop_of_length_le h]
@@ -250,7 +250,7 @@ theorem layout_new_loop7_total (circles : alloc.vec.Vec polar.Circle)
     · simp only [hlt, ↓reduceIte, spec_ok]
       have hge : circles.val.length ≤ k.val := by
         by_contra hcon; exact hlt (by simp only [alloc.vec.Vec.len]; scalar_tac)
-      rw [sectorsFrom_of_ge' circles.val k.val hge] at hlen
+      rw [sectorsFrom_past_end circles.val k.val hge] at hlen
       omega
   · exact le_refl _
 
