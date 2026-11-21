@@ -22,6 +22,7 @@ import LabyrinthCore.SceneConstructionOccupants
 import LabyrinthCore.SceneConstruction
 import LabyrinthCore.ScenePreflightRoutes
 import LabyrinthCore.ScenePreflight
+import LabyrinthCore.SceneEditPublish
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -217,3 +218,11 @@ import LabyrinthCore.ScenePreflight
 #print axioms Labyrinth.pf_route_call_certificate
 #print axioms Labyrinth.scene_preflight_edit_frame
 #print axioms Labyrinth.scene_preflight_edit_accepted
+#print axioms Labyrinth.commit_edit_phase_loop
+#print axioms Labyrinth.commit_edit_loop2_eq
+#print axioms Labyrinth.vec_extend_usize
+#print axioms Labyrinth.commit_edit_routes_loop
+#print axioms Labyrinth.scene_commit_edit_spec
+#print axioms Labyrinth.all_edges_of_cells
+#print axioms Labyrinth.scene_commit_edit_routes
+#print axioms Labyrinth.pf_route_call_len

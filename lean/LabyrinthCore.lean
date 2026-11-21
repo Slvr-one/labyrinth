@@ -60,3 +60,4 @@ import LabyrinthCore.SceneConstructionOccupants
 import LabyrinthCore.SceneConstruction
 import LabyrinthCore.ScenePreflightRoutes
 import LabyrinthCore.ScenePreflight
+import LabyrinthCore.SceneEditPublish
