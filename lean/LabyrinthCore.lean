@@ -70,3 +70,6 @@ import LabyrinthCore.SceneReservation
 import LabyrinthCore.SceneReservationHolds
 import LabyrinthCore.SceneReservationCrossing
 import LabyrinthCore.SceneReservationRemoval
+import LabyrinthCore.SceneShatterDrain
+import LabyrinthCore.SceneReservationInv
+import LabyrinthCore.SceneReservationTick

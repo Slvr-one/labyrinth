@@ -32,6 +32,9 @@ import LabyrinthCore.SceneReservation
 import LabyrinthCore.SceneReservationHolds
 import LabyrinthCore.SceneReservationCrossing
 import LabyrinthCore.SceneReservationRemoval
+import LabyrinthCore.SceneShatterDrain
+import LabyrinthCore.SceneReservationInv
+import LabyrinthCore.SceneReservationTick
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -294,3 +297,37 @@ import LabyrinthCore.SceneReservationRemoval
 #print axioms Labyrinth.check_removal_exact
 #print axioms Labyrinth.crossing_blocks_removal
 #print axioms Labyrinth.crossing_blocks_own_edge
+#print axioms Labyrinth.drain_scan_spec
+#print axioms Labyrinth.drain_park_spec
+#print axioms Labyrinth.parkedWalker_cell
+#print axioms Labyrinth.drainW_cell
+#print axioms Labyrinth.patchHas_parked
+#print axioms Labyrinth.touches_drainW
+#print axioms Labyrinth.stage_eq_spec
+#print axioms Labyrinth.touches_iff_scan
+#print axioms Labyrinth.drainW_succ_iff
+#print axioms Labyrinth.drainW_succ_skip
+#print axioms Labyrinth.drainW_succ_hit
+#print axioms Labyrinth.parked_drainW
+#print axioms Labyrinth.drainLists_skip
+#print axioms Labyrinth.drainLists_park
+#print axioms Labyrinth.drain_patches_body_spec
+#print axioms Labyrinth.drain_patches_spec
+#print axioms Labyrinth.walkerMult_le_crossMult
+#print axioms Labyrinth.walkerMult_notCrossing
+#print axioms Labyrinth.crossMult_set
+#print axioms Labyrinth.crossMult_relaxed
+#print axioms Labyrinth.resInvL_relaxed
+#print axioms Labyrinth.resInv_begin_crossing_success
+#print axioms Labyrinth.begin_crossing_resinv
+#print axioms Labyrinth.fromU64U32_val
+#print axioms Labyrinth.tick_loop0_spec
+#print axioms Labyrinth.relaxed_refl
+#print axioms Labyrinth.relaxed_trans
+#print axioms Labyrinth.relaxed_set
+#print axioms Labyrinth.tick_ready_relaxed
+#print axioms Labyrinth.drain_patches_relaxed
+#print axioms Labyrinth.tick_loop1_relaxed
+#print axioms Labyrinth.tick_active_resinv
+#print axioms Labyrinth.resInv_remaining_ok
+#print axioms Labyrinth.resInv_held_positive
