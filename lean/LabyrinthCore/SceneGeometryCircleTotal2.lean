@@ -180,7 +180,8 @@ theorem layout_new_loop1_spec (ps : Slice polar.PortalSpec) (margin : Std.I32)
     (hcl : counts.val.length = circles.val.length)
     (hcnt : ∀ k (h : k < counts.val.length), (counts.val[k]'h).val ≤ i.val) :
     scene.Layout.new_loop1 ps margin circles status bands counts i ⦃ r =>
-      r.2.1.val.length = circles.val.length ∧ r.2.2.val.length = circles.val.length ⦄ := by
+      r.2.1.val.length = circles.val.length ∧ r.2.2.val.length = circles.val.length ∧
+      (status = .Ok () → ∀ e, r.1 = .Err e → e = .InvalidGeometry) ⦄ := by
   unfold scene.Layout.new_loop1
   apply loop.spec_decr_nat
     (fun st : core.result.Result Unit topology.Error × alloc.vec.Vec Std.I32 ×
@@ -188,21 +189,22 @@ theorem layout_new_loop1_spec (ps : Slice polar.PortalSpec) (margin : Std.I32)
     (fun st : core.result.Result Unit topology.Error × alloc.vec.Vec Std.I32 ×
       alloc.vec.Vec Std.Usize × Std.Usize => st.2.1.val.length = circles.val.length ∧
         st.2.2.1.val.length = circles.val.length ∧
-        ∀ k (h : k < st.2.2.1.val.length), (st.2.2.1.val[k]'h).val ≤ st.2.2.2.val)
+        (∀ k (h : k < st.2.2.1.val.length), (st.2.2.1.val[k]'h).val ≤ st.2.2.2.val) ∧
+        (status = .Ok () → ∀ e, st.1 = .Err e → e = .InvalidGeometry))
     _
-  · rintro ⟨st, bs, cs, k⟩ ⟨hbs, hcs, hck⟩
-    dsimp only at hbs hcs hck ⊢
+  · rintro ⟨st, bs, cs, k⟩ ⟨hbs, hcs, hck, hstat⟩
+    dsimp only at hbs hcs hck hstat ⊢
     unfold scene.Layout.new_loop1.body
     simp only [alloc.vec.Vec.index_slice_index, alloc.vec.Vec.index_mut_slice_index]
     by_cases hlt : k < Slice.len ps
     swap
     · simp only [hlt, ↓reduceIte, spec_ok]
-      exact ⟨hbs, hcs⟩
+      exact ⟨hbs, hcs, hstat⟩
     simp only [hlt, ↓reduceIte]
     cases st with
     | Err e =>
       simp only [core.result.Result.is_ok, Std.bind_ok, Bool.false_eq_true, ↓reduceIte, spec_ok]
-      exact ⟨hbs, hcs⟩
+      exact ⟨hbs, hcs, hstat⟩
     | Ok u =>
     simp only [core.result.Result.is_ok, Std.bind_ok, ↓reduceIte]
     have hkl : k.val < ps.val.length := by scalar_tac
@@ -220,6 +222,7 @@ theorem layout_new_loop1_spec (ps : Slice polar.PortalSpec) (margin : Std.I32)
       · exact hbs
       · exact hcs
       · intro kk hh; have := hck kk hh; omega
+      · intro _ e' h; cases h; exact hp2 e rfl
       · omega
     | Ok v =>
     simp only [Std.bind_ok, ↓reduceIte]
@@ -247,8 +250,9 @@ theorem layout_new_loop1_spec (ps : Slice polar.PortalSpec) (margin : Std.I32)
       by_cases hkc : portal.circle.val = kk
       · simp only [hkc, ite_true]; omega
       · simp only [hkc, ite_false]; have := hck kk (by simpa using hh); omega
+    · intro _ e h; cases h
     · omega
-  · exact ⟨hbl, hcl, hcnt⟩
+  · exact ⟨hbl, hcl, hcnt, fun h e he => by rw [h] at he; cases he⟩
 
 /-- The portal loop of `Layout::new` returns, and keeps one band and one count per circle. -/
 theorem layout_new_loop1_total (ps : Slice polar.PortalSpec) (margin : Std.I32)
@@ -258,10 +262,11 @@ theorem layout_new_loop1_total (ps : Slice polar.PortalSpec) (margin : Std.I32)
     (hcl : counts.val.length = circles.val.length)
     (hcnt : ∀ k (h : k < counts.val.length), (counts.val[k]'h).val ≤ i.val) :
     ∃ r, scene.Layout.new_loop1 ps margin circles status bands counts i = ok r ∧
-      r.2.1.val.length = circles.val.length ∧ r.2.2.val.length = circles.val.length := by
-  obtain ⟨r, hr, h1, h2⟩ := spec_exists_ok
+      r.2.1.val.length = circles.val.length ∧ r.2.2.val.length = circles.val.length ∧
+      (status = .Ok () → ∀ e, r.1 = .Err e → e = .InvalidGeometry) := by
+  obtain ⟨r, hr, h1, h2, h3⟩ := spec_exists_ok
     (layout_new_loop1_spec ps margin circles status bands counts i hm hb.1 hcl hcnt)
-  exact ⟨r, hr, h1, h2⟩
+  exact ⟨r, hr, h1, h2, h3⟩
 
 /-! ### `check_circle_extent` -/
 
@@ -546,24 +551,28 @@ theorem layout_new_loop2_spec (margin : Std.I32) (circles : alloc.vec.Vec polar.
     (hcl : counts.val.length = circles.val.length)
     (hm : 0 < margin.val ∧ margin.val ≤ 1000000)
     (hst : status = .Ok () → ExtentOk circles.val bands.val i.val) :
-    scene.Layout.new_loop2 margin circles status bands counts i ⦃ r => True ⦄ := by
+    scene.Layout.new_loop2 margin circles status bands counts i ⦃ r =>
+      (status = .Ok () → ∀ e, r = .Err e → ExtentErr e) ⦄ := by
   unfold scene.Layout.new_loop2
   apply loop.spec_decr_nat
     (fun st : core.result.Result Unit topology.Error × Std.Usize =>
       circles.val.length - st.2.val)
     (fun st : core.result.Result Unit topology.Error × Std.Usize =>
-      st.1 = .Ok () → ExtentOk circles.val bands.val st.2.val)
+      (st.1 = .Ok () → ExtentOk circles.val bands.val st.2.val) ∧
+      (status = .Ok () → ∀ e, st.1 = .Err e → ExtentErr e))
     _
-  · rintro ⟨st, k⟩ hsts
-    dsimp only at hsts ⊢
+  · rintro ⟨st, k⟩ ⟨hsts, hstat⟩
+    dsimp only at hsts hstat ⊢
     unfold scene.Layout.new_loop2.body
     by_cases hlt : k < alloc.vec.Vec.len circles
     swap
     · simp only [hlt, ↓reduceIte, spec_ok]
+      exact hstat
     simp only [hlt, ↓reduceIte]
     cases st with
     | Err e =>
       simp only [core.result.Result.is_ok, Std.bind_ok, Bool.false_eq_true, ↓reduceIte, spec_ok]
+      exact hstat
     | Ok u =>
     simp only [core.result.Result.is_ok, Std.bind_ok, ↓reduceIte]
     have hsts' := hsts (by cases u; rfl)
@@ -580,14 +589,14 @@ theorem layout_new_loop2_spec (margin : Std.I32) (circles : alloc.vec.Vec polar.
     rw [hr]
     simp only [Std.bind_ok]
     step as ⟨k1, hk1⟩
-    refine ⟨fun h1 j hj1 hj2 hjk => ?_, by omega⟩
+    refine ⟨fun h1 j hj1 hj2 hjk => ?_, fun _ e h => herr e h, by omega⟩
     by_cases hjk' : j < k.val
     · exact hsts' j hj1 hj2 hjk'
     · have : j = k.val := by scalar_tac
       subst this
       have := hok h1
       simpa [vec_deref_val] using this
-  · exact hst
+  · exact ⟨hst, fun h e he => by rw [h] at he; cases he⟩
 
 /-- The extent loop of `Layout::new` returns. -/
 theorem layout_new_loop2_total (margin : Std.I32) (circles : alloc.vec.Vec polar.Circle)
@@ -597,10 +606,11 @@ theorem layout_new_loop2_total (margin : Std.I32) (circles : alloc.vec.Vec polar
     (hcl : counts.val.length = circles.val.length)
     (hm : 0 < margin.val ∧ margin.val ≤ 1000000)
     (hst : status = .Ok () → ExtentOk circles.val bands.val i.val) :
-    ∃ r, scene.Layout.new_loop2 margin circles status bands counts i = ok r :=
-  let ⟨r, hr, _⟩ := spec_exists_ok
+    ∃ r, scene.Layout.new_loop2 margin circles status bands counts i = ok r ∧
+      (status = .Ok () → ∀ e, r = .Err e → e = .InvalidGeometry ∨ e = .Overflow) :=
+  let ⟨r, hr, h⟩ := spec_exists_ok
     (layout_new_loop2_spec margin circles status bands counts i n hcirc hb.1 hb.2 hcl hm hst)
-  ⟨r, hr⟩
+  ⟨r, hr, h⟩
 
 /-- `check_portal_spec` returns; every error is `InvalidGeometry`. -/
 theorem check_portal_spec_total (p : polar.PortalSpec) (circles : Slice polar.Circle)

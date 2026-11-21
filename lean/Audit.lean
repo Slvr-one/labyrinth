@@ -36,6 +36,7 @@ import LabyrinthCore.SceneGeometryCircleTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal
 import LabyrinthCore.SceneGeometryEdgesTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal3
+import LabyrinthCore.SceneGeometryLayoutTotal
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -489,3 +490,15 @@ import LabyrinthCore.SceneGeometryEdgesTotal3
 #print axioms Labyrinth.edges_sum_bound
 #print axioms Labyrinth.layout_new_loop4_positions
 #print axioms Labyrinth.layout_new_edges_total
+#print axioms Labyrinth.FromEdgesErr
+#print axioms Labyrinth.LayoutNewErr
+#print axioms Labyrinth.LayoutNewPost
+#print axioms Labyrinth.layoutNewPost_err
+#print axioms Labyrinth.new_residual
+#print axioms Labyrinth.specCells
+#print axioms Labyrinth.LayoutCapacity
+#print axioms Labyrinth.cellsFrom_zero_of_specs
+#print axioms Labyrinth.layout_new_loop0_specs
+#print axioms Labyrinth.layout_new_total
+#print axioms Labyrinth.layout_new_ok_post
+#print axioms Labyrinth.layout_new_doorway_minimum_exact

@@ -101,7 +101,8 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
     scene.Layout.new_loop5 ps cell_grid status cells portals i ⦃ r =>
       r.2.2.val.length + cells.val.length ≤ r.2.1.val.length + portals.val.length ∧
       (∀ p ∈ r.2.2.val, ∃ j, ∃ h : j < ps.val.length, p.spec = ps.val[j]'h) ∧
-      (∃ k, r.2.1.val = cells.val ++ k ∧ GridFree k) ⦄ := by
+      (∃ k, r.2.1.val = cells.val ++ k ∧ GridFree k) ∧
+      (status = .Ok () → ∀ e, r.1 = .Err e → e = topology.Error.InvalidGeometry) ⦄ := by
   unfold scene.Layout.new_loop5
   obtain ⟨hst0, hspec0, _⟩ := hinv
   apply loop.spec_decr_nat
@@ -114,9 +115,10 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
         (st.2.2.1.val[j]'h).spec = ps.val[j]'hj) ∧
       st.2.2.1.val.length + cells.val.length ≤ st.2.1.val.length + portals.val.length ∧
       st.2.1.val.length + (ps.val.length - st.2.2.2.val) ≤ Std.Usize.max ∧
-      ∃ k, st.2.1.val = cells.val ++ k ∧ GridFree k)
+      (∃ k, st.2.1.val = cells.val ++ k ∧ GridFree k) ∧
+      (status = .Ok () → ∀ e, st.1 = .Err e → e = topology.Error.InvalidGeometry))
     _
-  · rintro ⟨st, cs, pt, kk⟩ ⟨hst, hspec, hcnt, hcp, k, hk, hfree⟩
+  · rintro ⟨st, cs, pt, kk⟩ ⟨hst, hspec, hcnt, hcp, ⟨k, hk, hfree⟩, hbad⟩
     simp only at hst hspec hcnt hcp hk
     unfold scene.Layout.new_loop5.body
     by_cases hlt : kk < Slice.len ps
@@ -124,7 +126,7 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
       cases st with
       | Err e =>
         simp only [core.result.Result.is_ok, Std.bind_ok, Bool.false_eq_true, ↓reduceIte, spec_ok]
-        refine ⟨hcnt, fun p hp => ?_, k, hk, hfree⟩
+        refine ⟨hcnt, fun p hp => ?_, ⟨k, hk, hfree⟩, hbad⟩
         obtain ⟨j, hj⟩ := List.getElem_of_mem hp
         obtain ⟨hj1, hj2⟩ := hj
         obtain ⟨hjs, he⟩ := hspec j hj1
@@ -151,9 +153,12 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
         simp only [Std.bind_ok]
         step as ⟨k1, hk1⟩
         have hk1v : k1.val = kk.val + 1 := hk1
-        refine ⟨?_, hspec, hcnt, ?_, ⟨k, hk, hfree⟩, ?_⟩
+        refine ⟨?_, hspec, hcnt, ?_, ⟨k, hk, hfree⟩, ?_, ?_⟩
         · intro h; cases h
         · omega
+        · intro _ e2 h2
+          cases h2
+          exact hr.2 e rfl
         · omega
       | Ok portal =>
         simp only [Std.bind_ok]
@@ -164,7 +169,7 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
         step as ⟨pt2, hpt2⟩
         step as ⟨k1, hk1⟩
         have hk1v : k1.val = kk.val + 1 := hk1
-        refine ⟨?_, ?_, ?_, ?_, ⟨k ++ [scene.Cell.Transition kk], ?_, ?_⟩, ?_⟩
+        refine ⟨?_, ?_, ?_, ?_, ⟨k ++ [scene.Cell.Transition kk], ?_, ?_⟩, ?_, ?_⟩
         · intro _; rw [hpt2]; simp [hlen, hk1v]
         · intro j hj
           rw [hpt2] at hj
@@ -182,14 +187,16 @@ theorem layout_new_loop5_total (ps : Slice polar.PortalSpec) (cell_grid : grid.G
         · rw [hcs2]; simp; omega
         · rw [hcs2, hk]; simp
         · exact hfree.append (GridFree.singleton _ (by intro a b d h; cases h))
+        · intro _ e2 h2; cases h2
         · omega
     · simp only [hlt, ↓reduceIte, spec_ok]
-      refine ⟨hcnt, fun p hp => ?_, k, hk, hfree⟩
+      refine ⟨hcnt, fun p hp => ?_, ⟨k, hk, hfree⟩, hbad⟩
       obtain ⟨j, hj⟩ := List.getElem_of_mem hp
       obtain ⟨hj1, hj2⟩ := hj
       obtain ⟨hjs, he⟩ := hspec j hj1
       exact ⟨j, hjs, by rw [← hj2]; exact he⟩
-  · refine ⟨hst0, hspec0, by dsimp only; omega, hcap, [], by simp, by intro c hc; simp at hc⟩
+  · refine ⟨hst0, hspec0, by dsimp only; omega, hcap,
+      ⟨[], by simp, by intro c hc; simp at hc⟩, fun h e he => by simp only at he; rw [h] at he; cases he⟩
 
 /-- The ring loop of `Circle::new` pushes one start per ring while the status stays `Ok`. -/
 theorem circle_new_loop0_rs (cr rw : Std.I32) (v : alloc.vec.Vec Std.Usize) (margin : Std.I32)

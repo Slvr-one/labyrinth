@@ -74,3 +74,4 @@ import LabyrinthCore.SceneGeometryCircleTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal
 import LabyrinthCore.SceneGeometryEdgesTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal3
+import LabyrinthCore.SceneGeometryLayoutTotal
