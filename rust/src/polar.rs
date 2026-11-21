@@ -289,7 +289,10 @@ impl Circle {
         {
             return Err(Error::InvalidGeometry);
         }
-        let ring_count = i32::try_from(spec.sectors.len()).map_err(|_| Error::Overflow)?;
+        if spec.sectors.len() > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let ring_count = spec.sectors.len() as i32;
         let outer = ring_count
             .checked_mul(spec.ring_width)
             .ok_or(Error::Overflow)?;
