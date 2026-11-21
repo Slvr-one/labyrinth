@@ -86,6 +86,10 @@ import LabyrinthCore.SceneInvSummary
 import LabyrinthCore.SceneInvSwept
 import LabyrinthCore.SceneInvNewWork
 import LabyrinthCore.SceneInvNewEdit
+import LabyrinthCore.ConstructorCarrierEdgeRows
+import LabyrinthCore.ConstructorCarrierRowsErrors
+import LabyrinthCore.SceneInvNewTree
+import LabyrinthCore.SceneInvNewTreeFinal
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -944,3 +948,26 @@ import LabyrinthCore.SceneInvNewEdit
 #print axioms Labyrinth.new_routes_copy
 #print axioms Labyrinth.scene_new_edit_facts
 #print axioms Labyrinth.scene_new_full
+#print axioms Labyrinth.constructor_carrier_from_edges_rows_aux
+#print axioms Labyrinth.constructor_carrier_from_edges_rows_spec
+#print axioms Labyrinth.from_edges_error_set
+#print axioms Labyrinth.from_csr_closed
+#print axioms Labyrinth.validate_row_entry_closed
+#print axioms Labyrinth.count_edge_closed
+#print axioms Labyrinth.check_storage_closed
+#print axioms Labyrinth.csr_row_loop_closed
+#print axioms Labyrinth.csr_rows_closed
+#print axioms Labyrinth.edges_count_loop_closed
+#print axioms Labyrinth.prefix_offsets_closed
+#print axioms Labyrinth.layout_new_carrier_cells
+#print axioms Labyrinth.carrierEdge_symm
+#print axioms Labyrinth.carrier_edge_mem_adj
+#print axioms Labyrinth.carrier_sub_of_rows
+#print axioms Labyrinth.treeValid_of_live
+#print axioms Labyrinth.scene_new_tree
+#print axioms Labyrinth.scene_new_full_unconditional
+#print axioms Labyrinth.sceneReachableU_toReachable
+#print axioms Labyrinth.sceneReachable_inv_unconditional
+#print axioms Labyrinth.sceneReachableU_hold_exact
+#print axioms Labyrinth.layoutNewErr_closed
+#print axioms Labyrinth.layout_new_total_closed
