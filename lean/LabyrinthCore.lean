@@ -65,3 +65,5 @@ import LabyrinthCore.SceneGeometryValidate
 import LabyrinthCore.SceneGeometryLayoutNew
 import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
+import LabyrinthCore.SceneGeometryMinimum
+import LabyrinthCore.SceneGeometryFloor

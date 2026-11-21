@@ -27,6 +27,8 @@ import LabyrinthCore.SceneGeometryValidate
 import LabyrinthCore.SceneGeometryLayoutNew
 import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
+import LabyrinthCore.SceneGeometryMinimum
+import LabyrinthCore.SceneGeometryFloor
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -340,3 +342,12 @@ import LabyrinthCore.SceneGeometryDisk
 #print axioms Labyrinth.diskDist2_bound
 #print axioms Labyrinth.grid_rect_touches_disk_spec
 #print axioms Labyrinth.grid_rect_touches_disk_total
+#print axioms Labyrinth.doorway_minimum_arith
+#print axioms Labyrinth.doorway_minimum_exact
+#print axioms Labyrinth.okPost_and
+#print axioms Labyrinth.circle_new_floor
+#print axioms Labyrinth.CirclesFloor
+#print axioms Labyrinth.layout_new_loop0_floor
+#print axioms Labyrinth.layoutMargin
+#print axioms Labyrinth.LayoutFloor
+#print axioms Labyrinth.layout_doorway_minimum_exact
