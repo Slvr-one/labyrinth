@@ -121,3 +121,4 @@ import LabyrinthCore.SceneInvShatter
 import LabyrinthCore.SceneInvReform
 import LabyrinthCore.SceneInvNew
 import LabyrinthCore.SceneInvSummary
+import LabyrinthCore.SceneInvSwept

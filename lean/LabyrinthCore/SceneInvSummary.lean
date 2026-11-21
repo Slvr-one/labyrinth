@@ -1,16 +1,16 @@
 module
-public import LabyrinthCore.SceneInvNew
+public import LabyrinthCore.SceneInvSwept
 
-/-! The scene invariant, part 10: the summary.
+/-! The scene invariant, part 11: the summary.
 
 `SceneReachable` is the set of scenes built by `Scene::new` and then changed by any sequence of the
 covered public operations: `suspend`, `resume`, `request_layout`, `reject_layout`, `publish_layout`
 (whose candidate is itself reachable), `begin_crossing`, `motion`, `carve`, `tick`, `begin_shatter`,
-`hide_patch`, `scatter_patch` and `reform_patch`, each on whatever it returns (accepted or
-rejected). The read-only operations (`stamp`, `layout`, `tree`, `routes`, `phases`, `holds`,
-`walkers`, `clock`, `trail_revision`, `is_suspended`, `is_inactive`, `cell_pose`, `walker_pose`,
-`doorway_bounds`, `reservation`, `patch_stage`) do not change the scene. Not covered:
-`swept_doorway` (writes the scratch phase table) and `advance_motion` with the motion planner.
+`hide_patch`, `scatter_patch`, `reform_patch` and `swept_doorway`, each on whatever it returns
+(accepted or rejected). The read-only operations (`stamp`, `layout`, `tree`, `routes`, `phases`,
+`holds`, `walkers`, `clock`, `trail_revision`, `is_suspended`, `is_inactive`, `cell_pose`,
+`walker_pose`, `doorway_bounds`, `reservation`, `patch_stage`) do not change the scene. Not
+covered: `advance_motion` with the motion planner.
 
 `sceneReachable_inv`: every reachable scene satisfies the scene invariant and the hold law. The
 construction step assumes the edit preconditions `EditSafe` and `EditCapacity` of the scene
@@ -75,6 +75,9 @@ inductive SceneReachable : scene.Scene → Prop
       (duration : Std.U64) (edit : scene.Edit) (hs : SceneReachable s)
       (h : ∃ r, scene.Scene.reform_patch s stamp id duration edit = ok (r, s')) :
       SceneReachable s'
+  | swept_doorway (s s' : scene.Scene) (edge : topology.Edge) (steps : Slice Std.I32)
+      (hs : SceneReachable s)
+      (h : ∃ r, scene.Scene.swept_doorway s edge steps = ok (r, s')) : SceneReachable s'
 
 /-- Every covered operation keeps the scene invariant and the hold law, on every outcome. -/
 theorem sceneInvFull_ops (s : scene.Scene) (h : SceneInvFull s) :
@@ -156,6 +159,9 @@ theorem sceneReachable_inv {s : scene.Scene} (h : SceneReachable s) : SceneInvFu
   | reform_patch s s' stamp id duration edit _ h ih =>
     obtain ⟨r, hr⟩ := h
     exact (sceneInvFull_ops s ih).2.2.2.2.2.2.2.2.2.2.2.2 stamp id duration edit _ hr
+  | swept_doorway s s' edge steps _ h ih =>
+    obtain ⟨r, hr⟩ := h
+    exact swept_doorway_inv s edge steps ih _ hr
 
 /-! ### The hold-release question -/
 

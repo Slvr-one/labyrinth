@@ -83,6 +83,7 @@ import LabyrinthCore.SceneInvShatter
 import LabyrinthCore.SceneInvReform
 import LabyrinthCore.SceneInvNew
 import LabyrinthCore.SceneInvSummary
+import LabyrinthCore.SceneInvSwept
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -925,3 +926,6 @@ import LabyrinthCore.SceneInvSummary
 #print axioms Labyrinth.crossMult_pos
 #print axioms Labyrinth.reachable_no_leaked_hold
 #print axioms Labyrinth.reachable_unheld_zero
+#print axioms Labyrinth.swept_doorway_loop_len
+#print axioms Labyrinth.swept_doorway_shape
+#print axioms Labyrinth.swept_doorway_inv
