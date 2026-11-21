@@ -56,3 +56,5 @@ import LabyrinthCore.SceneConstructionChecks
 import LabyrinthCore.SceneConstructionSpinning
 import LabyrinthCore.SceneConstructionRequired
 import LabyrinthCore.SceneConstructionLive
+import LabyrinthCore.SceneConstructionOccupants
+import LabyrinthCore.SceneConstruction

@@ -18,6 +18,8 @@ import LabyrinthCore.SceneConstructionChecks
 import LabyrinthCore.SceneConstructionSpinning
 import LabyrinthCore.SceneConstructionRequired
 import LabyrinthCore.SceneConstructionLive
+import LabyrinthCore.SceneConstructionOccupants
+import LabyrinthCore.SceneConstruction
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -176,3 +178,9 @@ import LabyrinthCore.SceneConstructionLive
 #print axioms Labyrinth.scene_new_live_loop
 #print axioms Labyrinth.slice_eq_of_allZero
 #print axioms Labyrinth.scene_new_required_subset_live
+#print axioms Labyrinth.okPost_and
+#print axioms Labyrinth.with_capacity_val
+#print axioms Labyrinth.scene_new_not_pass
+#print axioms Labyrinth.scene_new_occupant_loop_body
+#print axioms Labyrinth.scene_new_occupant_loop
+#print axioms Labyrinth.scene_new_spec
