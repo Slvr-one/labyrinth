@@ -58,3 +58,4 @@ import LabyrinthCore.SceneGeometryArc
 import LabyrinthCore.SceneGeometryCordic
 import LabyrinthCore.SceneGeometryCircle
 import LabyrinthCore.SceneGeometryBounds
+import LabyrinthCore.SceneGeometryLayout

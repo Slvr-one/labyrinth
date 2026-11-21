@@ -20,6 +20,7 @@ import LabyrinthCore.SceneGeometryArc
 import LabyrinthCore.SceneGeometryCordic
 import LabyrinthCore.SceneGeometryCircle
 import LabyrinthCore.SceneGeometryBounds
+import LabyrinthCore.SceneGeometryLayout
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -231,3 +232,22 @@ import LabyrinthCore.SceneGeometryBounds
 #print axioms Labyrinth.polar_bounds_loop0_loop0_spec
 #print axioms Labyrinth.polar_bounds_loop0_spec
 #print axioms Labyrinth.polar_bounds_spec
+#print axioms Labyrinth.LayoutGeom
+#print axioms Labyrinth.cellCircle_lt
+#print axioms Labyrinth.layout_circle_of_spec
+#print axioms Labyrinth.layout_local_pose_spec
+#print axioms Labyrinth.layout_local_pose_step
+#print axioms Labyrinth.layout_frame_pose_spec
+#print axioms Labyrinth.layout_world_spec
+#print axioms Labyrinth.layout_cell_arc_spec
+#print axioms Labyrinth.layout_cell_arc_step
+#print axioms Labyrinth.layout_swept_arc_spec
+#print axioms Labyrinth.usize_saturating_sub_one
+#print axioms Labyrinth.walker_holds_insert_loop_spec
+#print axioms Labyrinth.array4_len_val
+#print axioms Labyrinth.walker_holds_insert_spec
+#print axioms Labyrinth.layout_holds_loop1_spec
+#print axioms Labyrinth.layout_holds_loop2_spec
+#print axioms Labyrinth.layout_holds_loop0_spec
+#print axioms Labyrinth.layout_circle_of_step
+#print axioms Labyrinth.layout_holds_spec
