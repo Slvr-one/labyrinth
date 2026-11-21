@@ -78,6 +78,7 @@ import LabyrinthCore.SceneHoldLaw
 import LabyrinthCore.SceneHoldTick
 import LabyrinthCore.SceneHoldPatches
 import LabyrinthCore.SceneHoldTickActive
+import LabyrinthCore.SceneInvCarve
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -884,3 +885,12 @@ import LabyrinthCore.SceneHoldTickActive
 #print axioms Labyrinth.tick_cases
 #print axioms Labyrinth.tick_inv
 #print axioms Labyrinth.tick_holdLaw
+#print axioms Labyrinth.commit_frame
+#print axioms Labyrinth.carveShape_residual
+#print axioms Labyrinth.carveShape_err
+#print axioms Labyrinth.carve_shape
+#print axioms Labyrinth.carve_preflight
+#print axioms Labyrinth.carve_safe
+#print axioms Labyrinth.carve_inv
+#print axioms Labyrinth.carve_holdLaw
+#print axioms Labyrinth.motion_holdLaw
