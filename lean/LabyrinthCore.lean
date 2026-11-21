@@ -61,3 +61,8 @@ import LabyrinthCore.SceneConstruction
 import LabyrinthCore.ScenePreflightRoutes
 import LabyrinthCore.ScenePreflight
 import LabyrinthCore.SceneEditPublish
+import LabyrinthCore.SceneEditPrepare
+import LabyrinthCore.SceneEditSafe
+import LabyrinthCore.SceneEditMotion
+import LabyrinthCore.SceneEditCarve
+import LabyrinthCore.ScenePreflightFrame

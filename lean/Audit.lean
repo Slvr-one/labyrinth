@@ -23,6 +23,11 @@ import LabyrinthCore.SceneConstruction
 import LabyrinthCore.ScenePreflightRoutes
 import LabyrinthCore.ScenePreflight
 import LabyrinthCore.SceneEditPublish
+import LabyrinthCore.SceneEditPrepare
+import LabyrinthCore.SceneEditSafe
+import LabyrinthCore.SceneEditMotion
+import LabyrinthCore.SceneEditCarve
+import LabyrinthCore.ScenePreflightFrame
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -226,3 +231,22 @@ import LabyrinthCore.SceneEditPublish
 #print axioms Labyrinth.all_edges_of_cells
 #print axioms Labyrinth.scene_commit_edit_routes
 #print axioms Labyrinth.pf_route_call_len
+#print axioms Labyrinth.prepare_motion_loop1_frame
+#print axioms Labyrinth.index_mut_ok_set
+#print axioms Labyrinth.prepare_motion_loop0_len
+#print axioms Labyrinth.prepare_motion_frame
+#print axioms Labyrinth.allEdges_deref
+#print axioms Labyrinth.edit_commit_safe
+#print axioms Labyrinth.edit_commit_post
+#print axioms Labyrinth.edited_edge_empty
+#print axioms Labyrinth.okPost_pair
+#print axioms Labyrinth.editSafe_next
+#print axioms Labyrinth.editSafe_required
+#print axioms Labyrinth.editSafe_work
+#print axioms Labyrinth.editSafe_stamp
+#print axioms Labyrinth.pfRoutes_congr
+#print axioms Labyrinth.motion_commit_leaf
+#print axioms Labyrinth.motion_edges_leaf
+#print axioms Labyrinth.scene_motion_spec
+#print axioms Labyrinth.carve_loop_spec
+#print axioms Labyrinth.scene_carve_spec

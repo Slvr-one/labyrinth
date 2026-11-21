@@ -1,5 +1,5 @@
 module
-public import LabyrinthCore.ScenePreflight
+public import LabyrinthCore.ScenePreflightFrame
 
 /-! Scene edits (S3), part 3: `Scene::commit_edit`. It copies the scratch phase table over the
 published one, replaces each route's cells when the edit carries routes, stamps the new revision
@@ -306,10 +306,14 @@ theorem scene_commit_edit_routes (self : scene.Scene) (edit : scene.Edit) (revis
       (edit.routes = none → s'.routes = self.routes) ∧
       (∀ rs, edit.routes = some rs → allEdges s'.routes.val = allEdges rs.val) ∧
       s'.tree = self.tree ∧ s'.layout = self.layout ∧ s'.work = self.work ∧
-      s'.required = self.required ∧ s'.walkers = self.walkers ∧ s'.holds = self.holds ⦄ := by
+      s'.required = self.required ∧ s'.walkers = self.walkers ∧ s'.holds = self.holds ∧
+      s'.next_phases = self.next_phases ∧ s'.routes.val.length = self.routes.val.length ∧
+      s'.stamp = ({ self.stamp with revision := revision } : walker.Stamp) ∧
+      s'.phases.val.length = self.phases.val.length ∧
+      (∀ j, j < self.phases.val.length → s'.phases.val[j]? = self.next_phases.val[j]?) ⦄ := by
   apply spec_mono (scene_commit_edit_spec self edit revision hph (fun rs h => (hlen rs h).le))
-  rintro s' ⟨ph, _, _, rt, hrl, hrt, rfl⟩
-  refine ⟨fun hn => ?_, fun rs hrs => ?_, rfl, rfl, rfl, rfl, rfl, rfl⟩
+  rintro s' ⟨ph, hphl, hphp, rt, hrl, hrt, rfl⟩
+  refine ⟨fun hn => ?_, fun rs hrs => ?_, rfl, rfl, rfl, rfl, rfl, rfl, rfl, hrl, rfl, hphl, hphp⟩
   · simp only [commitResult]
     have hn' : ∀ (j : Nat) (r0 : scene.Route), self.routes.val[j]? = some r0 → ∃ r1 : scene.Route,
         rt.val[j]? = some r1 ∧ r1 = r0 := by
@@ -351,14 +355,5 @@ theorem scene_commit_edit_routes (self : scene.Scene) (edit : scene.Edit) (revis
     · have h1 : rt.val[j]? = none := List.getElem?_eq_none (by omega)
       have h2 : rs.val[j]? = none := List.getElem?_eq_none (by omega)
       rw [h1, h2]
-
-/-- A passing route check means the routes cover every circle. -/
-theorem pf_route_call_len (self : scene.Scene) (edit : scene.Edit)
-    (req : alloc.vec.Vec topology.Edge) (h : PfRouteCall self edit req (core.result.Result.Ok ())) :
-    (PfRoutes self edit).val.length = self.layout.circles.val.length := by
-  unfold PfRouteCall scene.check_routes at h
-  by_cases hne : (Slice.len (PfRoutes self edit) != alloc.vec.Vec.len self.layout.circles) = true
-  · simp [hne] at h
-  · simpa [Slice.len] using hne
 
 end Labyrinth
