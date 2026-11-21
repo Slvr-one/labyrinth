@@ -51,6 +51,8 @@ import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
 import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
+import LabyrinthCore.SceneShatterStages
+import LabyrinthCore.SceneShatterBegin
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -537,3 +539,15 @@ import LabyrinthCore.SceneGeometryFloor
 #print axioms Labyrinth.layoutMargin
 #print axioms Labyrinth.LayoutFloor
 #print axioms Labyrinth.layout_doorway_minimum_exact
+#print axioms Labyrinth.stage_ne_spec
+#print axioms Labyrinth.hide_loop_spec
+#print axioms Labyrinth.hide_patch_spec
+#print axioms Labyrinth.u64_checked_add
+#print axioms Labyrinth.scatter_patch_spec
+#print axioms Labyrinth.begin_dup_spec
+#print axioms Labyrinth.begin_shatter_scan_spec
+#print axioms Labyrinth.begin_slot_spec
+#print axioms Labyrinth.begin_mark_spec
+#print axioms Labyrinth.cellVerdict_ok
+#print axioms Labyrinth.verdictUpTo_ok
+#print axioms Labyrinth.begin_shatter_spec

@@ -89,3 +89,5 @@ import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
 import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
+import LabyrinthCore.SceneShatterStages
+import LabyrinthCore.SceneShatterBegin
