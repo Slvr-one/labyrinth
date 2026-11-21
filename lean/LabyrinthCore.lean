@@ -66,3 +66,7 @@ import LabyrinthCore.SceneEditSafe
 import LabyrinthCore.SceneEditMotion
 import LabyrinthCore.SceneEditCarve
 import LabyrinthCore.ScenePreflightFrame
+import LabyrinthCore.SceneReservation
+import LabyrinthCore.SceneReservationHolds
+import LabyrinthCore.SceneReservationCrossing
+import LabyrinthCore.SceneReservationRemoval

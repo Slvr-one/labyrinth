@@ -28,6 +28,10 @@ import LabyrinthCore.SceneEditSafe
 import LabyrinthCore.SceneEditMotion
 import LabyrinthCore.SceneEditCarve
 import LabyrinthCore.ScenePreflightFrame
+import LabyrinthCore.SceneReservation
+import LabyrinthCore.SceneReservationHolds
+import LabyrinthCore.SceneReservationCrossing
+import LabyrinthCore.SceneReservationRemoval
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -250,3 +254,43 @@ import LabyrinthCore.ScenePreflightFrame
 #print axioms Labyrinth.scene_motion_spec
 #print axioms Labyrinth.carve_loop_spec
 #print axioms Labyrinth.scene_carve_spec
+#print axioms Labyrinth.walkerState_ne_ready
+#print axioms Labyrinth.stage_ne_idle
+#print axioms Labyrinth.reservation_eq_spec
+#print axioms Labyrinth.patch_contains_spec
+#print axioms Labyrinth.admission_loop_spec
+#print axioms Labyrinth.admission_spec
+#print axioms Labyrinth.reservation_spec
+#print axioms Labyrinth.array_index_ok
+#print axioms Labyrinth.vec_index_ok
+#print axioms Labyrinth.usize_add_ok
+#print axioms Labyrinth.usize_sub_ok
+#print axioms Labyrinth.u32_add_ok
+#print axioms Labyrinth.u32_sub_ok
+#print axioms Labyrinth.holds_ids_length
+#print axioms Labyrinth.holds_take_length
+#print axioms Labyrinth.prefMult_zero
+#print axioms Labyrinth.prefMult_full
+#print axioms Labyrinth.prefMult_succ
+#print axioms Labyrinth.holdMult_ge
+#print axioms Labyrinth.release_loop_spec
+#print axioms Labyrinth.slice_index_ok_eq
+#print axioms Labyrinth.usize_MAX_val
+#print axioms Labyrinth.acquire_loop_post
+#print axioms Labyrinth.acquire_holds_post
+#print axioms Labyrinth.check_capacity_loop_post
+#print axioms Labyrinth.check_hold_capacity_post
+#print axioms Labyrinth.holds_insert_loop_spec
+#print axioms Labyrinth.mem_take_iff
+#print axioms Labyrinth.holds_insert_spec
+#print axioms Labyrinth.okPost_ok_iff
+#print axioms Labyrinth.stamp_gate_ok
+#print axioms Labyrinth.begin_crossing_outcome
+#print axioms Labyrinth.stampFail_scene
+#print axioms Labyrinth.begin_crossing_rejection_frame
+#print axioms Labyrinth.rectMeet_self
+#print axioms Labyrinth.rect_intersects_spec
+#print axioms Labyrinth.removal_loop_spec
+#print axioms Labyrinth.check_removal_exact
+#print axioms Labyrinth.crossing_blocks_removal
+#print axioms Labyrinth.crossing_blocks_own_edge
