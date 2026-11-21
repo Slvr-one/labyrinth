@@ -73,6 +73,10 @@ import LabyrinthCore.SceneDoorwayLocal
 import LabyrinthCore.SceneInvFresh
 import LabyrinthCore.SceneInvCapacity
 import LabyrinthCore.SceneInvMotion
+import LabyrinthCore.SceneInvEdit
+import LabyrinthCore.SceneHoldLaw
+import LabyrinthCore.SceneHoldTick
+import LabyrinthCore.SceneHoldPatches
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -830,3 +834,46 @@ import LabyrinthCore.SceneInvMotion
 #print axioms Labyrinth.preflight_routes_len
 #print axioms Labyrinth.motion_shape
 #print axioms Labyrinth.motion_safe
+#print axioms Labyrinth.edge_new_of_ends
+#print axioms Labyrinth.avoids_kept
+#print axioms Labyrinth.edited_keeps_crossings
+#print axioms Labyrinth.phaseRange_of_index
+#print axioms Labyrinth.sceneInv_of_edit
+#print axioms Labyrinth.same_phases_range
+#print axioms Labyrinth.motion_phases_range
+#print axioms Labyrinth.motion_phases_held
+#print axioms Labyrinth.motion_inv
+#print axioms Labyrinth.holdEqL_le
+#print axioms Labyrinth.touches_crossSub
+#print axioms Labyrinth.patchClear_crossSub
+#print axioms Labyrinth.sameCrossings_relaxed
+#print axioms Labyrinth.sameCrossings_symm
+#print axioms Labyrinth.crossMult_same
+#print axioms Labyrinth.holdEqL_same
+#print axioms Labyrinth.sweep_sameCrossings
+#print axioms Labyrinth.crossSub_of_same
+#print axioms Labyrinth.holdLaw_of_eq_fields
+#print axioms Labyrinth.suspend_holdLaw
+#print axioms Labyrinth.resume_holdLaw
+#print axioms Labyrinth.request_layout_holdLaw
+#print axioms Labyrinth.reject_layout_holdLaw
+#print axioms Labyrinth.publish_layout_holdLaw
+#print axioms Labyrinth.admitted_not_patch
+#print axioms Labyrinth.holdLaw_begin_crossing_success
+#print axioms Labyrinth.begin_crossing_holdLaw
+#print axioms Labyrinth.begin_crossing_inv
+#print axioms Labyrinth.crossSub_set
+#print axioms Labyrinth.tick_loop0_exact
+#print axioms Labyrinth.drainP_cells
+#print axioms Labyrinth.reformP_cells
+#print axioms Labyrinth.touches_congr
+#print axioms Labyrinth.list_eq_map
+#print axioms Labyrinth.sameCrossings_map
+#print axioms Labyrinth.drainW_crossing
+#print axioms Labyrinth.drainW_same
+#print axioms Labyrinth.drain_clear
+#print axioms Labyrinth.reformW_keep
+#print axioms Labyrinth.expired_settled
+#print axioms Labyrinth.reformW_same
+#print axioms Labyrinth.reform_clear
+#print axioms Labyrinth.same_comp

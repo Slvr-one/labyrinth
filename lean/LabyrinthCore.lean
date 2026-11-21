@@ -111,3 +111,7 @@ import LabyrinthCore.SceneDoorwayLocal
 import LabyrinthCore.SceneInvFresh
 import LabyrinthCore.SceneInvCapacity
 import LabyrinthCore.SceneInvMotion
+import LabyrinthCore.SceneInvEdit
+import LabyrinthCore.SceneHoldLaw
+import LabyrinthCore.SceneHoldTick
+import LabyrinthCore.SceneHoldPatches
