@@ -86,6 +86,8 @@ import LabyrinthCore.SceneInvSummary
 import LabyrinthCore.SceneInvSwept
 import LabyrinthCore.SceneInvNewWork
 import LabyrinthCore.SceneInvNewEdit
+import LabyrinthCore.SceneMotionAdvance
+import LabyrinthCore.SceneMotionReach
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -944,3 +946,22 @@ import LabyrinthCore.SceneInvNewEdit
 #print axioms Labyrinth.new_routes_copy
 #print axioms Labyrinth.scene_new_edit_facts
 #print axioms Labyrinth.scene_new_full
+#print axioms Labyrinth.nextOf_refl
+#print axioms Labyrinth.nextOf_trans
+#print axioms Labyrinth.prepare_motion_next
+#print axioms Labyrinth.sceneInv_next
+#print axioms Labyrinth.holdLaw_next
+#print axioms Labyrinth.sceneInvFull_next
+#print axioms Labyrinth.advance_loop2_next
+#print axioms Labyrinth.advance_residual_err
+#print axioms Labyrinth.advance_early
+#print axioms Labyrinth.advance_publish
+#print axioms Labyrinth.advance_scene
+#print axioms Labyrinth.advance_motion_scene
+#print axioms Labyrinth.advance_motion_inv
+#print axioms Labyrinth.advance_motion_safe
+#print axioms Labyrinth.sceneReachable_motion
+#print axioms Labyrinth.sceneReachableM_inv
+#print axioms Labyrinth.reachableM_hold_exact
+#print axioms Labyrinth.reachableM_no_leaked_hold
+#print axioms Labyrinth.reachableM_advance_motion_safe
