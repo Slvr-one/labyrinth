@@ -166,12 +166,12 @@ theorem check_stamp_spec (self : scene.Scene) (stamp : walker.Stamp) :
 /-! ### Shared shape of the stamp-checked operations -/
 
 /-- The stamp is the scene's current one and its revision has a successor. -/
-def StampAccepts (self : scene.Scene) (stamp : walker.Stamp) : Prop :=
+@[expose] def StampAccepts (self : scene.Scene) (stamp : walker.Stamp) : Prop :=
   stamp.epoch = self.stamp.epoch ∧ stamp.revision = self.stamp.revision ∧
     self.stamp.revision.val < U64.max
 
 /-- The three failures of `check_stamp`, in order, each leaving the scene unchanged. -/
-def StampRejects {α : Type _} (self : scene.Scene) (stamp : walker.Stamp)
+@[expose] def StampRejects {α : Type _} (self : scene.Scene) (stamp : walker.Stamp)
     (res : core.result.Result α topology.Error × scene.Scene) : Prop :=
   (stamp.epoch ≠ self.stamp.epoch → res = (.Err topology.Error.StaleEpoch, self)) ∧
   (stamp.epoch = self.stamp.epoch → stamp.revision ≠ self.stamp.revision →
@@ -180,7 +180,7 @@ def StampRejects {α : Type _} (self : scene.Scene) (stamp : walker.Stamp)
     self.stamp.revision.val = U64.max → res = (.Err topology.Error.Overflow, self))
 
 /-- The stamp returned on success: the current epoch and the successor revision. -/
-def bumped (self : scene.Scene) (v : Std.U64) : walker.Stamp := { self.stamp with revision := v }
+@[expose] def bumped (self : scene.Scene) (v : Std.U64) : walker.Stamp := { self.stamp with revision := v }
 
 theorem stamp_rejects_of_accepts {α : Type _} {self : scene.Scene} {stamp : walker.Stamp}
     (h : StampAccepts self stamp) (res : core.result.Result α topology.Error × scene.Scene) :
@@ -706,7 +706,7 @@ theorem tick_clock_overflow (self : scene.Scene) (stamp : walker.Stamp) (wall : 
 /-! ### `tick`: the simulation step leaves everything but holds, walkers and patches alone -/
 
 /-- The tuple the generated loops return in place of a scene. -/
-def sceneTuple (s : scene.Scene) :=
+@[expose] def sceneTuple (s : scene.Scene) :=
   (s.layout, s.tree, s.work, s.routes, s.required, s.phases, s.next_phases, s.holds, s.walkers,
     s.patches, s.stamp, s.clock, s.wall, s.reanchor, s.suspended, s.inactive, s.latest_request,
     s.pending, s.trail_revision)

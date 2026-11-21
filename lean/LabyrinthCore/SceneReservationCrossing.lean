@@ -23,29 +23,13 @@ namespace Labyrinth
 theorem okPost_ok_iff {α : Type _} {P : α → Prop} {a : α} : OkPost (ok a) P ↔ P a :=
   ⟨fun h => h a rfl, okPost_ok⟩
 
-/-- The stamp is the scene's current one and its revision has a successor (`StampAccepts`,
-restated so its body is visible here). -/
-def StampPass (self : scene.Scene) (stamp : walker.Stamp) : Prop :=
-  stamp.epoch = self.stamp.epoch ∧ stamp.revision = self.stamp.revision ∧
-    self.stamp.revision.val < U64.max
-
-/-- The three failures of `check_stamp`, in order, each leaving the scene unchanged
-(`StampRejects`, restated). -/
-def StampFail {α : Type _} (self : scene.Scene) (stamp : walker.Stamp)
-    (res : core.result.Result α topology.Error × scene.Scene) : Prop :=
-  (stamp.epoch ≠ self.stamp.epoch → res = (.Err topology.Error.StaleEpoch, self)) ∧
-  (stamp.epoch = self.stamp.epoch → stamp.revision ≠ self.stamp.revision →
-    res = (.Err topology.Error.StaleRevision, self)) ∧
-  (stamp.epoch = self.stamp.epoch → stamp.revision = self.stamp.revision →
-    self.stamp.revision.val = U64.max → res = (.Err topology.Error.Overflow, self))
-
 /-- The partial-correctness form of `stamp_gate`. -/
 theorem stamp_gate_ok {α : Type _} (self : scene.Scene) (stamp : walker.Stamp)
     (K : Std.U64 → Result (core.result.Result α topology.Error × scene.Scene))
     (P : core.result.Result α topology.Error × scene.Scene → Prop)
-    (hok : ∀ v : Std.U64, v.val = self.stamp.revision.val + 1 → StampPass self stamp →
+    (hok : ∀ v : Std.U64, v.val = self.stamp.revision.val + 1 → StampAccepts self stamp →
       OkPost (K v) P)
-    (hrej : ∀ res, ¬ StampPass self stamp → StampFail self stamp res → P res) :
+    (hrej : ∀ res, ¬ StampAccepts self stamp → StampRejects self stamp res → P res) :
     OkPost (do
       let r ← scene.Scene.check_stamp self stamp
       let cf ← core.result.Result.Insts.CoreOpsTry.branch r
@@ -157,8 +141,8 @@ def BcAccepted (self : scene.Scene) (wi target : Std.Usize) (duration : Std.U32)
 def BcOutcome (self : scene.Scene) (stamp : walker.Stamp) (wi target : Std.Usize)
     (duration : Std.U32)
     (res : core.result.Result walker.Reservation topology.Error × scene.Scene) : Prop :=
-  (¬ StampPass self stamp ∧ StampFail self stamp res) ∨
-  (StampPass self stamp ∧ BcAccepted self wi target duration res)
+  (¬ StampAccepts self stamp ∧ StampRejects self stamp res) ∨
+  (StampAccepts self stamp ∧ BcAccepted self wi target duration res)
 
 theorem begin_crossing_outcome (self : scene.Scene) (stamp : walker.Stamp) (wi target : Std.Usize)
     (duration : Std.U32) :
@@ -292,7 +276,7 @@ theorem begin_crossing_outcome (self : scene.Scene) (stamp : walker.Stamp) (wi t
 
 theorem stampFail_scene {α : Type _} {self : scene.Scene} {stamp : walker.Stamp}
     {res : core.result.Result α topology.Error × scene.Scene}
-    (hn : ¬ StampPass self stamp) (hf : StampFail self stamp res) : res.2 = self := by
+    (hn : ¬ StampAccepts self stamp) (hf : StampRejects self stamp res) : res.2 = self := by
   obtain ⟨f1, f2, f3⟩ := hf
   by_cases h1 : stamp.epoch = self.stamp.epoch
   · by_cases h2 : stamp.revision = self.stamp.revision

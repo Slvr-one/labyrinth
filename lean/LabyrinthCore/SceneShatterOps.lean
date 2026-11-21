@@ -140,9 +140,6 @@ theorem slotVerdict_cases (self : scene.Scene) (id : shatter.PatchId) :
         exact Or.inr ⟨p, ⟨slotVerdict_ok self id he hlt p hp hs hser, hp⟩, hs⟩
   · exact Or.inl ⟨_, slotVerdict_stale self id he⟩
 
-/-- The stamp a successful stage step returns. -/
-def stampAt (self : scene.Scene) (v : Std.U64) : walker.Stamp := { self.stamp with revision := v }
-
 /-- `patch_stage` reads the stage of a valid handle's patch, and forwards `patch_slot`'s error. -/
 theorem patch_stage_spec (self : scene.Scene) (id : shatter.PatchId) :
     scene.Scene.patch_stage self id ⦃ r =>

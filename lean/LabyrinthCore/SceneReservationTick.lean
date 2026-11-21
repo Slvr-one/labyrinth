@@ -333,7 +333,7 @@ theorem tick_loop1_relaxed (clock : Std.U64) (x : scene.Scene) :
 
 /-- `tick` on its active path keeps the reservation invariant. -/
 theorem tick_active_resinv (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64)
-    (hacc : StampPass self stamp) (hw : self.wall.val ≤ wall.val)
+    (hacc : StampAccepts self stamp) (hw : self.wall.val ≤ wall.val)
     (hs : self.suspended = false) (hi : self.inactive = false) (hp : self.pending = none)
     (hr : self.reanchor = false)
     (hnov : self.clock.val + (wall.val - self.wall.val) ≤ U64.max) (hinv : ResInv self) :
