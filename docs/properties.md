@@ -21,7 +21,7 @@ limits listed in "Trust and limitations". The Portfolio still uses its existing 
 | Shatter | proved (total for begin, hide, scatter; partial correctness for reform) | `begin_shatter_spec`, `hide_patch_spec`, `scatter_patch_spec`, `reform_patch_spec`, `reform_patch_headline`, `reform_patch_safe`, `tick_patch_progress` |
 | Geometry totality | proved (total) | `layout_doorway_total`, `layout_new_total_closed`, `doorway_minimum_exact`, `grid_rect_touches_disk_total`, `from_edges_error_set` (partial correctness) |
 | Scene invariant and reachability | proved as partial correctness | `sceneReachable_inv_unconditional`, `sceneReachableU_hold_exact`, `reachable_no_leaked_hold` |
-| Motion planner (`advance_motion` and the `motion` planner definitions) | **in progress, not proved** | none |
+| Motion planner (`advance_motion`) | proved as partial correctness for the scene invariant, safety, connectedness of the accepted result and workspace frames; **not proved**: that it always returns and always proposes an acceptable edit | `advance_motion_inv`, `advance_motion_safe`, `advance_motion_connected`, `sceneReachableM_inv`, `plan_ok_balanced` |
 
 Section "Not proved" lists everything else that has no theorem.
 
@@ -110,6 +110,8 @@ application-level success updates exactly the requested index with both indices 
 application-level error leaves the storage unchanged. It does not prove termination or panic freedom
 of `set_parent` or of the `tree::reaches` loop it calls, and it does not prove acyclicity.
 Malformed storage can panic in the walk; this operation is not a validated carrier constructor.
+The theorem is declared at the top level, outside the `Labyrinth` namespace, so its fully qualified
+name is just `set_parent_spec` (it opens `labyrinth_core` but does not live in it).
 
 ## Route budget
 
@@ -201,7 +203,7 @@ to remove, an equal-length list of edges to add, and optionally replacement rout
   phase in the scratch table; `motion_phases_held` (additionally: the reservation invariant, and that
   the new published phases are the scratch table) gives that an accepted motion leaves the phase of
   every transform held by a crossing walker unchanged. This covers the first loop of `prepare_motion`
-  only (see "Not proved").
+  only; `advance_motion` is covered in "The motion planner".
 
 ## Epoch and revision publication
 
@@ -357,7 +359,8 @@ and `HoldLaw`; concludes both), `begin_shatter_inv`, `hide_patch_inv`, `scatter_
 
 `SceneReachableU` is the set of scenes obtained from a successful `Scene::new` on a layout that
 `Layout::new` accepted, by any sequence of calls that return, among exactly these fourteen
-operations: `suspend`, `resume`, `request_layout`, `reject_layout`, `publish_layout` (the candidate
+operations (`advance_motion` is covered separately in "The motion planner"): `suspend`, `resume`,
+`request_layout`, `reject_layout`, `publish_layout` (the candidate
 must itself be reachable), `begin_crossing`, `motion`, `carve`, `tick`, `swept_doorway`,
 `begin_shatter`, `hide_patch`, `scatter_patch`, `reform_patch`. A call counts whether it returned
 success or an error; only that it returned matters.
@@ -373,13 +376,62 @@ success or an error; only that it returned matters.
 
 Reachability is only about operations that are listed. Other public functions are not covered by it.
 
+## The motion planner
+
+Source: `SceneMotionAdvance.lean`, `SceneMotionReach.lean`, `SceneMotionConnected.lean`,
+`SceneMotionFrame.lean`. All statements here are **partial correctness**: they hold of every result
+`advance_motion` returns, and say nothing about whether it returns. `advance_motion` validates the
+request with `prepare_motion`, lets the planner propose an edit for a divided step table, and
+publishes through one final `Scene::motion` call, which re-checks everything it publishes.
+
+- `advance_motion_scene`: every outcome is either an error on a scene that differs from the input only
+  in the scratch phase table (same length), or exactly what `Scene::motion` returns on such a scene,
+  and an accepted advance carries the same event as that motion. Supporting lemmas: `NextOf`
+  (`nextOf_refl`, `nextOf_trans`), `prepare_motion_next`, `advance_loop2_next`, `advance_early`,
+  `advance_publish`, `advance_scene`, `sceneInv_next`, `holdLaw_next`, `sceneInvFull_next`.
+- `advance_motion_inv` (hypothesis: `SceneInv` and `HoldLaw` on the input scene). **Whatever it
+  returns, success or error, the returned scene satisfies `SceneInv` and `HoldLaw`.**
+- `advance_motion_safe` (hypothesis: `SceneInv` on the input scene). On success, every edge between
+  the source and target of a crossing walker that was a tree edge before is still a tree edge, and
+  every transform with a nonzero hold counter keeps its published phase.
+- `advance_motion_connected` (hypothesis: `SceneInv` on the input scene). On success the layout is
+  unchanged, the new tree is `TreeValid` on the layout's carrier, every route edge is an edge of the
+  new tree, and one of two things holds: nothing moved (tree, published phases and routes are all
+  unchanged), or the published phases are a table `np` (the new published phases equal `np` at every
+  transform) such that every edge of the new tree has a doorway that `Layout::doorway` accepts between
+  the old phases and `np`. This does **not** pair each removed edge with a replacement chosen for it
+  and says nothing about why the planner picked the edit it did; it says that no tree edge whose
+  doorway became inadmissible survives the accepted motion. Supporting lemmas: `motion_door`,
+  `motion_commit_door`, `preflight_doors`, `kept_door`, `added_door`.
+- Reachability with `advance_motion`. `SceneReachableM` is `SceneReachableU`'s construction case (here
+  with the additional assumption that the new scene's tree is valid on the layout carrier, as in
+  `SceneReachable`) plus the fourteen operations above plus `advance_motion`: **fifteen operations**.
+  `sceneReachable_motion` shows it contains everything `SceneReachable` does. Corollaries, all partial
+  correctness and with no further hypotheses on the scene: `sceneReachableM_inv` (every such scene
+  satisfies `SceneInv` and `HoldLaw`), `reachableM_hold_exact` (every hold counter equals the number
+  of crossing holds), `reachableM_no_leaked_hold`, `reachableM_advance_motion_safe` and
+  `reachableM_advance_motion_connected` (the two statements above on every such scene).
+- Workspace frame (`WFrame`). The planner's workspace fields that bind it to a scene (`epoch`, `cells`,
+  `edges`, `endpoints`), the divided steps, the `admissible` and `locked` flags and the split-vertex
+  network (`from`, `to`, `offsets`, `arcs`) are not written by the search helpers: `clear_search_frame`,
+  `augment_frame`, `residual_path_frame`, `flow_path_frame`, `reset_flow_frame`, `tree_path_frame`,
+  `route_through_frame`, `plan_route_frame` (and their loop forms), with `wFrame_refl`.
+- `plan_ok_balanced`: an accepted plan proposes as many added edges as removed edges.
+
 ## Not proved
 
-- **The motion planner.** `Scene::advance_motion`, `prepare_motion` beyond its first loop, `motion_edge`
-  and all `motion.*` planner definitions (`MotionWorkspace` and its flow, search and route functions,
-  `network_sizes`) have no theorem. This work is in progress. The proved `scene_motion_spec` and
-  `scene_carve_spec` cover any caller-supplied edit, not the edit the planner proposes. The planner's
-  claim that admissible doorways stay connected across sector-boundary events is not proved.
+- **The motion planner's liveness.** There is no theorem that `advance_motion`, `MotionWorkspace::advance`
+  or `plan` always return (no panic, no divergence), and none that the planner always proposes an edit
+  that `Scene::motion` accepts, so an advance can still end in an error. The same holds for the
+  totality and the search behaviour of `plan`, `route_through`, `flow_path` and the rest of the search.
+  The statements in "The motion planner" speak only of results that are returned.
+- **The exact specifications of the planner's leaf helpers**: `MotionWorkspace::new`, `check_scene`,
+  `eligible`, `arc_pair`, `edge_index`, `virtual_edge`, `check_route_endpoints`, `route_admissible`,
+  `network_sizes`, `motion_edge`, and what the flow, residual and tree-path searches compute
+  (shortest or feasible paths, flow value). Only that they leave the listed workspace fields alone is
+  proved. The planner's own claim that every sector-boundary event is connected is therefore proved
+  only in the checked form given in "The motion planner" (the accepted edit leaves a valid tree whose
+  edges all have doorways), not as a statement about the planner's choices.
 - Functions with no theorem and not named by any proof file: `tree::reaches` and `tree::random_reparent`
   (no theorem; `set_parent_spec` is only about the update and the error cases); the polar projection and
   ring/sector helpers (`polar::project`, `Circle::offset_at`, `ring_offset`, `sector`, `sector_arc`,
@@ -503,8 +555,9 @@ The hypotheses stated with each theorem apply.
 The native crate implements validated CSR carriers, ordinary DFS, required-forest
 contraction/quotient DFS/expansion, sparse tree edits, combined grid/polar layouts, reservations,
 shatter, suspension and epoch replacement. `Scene::advance_motion` performs production
-boundary-event planning with reusable flow/search storage and sparse edge proposals; this planner is
-the part that is not proved.
+boundary-event planning with reusable flow/search storage and sparse edge proposals. What is proved
+about it (partial correctness only) is in "The motion planner"; that it always returns and always
+proposes an acceptable edit is not proved.
 
 Spinning admission uses conservative radius/clearance bounds and checks the chosen exterior
 portal pair over every quantized one-unit outer-ring sweep. Some geometrically feasible
