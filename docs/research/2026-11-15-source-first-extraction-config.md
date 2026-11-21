@@ -1,3 +1,5 @@
+> Note: the phase-1 gate named below as `scripts/check-phase1.py` is now `tools/check` (`cargo run --release --manifest-path tools/check/Cargo.toml`).
+
 # Source-first extraction configuration
 
 ## Scope

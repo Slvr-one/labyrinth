@@ -34,3 +34,21 @@ different portals, and exercises both motion modes through the production planne
 `Scene::advance_motion` chooses safe sparse replacements; `Scene::motion` validates an explicit
 caller-proposed update. `MotionAdvance::divisor` reports a consumed subinterval when a request
 crosses more than one doorway event.
+
+## Verification gate
+
+The gate is a Rust program in `tools/check` (its own package, not part of `rust/`). With
+`LABYRINTH_TOOLCHAINS` pointing at the isolated toolchains, from the repository root:
+
+```sh
+cargo run --release --manifest-path tools/check/Cargo.toml            # whole gate
+cargo run --release --manifest-path tools/check/Cargo.toml -- --help  # checks and steps
+```
+
+Checks on the gate itself, from `tools/check`:
+
+```sh
+cargo fmt --check
+cargo clippy --all-targets -- -D warnings
+cargo test
+```
