@@ -11,6 +11,7 @@ import LabyrinthCore.ConstructorOrientation
 import LabyrinthCore.ConstructorSceneRejection
 import LabyrinthCore.ConstructorSceneAcceptance
 import LabyrinthCore.ConstructorSceneTotal
+import LabyrinthCore.SceneStd
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -55,3 +56,27 @@ import LabyrinthCore.ConstructorSceneTotal
 #print axioms core.option.Option.Insts.CoreCmpPartialEqOption.eq
 #print axioms alloc.vec.Vec.clear
 #print axioms Aeneas.Std.I32.div
+#print axioms Labyrinth.i32_abs_spec
+#print axioms Labyrinth.i32_rem_euclid_spec
+#print axioms Labyrinth.range_inclusive_contains_i32_spec
+#print axioms Labyrinth.range_inclusive_contains_i32_new
+#print axioms Labyrinth.option_copied
+#print axioms Labyrinth.option_clone_i32
+#print axioms Labyrinth.option_clone_u64
+#print axioms Labyrinth.option_clone_usize
+#print axioms Labyrinth.option_eq_spec
+#print axioms Labyrinth.option_eq_i32_spec
+#print axioms Labyrinth.option_eq_u64_spec
+#print axioms Labyrinth.option_eq_usize_spec
+#print axioms Labyrinth.vec_clear_spec
+#print axioms Labyrinth.i32_div_spec
+#print axioms Labyrinth.i32_div_turn_eight
+#print axioms Labyrinth.i32_div_turn_four
+#print axioms Labyrinth.option_debug_fmt_none
+#print axioms Labyrinth.option_debug_fmt_some
+#print axioms Labyrinth.slice_contains_spec
+#print axioms Labyrinth.edge_eq_spec
+#print axioms Labyrinth.slice_contains_edge_spec
+#print axioms Labyrinth.option_ok_or_spec
+#print axioms Labyrinth.option_ok_or_ok?
+#print axioms Labyrinth.result_is_err_spec
