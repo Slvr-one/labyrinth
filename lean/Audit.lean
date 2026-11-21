@@ -21,6 +21,7 @@ import LabyrinthCore.SceneGeometryCordic
 import LabyrinthCore.SceneGeometryCircle
 import LabyrinthCore.SceneGeometryBounds
 import LabyrinthCore.SceneGeometryLayout
+import LabyrinthCore.SceneGeometrySweep
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -251,3 +252,6 @@ import LabyrinthCore.SceneGeometryLayout
 #print axioms Labyrinth.layout_holds_loop0_spec
 #print axioms Labyrinth.layout_circle_of_step
 #print axioms Labyrinth.layout_holds_spec
+#print axioms Labyrinth.SweepOk
+#print axioms Labyrinth.CircleOk.ring_end_le
+#print axioms Labyrinth.layout_cell_sweep_spec

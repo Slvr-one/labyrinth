@@ -314,6 +314,10 @@ theorem usize_saturating_sub_one (x : Std.Usize) :
 /-- A hold set never records more than its four slots. -/
 def HoldsOk (h : walker.Holds) : Prop := h.count.val ≤ 4
 
+/-- A hold-set status: `Ok`, or `InsufficientWorkspace` once the four slots are full. -/
+def HoldStatusOk (s : core.result.Result Unit topology.Error) : Prop :=
+  s = .Ok () ∨ s = .Err topology.Error.InsufficientWorkspace
+
 theorem walker_holds_insert_loop_spec (self : walker.Holds) (id slot : Std.Usize)
     (hc : self.count.val ≤ 4) (hs : slot.val ≤ self.count.val) :
     walker.Holds.insert_loop self id slot ⦃ r =>
@@ -348,7 +352,7 @@ theorem array4_len_val {α : Type _} (arr : Array α 4#usize) :
   simp [Array.to_slice, Slice.length, arr.property]
 
 theorem walker_holds_insert_spec (self : walker.Holds) (id : Std.Usize) (hc : HoldsOk self) :
-    walker.Holds.insert self id ⦃ r => HoldsOk r.2 ⦄ := by
+    walker.Holds.insert self id ⦃ r => HoldsOk r.2 ∧ HoldStatusOk r.1 ⦄ := by
   unfold walker.Holds.insert
   unfold HoldsOk at hc
   apply spec_bind (walker_holds_insert_loop_spec self id 0#usize hc (by simp))
@@ -361,7 +365,7 @@ theorem walker_holds_insert_spec (self : walker.Holds) (id : Std.Usize) (hc : Ho
     simp only [lift, Std.bind_ok, array4_len_val]
     by_cases hfull : self.count = 4#usize
     · simp only [hfull, ite_true, spec_ok]
-      unfold HoldsOk; simp [hfull]
+      unfold HoldsOk HoldStatusOk; simp [hfull]
     · have hfull' : ¬ self.count = 4#usize := hfull
       simp only [hfull', ite_false]
       have hslot4 : slot.val < 4 := by
@@ -369,25 +373,25 @@ theorem walker_holds_insert_spec (self : walker.Holds) (id : Std.Usize) (hc : Ho
         scalar_tac
       step as ⟨a1, ha1⟩
       step as ⟨i2, hi2⟩
-      unfold HoldsOk
-      scalar_tac
+      unfold HoldsOk HoldStatusOk
+      refine ⟨by scalar_tac, by simp⟩
   · simp only [hs, ite_false, spec_ok]
-    exact hc
+    exact ⟨hc, by simp [HoldStatusOk]⟩
 
 theorem layout_holds_loop1_spec (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
     (status : core.result.Result Unit topology.Error) (ring : Std.Usize)
-    (hr : HoldsOk result) (hring : ring.val ≤ last.val + 1)
+    (hr : HoldsOk result) (hst : HoldStatusOk status) (hring : ring.val ≤ last.val + 1)
     (hlast : last.val + 1 ≤ Std.Usize.max)
     (hts : c.transform_start.val + last.val ≤ Std.Usize.max) :
-    scene.Layout.holds_loop1 result c last status ring ⦃ r => HoldsOk r.2 ⦄ := by
+    scene.Layout.holds_loop1 result c last status ring ⦃ r => HoldsOk r.2 ∧ HoldStatusOk r.1 ⦄ := by
   unfold scene.Layout.holds_loop1
   apply loop.spec_decr_nat
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
       last.val + 1 - st.2.2.val)
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
-      HoldsOk st.1 ∧ st.2.2.val ≤ last.val + 1)
+      HoldsOk st.1 ∧ HoldStatusOk st.2.1 ∧ st.2.2.val ≤ last.val + 1)
     _
-  · rintro ⟨res, st, rg⟩ ⟨hres, hrg⟩
+  · rintro ⟨res, st, rg⟩ ⟨hres, hst', hrg⟩
     unfold scene.Layout.holds_loop1.body
     by_cases hle : rg ≤ last
     · simp only [hle, ite_true]
@@ -396,31 +400,31 @@ theorem layout_holds_loop1_spec (c : polar.Circle) (last : Std.Usize) (result : 
       · simp only [hb', ite_true]
         step as ⟨id, hid⟩
         apply spec_bind (walker_holds_insert_spec res id hres)
-        rintro ⟨st1, res1⟩ hres1
+        rintro ⟨st1, res1⟩ ⟨hres1, hst1⟩
         step as ⟨rg1, hrg1⟩
-        exact ⟨hres1, by scalar_tac, by scalar_tac⟩
+        exact ⟨hres1, hst1, by scalar_tac, by scalar_tac⟩
       · have hbf : b = false := by simpa using hb'
         simp only [hbf, Bool.false_eq_true, ↓reduceIte, spec_ok]
-        exact hres
+        exact ⟨hres, hst'⟩
     · have hle2 : ¬ rg ≤ last := hle
       simp only [hle2, ite_false, spec_ok]
-      exact hres
-  · exact ⟨hr, hring⟩
+      exact ⟨hres, hst'⟩
+  · exact ⟨hr, hst, hring⟩
 
 theorem layout_holds_loop2_spec (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
     (status : core.result.Result Unit topology.Error) (ring : Std.Usize)
-    (hr : HoldsOk result) (hring : ring.val ≤ last.val + 1)
+    (hr : HoldsOk result) (hst : HoldStatusOk status) (hring : ring.val ≤ last.val + 1)
     (hlast : last.val + 1 ≤ Std.Usize.max)
     (hts : c.transform_start.val + last.val ≤ Std.Usize.max) :
-    scene.Layout.holds_loop2 result c last status ring ⦃ r => HoldsOk r.2 ⦄ := by
+    scene.Layout.holds_loop2 result c last status ring ⦃ r => HoldsOk r.2 ∧ HoldStatusOk r.1 ⦄ := by
   unfold scene.Layout.holds_loop2
   apply loop.spec_decr_nat
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
       last.val + 1 - st.2.2.val)
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
-      HoldsOk st.1 ∧ st.2.2.val ≤ last.val + 1)
+      HoldsOk st.1 ∧ HoldStatusOk st.2.1 ∧ st.2.2.val ≤ last.val + 1)
     _
-  · rintro ⟨res, st, rg⟩ ⟨hres, hrg⟩
+  · rintro ⟨res, st, rg⟩ ⟨hres, hst', hrg⟩
     unfold scene.Layout.holds_loop2.body
     by_cases hle : rg ≤ last
     · simp only [hle, ite_true]
@@ -429,30 +433,30 @@ theorem layout_holds_loop2_spec (c : polar.Circle) (last : Std.Usize) (result : 
       · simp only [hb', ite_true]
         step as ⟨id, hid⟩
         apply spec_bind (walker_holds_insert_spec res id hres)
-        rintro ⟨st1, res1⟩ hres1
+        rintro ⟨st1, res1⟩ ⟨hres1, hst1⟩
         step as ⟨rg1, hrg1⟩
-        exact ⟨hres1, by scalar_tac, by scalar_tac⟩
+        exact ⟨hres1, hst1, by scalar_tac, by scalar_tac⟩
       · have hbf : b = false := by simpa using hb'
         simp only [hbf, Bool.false_eq_true, ↓reduceIte, spec_ok]
-        exact hres
+        exact ⟨hres, hst'⟩
     · have hle2 : ¬ rg ≤ last := hle
       simp only [hle2, ite_false, spec_ok]
-      exact hres
-  · exact ⟨hr, hring⟩
+      exact ⟨hres, hst'⟩
+  · exact ⟨hr, hst, hring⟩
 
 theorem layout_holds_loop0_spec (c : polar.Circle) (result : walker.Holds)
     (status : core.result.Result Unit topology.Error) (ring : Std.Usize)
-    (hr : HoldsOk result) (hring : ring.val ≤ 1)
+    (hr : HoldsOk result) (hst : HoldStatusOk status) (hring : ring.val ≤ 1)
     (hts : c.transform_start.val + 1 ≤ Std.Usize.max) :
-    scene.Layout.holds_loop0 result c status ring ⦃ r => HoldsOk r.2 ⦄ := by
+    scene.Layout.holds_loop0 result c status ring ⦃ r => HoldsOk r.2 ∧ HoldStatusOk r.1 ⦄ := by
   unfold scene.Layout.holds_loop0
   apply loop.spec_decr_nat
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
       1 - st.2.2.val)
     (fun st : walker.Holds × (core.result.Result Unit topology.Error) × Std.Usize =>
-      HoldsOk st.1 ∧ st.2.2.val ≤ 1)
+      HoldsOk st.1 ∧ HoldStatusOk st.2.1 ∧ st.2.2.val ≤ 1)
     _
-  · rintro ⟨res, st, rg⟩ ⟨hres, hrg⟩
+  · rintro ⟨res, st, rg⟩ ⟨hres, hst', hrg⟩
     unfold scene.Layout.holds_loop0.body
     by_cases hle : rg ≤ 0#usize
     · simp only [hle, ite_true]
@@ -461,16 +465,16 @@ theorem layout_holds_loop0_spec (c : polar.Circle) (result : walker.Holds)
       · simp only [hb', ite_true]
         step as ⟨id, hid⟩
         apply spec_bind (walker_holds_insert_spec res id hres)
-        rintro ⟨st1, res1⟩ hres1
+        rintro ⟨st1, res1⟩ ⟨hres1, hst1⟩
         step as ⟨rg1, hrg1⟩
-        exact ⟨hres1, by scalar_tac, by scalar_tac⟩
+        exact ⟨hres1, hst1, by scalar_tac, by scalar_tac⟩
       · have hbf : b = false := by simpa using hb'
         simp only [hbf, Bool.false_eq_true, ↓reduceIte, spec_ok]
-        exact hres
+        exact ⟨hres, hst'⟩
     · have hle2 : ¬ rg ≤ 0#usize := hle
       simp only [hle2, ite_false, spec_ok]
-      exact hres
-  · exact ⟨hr, hring⟩
+      exact ⟨hres, hst'⟩
+  · exact ⟨hr, hst, hring⟩
 
 
 @[step]
@@ -481,7 +485,7 @@ theorem layout_circle_of_step (L : scene.Layout) (hL : LayoutGeom L) (cell : Std
 
 theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usize)
     (result : walker.Holds) (h : cell.val < L.cells.val.length) (hres : HoldsOk result) :
-    scene.Layout.holds L cell result ⦃ r => HoldsOk r.2 ⦄ := by
+    scene.Layout.holds L cell result ⦃ r => HoldsOk r.2 ∧ HoldStatusOk r.1 ⦄ := by
   unfold scene.Layout.holds
   step as ⟨o, ho⟩
   have hcell := hL.cell cell h
@@ -490,7 +494,7 @@ theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usi
     rw [hcc] at ho
     subst ho
     simp only [cellCircle, spec_ok]
-    exact hres
+    exact ⟨hres, by simp [HoldStatusOk]⟩
   | Center k =>
     rw [hcc] at ho
     subst ho
@@ -507,12 +511,12 @@ theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usi
     have hc' : c = L.circles.val[k.val]'hk := hc
     subst hc'
     cases mm with
-    | Spinning => simp only [spec_ok]; exact hres
+    | Spinning => simp only [spec_ok]; exact ⟨hres, by simp [HoldStatusOk]⟩
     | Twisting a m =>
       have hts := hco.transform
       have hmax := L.transforms.hmax
       have hn := hco.rings
-      apply layout_holds_loop0_spec _ result _ 0#usize hres (by simp) (by scalar_tac)
+      apply layout_holds_loop0_spec _ result _ 0#usize hres (by simp [HoldStatusOk]) (by simp) (by scalar_tac)
   | Sector k r s =>
     rw [hcc] at ho
     subst ho
@@ -534,7 +538,7 @@ theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usi
     cases mm with
     | Spinning =>
       simp only [Std.bind_ok]
-      apply layout_holds_loop1_spec _ _ result _ _ hres (by simp) (by scalar_tac) (by scalar_tac)
+      apply layout_holds_loop1_spec _ _ result _ _ hres (by simp [HoldStatusOk]) (by simp) (by scalar_tac) (by scalar_tac)
     | Twisting a m =>
       simp only [lift, Std.bind_ok]
       step as ⟨i1, hi1⟩
@@ -542,7 +546,7 @@ theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usi
       step as ⟨i3, hi3⟩
       have hsat := usize_saturating_sub_one r
       have hmin : (core.cmp.impls.OrdUsize.min i1 i3).val = min i1.val i3.val := by simp
-      apply layout_holds_loop1_spec _ _ result _ _ hres (by scalar_tac) (by scalar_tac) (by scalar_tac)
+      apply layout_holds_loop1_spec _ _ result _ _ hres (by simp [HoldStatusOk]) (by scalar_tac) (by scalar_tac) (by scalar_tac)
   | Transition p =>
     rw [hcc] at ho
     subst ho
@@ -563,6 +567,6 @@ theorem layout_holds_spec (L : scene.Layout) (hL : LayoutGeom L) (cell : Std.Usi
     step as ⟨i, hi⟩
     step as ⟨first, hfirst⟩
     step as ⟨last, hlast⟩
-    apply layout_holds_loop2_spec _ _ result _ _ hres (by scalar_tac) (by scalar_tac) (by scalar_tac)
+    apply layout_holds_loop2_spec _ _ result _ _ hres (by simp [HoldStatusOk]) (by scalar_tac) (by scalar_tac) (by scalar_tac)
 
 end Labyrinth
