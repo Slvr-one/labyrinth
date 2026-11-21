@@ -16,6 +16,10 @@ import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
 import LabyrinthCore.SceneGeometryGrid
 import LabyrinthCore.SceneGeometryBase
+import LabyrinthCore.SceneGeometryArc
+import LabyrinthCore.SceneGeometryCordic
+import LabyrinthCore.SceneGeometryCircle
+import LabyrinthCore.SceneGeometryBounds
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -178,3 +182,52 @@ import LabyrinthCore.SceneGeometryBase
 #print axioms Labyrinth.turn_val
 #print axioms Labyrinth.polar_normalize_spec
 #print axioms Labyrinth.arcOk_bnd
+#print axioms Labyrinth.polar_angle_delta_spec
+#print axioms Labyrinth.polar_arc_contains_spec
+#print axioms Labyrinth.polar_arc_shifted_spec
+#print axioms Labyrinth.polar_arc_swept_spec
+#print axioms Labyrinth.polar_arc_middle_spec
+#print axioms Labyrinth.arcs_len_val
+#print axioms Labyrinth.polar_overlap_inner_spec
+#print axioms Labyrinth.polar_overlap_outer_spec
+#print axioms Labyrinth.polar_overlap_spec
+#print axioms Labyrinth.polar_scale_spec
+#print axioms Labyrinth.cordic_gain_val
+#print axioms Labyrinth.cordic_atan_mem
+#print axioms Labyrinth.cordic_atan_len
+#print axioms Labyrinth.cordic_atan_slice_len
+#print axioms Labyrinth.polar_atan_index_spec
+#print axioms Labyrinth.cordic_pow_le
+#print axioms Labyrinth.cordic_shift_abs
+#print axioms Labyrinth.cordic_tdiv_abs
+#print axioms Labyrinth.cordic_mul_abs
+#print axioms Labyrinth.cordic_quot_bound
+#print axioms Labyrinth.cordic_i64_clamp_spec
+#print axioms Labyrinth.polar_unit_vector_loop_body_spec
+#print axioms Labyrinth.polar_unit_vector_loop_spec
+#print axioms Labyrinth.cordic_shl20
+#print axioms Labyrinth.polar_unit_vector_spec
+#print axioms Labyrinth.polar_point_spec
+#print axioms Labyrinth.sector_arc_arith
+#print axioms Labyrinth.usize_hcast_i32_spec
+#print axioms Labyrinth.i64_from_i32_spec
+#print axioms Labyrinth.i64_cast_i32_spec
+#print axioms Labyrinth.circle_arc_spec
+#print axioms Labyrinth.circle_rings_le
+#print axioms Labyrinth.circle_ring_count_spec
+#print axioms Labyrinth.circle_mode_spec
+#print axioms Labyrinth.circle_center_spec
+#print axioms Labyrinth.circle_radius_spec
+#print axioms Labyrinth.direction_sign_spec
+#print axioms Labyrinth.circle_offset_spec
+#print axioms Labyrinth.tdiv_mul_small
+#print axioms Labyrinth.tdiv_mul_small_bound
+#print axioms Labyrinth.circle_offset_at_valid_loop_spec
+#print axioms Labyrinth.int_mul_bounds
+#print axioms Labyrinth.ringRadius_succ
+#print axioms Labyrinth.circle_offset_at_valid_tail
+#print axioms Labyrinth.circle_offset_at_valid_spec
+#print axioms Labyrinth.polar_point_near
+#print axioms Labyrinth.polar_bounds_loop0_loop0_spec
+#print axioms Labyrinth.polar_bounds_loop0_spec
+#print axioms Labyrinth.polar_bounds_spec

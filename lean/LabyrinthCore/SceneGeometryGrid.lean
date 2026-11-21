@@ -81,6 +81,7 @@ theorem spec_exists_ok {α : Type _} {m : Result α} {P : α → Prop} (h : spec
   | vis i k => exact absurd h (by rw [spec_vis]; exact id)
   | div => exact absurd h (by simp)
 
+@[step]
 theorem grid_rect_validate_spec (r : grid.Rect) :
     grid.Rect.validate r ⦃ x =>
       (x = .Ok () ↔ RectOk r) ∧ (x ≠ .Ok () → x = .Err topology.Error.InvalidGeometry) ⦄ := by
@@ -145,6 +146,7 @@ def MarginOk (g : grid.Geometry) : Prop :=
   0 < g.walker_radius.val ∧ 0 ≤ g.clearance.val ∧
     g.walker_radius.val + g.clearance.val + 2 ≤ 1000000
 
+@[step]
 theorem grid_geometry_margin_spec (g : grid.Geometry) :
     grid.Geometry.margin g ⦃ r =>
       (∀ m, r = .Ok m → MarginOk g ∧ m.val = g.walker_radius.val + g.clearance.val + 2) ∧
@@ -175,6 +177,7 @@ theorem grid_geometry_margin_spec (g : grid.Geometry) :
         simp only [core.option.Option.ok_or, core.result.Result.Insts.CoreOpsTry.branch, Std.bind_ok]
         split_ifs with h3 <;> simp [spec_ok] <;> scalar_tac
 
+@[step]
 theorem grid_rect_contains_spec (a b : grid.Rect) :
     grid.Rect.contains a b ⦃ r => (r = true ↔ a.min.x.val ≤ b.min.x.val ∧ a.min.y.val ≤ b.min.y.val ∧
       b.max.x.val ≤ a.max.x.val ∧ b.max.y.val ≤ a.max.y.val) ⦄ := by
@@ -189,6 +192,7 @@ theorem grid_rect_union_spec (a b : grid.Rect) :
   unfold grid.Rect.union
   step*
 
+@[step]
 theorem grid_rect_intersects_spec (a b : grid.Rect) :
     grid.Rect.intersects a b ⦃ r => (r = true ↔ a.min.x.val ≤ b.max.x.val ∧ b.min.x.val ≤ a.max.x.val ∧
       a.min.y.val ≤ b.max.y.val ∧ b.min.y.val ≤ a.max.y.val) ⦄ := by
@@ -200,6 +204,7 @@ theorem i32_val_bounds (x : Std.I32) : -2147483648 ≤ x.val ∧ x.val ≤ 21474
   simp [IScalarTy.numBits, I32.numBits] at this
   omega
 
+@[step]
 theorem grid_rect_expand_spec (r : grid.Rect) (m : Std.I32) :
     grid.Rect.expand r m ⦃ x =>
       (∀ e, x = .Ok e → 0 ≤ m.val ∧ e.min.x.val = r.min.x.val - m.val ∧
@@ -279,6 +284,7 @@ theorem grid_rect_expand_spec (r : grid.Rect) (m : Std.I32) :
       · intro e he; cases he; simp
       · intro _ _ _ _ _ e he; cases he; rfl
 
+@[step]
 theorem grid_rect_between_spec (a b : grid.Point) (m : Std.I32) :
     grid.Rect.between a b m ⦃ x =>
       (∀ e, x = .Ok e → 0 < m.val ∧ RectOk e ∧ e.min.x.val = min a.x.val b.x.val - m.val ∧
@@ -368,6 +374,7 @@ theorem grid_geometry_check_loop_spec (v : alloc.vec.Vec grid.Rect) (swept : gri
         · exact absurd (lt_of_le_of_lt (by omega) hkl) (by omega)
   · exact Iff.rfl
 
+@[step]
 theorem grid_geometry_check_spec (g : grid.Geometry) (swept : grid.Rect) :
     grid.Geometry.check g swept ⦃ x =>
       (x = .Ok () ↔ RectOk swept ∧ RectHolds g.viewport swept ∧
@@ -553,6 +560,7 @@ theorem grid_geometry_validate_spec (g : grid.Geometry) :
           simp
 
 /-- `Rect::center` on a valid rectangle returns a valid point inside it. -/
+@[step]
 theorem grid_rect_center_spec (r : grid.Rect) (h : RectOk r) :
     grid.Rect.center r ⦃ p => PointOk p ∧ r.min.x.val ≤ p.x.val ∧ p.x.val ≤ r.max.x.val ∧
       r.min.y.val ≤ p.y.val ∧ p.y.val ≤ r.max.y.val ⦄ := by

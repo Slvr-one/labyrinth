@@ -54,3 +54,7 @@ import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
 import LabyrinthCore.SceneGeometryGrid
 import LabyrinthCore.SceneGeometryBase
+import LabyrinthCore.SceneGeometryArc
+import LabyrinthCore.SceneGeometryCordic
+import LabyrinthCore.SceneGeometryCircle
+import LabyrinthCore.SceneGeometryBounds
