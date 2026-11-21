@@ -167,8 +167,9 @@ def ReformGate (self : scene.Scene) (id : shatter.PatchId) (p : shatter.Patch)
     (dl : Std.U64) (edit : scene.Edit)
     (res : core.result.Result walker.Stamp topology.Error × scene.Scene) : Prop :=
   EditSafe res.2 ∧
-  ((∃ np x pr, PhaseCopy self np ∧
-      PreflightOutcome { self with next_phases := np } edit (.Err x, pr) ∧ res = (.Err x, pr)) ∨
+  ((∃ np x pr req, PhaseCopy self np ∧
+      PreflightOutcome { self with next_phases := np } edit (.Err x, pr) ∧
+      pr = { self with next_phases := np, required := req } ∧ res = (.Err x, pr)) ∨
    (∃ np m req, PhaseCopy self np ∧
       PreflightOutcome { self with next_phases := np } edit (.Ok m,
         { self with next_phases := np, required := req }) ∧
@@ -413,7 +414,7 @@ theorem reform_patch_spec (self : scene.Scene) (stamp : walker.Stamp) (id : shat
                       simp only [core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual,
                         core.convert.FromSame.from, bind_tc_ok, ok.injEq] at hr6
                       subst hr6
-                      refine okPost_ok ⟨?_, Or.inl ⟨np, x, self1, hnp, hpre, rfl⟩⟩
+                      refine okPost_ok ⟨?_, Or.inl ⟨np, x, self1, req, hnp, hpre, hf, rfl⟩⟩
                       rw [hf]
                       exact editSafe_required hs1 req hreq
                     | Ok m =>

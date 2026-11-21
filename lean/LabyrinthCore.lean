@@ -92,3 +92,5 @@ import LabyrinthCore.SceneGeometryFloor
 import LabyrinthCore.SceneShatterStages
 import LabyrinthCore.SceneShatterBegin
 import LabyrinthCore.SceneShatterReform
+import LabyrinthCore.SceneShatterTick
+import LabyrinthCore.SceneShatterFrame

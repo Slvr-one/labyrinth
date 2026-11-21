@@ -54,6 +54,8 @@ import LabyrinthCore.SceneGeometryFloor
 import LabyrinthCore.SceneShatterStages
 import LabyrinthCore.SceneShatterBegin
 import LabyrinthCore.SceneShatterReform
+import LabyrinthCore.SceneShatterTick
+import LabyrinthCore.SceneShatterFrame
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -556,3 +558,25 @@ import LabyrinthCore.SceneShatterReform
 #print axioms Labyrinth.reform_outside_spec
 #print axioms Labyrinth.reform_finish
 #print axioms Labyrinth.reform_patch_spec
+#print axioms Labyrinth.tick_sweep_spec
+#print axioms Labyrinth.reformW_cell
+#print axioms Labyrinth.tick_loop1_body_spec
+#print axioms Labyrinth.tick_loop1_spec
+#print axioms Labyrinth.reformW_eq_or
+#print axioms Labyrinth.drainW_eq_or
+#print axioms Labyrinth.tick_active_spec
+#print axioms Labyrinth.stampRejects_err
+#print axioms Labyrinth.begin_shatter_frame
+#print axioms Labyrinth.hide_patch_frame
+#print axioms Labyrinth.scatter_patch_frame
+#print axioms Labyrinth.not_outside_edges
+#print axioms Labyrinth.reform_patch_headline
+#print axioms Labyrinth.tick_patch_progress
+#print axioms Labyrinth.reformW_ready
+#print axioms Labyrinth.op_stage_steps
+#print axioms Labyrinth.begin_shatter_patch
+#print axioms Labyrinth.tick_finishing_walkers_ready
+#print axioms Labyrinth.begin_shatter_headline
+#print axioms Labyrinth.hide_patch_headline
+#print axioms Labyrinth.scatter_patch_headline
+#print axioms Labyrinth.tick_active_headline
