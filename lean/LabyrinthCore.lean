@@ -73,3 +73,4 @@ import LabyrinthCore.SceneReservationRemoval
 import LabyrinthCore.SceneShatterDrain
 import LabyrinthCore.SceneReservationInv
 import LabyrinthCore.SceneReservationTick
+import LabyrinthCore.SceneShatterOps

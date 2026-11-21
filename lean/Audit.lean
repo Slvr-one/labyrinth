@@ -35,6 +35,7 @@ import LabyrinthCore.SceneReservationRemoval
 import LabyrinthCore.SceneShatterDrain
 import LabyrinthCore.SceneReservationInv
 import LabyrinthCore.SceneReservationTick
+import LabyrinthCore.SceneShatterOps
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -331,3 +332,10 @@ import LabyrinthCore.SceneReservationTick
 #print axioms Labyrinth.tick_active_resinv
 #print axioms Labyrinth.resInv_remaining_ok
 #print axioms Labyrinth.resInv_held_positive
+#print axioms Labyrinth.slotVerdict_stale
+#print axioms Labyrinth.slotVerdict_index
+#print axioms Labyrinth.slotVerdict_bad
+#print axioms Labyrinth.slotVerdict_ok
+#print axioms Labyrinth.patch_slot_spec
+#print axioms Labyrinth.slotVerdict_cases
+#print axioms Labyrinth.patch_stage_spec
