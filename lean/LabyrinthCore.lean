@@ -96,3 +96,11 @@ import LabyrinthCore.SceneShatterTick
 import LabyrinthCore.SceneShatterFrame
 import LabyrinthCore.SceneSafetyTick
 import LabyrinthCore.SceneSafety
+import LabyrinthCore.SceneGeometryConnectorTotal
+import LabyrinthCore.SceneGeometryGridTotal
+import LabyrinthCore.SceneGeometryCircleTotal
+import LabyrinthCore.SceneGeometryCircleTotal2
+import LabyrinthCore.SceneGeometryEdgesTotal
+import LabyrinthCore.SceneGeometryEdgesTotal2
+import LabyrinthCore.SceneGeometryEdgesTotal3
+import LabyrinthCore.SceneGeometryLayoutTotal
