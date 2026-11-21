@@ -50,3 +50,4 @@ import LabyrinthCore.ConstructorSceneTotalPrefix
 import LabyrinthCore.ConstructorSceneAcceptance
 import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
+import LabyrinthCore.ScenePublication
