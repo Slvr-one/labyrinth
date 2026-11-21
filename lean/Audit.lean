@@ -81,6 +81,8 @@ import LabyrinthCore.SceneHoldTickActive
 import LabyrinthCore.SceneInvCarve
 import LabyrinthCore.SceneInvShatter
 import LabyrinthCore.SceneInvReform
+import LabyrinthCore.SceneInvNew
+import LabyrinthCore.SceneInvSummary
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -911,3 +913,15 @@ import LabyrinthCore.SceneInvReform
 #print axioms Labyrinth.reform_cap
 #print axioms Labyrinth.reform_patch_inv
 #print axioms Labyrinth.reform_patch_holdLaw
+#print axioms Labyrinth.new_walkers_ready
+#print axioms Labyrinth.new_patches_idle
+#print axioms Labyrinth.scene_new_facts
+#print axioms Labyrinth.crossMult_none
+#print axioms Labyrinth.newFacts_inv
+#print axioms Labyrinth.scene_new_inv
+#print axioms Labyrinth.sceneInvFull_ops
+#print axioms Labyrinth.sceneReachable_inv
+#print axioms Labyrinth.reachable_hold_exact
+#print axioms Labyrinth.crossMult_pos
+#print axioms Labyrinth.reachable_no_leaked_hold
+#print axioms Labyrinth.reachable_unheld_zero
