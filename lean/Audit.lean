@@ -56,6 +56,8 @@ import LabyrinthCore.SceneShatterBegin
 import LabyrinthCore.SceneShatterReform
 import LabyrinthCore.SceneShatterTick
 import LabyrinthCore.SceneShatterFrame
+import LabyrinthCore.SceneSafetyTick
+import LabyrinthCore.SceneSafety
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -580,3 +582,13 @@ import LabyrinthCore.SceneShatterFrame
 #print axioms Labyrinth.hide_patch_headline
 #print axioms Labyrinth.scatter_patch_headline
 #print axioms Labyrinth.tick_active_headline
+#print axioms Labyrinth.tickOutcome_resinv
+#print axioms Labyrinth.tick_spec
+#print axioms Labyrinth.tick_resinv
+#print axioms Labyrinth.doorway_corridor_valid
+#print axioms Labyrinth.crossing_blocks_fresh
+#print axioms Labyrinth.removals_avoid_crossings
+#print axioms Labyrinth.preflightOutcome_removals
+#print axioms Labyrinth.preflight_edit_safe
+#print axioms Labyrinth.reform_patch_safe
+#print axioms Labyrinth.begin_crossing_fresh

@@ -94,3 +94,5 @@ import LabyrinthCore.SceneShatterBegin
 import LabyrinthCore.SceneShatterReform
 import LabyrinthCore.SceneShatterTick
 import LabyrinthCore.SceneShatterFrame
+import LabyrinthCore.SceneSafetyTick
+import LabyrinthCore.SceneSafety
