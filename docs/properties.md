@@ -475,7 +475,7 @@ The check runner assumes these tools/dependencies are available; it does not ins
 From the repository root:
 
 ```sh
-python3 scripts/check-phase1.py
+cargo run --release --manifest-path tools/check/Cargo.toml
 ```
 
 The runner checks translator source revisions and the Aeneas executable version, then extracts
