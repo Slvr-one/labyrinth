@@ -108,3 +108,6 @@ import LabyrinthCore.SceneInvPrepare
 import LabyrinthCore.SceneDoorwayPhases
 import LabyrinthCore.SceneDoorwayCells
 import LabyrinthCore.SceneDoorwayLocal
+import LabyrinthCore.SceneInvFresh
+import LabyrinthCore.SceneInvCapacity
+import LabyrinthCore.SceneInvMotion

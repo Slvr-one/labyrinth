@@ -70,6 +70,9 @@ import LabyrinthCore.SceneInvPrepare
 import LabyrinthCore.SceneDoorwayPhases
 import LabyrinthCore.SceneDoorwayCells
 import LabyrinthCore.SceneDoorwayLocal
+import LabyrinthCore.SceneInvFresh
+import LabyrinthCore.SceneInvCapacity
+import LabyrinthCore.SceneInvMotion
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -792,3 +795,38 @@ import LabyrinthCore.SceneDoorwayLocal
 #print axioms Labyrinth.from_residual_not_ok
 #print axioms Labyrinth.doorway_holds_reads
 #print axioms Labyrinth.doorway_phase_local
+#print axioms Labyrinth.crossHeld_fresh
+#print axioms Labyrinth.crossSub_refl
+#print axioms Labyrinth.crossSub_trans
+#print axioms Labyrinth.relaxed_crossSub
+#print axioms Labyrinth.crossSub_pointwise
+#print axioms Labyrinth.crossHeld_transfer
+#print axioms Labyrinth.sceneInv_fresh
+#print axioms Labyrinth.sceneInv_of_eq_fields
+#print axioms Labyrinth.stamp_rejects_self
+#print axioms Labyrinth.suspend_inv
+#print axioms Labyrinth.resume_inv
+#print axioms Labyrinth.request_layout_inv
+#print axioms Labyrinth.reject_layout_frame
+#print axioms Labyrinth.reject_layout_inv
+#print axioms Labyrinth.publish_layout_inv
+#print axioms Labyrinth.begin_crossing_held
+#print axioms Labyrinth.set_parent_capacity
+#print axioms Labyrinth.clear_edits_capacity
+#print axioms Labyrinth.edit_edges_loop1_capacity
+#print axioms Labyrinth.attach_virtual_loop0_capacity
+#print axioms Labyrinth.attach_virtual_loop1_capacity
+#print axioms Labyrinth.attach_virtual_capacity
+#print axioms Labyrinth.edit_edges_loop2_capacity
+#print axioms Labyrinth.edit_edges_loop3_capacity
+#print axioms Labyrinth.edit_edges_capacity
+#print axioms Labyrinth.motionShape_err
+#print axioms Labyrinth.motionShape_residual
+#print axioms Labyrinth.preflight_shape
+#print axioms Labyrinth.preflightOutcome_ok_len
+#print axioms Labyrinth.motion_commit_shape
+#print axioms Labyrinth.stationary_shape
+#print axioms Labyrinth.motion_phase_room
+#print axioms Labyrinth.preflight_routes_len
+#print axioms Labyrinth.motion_shape
+#print axioms Labyrinth.motion_safe
