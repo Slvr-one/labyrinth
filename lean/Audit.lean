@@ -14,6 +14,7 @@ import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
+import LabyrinthCore.SceneGeometryGrid
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -152,3 +153,24 @@ import LabyrinthCore.ScenePublication
 #print axioms Labyrinth.tick_loop1_frame
 #print axioms Labyrinth.tick_active_lax
 #print axioms Labyrinth.tick_active
+#print axioms Labyrinth.coord_limit_val
+#print axioms Labyrinth.rectOk_iff
+#print axioms Labyrinth.int_tdiv_two_facts
+#print axioms Labyrinth.grid_point_validate_spec
+#print axioms Labyrinth.spec_exists_ok
+#print axioms Labyrinth.grid_rect_validate_spec
+#print axioms Labyrinth.i32_checked_add_cases
+#print axioms Labyrinth.i32_checked_sub_cases
+#print axioms Labyrinth.grid_geometry_margin_spec
+#print axioms Labyrinth.grid_rect_contains_spec
+#print axioms Labyrinth.grid_rect_union_spec
+#print axioms Labyrinth.grid_rect_intersects_spec
+#print axioms Labyrinth.i32_val_bounds
+#print axioms Labyrinth.grid_rect_expand_spec
+#print axioms Labyrinth.grid_rect_between_spec
+#print axioms Labyrinth.grid_geometry_check_loop_spec
+#print axioms Labyrinth.grid_geometry_check_spec
+#print axioms Labyrinth.grid_geometry_validate_loop_spec
+#print axioms Labyrinth.grid_geometry_validate_spec
+#print axioms Labyrinth.grid_rect_center_spec
+#print axioms Labyrinth.i32_clamp_spec

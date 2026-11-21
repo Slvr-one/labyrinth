@@ -52,3 +52,4 @@ import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
+import LabyrinthCore.SceneGeometryGrid
