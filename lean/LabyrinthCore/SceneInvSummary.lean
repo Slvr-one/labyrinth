@@ -1,5 +1,5 @@
 module
-public import LabyrinthCore.SceneInvSwept
+public import LabyrinthCore.SceneInvNewEdit
 
 /-! The scene invariant, part 11: the summary.
 
@@ -13,9 +13,10 @@ covered public operations: `suspend`, `resume`, `request_layout`, `reject_layout
 covered: `advance_motion` with the motion planner.
 
 `sceneReachable_inv`: every reachable scene satisfies the scene invariant and the hold law. The
-construction step assumes the edit preconditions `EditSafe` and `EditCapacity` of the scene
-`Scene::new` returns (see `scene_new_inv`); everything else the invariant states about that scene is
-proved.
+construction step starts from a layout `Layout::new` accepted and a legal generator, and assumes
+one fact about the scene `Scene::new` returns: its tree is valid on the layout's carrier
+(`scene_dfs` proves it valid on the carrier of the live edges, a subset of the layout carrier's
+edges). Everything else the invariant states about that scene is proved (`scene_new_full`).
 
 The hold law answers the hold-release question: every counter equals the number of crossing-holds on
 it (`reachable_hold_exact`), so a positive counter is always held by a crossing walker
@@ -32,12 +33,15 @@ def SceneInvFull (s : scene.Scene) : Prop := SceneInv s ∧ HoldLaw s
 
 /-- Scenes built by `Scene::new` and changed by the covered operations. -/
 inductive SceneReachable : scene.Scene → Prop
-  | new {R : Type} (treeRngInst : tree.Rng R) (layout : scene.Layout) (routes : Slice scene.Route)
-      (occupants : Slice Std.Usize) (patch_capacity : Std.Usize) (epoch : Std.U64) (rng rng' : R)
-      (s : scene.Scene) (hL : LayoutGeom layout)
+  | new {R : Type} (treeRngInst : tree.Rng R) (hrng : constructorLegalRng treeRngInst)
+      (grid_spec : grid.GridSpec) (specs : alloc.vec.Vec polar.PolarSpec)
+      (ps : Slice polar.PortalSpec) (geometry : grid.Geometry) (layout : scene.Layout)
+      (hlayout : scene.Layout.new grid_spec specs ps geometry = ok (.Ok layout))
+      (routes : Slice scene.Route) (occupants : Slice Std.Usize) (patch_capacity : Std.Usize)
+      (epoch : Std.U64) (rng rng' : R) (s : scene.Scene)
       (h : scene.Scene.new treeRngInst layout routes occupants patch_capacity epoch rng =
         ok (.Ok s, rng'))
-      (hsafe : EditSafe s) (hcap : EditCapacity s) : SceneReachable s
+      (htree : TreeValid s.layout.carrier s.tree) : SceneReachable s
   | suspend (s s' : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) (hs : SceneReachable s)
       (h : ∃ r, scene.Scene.suspend s stamp wall = ok (r, s')) : SceneReachable s'
   | resume (s s' : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) (hs : SceneReachable s)
@@ -125,10 +129,12 @@ theorem sceneInvFull_ops (s : scene.Scene) (h : SceneInvFull s) :
 /-- **Every reachable scene satisfies the scene invariant and the hold law.** -/
 theorem sceneReachable_inv {s : scene.Scene} (h : SceneReachable s) : SceneInvFull s := by
   induction h with
-  | new treeRngInst layout routes occupants patch_capacity epoch rng rng' s hL h hsafe hcap =>
-    obtain ⟨hlaw, hinv⟩ :=
-      scene_new_inv treeRngInst layout routes occupants patch_capacity epoch rng hL _ h s rfl
-    exact ⟨hinv hsafe hcap, hlaw⟩
+  | new treeRngInst hrng grid_spec specs ps geometry layout hlayout routes occupants
+      patch_capacity epoch rng rng' s h htree =>
+    obtain ⟨hL, hc⟩ := layout_new_geom grid_spec specs ps geometry _ hlayout layout rfl
+    obtain ⟨hlaw, _, hinv⟩ := scene_new_full treeRngInst hrng layout routes occupants
+      patch_capacity epoch rng hc hL _ h s rfl
+    exact ⟨hinv htree, hlaw⟩
   | suspend s s' stamp wall _ h ih =>
     obtain ⟨r, hr⟩ := h; exact (sceneInvFull_ops s ih).1 stamp wall _ hr
   | resume s s' stamp wall _ h ih =>

@@ -84,6 +84,8 @@ import LabyrinthCore.SceneInvReform
 import LabyrinthCore.SceneInvNew
 import LabyrinthCore.SceneInvSummary
 import LabyrinthCore.SceneInvSwept
+import LabyrinthCore.SceneInvNewWork
+import LabyrinthCore.SceneInvNewEdit
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -929,3 +931,16 @@ import LabyrinthCore.SceneInvSwept
 #print axioms Labyrinth.swept_doorway_loop_len
 #print axioms Labyrinth.swept_doorway_shape
 #print axioms Labyrinth.swept_doorway_inv
+#print axioms Labyrinth.clear_edits_frame
+#print axioms Labyrinth.depth_first_loop0_frame
+#print axioms Labyrinth.depth_first_frame
+#print axioms Labyrinth.scene_dfs_loop7_frame
+#print axioms Labyrinth.scene_dfs_loop8_frame
+#print axioms Labyrinth.index_mut_back_len
+#print axioms Labyrinth.scene_dfs_loop9_loop0_len
+#print axioms Labyrinth.scene_dfs_loop9_len
+#print axioms Labyrinth.scene_dfs_frame
+#print axioms Labyrinth.allEdges_congr
+#print axioms Labyrinth.new_routes_copy
+#print axioms Labyrinth.scene_new_edit_facts
+#print axioms Labyrinth.scene_new_full
