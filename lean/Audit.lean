@@ -23,6 +23,7 @@ import LabyrinthCore.SceneGeometryBounds
 import LabyrinthCore.SceneGeometryLayout
 import LabyrinthCore.SceneGeometrySweep
 import LabyrinthCore.SceneGeometryDoorway
+import LabyrinthCore.SceneGeometryValidate
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -270,3 +271,17 @@ import LabyrinthCore.SceneGeometryDoorway
 #print axioms Labyrinth.doorway_cartesian_tail
 #print axioms Labyrinth.layout_doorway_spec
 #print axioms Labyrinth.layout_doorway_total
+#print axioms Labyrinth.okPost_spec
+#print axioms Labyrinth.okPost_any
+#print axioms Labyrinth.okPost_const
+#print axioms Labyrinth.okPost_residual
+#print axioms Labyrinth.polar_arc_validate_spec
+#print axioms Labyrinth.PortalSpecOk
+#print axioms Labyrinth.check_portal_spec_ok
+#print axioms Labyrinth.check_circle_extent_ok
+#print axioms Labyrinth.SectorsUpTo
+#print axioms Labyrinth.circle_new_loop0_ok
+#print axioms Labyrinth.i32_checked_mul_cases
+#print axioms Labyrinth.range_inclusive_new_eq
+#print axioms Labyrinth.okPost_residual_gen
+#print axioms Labyrinth.circle_new_ok
