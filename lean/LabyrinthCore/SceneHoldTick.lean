@@ -29,22 +29,24 @@ theorem crossSub_set {a b : List walker.Walker} (h : CrossSub a b) (i : Nat) (n 
 /-- **The walker loop of `tick`, exactly.** -/
 theorem tick_loop0_exact (delta : Std.U64) :
     ∀ (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec walker.Walker) (w : Std.Usize),
-      w.val ≤ v1.val.length → ResInvL v1.val v.val → HoldEqL v1.val v.val →
+      w.val ≤ v1.val.length → ResInvL v1.val v.val →
       scene.Scene.tick_loop0 v v1 delta w ⦃ r =>
-        ResInvL r.2.val r.1.val ∧ HoldEqL r.2.val r.1.val ∧ CrossSub v1.val r.2.val ∧
+        ResInvL r.2.val r.1.val ∧ (HoldEqL v1.val v.val → HoldEqL r.2.val r.1.val) ∧
+        CrossSub v1.val r.2.val ∧
         r.2.val.length = v1.val.length ∧ r.1.val.length = v.val.length ⦄ := by
-  intro v0 v10 w0 hw0 hinv0 heq0
+  intro v0 v10 w0 hw0 hinv0
   unfold scene.Scene.tick_loop0
   refine loop.spec_decr_nat
     (fun s : alloc.vec.Vec Std.Usize × alloc.vec.Vec walker.Walker × Std.Usize =>
       v10.val.length - s.2.2.val)
     (fun s => s.2.2.val ≤ v10.val.length ∧ s.2.1.val.length = v10.val.length ∧
-      s.1.val.length = v0.val.length ∧ ResInvL s.2.1.val s.1.val ∧ HoldEqL s.2.1.val s.1.val ∧
-      CrossSub v10.val s.2.1.val)
+      s.1.val.length = v0.val.length ∧ ResInvL s.2.1.val s.1.val ∧
+      (HoldEqL v10.val v0.val → HoldEqL s.2.1.val s.1.val) ∧ CrossSub v10.val s.2.1.val)
     (fun r : alloc.vec.Vec Std.Usize × alloc.vec.Vec walker.Walker =>
-      ResInvL r.2.val r.1.val ∧ HoldEqL r.2.val r.1.val ∧ CrossSub v10.val r.2.val ∧
+      ResInvL r.2.val r.1.val ∧ (HoldEqL v10.val v0.val → HoldEqL r.2.val r.1.val) ∧
+      CrossSub v10.val r.2.val ∧
       r.2.val.length = v10.val.length ∧ r.1.val.length = v0.val.length) _ _ ?_
-    ⟨hw0, rfl, rfl, hinv0, heq0, crossSub_refl _⟩
+    ⟨hw0, rfl, rfl, hinv0, fun h => h, crossSub_refl _⟩
   rintro ⟨v, v1, w⟩ ⟨hw, hlen1, hlenv, hinv, heq, hsub⟩
   simp only at hw hlen1 hlenv hinv heq hsub
   unfold scene.Scene.tick_loop0.body
@@ -144,11 +146,11 @@ theorem tick_loop0_exact (delta : Std.U64) :
             have := hdone k
             omega
         · rw [hfinal]
-          intro k hk
+          intro h0 k hk
           rw [hrl] at hk
           obtain ⟨a, b, ha, hb, hab⟩ := hr.2 k hk
           rw [prefMult_full c.holds k hcnt] at hab
-          obtain ⟨b', hb', he⟩ := heq k hk
+          obtain ⟨b', hb', he⟩ := heq h0 k hk
           rw [hb] at hb'; cases hb'
           refine ⟨a, ha, ?_⟩
           have := hdone k
@@ -205,10 +207,10 @@ theorem tick_loop0_exact (delta : Std.U64) :
           · intro k hk
             obtain ⟨a, ha, hle⟩ := hinv.2 k hk
             exact ⟨a, ha, by rw [hsame k]; exact hle⟩
-        · show HoldEqL (v1.set w (stepWalker w2 c i3)).val v.val
+        · show HoldEqL v10.val v0.val → HoldEqL (v1.set w (stepWalker w2 c i3)).val v.val
           rw [alloc.vec.Vec.set_val_eq]
-          intro k hk
-          obtain ⟨a, ha, he⟩ := heq k hk
+          intro h0 k hk
+          obtain ⟨a, ha, he⟩ := heq h0 k hk
           exact ⟨a, ha, by rw [hsame k]; exact he⟩
         · show CrossSub v10.val (v1.set w (stepWalker w2 c i3)).val
           rw [alloc.vec.Vec.set_val_eq]

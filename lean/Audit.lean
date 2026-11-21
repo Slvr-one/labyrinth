@@ -77,6 +77,7 @@ import LabyrinthCore.SceneInvEdit
 import LabyrinthCore.SceneHoldLaw
 import LabyrinthCore.SceneHoldTick
 import LabyrinthCore.SceneHoldPatches
+import LabyrinthCore.SceneHoldTickActive
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -877,3 +878,9 @@ import LabyrinthCore.SceneHoldPatches
 #print axioms Labyrinth.reformW_same
 #print axioms Labyrinth.reform_clear
 #print axioms Labyrinth.same_comp
+#print axioms Labyrinth.tick_active_exact
+#print axioms Labyrinth.tickSweep_relaxed
+#print axioms Labyrinth.tickSweep_same
+#print axioms Labyrinth.tick_cases
+#print axioms Labyrinth.tick_inv
+#print axioms Labyrinth.tick_holdLaw

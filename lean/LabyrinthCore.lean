@@ -115,3 +115,4 @@ import LabyrinthCore.SceneInvEdit
 import LabyrinthCore.SceneHoldLaw
 import LabyrinthCore.SceneHoldTick
 import LabyrinthCore.SceneHoldPatches
+import LabyrinthCore.SceneHoldTickActive
