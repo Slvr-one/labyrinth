@@ -15,6 +15,7 @@ import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
 import LabyrinthCore.SceneGeometryGrid
+import LabyrinthCore.SceneGeometryBase
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -174,3 +175,6 @@ import LabyrinthCore.SceneGeometryGrid
 #print axioms Labyrinth.grid_geometry_validate_spec
 #print axioms Labyrinth.grid_rect_center_spec
 #print axioms Labyrinth.i32_clamp_spec
+#print axioms Labyrinth.turn_val
+#print axioms Labyrinth.polar_normalize_spec
+#print axioms Labyrinth.arcOk_bnd
