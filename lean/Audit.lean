@@ -36,6 +36,21 @@ import LabyrinthCore.SceneShatterDrain
 import LabyrinthCore.SceneReservationInv
 import LabyrinthCore.SceneReservationTick
 import LabyrinthCore.SceneShatterOps
+import LabyrinthCore.SceneGeometryGrid
+import LabyrinthCore.SceneGeometryBase
+import LabyrinthCore.SceneGeometryArc
+import LabyrinthCore.SceneGeometryCordic
+import LabyrinthCore.SceneGeometryCircle
+import LabyrinthCore.SceneGeometryBounds
+import LabyrinthCore.SceneGeometryLayout
+import LabyrinthCore.SceneGeometrySweep
+import LabyrinthCore.SceneGeometryDoorway
+import LabyrinthCore.SceneGeometryValidate
+import LabyrinthCore.SceneGeometryLayoutNew
+import LabyrinthCore.SceneGeometryReject
+import LabyrinthCore.SceneGeometryDisk
+import LabyrinthCore.SceneGeometryMinimum
+import LabyrinthCore.SceneGeometryFloor
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -339,3 +354,186 @@ import LabyrinthCore.SceneShatterOps
 #print axioms Labyrinth.patch_slot_spec
 #print axioms Labyrinth.slotVerdict_cases
 #print axioms Labyrinth.patch_stage_spec
+#print axioms Labyrinth.coord_limit_val
+#print axioms Labyrinth.rectOk_iff
+#print axioms Labyrinth.int_tdiv_two_facts
+#print axioms Labyrinth.grid_point_validate_spec
+#print axioms Labyrinth.spec_exists_ok
+#print axioms Labyrinth.grid_rect_validate_spec
+#print axioms Labyrinth.i32_checked_add_cases
+#print axioms Labyrinth.i32_checked_sub_cases
+#print axioms Labyrinth.grid_geometry_margin_spec
+#print axioms Labyrinth.grid_rect_contains_spec
+#print axioms Labyrinth.grid_rect_union_spec
+#print axioms Labyrinth.grid_rect_intersects_spec
+#print axioms Labyrinth.i32_val_bounds
+#print axioms Labyrinth.grid_rect_expand_spec
+#print axioms Labyrinth.grid_rect_between_spec
+#print axioms Labyrinth.grid_geometry_check_loop_spec
+#print axioms Labyrinth.grid_geometry_check_spec
+#print axioms Labyrinth.grid_geometry_validate_loop_spec
+#print axioms Labyrinth.grid_geometry_validate_spec
+#print axioms Labyrinth.grid_rect_center_spec
+#print axioms Labyrinth.i32_clamp_spec
+#print axioms Labyrinth.turn_val
+#print axioms Labyrinth.polar_normalize_spec
+#print axioms Labyrinth.arcOk_bnd
+#print axioms Labyrinth.polar_angle_delta_spec
+#print axioms Labyrinth.polar_arc_contains_spec
+#print axioms Labyrinth.polar_arc_shifted_spec
+#print axioms Labyrinth.polar_arc_swept_spec
+#print axioms Labyrinth.polar_arc_middle_spec
+#print axioms Labyrinth.arcs_len_val
+#print axioms Labyrinth.polar_overlap_inner_spec
+#print axioms Labyrinth.polar_overlap_outer_spec
+#print axioms Labyrinth.polar_overlap_spec
+#print axioms Labyrinth.polar_scale_spec
+#print axioms Labyrinth.cordic_gain_val
+#print axioms Labyrinth.cordic_atan_mem
+#print axioms Labyrinth.cordic_atan_len
+#print axioms Labyrinth.cordic_atan_slice_len
+#print axioms Labyrinth.polar_atan_index_spec
+#print axioms Labyrinth.cordic_pow_le
+#print axioms Labyrinth.cordic_shift_abs
+#print axioms Labyrinth.cordic_tdiv_abs
+#print axioms Labyrinth.cordic_mul_abs
+#print axioms Labyrinth.cordic_quot_bound
+#print axioms Labyrinth.cordic_i64_clamp_spec
+#print axioms Labyrinth.polar_unit_vector_loop_body_spec
+#print axioms Labyrinth.polar_unit_vector_loop_spec
+#print axioms Labyrinth.cordic_shl20
+#print axioms Labyrinth.polar_unit_vector_spec
+#print axioms Labyrinth.polar_point_spec
+#print axioms Labyrinth.sector_arc_arith
+#print axioms Labyrinth.usize_hcast_i32_spec
+#print axioms Labyrinth.i64_from_i32_spec
+#print axioms Labyrinth.i64_cast_i32_spec
+#print axioms Labyrinth.circle_arc_spec
+#print axioms Labyrinth.circle_rings_le
+#print axioms Labyrinth.circle_ring_count_spec
+#print axioms Labyrinth.circle_mode_spec
+#print axioms Labyrinth.circle_center_spec
+#print axioms Labyrinth.circle_radius_spec
+#print axioms Labyrinth.direction_sign_spec
+#print axioms Labyrinth.circle_offset_spec
+#print axioms Labyrinth.tdiv_mul_small
+#print axioms Labyrinth.tdiv_mul_small_bound
+#print axioms Labyrinth.circle_offset_at_valid_loop_spec
+#print axioms Labyrinth.int_mul_bounds
+#print axioms Labyrinth.ringRadius_succ
+#print axioms Labyrinth.circle_offset_at_valid_tail
+#print axioms Labyrinth.circle_offset_at_valid_spec
+#print axioms Labyrinth.polar_point_near
+#print axioms Labyrinth.polar_bounds_loop0_loop0_spec
+#print axioms Labyrinth.polar_bounds_loop0_spec
+#print axioms Labyrinth.polar_bounds_spec
+#print axioms Labyrinth.LayoutGeom
+#print axioms Labyrinth.cellCircle_lt
+#print axioms Labyrinth.layout_circle_of_spec
+#print axioms Labyrinth.layout_local_pose_spec
+#print axioms Labyrinth.layout_local_pose_step
+#print axioms Labyrinth.layout_frame_pose_spec
+#print axioms Labyrinth.layout_world_spec
+#print axioms Labyrinth.layout_cell_arc_spec
+#print axioms Labyrinth.layout_cell_arc_step
+#print axioms Labyrinth.layout_swept_arc_spec
+#print axioms Labyrinth.usize_saturating_sub_one
+#print axioms Labyrinth.walker_holds_insert_loop_spec
+#print axioms Labyrinth.array4_len_val
+#print axioms Labyrinth.walker_holds_insert_spec
+#print axioms Labyrinth.layout_holds_loop1_spec
+#print axioms Labyrinth.layout_holds_loop2_spec
+#print axioms Labyrinth.layout_holds_loop0_spec
+#print axioms Labyrinth.layout_circle_of_step
+#print axioms Labyrinth.layout_holds_spec
+#print axioms Labyrinth.SweepOk
+#print axioms Labyrinth.CircleOk.ring_end_le
+#print axioms Labyrinth.layout_cell_sweep_spec
+#print axioms Labyrinth.HoldStatusOk
+#print axioms Labyrinth.CorridorOk
+#print axioms Labyrinth.DoorwayOk
+#print axioms Labyrinth.grid_rect_between_near
+#print axioms Labyrinth.branch_ok_eq
+#print axioms Labyrinth.branch_err_eq
+#print axioms Labyrinth.bind_ite_ok
+#print axioms Labyrinth.scene_same_ring_spec
+#print axioms Labyrinth.doorway_err_residual
+#print axioms Labyrinth.doorway_check_tail
+#print axioms Labyrinth.doorway_sweep_tail
+#print axioms Labyrinth.doorway_cartesian_tail
+#print axioms Labyrinth.layout_doorway_spec
+#print axioms Labyrinth.layout_doorway_total
+#print axioms Labyrinth.okPost_spec
+#print axioms Labyrinth.okPost_any
+#print axioms Labyrinth.okPost_const
+#print axioms Labyrinth.okPost_residual
+#print axioms Labyrinth.polar_arc_validate_spec
+#print axioms Labyrinth.PortalSpecOk
+#print axioms Labyrinth.check_portal_spec_ok
+#print axioms Labyrinth.check_circle_extent_ok
+#print axioms Labyrinth.SectorsUpTo
+#print axioms Labyrinth.circle_new_loop0_ok
+#print axioms Labyrinth.i32_checked_mul_cases
+#print axioms Labyrinth.range_inclusive_new_eq
+#print axioms Labyrinth.okPost_residual_gen
+#print axioms Labyrinth.circle_new_ok
+#print axioms Labyrinth.CircleOk.congr
+#print axioms Labyrinth.CircleOk.mono
+#print axioms Labyrinth.usize_checked_add_some
+#print axioms Labyrinth.vec_push_okPost
+#print axioms Labyrinth.CirclesOk
+#print axioms Labyrinth.layout_new_loop0_ok
+#print axioms Labyrinth.BandsOk
+#print axioms Labyrinth.layout_new_loop1_ok
+#print axioms Labyrinth.vec_deref_val
+#print axioms Labyrinth.ExtentOk
+#print axioms Labyrinth.layout_new_loop2_ok
+#print axioms Labyrinth.CellOkS
+#print axioms Labyrinth.CellOkS.extend
+#print axioms Labyrinth.GridCellOk
+#print axioms Labyrinth.layout_new_loop3_inner_ok
+#print axioms Labyrinth.layout_new_loop3_loop0_ok
+#print axioms Labyrinth.layout_new_loop3_ok
+#print axioms Labyrinth.circleKey
+#print axioms Labyrinth.keys_set
+#print axioms Labyrinth.specs_of_keys
+#print axioms Labyrinth.layout_new_loop4_sectors_ok
+#print axioms Labyrinth.layout_new_loop4_rings_ok
+#print axioms Labyrinth.layout_new_loop4_ok
+#print axioms Labyrinth.resolve_portal_ok
+#print axioms Labyrinth.PortalLoopInv
+#print axioms Labyrinth.layout_new_loop5_ok
+#print axioms Labyrinth.cellOkS_cellOk
+#print axioms Labyrinth.keys_get
+#print axioms Labyrinth.okPost_branch_err
+#print axioms Labyrinth.okPost_branch_ok
+#print axioms Labyrinth.layout_new_geom
+#print axioms Labyrinth.layout_new_doorway_total
+#print axioms Labyrinth.SceneGeom
+#print axioms Labyrinth.GeomErr
+#print axioms Labyrinth.scene_cell_pose_spec
+#print axioms Labyrinth.scene_cell_fits_spec
+#print axioms Labyrinth.rejectLoopS
+#print axioms Labyrinth.rejectLoop
+#print axioms Labyrinth.rejectLoopS_unfold
+#print axioms Labyrinth.rejectScan_eq
+#print axioms Labyrinth.ScanRel
+#print axioms Labyrinth.reject_loop_total
+#print axioms Labyrinth.rejectScan_total
+#print axioms Labyrinth.ScanRel.ok_iff
+#print axioms Labyrinth.ScanRel.err_iff
+#print axioms Labyrinth.RejectOutcome
+#print axioms Labyrinth.reject_layout_total
+#print axioms Labyrinth.i32_clamp_val
+#print axioms Labyrinth.diskDist2
+#print axioms Labyrinth.diskDist2_bound
+#print axioms Labyrinth.grid_rect_touches_disk_spec
+#print axioms Labyrinth.grid_rect_touches_disk_total
+#print axioms Labyrinth.doorway_minimum_arith
+#print axioms Labyrinth.doorway_minimum_exact
+#print axioms Labyrinth.circle_new_floor
+#print axioms Labyrinth.CirclesFloor
+#print axioms Labyrinth.layout_new_loop0_floor
+#print axioms Labyrinth.layoutMargin
+#print axioms Labyrinth.LayoutFloor
+#print axioms Labyrinth.layout_doorway_minimum_exact
