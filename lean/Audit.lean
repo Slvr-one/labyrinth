@@ -20,6 +20,8 @@ import LabyrinthCore.SceneConstructionRequired
 import LabyrinthCore.SceneConstructionLive
 import LabyrinthCore.SceneConstructionOccupants
 import LabyrinthCore.SceneConstruction
+import LabyrinthCore.ScenePreflightRoutes
+import LabyrinthCore.ScenePreflight
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -184,3 +186,34 @@ import LabyrinthCore.SceneConstruction
 #print axioms Labyrinth.scene_new_occupant_loop_body
 #print axioms Labyrinth.scene_new_occupant_loop
 #print axioms Labyrinth.scene_new_spec
+#print axioms Labyrinth.exists_idx_iff_mem
+#print axioms Labyrinth.scene_contains_spec
+#print axioms Labyrinth.route_admit_cert
+#print axioms Labyrinth.check_route_edge_cert
+#print axioms Labyrinth.check_route_loop_body_cert
+#print axioms Labyrinth.check_route_loop_cert
+#print axioms Labyrinth.check_route_cert
+#print axioms Labyrinth.check_routes_loop_body_cert
+#print axioms Labyrinth.check_routes_loop_cert
+#print axioms Labyrinth.scene_check_routes_cert
+#print axioms Labyrinth.route_edge_list_le
+#print axioms Labyrinth.all_edges_le
+#print axioms Labyrinth.canonical_of_le
+#print axioms Labyrinth.tree_cert_edited
+#print axioms Labyrinth.scene_check_routes_route_certificate
+#print axioms Labyrinth.usize_succ_spec
+#print axioms Labyrinth.deref_val
+#print axioms Labyrinth.slice_index_ok
+#print axioms Labyrinth.scene_check_removal_spec
+#print axioms Labyrinth.preflight_edit_loop0_body_post
+#print axioms Labyrinth.preflight_edit_loop0_post
+#print axioms Labyrinth.preflight_edit_loop2_body_post
+#print axioms Labyrinth.preflight_edit_loop2_post
+#print axioms Labyrinth.preflight_edit_loop1_body_post
+#print axioms Labyrinth.preflight_edit_loop1_post
+#print axioms Labyrinth.preflight_edit_loop2_err
+#print axioms Labyrinth.scene_preflight_edit_spec
+#print axioms Labyrinth.pf_route_call_inv
+#print axioms Labyrinth.pf_route_call_certificate
+#print axioms Labyrinth.scene_preflight_edit_frame
+#print axioms Labyrinth.scene_preflight_edit_accepted
