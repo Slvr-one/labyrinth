@@ -63,3 +63,4 @@ import LabyrinthCore.SceneGeometrySweep
 import LabyrinthCore.SceneGeometryDoorway
 import LabyrinthCore.SceneGeometryValidate
 import LabyrinthCore.SceneGeometryLayoutNew
+import LabyrinthCore.SceneGeometryReject

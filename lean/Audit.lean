@@ -25,6 +25,7 @@ import LabyrinthCore.SceneGeometrySweep
 import LabyrinthCore.SceneGeometryDoorway
 import LabyrinthCore.SceneGeometryValidate
 import LabyrinthCore.SceneGeometryLayoutNew
+import LabyrinthCore.SceneGeometryReject
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -318,3 +319,18 @@ import LabyrinthCore.SceneGeometryLayoutNew
 #print axioms Labyrinth.okPost_branch_ok
 #print axioms Labyrinth.layout_new_geom
 #print axioms Labyrinth.layout_new_doorway_total
+#print axioms Labyrinth.SceneGeom
+#print axioms Labyrinth.GeomErr
+#print axioms Labyrinth.scene_cell_pose_spec
+#print axioms Labyrinth.scene_cell_fits_spec
+#print axioms Labyrinth.rejectLoopS
+#print axioms Labyrinth.rejectLoop
+#print axioms Labyrinth.rejectLoopS_unfold
+#print axioms Labyrinth.rejectScan_eq
+#print axioms Labyrinth.ScanRel
+#print axioms Labyrinth.reject_loop_total
+#print axioms Labyrinth.rejectScan_total
+#print axioms Labyrinth.ScanRel.ok_iff
+#print axioms Labyrinth.ScanRel.err_iff
+#print axioms Labyrinth.RejectOutcome
+#print axioms Labyrinth.reject_layout_total
