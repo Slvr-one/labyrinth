@@ -15,6 +15,7 @@ import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
 import LabyrinthCore.SceneConstructionChecks
+import LabyrinthCore.SceneConstructionSpinning
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -162,3 +163,4 @@ import LabyrinthCore.SceneConstructionChecks
 #print axioms Labyrinth.scene_new_overflow_route_storage
 #print axioms Labyrinth.scene_new_overflow_transform_storage
 #print axioms Labyrinth.scene_new_checks_pass
+#print axioms Labyrinth.layout_check_spinning_portals_post
