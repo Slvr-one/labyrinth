@@ -31,6 +31,11 @@ import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
 import LabyrinthCore.SceneGeometryConnectorTotal
 import LabyrinthCore.SceneGeometryGridTotal
+import LabyrinthCore.SceneGeometryCircleTotal
+import LabyrinthCore.SceneGeometryCircleTotal2
+import LabyrinthCore.SceneGeometryEdgesTotal
+import LabyrinthCore.SceneGeometryEdgesTotal2
+import LabyrinthCore.SceneGeometryEdgesTotal3
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -388,3 +393,99 @@ import LabyrinthCore.SceneGeometryGridTotal
 #print axioms Labyrinth.layout_new_loop3_loop0_total
 #print axioms Labyrinth.layout_new_loop3_total
 #print axioms Labyrinth.layout_new_loop3_total_new
+#print axioms Labyrinth.CircleErr
+#print axioms Labyrinth.CircleStatus
+#print axioms Labyrinth.circle_status_ok
+#print axioms Labyrinth.circle_status_err
+#print axioms Labyrinth.usize_hcast_turn_spec
+#print axioms Labyrinth.circle_loop0_total
+#print axioms Labyrinth.usize_hcast_i64_spec
+#print axioms Labyrinth.tdiv_bounds
+#print axioms Labyrinth.circle_loop1_total
+#print axioms Labyrinth.direction_ne_total
+#print axioms Labyrinth.circle_twist_status_total
+#print axioms Labyrinth.circle_relative_total
+#print axioms Labyrinth.circle_loop2_total
+#print axioms Labyrinth.circle_loop3_total
+#print axioms Labyrinth.motion_eq_spinning
+#print axioms Labyrinth.motion_eq_twisting
+#print axioms Labyrinth.circle_residual_spec
+#print axioms Labyrinth.circle_new_spec
+#print axioms Labyrinth.circle_new_total
+#print axioms Labyrinth.into_iter_next_spec
+#print axioms Labyrinth.layout_new_loop0_spec
+#print axioms Labyrinth.layout_new_loop0_total
+#print axioms Labyrinth.polar_arc_validate_err
+#print axioms Labyrinth.i32_prod_bound
+#print axioms Labyrinth.check_portal_spec_spec
+#print axioms Labyrinth.layout_new_loop1_spec
+#print axioms Labyrinth.layout_new_loop1_total
+#print axioms Labyrinth.i32_sq_bound
+#print axioms Labyrinth.check_circle_extent_loop0_spec
+#print axioms Labyrinth.check_circle_extent_loop1_spec
+#print axioms Labyrinth.ExtentErr
+#print axioms Labyrinth.unit_residual_spec
+#print axioms Labyrinth.check_circle_extent_spec
+#print axioms Labyrinth.check_circle_extent_total
+#print axioms Labyrinth.layout_new_loop2_spec
+#print axioms Labyrinth.layout_new_loop2_total
+#print axioms Labyrinth.check_portal_spec_total
+#print axioms Labyrinth.ringSum
+#print axioms Labyrinth.sectorSum
+#print axioms Labyrinth.circleCells
+#print axioms Labyrinth.cellsFrom
+#print axioms Labyrinth.sectorsFrom
+#print axioms Labyrinth.ringSum_succ
+#print axioms Labyrinth.ringSum_ge
+#print axioms Labyrinth.ringSum_of_ge
+#print axioms Labyrinth.cellsFrom_succ
+#print axioms Labyrinth.sectorsFrom_succ
+#print axioms Labyrinth.cellsFrom_of_ge
+#print axioms Labyrinth.sectorsFrom_le_cellsFrom
+#print axioms Labyrinth.circleKey_spec
+#print axioms Labyrinth.ringSum_congr
+#print axioms Labyrinth.circleCells_congr
+#print axioms Labyrinth.cellsFrom_congr
+#print axioms Labyrinth.sectorSum_congr
+#print axioms Labyrinth.sectorsFrom_congr
+#print axioms Labyrinth.RingStartsLen
+#print axioms Labyrinth.PlacedTo
+#print axioms Labyrinth.Placed
+#print axioms Labyrinth.PlacedTo.mono
+#print axioms Labyrinth.Placed.mono
+#print axioms Labyrinth.PlacedTo.placed
+#print axioms Labyrinth.Placed.congr
+#print axioms Labyrinth.GridFree
+#print axioms Labyrinth.GridIdx
+#print axioms Labyrinth.GridIdx.append
+#print axioms Labyrinth.GridFree.append
+#print axioms Labyrinth.GridFree.singleton
+#print axioms Labyrinth.usize_max_ge
+#print axioms Labyrinth.layout_new_loop4_sectors_total
+#print axioms Labyrinth.layout_new_loop4_rings_total
+#print axioms Labyrinth.layout_new_loop4_total
+#print axioms Labyrinth.layout_new_loop3_loop0_idx
+#print axioms Labyrinth.layout_new_loop3_idx
+#print axioms Labyrinth.arcsOk_of_two
+#print axioms Labyrinth.resolve_portal_loop_total
+#print axioms Labyrinth.resolve_portal_total
+#print axioms Labyrinth.layout_new_loop5_total
+#print axioms Labyrinth.circle_new_loop0_rs
+#print axioms Labyrinth.circle_new_ring_starts
+#print axioms Labyrinth.layout_new_loop0_ring_starts
+#print axioms Labyrinth.push_edge_spec
+#print axioms Labyrinth.sectorsFrom_of_ge'
+#print axioms Labyrinth.layout_new_loop7_inner_total
+#print axioms Labyrinth.edges_cond_push
+#print axioms Labyrinth.layout_new_loop7_sectors_total
+#print axioms Labyrinth.layout_new_loop7_rings_total
+#print axioms Labyrinth.layout_new_loop7_total
+#print axioms Labyrinth.layout_new_loop8_inner_total
+#print axioms Labyrinth.layout_new_loop8_total
+#print axioms Labyrinth.layout_new_loop6_down
+#print axioms Labyrinth.layout_new_loop6_block
+#print axioms Labyrinth.layout_new_loop6_total
+#print axioms Labyrinth.circlesOk_of_keys
+#print axioms Labyrinth.edges_sum_bound
+#print axioms Labyrinth.layout_new_loop4_positions
+#print axioms Labyrinth.layout_new_edges_total
