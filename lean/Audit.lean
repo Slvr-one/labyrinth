@@ -66,6 +66,10 @@ import LabyrinthCore.SceneGeometryEdgesTotal
 import LabyrinthCore.SceneGeometryEdgesTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal3
 import LabyrinthCore.SceneGeometryLayoutTotal
+import LabyrinthCore.SceneInvPrepare
+import LabyrinthCore.SceneDoorwayPhases
+import LabyrinthCore.SceneDoorwayCells
+import LabyrinthCore.SceneDoorwayLocal
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -743,3 +747,48 @@ import LabyrinthCore.SceneGeometryLayoutTotal
 #print axioms Labyrinth.layout_new_total
 #print axioms Labyrinth.layout_new_ok_post
 #print axioms Labyrinth.layout_new_doorway_minimum_exact
+#print axioms Labyrinth.normalize_ok_val
+#print axioms Labyrinth.i32_add_ok
+#print axioms Labyrinth.vec_index_some
+#print axioms Labyrinth.slice_index_some
+#print axioms Labyrinth.index_mut_ok_lt
+#print axioms Labyrinth.prepEntry_set
+#print axioms Labyrinth.prepare_motion_loop0_spec
+#print axioms Labyrinth.prepare_motion_spec
+#print axioms Labyrinth.prepAccepted_range
+#print axioms Labyrinth.prepAccepted_held
+#print axioms Labyrinth.bind_congr_ok
+#print axioms Labyrinth.slice_index_congr
+#print axioms Labyrinth.offset_congr
+#print axioms Labyrinth.holdHas_iff_mem
+#print axioms Labyrinth.holds_insert_has
+#print axioms Labyrinth.rings_step
+#print axioms Labyrinth.holds_loop1_has
+#print axioms Labyrinth.holds_loop2_has
+#print axioms Labyrinth.holds_loop0_has
+#print axioms Labyrinth.circle_of_post
+#print axioms Labyrinth.layout_holds_has
+#print axioms Labyrinth.getElem_of_some
+#print axioms Labyrinth.sector_ring_lt
+#print axioms Labyrinth.circle_ok_of
+#print axioms Labyrinth.cell_arc_congr
+#print axioms Labyrinth.swept_arc_congr
+#print axioms Labyrinth.cell_sweep_congr
+#print axioms Labyrinth.frame_pose_congr
+#print axioms Labyrinth.radius_ok_val
+#print axioms Labyrinth.ringRadius_lt_iff
+#print axioms Labyrinth.ringRadius_lt_outer
+#print axioms Labyrinth.offset_at_valid_loop_ok
+#print axioms Labyrinth.offset_at_valid_congr
+#print axioms Labyrinth.offset_at_valid_sector
+#print axioms Labyrinth.offset_at_valid_center
+#print axioms Labyrinth.offset_at_valid_transition
+#print axioms Labyrinth.world_polar_congr
+#print axioms Labyrinth.local_pose_post
+#print axioms Labyrinth.band_nonneg
+#print axioms Labyrinth.world_frame_congr
+#print axioms Labyrinth.world_frame_eq
+#print axioms Labyrinth.doorway_congr
+#print axioms Labyrinth.from_residual_not_ok
+#print axioms Labyrinth.doorway_holds_reads
+#print axioms Labyrinth.doorway_phase_local

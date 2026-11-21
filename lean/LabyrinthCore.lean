@@ -104,3 +104,7 @@ import LabyrinthCore.SceneGeometryEdgesTotal
 import LabyrinthCore.SceneGeometryEdgesTotal2
 import LabyrinthCore.SceneGeometryEdgesTotal3
 import LabyrinthCore.SceneGeometryLayoutTotal
+import LabyrinthCore.SceneInvPrepare
+import LabyrinthCore.SceneDoorwayPhases
+import LabyrinthCore.SceneDoorwayCells
+import LabyrinthCore.SceneDoorwayLocal
