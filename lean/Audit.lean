@@ -24,6 +24,7 @@ import LabyrinthCore.SceneGeometryLayout
 import LabyrinthCore.SceneGeometrySweep
 import LabyrinthCore.SceneGeometryDoorway
 import LabyrinthCore.SceneGeometryValidate
+import LabyrinthCore.SceneGeometryLayoutNew
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -285,3 +286,14 @@ import LabyrinthCore.SceneGeometryValidate
 #print axioms Labyrinth.range_inclusive_new_eq
 #print axioms Labyrinth.okPost_residual_gen
 #print axioms Labyrinth.circle_new_ok
+#print axioms Labyrinth.CircleOk.congr
+#print axioms Labyrinth.CircleOk.mono
+#print axioms Labyrinth.usize_checked_add_some
+#print axioms Labyrinth.vec_push_okPost
+#print axioms Labyrinth.CirclesOk
+#print axioms Labyrinth.layout_new_loop0_ok
+#print axioms Labyrinth.BandsOk
+#print axioms Labyrinth.layout_new_loop1_ok
+#print axioms Labyrinth.vec_deref_val
+#print axioms Labyrinth.ExtentOk
+#print axioms Labyrinth.layout_new_loop2_ok
