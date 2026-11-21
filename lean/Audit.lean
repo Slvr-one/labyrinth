@@ -26,6 +26,7 @@ import LabyrinthCore.SceneGeometryDoorway
 import LabyrinthCore.SceneGeometryValidate
 import LabyrinthCore.SceneGeometryLayoutNew
 import LabyrinthCore.SceneGeometryReject
+import LabyrinthCore.SceneGeometryDisk
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -334,3 +335,8 @@ import LabyrinthCore.SceneGeometryReject
 #print axioms Labyrinth.ScanRel.err_iff
 #print axioms Labyrinth.RejectOutcome
 #print axioms Labyrinth.reject_layout_total
+#print axioms Labyrinth.i32_clamp_val
+#print axioms Labyrinth.diskDist2
+#print axioms Labyrinth.diskDist2_bound
+#print axioms Labyrinth.grid_rect_touches_disk_spec
+#print axioms Labyrinth.grid_rect_touches_disk_total
