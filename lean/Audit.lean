@@ -16,6 +16,8 @@ import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
 import LabyrinthCore.SceneConstructionChecks
 import LabyrinthCore.SceneConstructionSpinning
+import LabyrinthCore.SceneConstructionRequired
+import LabyrinthCore.SceneConstructionLive
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -164,3 +166,13 @@ import LabyrinthCore.SceneConstructionSpinning
 #print axioms Labyrinth.scene_new_overflow_transform_storage
 #print axioms Labyrinth.scene_new_checks_pass
 #print axioms Labyrinth.layout_check_spinning_portals_post
+#print axioms Labyrinth.vec_push_ok
+#print axioms Labyrinth.route_admit_admitted
+#print axioms Labyrinth.check_route_edge_admitted
+#print axioms Labyrinth.check_route_loop_admitted
+#print axioms Labyrinth.check_route_admitted
+#print axioms Labyrinth.check_routes_loop_admitted
+#print axioms Labyrinth.scene_check_routes_admitted
+#print axioms Labyrinth.scene_new_live_loop
+#print axioms Labyrinth.slice_eq_of_allZero
+#print axioms Labyrinth.scene_new_required_subset_live
