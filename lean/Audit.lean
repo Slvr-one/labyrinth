@@ -89,6 +89,7 @@ import LabyrinthCore.SceneInvNewEdit
 import LabyrinthCore.SceneMotionAdvance
 import LabyrinthCore.SceneMotionReach
 import LabyrinthCore.SceneMotionConnected
+import LabyrinthCore.SceneMotionFrame
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -978,3 +979,24 @@ import LabyrinthCore.SceneMotionConnected
 #print axioms Labyrinth.preflight_doors
 #print axioms Labyrinth.advance_motion_connected
 #print axioms Labyrinth.reachableM_advance_motion_connected
+#print axioms Labyrinth.wFrame_refl
+#print axioms Labyrinth.clear_search_loop_frame
+#print axioms Labyrinth.clear_search_frame
+#print axioms Labyrinth.augment_loop_frame
+#print axioms Labyrinth.augment_frame
+#print axioms Labyrinth.residual_path_loop0_frame
+#print axioms Labyrinth.residual_path_frame
+#print axioms Labyrinth.flow_path_loop0_frame
+#print axioms Labyrinth.flow_path_frame
+#print axioms Labyrinth.reset_flow_loop0_frame
+#print axioms Labyrinth.reset_flow_frame
+#print axioms Labyrinth.tree_path_loop0_frame
+#print axioms Labyrinth.tree_path_frame
+#print axioms Labyrinth.okPost_ite_both
+#print axioms Labyrinth.route_through_loop0_frame
+#print axioms Labyrinth.route_through_frame
+#print axioms Labyrinth.plan_route_loop_frame
+#print axioms Labyrinth.plan_route_frame
+#print axioms Labyrinth.fromResidual_ok_err
+#print axioms Labyrinth.okPost_ite_cases
+#print axioms Labyrinth.plan_ok_balanced
