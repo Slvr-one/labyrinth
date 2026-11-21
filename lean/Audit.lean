@@ -12,6 +12,7 @@ import LabyrinthCore.ConstructorSceneRejection
 import LabyrinthCore.ConstructorSceneAcceptance
 import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
+import LabyrinthCore.SceneRouteBudget
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -80,3 +81,33 @@ import LabyrinthCore.SceneStd
 #print axioms Labyrinth.option_ok_or_spec
 #print axioms Labyrinth.option_ok_or_is_ok
 #print axioms Labyrinth.result_is_err_spec
+#print axioms Labyrinth.okPost_admissible
+#print axioms Labyrinth.okPost_loop_adm
+#print axioms Labyrinth.okPost_bind
+#print axioms Labyrinth.okPost_bind_eq
+#print axioms Labyrinth.okPost_ok
+#print axioms Labyrinth.okPost_mono
+#print axioms Labyrinth.okPost_of_spec
+#print axioms Labyrinth.okPost_trivial
+#print axioms Labyrinth.okPost_loop
+#print axioms Labyrinth.route_required_length_lt
+#print axioms Labyrinth.route_admit_spec
+#print axioms Labyrinth.layout_doorway_ok_carrier_edge
+#print axioms Labyrinth.carrier_edge_mem_edges
+#print axioms Labyrinth.route_admit_post
+#print axioms Labyrinth.route_edge_post_err
+#print axioms Labyrinth.scene_check_route_edge_budget
+#print axioms Labyrinth.foldEdges_nil
+#print axioms Labyrinth.foldEdges_append
+#print axioms Labyrinth.foldEdges_nodup
+#print axioms Labyrinth.foldEdges_mem
+#print axioms Labyrinth.routeEdgeList_take_succ
+#print axioms Labyrinth.route_cell_status_eq
+#print axioms Labyrinth.route_loop_body_post
+#print axioms Labyrinth.route_loop_post
+#print axioms Labyrinth.scene_check_route_budget
+#print axioms Labyrinth.allEdges_take_succ
+#print axioms Labyrinth.routes_loop_body_post
+#print axioms Labyrinth.routes_loop_post
+#print axioms Labyrinth.scene_check_routes_required_exact
+#print axioms Labyrinth.scene_check_routes_ok_members
