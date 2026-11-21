@@ -285,7 +285,7 @@ theorem option_ok_or_spec {T E : Type _} (x : Option T) (e : E) :
   cases x <;> simp [spec_ok]
 
 /-- `ok_or` produces an `Ok` exactly when the option is `Some`. -/
-theorem option_ok_or_ok? {T E : Type _} (x : Option T) (e : E) :
+theorem option_ok_or_is_ok {T E : Type _} (x : Option T) (e : E) :
     core.option.Option.ok_or x e ⦃ r => r.ok? = x.isSome ⦄ := by
   cases x <;> simp [spec_ok]
 

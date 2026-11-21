@@ -78,5 +78,5 @@ import LabyrinthCore.SceneStd
 #print axioms Labyrinth.edge_eq_spec
 #print axioms Labyrinth.slice_contains_edge_spec
 #print axioms Labyrinth.option_ok_or_spec
-#print axioms Labyrinth.option_ok_or_ok?
+#print axioms Labyrinth.option_ok_or_is_ok
 #print axioms Labyrinth.result_is_err_spec
