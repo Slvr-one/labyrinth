@@ -88,6 +88,7 @@ import LabyrinthCore.SceneInvNewWork
 import LabyrinthCore.SceneInvNewEdit
 import LabyrinthCore.SceneMotionAdvance
 import LabyrinthCore.SceneMotionReach
+import LabyrinthCore.SceneMotionConnected
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -965,3 +966,15 @@ import LabyrinthCore.SceneMotionReach
 #print axioms Labyrinth.reachableM_hold_exact
 #print axioms Labyrinth.reachableM_no_leaked_hold
 #print axioms Labyrinth.reachableM_advance_motion_safe
+#print axioms Labyrinth.motionDoor_residual
+#print axioms Labyrinth.motion_commit_door
+#print axioms Labyrinth.motion_door
+#print axioms Labyrinth.edge_new_canon
+#print axioms Labyrinth.unitOf_ok
+#print axioms Labyrinth.removal_of_contains
+#print axioms Labyrinth.kept_door_dir
+#print axioms Labyrinth.kept_door
+#print axioms Labyrinth.added_door
+#print axioms Labyrinth.preflight_doors
+#print axioms Labyrinth.advance_motion_connected
+#print axioms Labyrinth.reachableM_advance_motion_connected

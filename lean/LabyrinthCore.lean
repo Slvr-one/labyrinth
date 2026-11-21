@@ -126,3 +126,4 @@ import LabyrinthCore.SceneInvNewWork
 import LabyrinthCore.SceneInvNewEdit
 import LabyrinthCore.SceneMotionAdvance
 import LabyrinthCore.SceneMotionReach
+import LabyrinthCore.SceneMotionConnected
