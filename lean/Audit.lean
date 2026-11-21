@@ -22,6 +22,7 @@ import LabyrinthCore.SceneGeometryCircle
 import LabyrinthCore.SceneGeometryBounds
 import LabyrinthCore.SceneGeometryLayout
 import LabyrinthCore.SceneGeometrySweep
+import LabyrinthCore.SceneGeometryDoorway
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -255,3 +256,17 @@ import LabyrinthCore.SceneGeometrySweep
 #print axioms Labyrinth.SweepOk
 #print axioms Labyrinth.CircleOk.ring_end_le
 #print axioms Labyrinth.layout_cell_sweep_spec
+#print axioms Labyrinth.HoldStatusOk
+#print axioms Labyrinth.CorridorOk
+#print axioms Labyrinth.DoorwayOk
+#print axioms Labyrinth.grid_rect_between_near
+#print axioms Labyrinth.branch_ok_eq
+#print axioms Labyrinth.branch_err_eq
+#print axioms Labyrinth.bind_ite_ok
+#print axioms Labyrinth.scene_same_ring_spec
+#print axioms Labyrinth.doorway_err_residual
+#print axioms Labyrinth.doorway_check_tail
+#print axioms Labyrinth.doorway_sweep_tail
+#print axioms Labyrinth.doorway_cartesian_tail
+#print axioms Labyrinth.layout_doorway_spec
+#print axioms Labyrinth.layout_doorway_total

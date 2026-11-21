@@ -60,3 +60,4 @@ import LabyrinthCore.SceneGeometryCircle
 import LabyrinthCore.SceneGeometryBounds
 import LabyrinthCore.SceneGeometryLayout
 import LabyrinthCore.SceneGeometrySweep
+import LabyrinthCore.SceneGeometryDoorway
