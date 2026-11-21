@@ -14,6 +14,7 @@ import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
 import LabyrinthCore.ScenePublication
+import LabyrinthCore.SceneConstructionChecks
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -152,3 +153,12 @@ import LabyrinthCore.ScenePublication
 #print axioms Labyrinth.tick_loop1_frame
 #print axioms Labyrinth.tick_active_lax
 #print axioms Labyrinth.tick_active
+#print axioms Labyrinth.scene_new_overflow_patch_count
+#print axioms Labyrinth.scene_new_overflow_route_count
+#print axioms Labyrinth.scene_new_overflow_patch_bytes
+#print axioms Labyrinth.scene_new_overflow_route_bytes
+#print axioms Labyrinth.scene_new_overflow_patch_storage
+#print axioms Labyrinth.scene_new_overflow_occupant_storage
+#print axioms Labyrinth.scene_new_overflow_route_storage
+#print axioms Labyrinth.scene_new_overflow_transform_storage
+#print axioms Labyrinth.scene_new_checks_pass
