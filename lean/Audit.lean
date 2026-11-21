@@ -79,6 +79,8 @@ import LabyrinthCore.SceneHoldTick
 import LabyrinthCore.SceneHoldPatches
 import LabyrinthCore.SceneHoldTickActive
 import LabyrinthCore.SceneInvCarve
+import LabyrinthCore.SceneInvShatter
+import LabyrinthCore.SceneInvReform
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -894,3 +896,18 @@ import LabyrinthCore.SceneInvCarve
 #print axioms Labyrinth.carve_inv
 #print axioms Labyrinth.carve_holdLaw
 #print axioms Labyrinth.motion_holdLaw
+#print axioms Labyrinth.sceneInv_of_relaxed
+#print axioms Labyrinth.patchClear_set_stage
+#print axioms Labyrinth.patchRoom_set_stage
+#print axioms Labyrinth.slotOk_mem
+#print axioms Labyrinth.shattered_lists
+#print axioms Labyrinth.begin_shatter_inv
+#print axioms Labyrinth.begin_shatter_holdLaw
+#print axioms Labyrinth.sweep_list
+#print axioms Labyrinth.hide_patch_inv
+#print axioms Labyrinth.hide_patch_holdLaw
+#print axioms Labyrinth.scatter_patch_inv
+#print axioms Labyrinth.scatter_patch_holdLaw
+#print axioms Labyrinth.reform_cap
+#print axioms Labyrinth.reform_patch_inv
+#print axioms Labyrinth.reform_patch_holdLaw
