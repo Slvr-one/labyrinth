@@ -29,6 +29,8 @@ import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
 import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
+import LabyrinthCore.SceneGeometryConnectorTotal
+import LabyrinthCore.SceneGeometryGridTotal
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -351,3 +353,38 @@ import LabyrinthCore.SceneGeometryFloor
 #print axioms Labyrinth.layoutMargin
 #print axioms Labyrinth.LayoutFloor
 #print axioms Labyrinth.layout_doorway_minimum_exact
+#print axioms Labyrinth.ConnectorStatusOk
+#print axioms Labyrinth.connectorStatusOk_ok
+#print axioms Labyrinth.connectorStatusOk_geom
+#print axioms Labyrinth.doorway_ok_in_range
+#print axioms Labyrinth.edge_new_spec
+#print axioms Labyrinth.doorway_residual_status
+#print axioms Labyrinth.layout_check_connector_pair_spec
+#print axioms Labyrinth.layout_check_connector_pair_total
+#print axioms Labyrinth.layout_check_connector_loop0_spec
+#print axioms Labyrinth.layout_check_connector_loop1_spec
+#print axioms Labyrinth.layout_check_connector_loop2_spec
+#print axioms Labyrinth.layout_check_connector_spec
+#print axioms Labyrinth.layout_check_connector_total
+#print axioms Labyrinth.layout_new_loop9_spec
+#print axioms Labyrinth.layout_new_loop9_total
+#print axioms Labyrinth.usize_checked_mul_cases
+#print axioms Labyrinth.i32_checked_mul_iff
+#print axioms Labyrinth.i32_max_val
+#print axioms Labyrinth.i32_max_as_usize_val
+#print axioms Labyrinth.GridSpecOk
+#print axioms Labyrinth.GridOk
+#print axioms Labyrinth.GridNewPost
+#print axioms Labyrinth.gridNewPost_err
+#print axioms Labyrinth.grid_grid_new_spec
+#print axioms Labyrinth.grid_grid_new_ok_iff
+#print axioms Labyrinth.grid_grid_bounds_spec
+#print axioms Labyrinth.grid_index_lt
+#print axioms Labyrinth.grid_grid_cell_spec
+#print axioms Labyrinth.grid_grid_cell_total
+#print axioms Labyrinth.grid_grid_retain_spec
+#print axioms Labyrinth.pointOk_boundsPointOk
+#print axioms Labyrinth.layout_new_loop3_inner_total
+#print axioms Labyrinth.layout_new_loop3_loop0_total
+#print axioms Labyrinth.layout_new_loop3_total
+#print axioms Labyrinth.layout_new_loop3_total_new

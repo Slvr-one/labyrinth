@@ -67,3 +67,5 @@ import LabyrinthCore.SceneGeometryReject
 import LabyrinthCore.SceneGeometryDisk
 import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
+import LabyrinthCore.SceneGeometryConnectorTotal
+import LabyrinthCore.SceneGeometryGridTotal
