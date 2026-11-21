@@ -91,3 +91,4 @@ import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
 import LabyrinthCore.SceneShatterStages
 import LabyrinthCore.SceneShatterBegin
+import LabyrinthCore.SceneShatterReform

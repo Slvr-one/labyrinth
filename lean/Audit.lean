@@ -53,6 +53,7 @@ import LabyrinthCore.SceneGeometryMinimum
 import LabyrinthCore.SceneGeometryFloor
 import LabyrinthCore.SceneShatterStages
 import LabyrinthCore.SceneShatterBegin
+import LabyrinthCore.SceneShatterReform
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -551,3 +552,7 @@ import LabyrinthCore.SceneShatterBegin
 #print axioms Labyrinth.cellVerdict_ok
 #print axioms Labyrinth.verdictUpTo_ok
 #print axioms Labyrinth.begin_shatter_spec
+#print axioms Labyrinth.edgeOutside_step
+#print axioms Labyrinth.reform_outside_spec
+#print axioms Labyrinth.reform_finish
+#print axioms Labyrinth.reform_patch_spec
