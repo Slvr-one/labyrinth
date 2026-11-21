@@ -90,6 +90,10 @@ import LabyrinthCore.ConstructorCarrierEdgeRows
 import LabyrinthCore.ConstructorCarrierRowsErrors
 import LabyrinthCore.SceneInvNewTree
 import LabyrinthCore.SceneInvNewTreeFinal
+import LabyrinthCore.SceneMotionAdvance
+import LabyrinthCore.SceneMotionReach
+import LabyrinthCore.SceneMotionConnected
+import LabyrinthCore.SceneMotionFrame
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -971,3 +975,55 @@ import LabyrinthCore.SceneInvNewTreeFinal
 #print axioms Labyrinth.sceneReachableU_hold_exact
 #print axioms Labyrinth.layoutNewErr_closed
 #print axioms Labyrinth.layout_new_total_closed
+#print axioms Labyrinth.nextOf_refl
+#print axioms Labyrinth.nextOf_trans
+#print axioms Labyrinth.prepare_motion_next
+#print axioms Labyrinth.sceneInv_next
+#print axioms Labyrinth.holdLaw_next
+#print axioms Labyrinth.sceneInvFull_next
+#print axioms Labyrinth.advance_loop2_next
+#print axioms Labyrinth.advance_residual_err
+#print axioms Labyrinth.advance_early
+#print axioms Labyrinth.advance_publish
+#print axioms Labyrinth.advance_scene
+#print axioms Labyrinth.advance_motion_scene
+#print axioms Labyrinth.advance_motion_inv
+#print axioms Labyrinth.advance_motion_safe
+#print axioms Labyrinth.sceneReachable_motion
+#print axioms Labyrinth.sceneReachableM_inv
+#print axioms Labyrinth.reachableM_hold_exact
+#print axioms Labyrinth.reachableM_no_leaked_hold
+#print axioms Labyrinth.reachableM_advance_motion_safe
+#print axioms Labyrinth.motionDoor_residual
+#print axioms Labyrinth.motion_commit_door
+#print axioms Labyrinth.motion_door
+#print axioms Labyrinth.edge_new_canon
+#print axioms Labyrinth.unitOf_ok
+#print axioms Labyrinth.removal_of_contains
+#print axioms Labyrinth.kept_door_dir
+#print axioms Labyrinth.kept_door
+#print axioms Labyrinth.added_door
+#print axioms Labyrinth.preflight_doors
+#print axioms Labyrinth.advance_motion_connected
+#print axioms Labyrinth.reachableM_advance_motion_connected
+#print axioms Labyrinth.wFrame_refl
+#print axioms Labyrinth.clear_search_loop_frame
+#print axioms Labyrinth.clear_search_frame
+#print axioms Labyrinth.augment_loop_frame
+#print axioms Labyrinth.augment_frame
+#print axioms Labyrinth.residual_path_loop0_frame
+#print axioms Labyrinth.residual_path_frame
+#print axioms Labyrinth.flow_path_loop0_frame
+#print axioms Labyrinth.flow_path_frame
+#print axioms Labyrinth.reset_flow_loop0_frame
+#print axioms Labyrinth.reset_flow_frame
+#print axioms Labyrinth.tree_path_loop0_frame
+#print axioms Labyrinth.tree_path_frame
+#print axioms Labyrinth.okPost_ite_both
+#print axioms Labyrinth.route_through_loop0_frame
+#print axioms Labyrinth.route_through_frame
+#print axioms Labyrinth.plan_route_loop_frame
+#print axioms Labyrinth.plan_route_frame
+#print axioms Labyrinth.fromResidual_ok_err
+#print axioms Labyrinth.okPost_ite_cases
+#print axioms Labyrinth.plan_ok_balanced

@@ -128,3 +128,7 @@ import LabyrinthCore.ConstructorCarrierEdgeRows
 import LabyrinthCore.ConstructorCarrierRowsErrors
 import LabyrinthCore.SceneInvNewTree
 import LabyrinthCore.SceneInvNewTreeFinal
+import LabyrinthCore.SceneMotionAdvance
+import LabyrinthCore.SceneMotionReach
+import LabyrinthCore.SceneMotionConnected
+import LabyrinthCore.SceneMotionFrame
