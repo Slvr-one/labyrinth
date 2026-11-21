@@ -13,6 +13,7 @@ import LabyrinthCore.ConstructorSceneAcceptance
 import LabyrinthCore.ConstructorSceneTotal
 import LabyrinthCore.SceneStd
 import LabyrinthCore.SceneRouteBudget
+import LabyrinthCore.ScenePublication
 
 #print axioms set_parent_spec
 #print axioms Labyrinth.constructor_parentGraph_adj_iff
@@ -111,3 +112,43 @@ import LabyrinthCore.SceneRouteBudget
 #print axioms Labyrinth.routes_loop_post
 #print axioms Labyrinth.scene_check_routes_required_exact
 #print axioms Labyrinth.scene_check_routes_ok_members
+#print axioms Labyrinth.lax_admissible
+#print axioms Labyrinth.lax_of_ok_imp
+#print axioms Labyrinth.lax_of_ok
+#print axioms Labyrinth.loop_lax
+#print axioms Labyrinth.lax_bind
+#print axioms Labyrinth.lax_triv
+#print axioms Labyrinth.lax_ok
+#print axioms Labyrinth.check_stamp_stale_epoch
+#print axioms Labyrinth.check_stamp_stale_revision
+#print axioms Labyrinth.check_stamp_overflow
+#print axioms Labyrinth.check_stamp_ok
+#print axioms Labyrinth.check_stamp_spec
+#print axioms Labyrinth.stamp_rejects_of_accepts
+#print axioms Labyrinth.stamp_gate
+#print axioms Labyrinth.suspend_spec
+#print axioms Labyrinth.resume_spec
+#print axioms Labyrinth.u64_checked_succ
+#print axioms Labyrinth.request_layout_spec
+#print axioms Labyrinth.publish_layout_loop_spec
+#print axioms Labyrinth.publish_layout_spec
+#print axioms Labyrinth.spec_eq_ok
+#print axioms Labyrinth.pending_ne_eval
+#print axioms Labyrinth.reject_layout_stale_pending
+#print axioms Labyrinth.reject_layout_stale_latest
+#print axioms Labyrinth.reject_layout_invalid_viewport
+#print axioms Labyrinth.reject_layout_overflow
+#print axioms Labyrinth.reject_layout_scan_failed
+#print axioms Labyrinth.reject_layout_commit
+#print axioms Labyrinth.tick_stale_epoch
+#print axioms Labyrinth.tick_stale_revision
+#print axioms Labyrinth.tick_revision_overflow
+#print axioms Labyrinth.tick_wall_regressed
+#print axioms Labyrinth.tick_frozen
+#print axioms Labyrinth.tick_reanchored
+#print axioms Labyrinth.tick_clock_overflow
+#print axioms Labyrinth.drain_patches_loop0_frame
+#print axioms Labyrinth.drain_patches_frame
+#print axioms Labyrinth.tick_loop1_frame
+#print axioms Labyrinth.tick_active_lax
+#print axioms Labyrinth.tick_active
