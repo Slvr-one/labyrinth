@@ -716,7 +716,7 @@ def grid.Geometry.check
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::GridSpec}::fmt]:
-    Source: 'src/grid.rs', lines 188:9-188:14
+    Source: 'src/grid.rs', lines 190:9-190:14
     Visibility: public -/
 def grid.GridSpec.Insts.CoreFmtDebug.fmt
   (self : grid.GridSpec) (f : core.fmt.Formatter) :
@@ -731,42 +731,42 @@ def grid.GridSpec.Insts.CoreFmtDebug.fmt
     "cell_size") dyn3
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:9-188:14 -/
+    Source: 'src/grid.rs', lines 190:9-190:14 -/
 @[reducible]
 def grid.GridSpec.Insts.CoreFmtDebug : core.fmt.Debug grid.GridSpec := {
   fmt := grid.GridSpec.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::GridSpec}::clone]:
-    Source: 'src/grid.rs', lines 188:16-188:21
+    Source: 'src/grid.rs', lines 190:16-190:21
     Visibility: public -/
 def grid.GridSpec.Insts.CoreCloneClone.clone
   (self : grid.GridSpec) : Result grid.GridSpec := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:16-188:21 -/
+    Source: 'src/grid.rs', lines 190:16-190:21 -/
 @[reducible]
 def grid.GridSpec.Insts.CoreCloneClone : core.clone.Clone grid.GridSpec := {
   clone := grid.GridSpec.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::marker::Copy for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:23-188:27 -/
+    Source: 'src/grid.rs', lines 190:23-190:27 -/
 @[reducible]
 def grid.GridSpec.Insts.CoreMarkerCopy : core.marker.Copy grid.GridSpec := {
   cloneInst := grid.GridSpec.Insts.CoreCloneClone
 }
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::marker::StructuralPartialEq for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:29-188:38 -/
+    Source: 'src/grid.rs', lines 190:29-190:38 -/
 @[reducible]
 def grid.GridSpec.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq grid.GridSpec := {
 }
 
 /-- [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::GridSpec> for labyrinth_core::grid::GridSpec}::eq]:
-    Source: 'src/grid.rs', lines 188:29-188:38
+    Source: 'src/grid.rs', lines 190:29-190:38
     Visibility: public -/
 def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec.eq
   (self : grid.GridSpec) (other : grid.GridSpec) : Result Bool := do
@@ -781,7 +781,7 @@ def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::GridSpec> for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:29-188:38 -/
+    Source: 'src/grid.rs', lines 190:29-190:38 -/
 @[reducible]
 impl_def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec : core.cmp.PartialEq
   grid.GridSpec grid.GridSpec := {
@@ -791,14 +791,14 @@ impl_def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec : core.cmp.PartialEq
 }
 
 /-- [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::GridSpec}::assert_fields_are_eq]:
-    Source: 'src/grid.rs', lines 188:40-188:42
+    Source: 'src/grid.rs', lines 190:40-190:42
     Visibility: public -/
 def grid.GridSpec.Insts.CoreCmpEq.assert_fields_are_eq
   (self : grid.GridSpec) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::GridSpec}]
-    Source: 'src/grid.rs', lines 188:40-188:42 -/
+    Source: 'src/grid.rs', lines 190:40-190:42 -/
 @[reducible]
 def grid.GridSpec.Insts.CoreCmpEq : core.cmp.Eq grid.GridSpec := {
   partialEqInst := grid.GridSpec.Insts.CoreCmpPartialEqGridSpec
@@ -806,7 +806,7 @@ def grid.GridSpec.Insts.CoreCmpEq : core.cmp.Eq grid.GridSpec := {
 }
 
 /-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Grid}::fmt]:
-    Source: 'src/grid.rs', lines 196:9-196:14
+    Source: 'src/grid.rs', lines 198:9-198:14
     Visibility: public -/
 def grid.Grid.Insts.CoreFmtDebug.fmt
   (self : grid.Grid) (f : core.fmt.Formatter) :
@@ -820,7 +820,7 @@ def grid.Grid.Insts.CoreFmtDebug.fmt
     dyn (toStr "ids") dyn1
 
 /-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Grid}]
-    Source: 'src/grid.rs', lines 196:9-196:14 -/
+    Source: 'src/grid.rs', lines 198:9-198:14 -/
 @[reducible]
 def grid.Grid.Insts.CoreFmtDebug : core.fmt.Debug grid.Grid := {
   fmt := grid.Grid.Insts.CoreFmtDebug.fmt
@@ -846,7 +846,7 @@ def topology.check_storage
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::new]:
-    Source: 'src/grid.rs', lines 203:4-231:5 -/
+    Source: 'src/grid.rs', lines 205:4-233:5 -/
 def grid.Grid.new
   (spec : grid.GridSpec) :
   Result (core.result.Result grid.Grid topology.Error)
@@ -948,7 +948,7 @@ def grid.Grid.new
       grid.Grid (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::cell]:
-    Source: 'src/grid.rs', lines 233:4-238:5
+    Source: 'src/grid.rs', lines 235:4-240:5
     Visibility: public -/
 def grid.Grid.cell
   (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) :
@@ -966,13 +966,13 @@ def grid.Grid.cell
         Std.Usize)) self.ids i1
 
 /-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::spec]:
-    Source: 'src/grid.rs', lines 240:4-242:5
+    Source: 'src/grid.rs', lines 242:4-244:5
     Visibility: public -/
 def grid.Grid.impl.spec (self : grid.Grid) : Result grid.GridSpec := do
   ok self.spec
 
 /-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::retain]:
-    Source: 'src/grid.rs', lines 244:4-246:5 -/
+    Source: 'src/grid.rs', lines 246:4-248:5 -/
 def grid.Grid.retain
   (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) (id : Std.Usize) :
   Result grid.Grid
@@ -986,7 +986,7 @@ def grid.Grid.retain
   ok { self with ids := v }
 
 /-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::bounds]:
-    Source: 'src/grid.rs', lines 248:4-258:5 -/
+    Source: 'src/grid.rs', lines 250:4-260:5 -/
 def grid.Grid.bounds
   (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) :
   Result grid.Rect
@@ -1021,7 +1021,7 @@ def walker.Stamp.Insts.CoreFmtDebug : core.fmt.Debug walker.Stamp := {
 }
 
 /-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::MotionEvent}::fmt]:
-    Source: 'src/scene.rs', lines 886:9-886:14
+    Source: 'src/scene.rs', lines 893:9-893:14
     Visibility: public -/
 def scene.MotionEvent.Insts.CoreFmtDebug.fmt
   (self : scene.MotionEvent) (f : core.fmt.Formatter) :
@@ -1035,7 +1035,7 @@ def scene.MotionEvent.Insts.CoreFmtDebug.fmt
     "stamp") dyn (toStr "replaced") dyn1 (toStr "moving_doorways") dyn2
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:9-886:14 -/
+    Source: 'src/scene.rs', lines 893:9-893:14 -/
 @[reducible]
 def scene.MotionEvent.Insts.CoreFmtDebug : core.fmt.Debug scene.MotionEvent
   := {
@@ -1102,7 +1102,7 @@ def walker.Stamp.Insts.CoreCmpPartialEqStamp.eq
   else ok false
 
 /-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::MotionEvent> for labyrinth_core::scene::MotionEvent}::eq]:
-    Source: 'src/scene.rs', lines 886:29-886:38
+    Source: 'src/scene.rs', lines 893:29-893:38
     Visibility: public -/
 def scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent.eq
   (self : scene.MotionEvent) (other : scene.MotionEvent) : Result Bool := do
@@ -1175,7 +1175,7 @@ def topology.Edge.Insts.CoreFmtDebug : core.fmt.Debug topology.Edge := {
 }
 
 /-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Route}::fmt]:
-    Source: 'src/scene.rs', lines 873:9-873:14
+    Source: 'src/scene.rs', lines 877:9-877:14
     Visibility: public -/
 def scene.Route.Insts.CoreFmtDebug.fmt
   (self : scene.Route) (f : core.fmt.Formatter) :
@@ -1189,14 +1189,14 @@ def scene.Route.Insts.CoreFmtDebug.fmt
     "circle") dyn (toStr "cells") dyn1
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Route}]
-    Source: 'src/scene.rs', lines 873:9-873:14 -/
+    Source: 'src/scene.rs', lines 877:9-877:14 -/
 @[reducible]
 def scene.Route.Insts.CoreFmtDebug : core.fmt.Debug scene.Route := {
   fmt := scene.Route.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionWorkspace}::fmt]:
-    Source: 'src/motion.rs', lines 19:9-19:14
+    Source: 'src/motion.rs', lines 21:9-21:14
     Visibility: public -/
 def motion.MotionWorkspace.Insts.CoreFmtDebug.fmt
   (self : motion.MotionWorkspace) (f : core.fmt.Formatter) :
@@ -1249,7 +1249,7 @@ def motion.MotionWorkspace.Insts.CoreFmtDebug.fmt
     values
 
 /-- Trait implementation: [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionWorkspace}]
-    Source: 'src/motion.rs', lines 19:9-19:14 -/
+    Source: 'src/motion.rs', lines 21:9-21:14 -/
 @[reducible]
 def motion.MotionWorkspace.Insts.CoreFmtDebug : core.fmt.Debug
   motion.MotionWorkspace := {
@@ -1257,7 +1257,7 @@ def motion.MotionWorkspace.Insts.CoreFmtDebug : core.fmt.Debug
 }
 
 /-- [labyrinth_core::motion::network_sizes]:
-    Source: 'src/motion.rs', lines 45:0-54:1 -/
+    Source: 'src/motion.rs', lines 47:0-56:1 -/
 def motion.network_sizes
   (cells : Std.Usize) (edges : Std.Usize) :
   Result (core.result.Result (Std.Usize × Std.Usize) topology.Error)
@@ -1325,53 +1325,53 @@ def motion.network_sizes
       (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::edges]:
-    Source: 'src/topology.rs', lines 288:4-290:5
+    Source: 'src/topology.rs', lines 290:4-292:5
     Visibility: public -/
 def topology.Carrier.impl.edges
   (self : topology.Carrier) : Result (Slice topology.Edge) := do
   ok (alloc.vec.Vec.deref self.edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::phases]:
-    Source: 'src/scene.rs', lines 1179:4-1181:5
+    Source: 'src/scene.rs', lines 1190:4-1192:5
     Visibility: public -/
 def scene.Scene.impl.phases (self : scene.Scene) : Result (Slice Std.I32) := do
   ok (alloc.vec.Vec.deref self.phases)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::routes]:
-    Source: 'src/scene.rs', lines 1176:4-1178:5
+    Source: 'src/scene.rs', lines 1187:4-1189:5
     Visibility: public -/
 def scene.Scene.impl.routes
   (self : scene.Scene) : Result (Slice scene.Route) := do
   ok (alloc.vec.Vec.deref self.routes)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::layout]:
-    Source: 'src/scene.rs', lines 1170:4-1172:5
+    Source: 'src/scene.rs', lines 1181:4-1183:5
     Visibility: public -/
 def scene.Scene.impl.layout (self : scene.Scene) : Result scene.Layout := do
   ok self.layout
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::stamp]:
-    Source: 'src/scene.rs', lines 1167:4-1169:5
+    Source: 'src/scene.rs', lines 1178:4-1180:5
     Visibility: public -/
 def scene.Scene.impl.stamp (self : scene.Scene) : Result walker.Stamp := do
   ok self.stamp
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::carrier]:
-    Source: 'src/scene.rs', lines 555:4-557:5
+    Source: 'src/scene.rs', lines 559:4-561:5
     Visibility: public -/
 def scene.Layout.impl.carrier
   (self : scene.Layout) : Result topology.Carrier := do
   ok self.carrier
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cells]:
-    Source: 'src/scene.rs', lines 546:4-548:5
+    Source: 'src/scene.rs', lines 550:4-552:5
     Visibility: public -/
 def scene.Layout.impl.cells
   (self : scene.Layout) : Result (Slice scene.Cell) := do
   ok (alloc.vec.Vec.deref self.cells)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::arc_pair]:
-    Source: 'src/motion.rs', lines 160:4-165:5 -/
+    Source: 'src/motion.rs', lines 162:4-167:5 -/
 def motion.MotionWorkspace.arc_pair
   (self : motion.MotionWorkspace) («from» : Std.Usize) («to» : Std.Usize) :
   Result motion.MotionWorkspace
@@ -1383,7 +1383,7 @@ def motion.MotionWorkspace.arc_pair
   ok { self with «from» := v2, «to» := v3 }
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 0:
-    Source: 'src/motion.rs', lines 107:8-121:9
+    Source: 'src/motion.rs', lines 109:8-123:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop0.body
@@ -1425,7 +1425,7 @@ def motion.MotionWorkspace.new_loop0.body
   else ok (done (v, v1))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 0:
-    Source: 'src/motion.rs', lines 107:8-121:9
+    Source: 'src/motion.rs', lines 109:8-123:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop0
@@ -1441,7 +1441,7 @@ def motion.MotionWorkspace.new_loop0
     (v, v1, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 1:
-    Source: 'src/motion.rs', lines 124:8-128:9
+    Source: 'src/motion.rs', lines 126:8-130:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop1.body
@@ -1461,7 +1461,7 @@ def motion.MotionWorkspace.new_loop1.body
   else ok (done work)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 1:
-    Source: 'src/motion.rs', lines 124:8-128:9
+    Source: 'src/motion.rs', lines 126:8-130:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop1
@@ -1475,7 +1475,7 @@ def motion.MotionWorkspace.new_loop1
     (work, v)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 2:
-    Source: 'src/motion.rs', lines 130:8-135:9
+    Source: 'src/motion.rs', lines 132:8-137:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop2.body
@@ -1501,7 +1501,7 @@ def motion.MotionWorkspace.new_loop2.body
   else ok (done work)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 2:
-    Source: 'src/motion.rs', lines 130:8-135:9
+    Source: 'src/motion.rs', lines 132:8-137:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop2
@@ -1515,7 +1515,7 @@ def motion.MotionWorkspace.new_loop2
     (work, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 3:
-    Source: 'src/motion.rs', lines 137:8-141:9
+    Source: 'src/motion.rs', lines 139:8-143:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop3.body
@@ -1539,7 +1539,7 @@ def motion.MotionWorkspace.new_loop3.body
   else ok (done work)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 3:
-    Source: 'src/motion.rs', lines 137:8-141:9
+    Source: 'src/motion.rs', lines 139:8-143:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop3
@@ -1552,7 +1552,7 @@ def motion.MotionWorkspace.new_loop3
     (work, a)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 4:
-    Source: 'src/motion.rs', lines 143:8-148:9
+    Source: 'src/motion.rs', lines 145:8-150:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop4.body
@@ -1579,7 +1579,7 @@ def motion.MotionWorkspace.new_loop4.body
   else ok (done work)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 4:
-    Source: 'src/motion.rs', lines 143:8-148:9
+    Source: 'src/motion.rs', lines 145:8-150:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop4
@@ -1592,7 +1592,7 @@ def motion.MotionWorkspace.new_loop4
     (work, node)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 5:
-    Source: 'src/motion.rs', lines 150:8-156:9
+    Source: 'src/motion.rs', lines 152:8-158:9
     Visibility: public -/
 @[rust_loop_body]
 def motion.MotionWorkspace.new_loop5.body
@@ -1622,7 +1622,7 @@ def motion.MotionWorkspace.new_loop5.body
   else ok (done work)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 5:
-    Source: 'src/motion.rs', lines 150:8-156:9
+    Source: 'src/motion.rs', lines 152:8-158:9
     Visibility: public -/
 @[rust_loop]
 def motion.MotionWorkspace.new_loop5
@@ -1635,7 +1635,7 @@ def motion.MotionWorkspace.new_loop5
     (work, a)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]:
-    Source: 'src/motion.rs', lines 61:4-158:5
+    Source: 'src/motion.rs', lines 63:4-160:5
     Visibility: public -/
 def motion.MotionWorkspace.new
   (current : scene.Scene) :
@@ -1776,7 +1776,7 @@ def motion.MotionWorkspace.new
       motion.MotionWorkspace (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_route_endpoints]:
-    Source: 'src/motion.rs', lines 167:4-178:5 -/
+    Source: 'src/motion.rs', lines 169:4-180:5 -/
 def motion.MotionWorkspace.check_route_endpoints
   (cells : Slice Std.Usize) (ends : Array Std.Usize 4#usize) :
   Result (core.result.Result Unit topology.Error)
@@ -1806,7 +1806,7 @@ def motion.MotionWorkspace.check_route_endpoints
         else ok (core.result.Result.Ok ())
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop body 0:
-    Source: 'src/motion.rs', lines 194:8-201:9 -/
+    Source: 'src/motion.rs', lines 196:8-203:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.check_scene_loop0.body
   (i : Std.Usize) (i1 : Std.Usize) (v : alloc.vec.Vec Std.Usize)
@@ -1850,7 +1850,7 @@ def motion.MotionWorkspace.check_scene_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop 0:
-    Source: 'src/motion.rs', lines 194:8-201:9 -/
+    Source: 'src/motion.rs', lines 196:8-203:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.check_scene_loop0
   (i : Std.Usize) (i1 : Std.Usize) (v : alloc.vec.Vec Std.Usize)
@@ -1864,7 +1864,7 @@ def motion.MotionWorkspace.check_scene_loop0
     (e, status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop body 1:
-    Source: 'src/motion.rs', lines 204:8-207:9 -/
+    Source: 'src/motion.rs', lines 206:8-209:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.check_scene_loop1.body
   (v : alloc.vec.Vec (Array Std.Usize 4#usize))
@@ -1892,7 +1892,7 @@ def motion.MotionWorkspace.check_scene_loop1.body
   else ok (done status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop 1:
-    Source: 'src/motion.rs', lines 204:8-207:9 -/
+    Source: 'src/motion.rs', lines 206:8-209:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.check_scene_loop1
   (v : alloc.vec.Vec (Array Std.Usize 4#usize))
@@ -1906,7 +1906,7 @@ def motion.MotionWorkspace.check_scene_loop1
     (status, r)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]:
-    Source: 'src/motion.rs', lines 180:4-209:5 -/
+    Source: 'src/motion.rs', lines 182:4-211:5 -/
 def motion.MotionWorkspace.check_scene
   (self : motion.MotionWorkspace) (current : scene.Scene) :
   Result (core.result.Result Unit topology.Error)
@@ -1979,7 +1979,7 @@ def spanning_tree.Tree.has_edge
   else ok false
 
 /-- [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::Stage> for labyrinth_core::shatter::Stage}::eq]:
-    Source: 'src/shatter.rs', lines 14:29-14:38
+    Source: 'src/shatter.rs', lines 16:29-16:38
     Visibility: public -/
 def shatter.Stage.Insts.CoreCmpPartialEqStage.eq
   (self : shatter.Stage) (other : shatter.Stage) : Result Bool := do
@@ -2013,7 +2013,7 @@ def shatter.Stage.Insts.CoreCmpPartialEqStage.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::Stage> for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:29-14:38 -/
+    Source: 'src/shatter.rs', lines 16:29-16:38 -/
 @[reducible]
 impl_def shatter.Stage.Insts.CoreCmpPartialEqStage : core.cmp.PartialEq
   shatter.Stage shatter.Stage := {
@@ -2078,7 +2078,7 @@ def walker.Holds.insert
   else ok (core.result.Result.Ok (), { ids := a, count := i })
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::circle_of]:
-    Source: 'src/scene.rs', lines 569:4-575:5 -/
+    Source: 'src/scene.rs', lines 573:4-579:5 -/
 def scene.Layout.circle_of
   (self : scene.Layout) (cell : Std.Usize) : Result (Option Std.Usize) := do
   let c ←
@@ -2107,7 +2107,7 @@ def polar.Circle.ring_count (self : polar.Circle) : Result Std.Usize := do
   ok (alloc.vec.Vec.len self.spec.sectors)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 0:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop_body]
 def scene.Layout.holds_loop0.body
   (c : polar.Circle) (result : walker.Holds)
@@ -2128,7 +2128,7 @@ def scene.Layout.holds_loop0.body
   else ok (done (status, result))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 0:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop]
 def scene.Layout.holds_loop0
   (result : walker.Holds) (c : polar.Circle)
@@ -2141,7 +2141,7 @@ def scene.Layout.holds_loop0
     (result, status, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 1:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop_body]
 def scene.Layout.holds_loop1.body
   (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
@@ -2162,7 +2162,7 @@ def scene.Layout.holds_loop1.body
   else ok (done (status, result))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 1:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop]
 def scene.Layout.holds_loop1
   (result : walker.Holds) (c : polar.Circle) (last : Std.Usize)
@@ -2175,7 +2175,7 @@ def scene.Layout.holds_loop1
     (result, status, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 2:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop_body]
 def scene.Layout.holds_loop2.body
   (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
@@ -2196,7 +2196,7 @@ def scene.Layout.holds_loop2.body
   else ok (done (status, result))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 2:
-    Source: 'src/scene.rs', lines 695:8-699:9 -/
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
 @[rust_loop]
 def scene.Layout.holds_loop2
   (result : walker.Holds) (c : polar.Circle) (last : Std.Usize)
@@ -2209,7 +2209,7 @@ def scene.Layout.holds_loop2
     (result, status, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]:
-    Source: 'src/scene.rs', lines 674:4-701:5 -/
+    Source: 'src/scene.rs', lines 678:4-705:5 -/
 def scene.Layout.holds
   (self : scene.Layout) (cell : Std.Usize) (result : walker.Holds) :
   Result ((core.result.Result Unit topology.Error) × walker.Holds)
@@ -2253,7 +2253,7 @@ def scene.Layout.holds
       scene.Layout.holds_loop2 result c last (core.result.Result.Ok ()) first
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]: loop body 0:
-    Source: 'src/scene.rs', lines 1439:8-1442:9 -/
+    Source: 'src/scene.rs', lines 1450:8-1453:9 -/
 @[rust_loop_body]
 def scene.Scene.check_patch_motion_loop.body
   (steps : Slice Std.I32) (dependencies : walker.Holds) (occupied : Bool)
@@ -2272,7 +2272,7 @@ def scene.Scene.check_patch_motion_loop.body
   else ok (done occupied)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]: loop 0:
-    Source: 'src/scene.rs', lines 1439:8-1442:9 -/
+    Source: 'src/scene.rs', lines 1450:8-1453:9 -/
 @[rust_loop]
 def scene.Scene.check_patch_motion_loop
   (steps : Slice Std.I32) (dependencies : walker.Holds) (occupied : Bool)
@@ -2285,7 +2285,7 @@ def scene.Scene.check_patch_motion_loop
     (occupied, j)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]:
-    Source: 'src/scene.rs', lines 1434:4-1448:5 -/
+    Source: 'src/scene.rs', lines 1445:4-1459:5 -/
 def scene.Scene.check_patch_motion
   (self : scene.Scene) (cell : Std.Usize) (steps : Slice Std.I32) :
   Result (core.result.Result Unit topology.Error)
@@ -2305,7 +2305,7 @@ def scene.Scene.check_patch_motion
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_stamp]:
-    Source: 'src/scene.rs', lines 1202:4-1210:5 -/
+    Source: 'src/scene.rs', lines 1213:4-1221:5 -/
 def scene.Scene.check_stamp
   (self : scene.Scene) (stamp : walker.Stamp) :
   Result (core.result.Result Std.U64 topology.Error)
@@ -2331,7 +2331,7 @@ def polar.normalize (angle : Std.I32) : Result Std.I32 := do
   core.num.I32.rem_euclid angle polar.TURN
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 0:
-    Source: 'src/scene.rs', lines 1895:8-1904:9 -/
+    Source: 'src/scene.rs', lines 1911:8-1920:9 -/
 @[rust_loop_body]
 def scene.Scene.prepare_motion_loop0.body
   (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.Usize)
@@ -2392,7 +2392,7 @@ def scene.Scene.prepare_motion_loop0.body
   else ok (done (v2, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 0:
-    Source: 'src/scene.rs', lines 1895:8-1904:9 -/
+    Source: 'src/scene.rs', lines 1911:8-1920:9 -/
 @[rust_loop]
 def scene.Scene.prepare_motion_loop0
   (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
@@ -2406,7 +2406,7 @@ def scene.Scene.prepare_motion_loop0
     (v1, status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 2:
-    Source: 'src/scene.rs', lines 1911:16-1916:17 -/
+    Source: 'src/scene.rs', lines 1927:16-1932:17 -/
 @[rust_loop_body]
 def scene.Scene.prepare_motion_loop1_loop0.body
   (steps : Slice Std.I32) (c : polar.Circle)
@@ -2433,7 +2433,7 @@ def scene.Scene.prepare_motion_loop1_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 2:
-    Source: 'src/scene.rs', lines 1911:16-1916:17 -/
+    Source: 'src/scene.rs', lines 1927:16-1932:17 -/
 @[rust_loop]
 def scene.Scene.prepare_motion_loop1_loop0
   (steps : Slice Std.I32) (status : core.result.Result Unit topology.Error)
@@ -2446,7 +2446,7 @@ def scene.Scene.prepare_motion_loop1_loop0
     (status, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 1:
-    Source: 'src/scene.rs', lines 1907:8-1919:9 -/
+    Source: 'src/scene.rs', lines 1923:8-1935:9 -/
 @[rust_loop_body]
 def scene.Scene.prepare_motion_loop1.body
   (l : scene.Layout) (steps : Slice Std.I32)
@@ -2483,7 +2483,7 @@ def scene.Scene.prepare_motion_loop1.body
       l.carrier, l.transforms, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 1:
-    Source: 'src/scene.rs', lines 1907:8-1919:9 -/
+    Source: 'src/scene.rs', lines 1923:8-1935:9 -/
 @[rust_loop]
 def scene.Scene.prepare_motion_loop1
   (l : scene.Layout) (steps : Slice Std.I32)
@@ -2499,7 +2499,7 @@ def scene.Scene.prepare_motion_loop1
     (status, ci)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 4:
-    Source: 'src/scene.rs', lines 1925:16-1930:17 -/
+    Source: 'src/scene.rs', lines 1941:16-1946:17 -/
 @[rust_loop_body]
 def scene.Scene.prepare_motion_loop2_loop0.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -2570,7 +2570,7 @@ def scene.Scene.prepare_motion_loop2_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 4:
-    Source: 'src/scene.rs', lines 1925:16-1930:17 -/
+    Source: 'src/scene.rs', lines 1941:16-1946:17 -/
 @[rust_loop]
 def scene.Scene.prepare_motion_loop2_loop0
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -2594,7 +2594,7 @@ def scene.Scene.prepare_motion_loop2_loop0
     (status, cell)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 3:
-    Source: 'src/scene.rs', lines 1922:8-1933:9 -/
+    Source: 'src/scene.rs', lines 1938:8-1949:9 -/
 @[rust_loop_body]
 def scene.Scene.prepare_motion_loop2.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -2636,7 +2636,7 @@ def scene.Scene.prepare_motion_loop2.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 3:
-    Source: 'src/scene.rs', lines 1922:8-1933:9 -/
+    Source: 'src/scene.rs', lines 1938:8-1949:9 -/
 @[rust_loop]
 def scene.Scene.prepare_motion_loop2
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -2658,7 +2658,7 @@ def scene.Scene.prepare_motion_loop2
     (status, p)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]:
-    Source: 'src/scene.rs', lines 1885:4-1936:5 -/
+    Source: 'src/scene.rs', lines 1901:4-1952:5 -/
 def scene.Scene.prepare_motion
   (self : scene.Scene) (stamp : walker.Stamp) (steps : Slice Std.I32) :
   Result ((core.result.Result Std.U64 topology.Error) × scene.Scene)
@@ -2775,14 +2775,14 @@ def scene.Scene.prepare_motion
     ok (r1, self)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::len]:
-    Source: 'src/topology.rs', lines 260:4-262:5
+    Source: 'src/topology.rs', lines 262:4-264:5
     Visibility: public -/
 def topology.Carrier.len (self : topology.Carrier) : Result Std.Usize := do
   let i := alloc.vec.Vec.len self.offsets
   i - 1#usize
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::neighbors]:
-    Source: 'src/topology.rs', lines 269:4-274:5
+    Source: 'src/topology.rs', lines 271:4-276:5
     Visibility: public -/
 def topology.Carrier.impl.neighbors
   (self : topology.Carrier) (cell : Std.Usize) : Result (Slice Std.Usize) := do
@@ -2801,7 +2801,7 @@ def topology.Carrier.impl.neighbors
       self.neighbors { start := i1, «end» := i3 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop body 0:
-    Source: 'src/topology.rs', lines 282:8-284:9
+    Source: 'src/topology.rs', lines 284:8-286:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.contains_edge_loop.body
@@ -2819,7 +2819,7 @@ def topology.Carrier.contains_edge_loop.body
   else ok (done i1)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop 0:
-    Source: 'src/topology.rs', lines 282:8-284:9
+    Source: 'src/topology.rs', lines 284:8-286:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.contains_edge_loop
@@ -2831,7 +2831,7 @@ def topology.Carrier.contains_edge_loop
     i1
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]:
-    Source: 'src/topology.rs', lines 276:4-286:5
+    Source: 'src/topology.rs', lines 278:4-288:5
     Visibility: public -/
 def topology.Carrier.contains_edge
   (self : topology.Carrier) (edge : topology.Edge) : Result Bool := do
@@ -3639,7 +3639,7 @@ def spanning_tree.Tree.edit_edges
     ok (r1, self, work)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 0:
-    Source: 'src/scene.rs', lines 1460:8-1463:9 -/
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
 @[rust_loop_body]
 def scene.Scene.commit_edit_loop0.body
   (self : scene.Scene) (i : Std.Usize) :
@@ -3670,7 +3670,7 @@ def scene.Scene.commit_edit_loop0.body
       self.inactive, self.latest_request, self.pending, self.trail_revision))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 0:
-    Source: 'src/scene.rs', lines 1460:8-1463:9 -/
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
 @[rust_loop]
 def scene.Scene.commit_edit_loop0
   (self : scene.Scene) (i : Std.Usize) :
@@ -3686,7 +3686,7 @@ def scene.Scene.commit_edit_loop0
     (self, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 1:
-    Source: 'src/scene.rs', lines 1453:12-1457:13 -/
+    Source: 'src/scene.rs', lines 1464:12-1468:13 -/
 @[rust_loop_body]
 def scene.Scene.commit_edit_loop1.body
   (routes : Slice scene.Route) (self : scene.Scene) (i : Std.Usize) :
@@ -3712,7 +3712,7 @@ def scene.Scene.commit_edit_loop1.body
   else ok (done self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 1:
-    Source: 'src/scene.rs', lines 1453:12-1457:13 -/
+    Source: 'src/scene.rs', lines 1464:12-1468:13 -/
 @[rust_loop]
 def scene.Scene.commit_edit_loop1
   (self : scene.Scene) (routes : Slice scene.Route) (i : Std.Usize) :
@@ -3723,7 +3723,7 @@ def scene.Scene.commit_edit_loop1
     (self, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 2:
-    Source: 'src/scene.rs', lines 1460:8-1463:9 -/
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
 @[rust_loop_body]
 def scene.Scene.commit_edit_loop2.body
   (self : scene.Scene) (i : Std.Usize) :
@@ -3754,7 +3754,7 @@ def scene.Scene.commit_edit_loop2.body
       self.inactive, self.latest_request, self.pending, self.trail_revision))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 2:
-    Source: 'src/scene.rs', lines 1460:8-1463:9 -/
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
 @[rust_loop]
 def scene.Scene.commit_edit_loop2
   (self : scene.Scene) (i : Std.Usize) :
@@ -3770,7 +3770,7 @@ def scene.Scene.commit_edit_loop2
     (self, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]:
-    Source: 'src/scene.rs', lines 1450:4-1468:5 -/
+    Source: 'src/scene.rs', lines 1461:4-1479:5 -/
 def scene.Scene.commit_edit
   (self : scene.Scene) (edit : scene.Edit) (revision : Std.U64) :
   Result scene.Scene
@@ -4075,7 +4075,7 @@ def polar.Arc.shifted
   ok { self with start := i1 }
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cell_arc]:
-    Source: 'src/scene.rs', lines 606:4-626:5 -/
+    Source: 'src/scene.rs', lines 610:4-630:5 -/
 def scene.Layout.cell_arc
   (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32) :
   Result polar.Arc
@@ -4130,7 +4130,7 @@ def polar.angle_delta
   else ok difference
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::swept_arc]:
-    Source: 'src/scene.rs', lines 628:4-636:5 -/
+    Source: 'src/scene.rs', lines 632:4-640:5 -/
 def scene.Layout.swept_arc
   (self : scene.Layout) (cell : Std.Usize) (arc : polar.Arc)
   (mode : polar.MotionMode) (next : Slice Std.I32) :
@@ -4257,7 +4257,7 @@ def polar.bounds
   grid.Rect.expand { min := p, max := p1 } margin
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cell_sweep]:
-    Source: 'src/scene.rs', lines 703:4-728:5 -/
+    Source: 'src/scene.rs', lines 707:4-732:5 -/
 def scene.Layout.cell_sweep
   (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32)
   (next : Slice Std.I32) :
@@ -4470,7 +4470,7 @@ def polar.Circle.offset_at_valid
       polar.normalize i12
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::world]:
-    Source: 'src/scene.rs', lines 654:4-672:5 -/
+    Source: 'src/scene.rs', lines 658:4-676:5 -/
 def scene.Layout.world
   (self : scene.Layout) (pose : walker.LocalPose) (phases : Slice Std.I32) :
   Result grid.Point
@@ -4503,7 +4503,7 @@ def polar.Arc.middle (self : polar.Arc) : Result Std.I32 := do
   polar.normalize i1
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::local_pose]:
-    Source: 'src/scene.rs', lines 577:4-604:5 -/
+    Source: 'src/scene.rs', lines 581:4-608:5 -/
 def scene.Layout.local_pose
   (self : scene.Layout) (cell : Std.Usize) : Result walker.LocalPose := do
   let c ←
@@ -4537,7 +4537,7 @@ def scene.Layout.local_pose
     ok (walker.LocalPose.Polar portal1.spec.circle i1 i2)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::frame_pose]:
-    Source: 'src/scene.rs', lines 638:4-652:5 -/
+    Source: 'src/scene.rs', lines 642:4-656:5 -/
 def scene.Layout.frame_pose
   (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32) :
   Result walker.LocalPose
@@ -4666,7 +4666,7 @@ def polar.overlap
   else ok (core.result.Result.Ok { start := i, length := i1 })
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::doorway]:
-    Source: 'src/scene.rs', lines 730:4-808:5 -/
+    Source: 'src/scene.rs', lines 734:4-812:5 -/
 def scene.Layout.doorway
   (self : scene.Layout) (edge : topology.Edge) (phases : Slice Std.I32)
   (next : Slice Std.I32) :
@@ -4925,7 +4925,7 @@ def scene.Layout.doorway
       else ok (core.result.Result.Err topology.Error.InvalidIndex)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]: loop body 0:
-    Source: 'src/scene.rs', lines 1344:8-1349:9 -/
+    Source: 'src/scene.rs', lines 1355:8-1360:9 -/
 @[rust_loop_body]
 def scene.Scene.check_removal_loop.body
   (v : alloc.vec.Vec walker.Walker) (removed : scene.Doorway) (occupied : Bool)
@@ -4957,7 +4957,7 @@ def scene.Scene.check_removal_loop.body
   else ok (done occupied)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]: loop 0:
-    Source: 'src/scene.rs', lines 1344:8-1349:9 -/
+    Source: 'src/scene.rs', lines 1355:8-1360:9 -/
 @[rust_loop]
 def scene.Scene.check_removal_loop
   (v : alloc.vec.Vec walker.Walker) (removed : scene.Doorway) (occupied : Bool)
@@ -4970,7 +4970,7 @@ def scene.Scene.check_removal_loop
     (removed, occupied, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]:
-    Source: 'src/scene.rs', lines 1337:4-1355:5 -/
+    Source: 'src/scene.rs', lines 1348:4-1366:5 -/
 def scene.Scene.check_removal
   (self : scene.Scene) (edge : topology.Edge) :
   Result (core.result.Result Unit topology.Error)
@@ -5035,7 +5035,7 @@ def scene.contains
   scene.contains_loop edges edge false 0#usize
 
 /-- [labyrinth_core::scene::check_route_edge]:
-    Source: 'src/scene.rs', lines 1034:0-1062:1 -/
+    Source: 'src/scene.rs', lines 1041:0-1069:1 -/
 def scene.check_route_edge
   (layout : scene.Layout)
   (edge : core.result.Result (Option topology.Edge) topology.Error)
@@ -5137,7 +5137,7 @@ def scene.check_route_edge
     ok (r, required)
 
 /-- [labyrinth_core::scene::check_route_cell]: loop body 0:
-    Source: 'src/scene.rs', lines 1001:4-1004:5 -/
+    Source: 'src/scene.rs', lines 1008:4-1011:5 -/
 @[rust_loop_body]
 def scene.check_route_cell_loop.body
   (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (cell : Std.Usize)
@@ -5157,7 +5157,7 @@ def scene.check_route_cell_loop.body
   else ok (done duplicate)
 
 /-- [labyrinth_core::scene::check_route_cell]: loop 0:
-    Source: 'src/scene.rs', lines 1001:4-1004:5 -/
+    Source: 'src/scene.rs', lines 1008:4-1011:5 -/
 @[rust_loop]
 def scene.check_route_cell_loop
   (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (cell : Std.Usize)
@@ -5170,7 +5170,7 @@ def scene.check_route_cell_loop
     (duplicate, j)
 
 /-- [labyrinth_core::scene::check_route_cell]:
-    Source: 'src/scene.rs', lines 994:0-1032:1 -/
+    Source: 'src/scene.rs', lines 1001:0-1039:1 -/
 def scene.check_route_cell
   (layout : scene.Layout) (route : scene.Route) (i : Std.Usize) :
   Result (core.result.Result Bool topology.Error)
@@ -5287,7 +5287,7 @@ def scene.route_cell_status
   | core.result.Result.Err error => ok (interior, core.result.Result.Err error)
 
 /-- [labyrinth_core::scene::check_route]: loop body 0:
-    Source: 'src/scene.rs', lines 973:4-985:5 -/
+    Source: 'src/scene.rs', lines 980:4-992:5 -/
 @[rust_loop_body]
 def scene.check_route_loop.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -5346,7 +5346,7 @@ def scene.check_route_loop.body
   else ok (done (required, status, interior))
 
 /-- [labyrinth_core::scene::check_route]: loop 0:
-    Source: 'src/scene.rs', lines 973:4-985:5 -/
+    Source: 'src/scene.rs', lines 980:4-992:5 -/
 @[rust_loop]
 def scene.check_route_loop
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -5368,7 +5368,7 @@ def scene.check_route_loop
     (required, status, interior, previous, i2)
 
 /-- [labyrinth_core::scene::check_route]:
-    Source: 'src/scene.rs', lines 957:0-992:1 -/
+    Source: 'src/scene.rs', lines 964:0-999:1 -/
 def scene.check_route
   (layout : scene.Layout) (route : scene.Route) (circle : Std.Usize)
   (phases : Slice Std.I32) (next : Slice Std.I32)
@@ -5410,7 +5410,7 @@ def scene.check_route
           ok (r, required1)
 
 /-- [labyrinth_core::scene::check_routes]: loop body 0:
-    Source: 'src/scene.rs', lines 950:4-953:5 -/
+    Source: 'src/scene.rs', lines 957:4-960:5 -/
 @[rust_loop_body]
 def scene.check_routes_loop.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -5450,7 +5450,7 @@ def scene.check_routes_loop.body
   else ok (done (status, required))
 
 /-- [labyrinth_core::scene::check_routes]: loop 0:
-    Source: 'src/scene.rs', lines 950:4-953:5 -/
+    Source: 'src/scene.rs', lines 957:4-960:5 -/
 @[rust_loop]
 def scene.check_routes_loop
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -5470,7 +5470,7 @@ def scene.check_routes_loop
     (required, status, r)
 
 /-- [labyrinth_core::scene::check_routes]:
-    Source: 'src/scene.rs', lines 930:0-955:1 -/
+    Source: 'src/scene.rs', lines 937:0-962:1 -/
 def scene.check_routes
   (layout : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
   (next : Slice Std.I32) (current_tree : Option spanning_tree.Tree)
@@ -5490,7 +5490,7 @@ def scene.check_routes
       current_tree (core.result.Result.Ok ()) 0#usize
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 0:
-    Source: 'src/scene.rs', lines 1363:8-1366:9 -/
+    Source: 'src/scene.rs', lines 1374:8-1377:9 -/
 @[rust_loop_body]
 def scene.Scene.preflight_edit_loop0.body
   (self : scene.Scene) (s : Slice topology.Edge)
@@ -5513,7 +5513,7 @@ def scene.Scene.preflight_edit_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 0:
-    Source: 'src/scene.rs', lines 1363:8-1366:9 -/
+    Source: 'src/scene.rs', lines 1374:8-1377:9 -/
 @[rust_loop]
 def scene.Scene.preflight_edit_loop0
   (self : scene.Scene) (s : Slice topology.Edge)
@@ -5526,7 +5526,7 @@ def scene.Scene.preflight_edit_loop0
     (status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 1:
-    Source: 'src/scene.rs', lines 1390:8-1418:9 -/
+    Source: 'src/scene.rs', lines 1401:8-1429:9 -/
 @[rust_loop_body]
 def scene.Scene.preflight_edit_loop1.body
   (l : scene.Layout) (t : spanning_tree.Tree) (v : alloc.vec.Vec Std.I32)
@@ -5599,7 +5599,7 @@ def scene.Scene.preflight_edit_loop1.body
   else ok (done (status, moving))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 1:
-    Source: 'src/scene.rs', lines 1390:8-1418:9 -/
+    Source: 'src/scene.rs', lines 1401:8-1429:9 -/
 @[rust_loop]
 def scene.Scene.preflight_edit_loop1
   (l : scene.Layout) (t : spanning_tree.Tree) (v : alloc.vec.Vec Std.I32)
@@ -5614,7 +5614,7 @@ def scene.Scene.preflight_edit_loop1
     (status, moving, cell)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 2:
-    Source: 'src/scene.rs', lines 1420:8-1429:9 -/
+    Source: 'src/scene.rs', lines 1431:8-1440:9 -/
 @[rust_loop_body]
 def scene.Scene.preflight_edit_loop2.body
   (l : scene.Layout) (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
@@ -5644,7 +5644,7 @@ def scene.Scene.preflight_edit_loop2.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 2:
-    Source: 'src/scene.rs', lines 1420:8-1429:9 -/
+    Source: 'src/scene.rs', lines 1431:8-1440:9 -/
 @[rust_loop]
 def scene.Scene.preflight_edit_loop2
   (l : scene.Layout) (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
@@ -5658,7 +5658,7 @@ def scene.Scene.preflight_edit_loop2
     (status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]:
-    Source: 'src/scene.rs', lines 1357:4-1432:5 -/
+    Source: 'src/scene.rs', lines 1368:4-1443:5 -/
 def scene.Scene.preflight_edit
   (self : scene.Scene) (edit : scene.Edit) :
   Result ((core.result.Result Std.Usize topology.Error) × scene.Scene)
@@ -5723,7 +5723,7 @@ def scene.Scene.preflight_edit
       ok (r, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]: loop body 0:
-    Source: 'src/scene.rs', lines 1481:8-1484:9
+    Source: 'src/scene.rs', lines 1497:8-1500:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.motion_loop.body
@@ -5742,7 +5742,7 @@ def scene.Scene.motion_loop.body
   else ok (done stationary)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]: loop 0:
-    Source: 'src/scene.rs', lines 1481:8-1484:9
+    Source: 'src/scene.rs', lines 1497:8-1500:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.motion_loop
@@ -5755,7 +5755,7 @@ def scene.Scene.motion_loop
     (stationary, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]:
-    Source: 'src/scene.rs', lines 1472:4-1504:5
+    Source: 'src/scene.rs', lines 1488:4-1520:5
     Visibility: public -/
 def scene.Scene.motion
   (self : scene.Scene) (stamp : walker.Stamp) (steps : Slice Std.I32)
@@ -5951,14 +5951,14 @@ def scene.Scene.motion
     ok (r1, self1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tree]:
-    Source: 'src/scene.rs', lines 1173:4-1175:5
+    Source: 'src/scene.rs', lines 1184:4-1186:5
     Visibility: public -/
 def scene.Scene.impl.tree
   (self : scene.Scene) : Result spanning_tree.Tree := do
   ok self.tree
 
 /-- [labyrinth_core::scene::{impl core::default::Default for labyrinth_core::scene::Edit<'a>}::default]:
-    Source: 'src/scene.rs', lines 879:22-879:29
+    Source: 'src/scene.rs', lines 886:22-886:29
     Visibility: public -/
 def scene.Edit.Insts.CoreDefaultDefault.default : Result scene.Edit := do
   let s ← Shared0Slice.Insts.CoreDefaultDefault.default topology.Edge
@@ -5967,7 +5967,7 @@ def scene.Edit.Insts.CoreDefaultDefault.default : Result scene.Edit := do
   ok { remove := s, add := s, routes := o }
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion_edge]:
-    Source: 'src/scene.rs', lines 1938:4-1941:5 -/
+    Source: 'src/scene.rs', lines 1954:4-1957:5 -/
 def scene.Scene.motion_edge
   (self : scene.Scene) (edge : topology.Edge) :
   Result (core.result.Result Unit topology.Error)
@@ -5984,7 +5984,7 @@ def scene.Scene.motion_edge
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::virtual_edge]:
-    Source: 'src/motion.rs', lines 533:4-535:5 -/
+    Source: 'src/motion.rs', lines 535:4-537:5 -/
 def motion.MotionWorkspace.virtual_edge
   (self : motion.MotionWorkspace) (current : scene.Scene)
   (edge : topology.Edge) :
@@ -6008,7 +6008,7 @@ def motion.MotionWorkspace.virtual_edge
     else ok false
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]: loop body 0:
-    Source: 'src/motion.rs', lines 366:8-369:9 -/
+    Source: 'src/motion.rs', lines 368:8-371:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.clear_search_loop.body
   (self : motion.MotionWorkspace) (i : Std.Usize) :
@@ -6039,7 +6039,7 @@ def motion.MotionWorkspace.clear_search_loop.body
       self.second))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]: loop 0:
-    Source: 'src/motion.rs', lines 366:8-369:9 -/
+    Source: 'src/motion.rs', lines 368:8-371:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.clear_search_loop
   (self : motion.MotionWorkspace) (i : Std.Usize) :
@@ -6057,7 +6057,7 @@ def motion.MotionWorkspace.clear_search_loop
     (self, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]:
-    Source: 'src/motion.rs', lines 364:4-372:5 -/
+    Source: 'src/motion.rs', lines 366:4-374:5 -/
 def motion.MotionWorkspace.clear_search
   (self : motion.MotionWorkspace) (source : Std.Usize) :
   Result motion.MotionWorkspace
@@ -6099,7 +6099,7 @@ def motion.MotionWorkspace.clear_search
     }
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop body 1:
-    Source: 'src/motion.rs', lines 545:12-557:13 -/
+    Source: 'src/motion.rs', lines 547:12-559:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.tree_path_loop0_loop0.body
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6190,7 +6190,7 @@ def motion.MotionWorkspace.tree_path_loop0_loop0.body
   else ok (done (v15, v16, written))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop 1:
-    Source: 'src/motion.rs', lines 545:12-557:13 -/
+    Source: 'src/motion.rs', lines 547:12-559:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.tree_path_loop0_loop0
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6214,7 +6214,7 @@ def motion.MotionWorkspace.tree_path_loop0_loop0
     (v13, v14, written, pos)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop body 0:
-    Source: 'src/motion.rs', lines 541:8-559:9 -/
+    Source: 'src/motion.rs', lines 543:8-561:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.tree_path_loop0.body
   (current : scene.Scene) (target : Std.Usize) (self : motion.MotionWorkspace)
@@ -6249,7 +6249,7 @@ def motion.MotionWorkspace.tree_path_loop0.body
   else ok (done self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop 0:
-    Source: 'src/motion.rs', lines 541:8-559:9 -/
+    Source: 'src/motion.rs', lines 543:8-561:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.tree_path_loop0
   (self : motion.MotionWorkspace) (current : scene.Scene) (target : Std.Usize)
@@ -6263,7 +6263,7 @@ def motion.MotionWorkspace.tree_path_loop0
     (self, read, written)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]:
-    Source: 'src/motion.rs', lines 537:4-561:5 -/
+    Source: 'src/motion.rs', lines 539:4-563:5 -/
 def motion.MotionWorkspace.tree_path
   (self : motion.MotionWorkspace) (current : scene.Scene) (source : Std.Usize)
   (target : Std.Usize) :
@@ -6278,7 +6278,7 @@ def motion.MotionWorkspace.tree_path
   ok (i != core.num.Usize.MAX, self2)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::circles]:
-    Source: 'src/scene.rs', lines 549:4-551:5
+    Source: 'src/scene.rs', lines 553:4-555:5
     Visibility: public -/
 def scene.Layout.impl.circles
   (self : scene.Layout) : Result (Slice polar.Circle) := do
@@ -6292,7 +6292,7 @@ def polar.Circle.impl.center_cell
   ok self.center_cell
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 1:
-    Source: 'src/motion.rs', lines 414:12-423:13 -/
+    Source: 'src/motion.rs', lines 416:12-425:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.flow_path_loop0_loop0.body
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -6348,7 +6348,7 @@ def motion.MotionWorkspace.flow_path_loop0_loop0.body
   else ok (done (v4, v5, written))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 1:
-    Source: 'src/motion.rs', lines 414:12-423:13 -/
+    Source: 'src/motion.rs', lines 416:12-425:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.flow_path_loop0_loop0
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -6364,7 +6364,7 @@ def motion.MotionWorkspace.flow_path_loop0_loop0
     (v4, v5, written, pos)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 0:
-    Source: 'src/motion.rs', lines 411:8-425:9 -/
+    Source: 'src/motion.rs', lines 413:8-427:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.flow_path_loop0.body
   (target : Std.Usize) (self : motion.MotionWorkspace) (read : Std.Usize)
@@ -6394,7 +6394,7 @@ def motion.MotionWorkspace.flow_path_loop0.body
   else ok (done self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 0:
-    Source: 'src/motion.rs', lines 411:8-425:9 -/
+    Source: 'src/motion.rs', lines 413:8-427:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.flow_path_loop0
   (self : motion.MotionWorkspace) (target : Std.Usize) (read : Std.Usize)
@@ -6407,7 +6407,7 @@ def motion.MotionWorkspace.flow_path_loop0
     (self, read, written)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 2:
-    Source: 'src/motion.rs', lines 431:8-439:9 -/
+    Source: 'src/motion.rs', lines 433:8-441:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.flow_path_loop1.body
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -6446,7 +6446,7 @@ def motion.MotionWorkspace.flow_path_loop1.body
   else ok (done (v2, v3))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 2:
-    Source: 'src/motion.rs', lines 431:8-439:9 -/
+    Source: 'src/motion.rs', lines 433:8-441:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.flow_path_loop1
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.U8)
@@ -6460,7 +6460,7 @@ def motion.MotionWorkspace.flow_path_loop1
     (v1, v3, node)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]:
-    Source: 'src/motion.rs', lines 407:4-442:5 -/
+    Source: 'src/motion.rs', lines 409:4-444:5 -/
 def motion.MotionWorkspace.flow_path
   (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
   Result ((core.result.Result Unit topology.Error) × motion.MotionWorkspace)
@@ -6483,7 +6483,7 @@ def motion.MotionWorkspace.flow_path
     ok (core.result.Result.Ok (), { self2 with residual := v1, second := v3 })
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]: loop body 0:
-    Source: 'src/motion.rs', lines 398:8-403:9 -/
+    Source: 'src/motion.rs', lines 400:8-405:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.augment_loop.body
   (source : Std.Usize) (self : motion.MotionWorkspace) (node : Std.Usize) :
@@ -6513,7 +6513,7 @@ def motion.MotionWorkspace.augment_loop.body
   else ok (done self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]: loop 0:
-    Source: 'src/motion.rs', lines 398:8-403:9 -/
+    Source: 'src/motion.rs', lines 400:8-405:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.augment_loop
   (self : motion.MotionWorkspace) (source : Std.Usize) (node : Std.Usize) :
@@ -6525,7 +6525,7 @@ def motion.MotionWorkspace.augment_loop
     (self, node)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]:
-    Source: 'src/motion.rs', lines 396:4-404:5 -/
+    Source: 'src/motion.rs', lines 398:4-406:5 -/
 @[reducible]
 def motion.MotionWorkspace.augment
   (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
@@ -6534,7 +6534,7 @@ def motion.MotionWorkspace.augment
   motion.MotionWorkspace.augment_loop self source target
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop body 1:
-    Source: 'src/motion.rs', lines 381:12-390:13 -/
+    Source: 'src/motion.rs', lines 383:12-392:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.residual_path_loop0_loop0.body
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -6584,7 +6584,7 @@ def motion.MotionWorkspace.residual_path_loop0_loop0.body
   else ok (done (v4, v5, written))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop 1:
-    Source: 'src/motion.rs', lines 381:12-390:13 -/
+    Source: 'src/motion.rs', lines 383:12-392:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.residual_path_loop0_loop0
   (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -6600,7 +6600,7 @@ def motion.MotionWorkspace.residual_path_loop0_loop0
     (v4, v5, written, pos)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop body 0:
-    Source: 'src/motion.rs', lines 378:8-392:9 -/
+    Source: 'src/motion.rs', lines 380:8-394:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.residual_path_loop0.body
   (target : Std.Usize) (self : motion.MotionWorkspace) (read : Std.Usize)
@@ -6630,7 +6630,7 @@ def motion.MotionWorkspace.residual_path_loop0.body
   else ok (done self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop 0:
-    Source: 'src/motion.rs', lines 378:8-392:9 -/
+    Source: 'src/motion.rs', lines 380:8-394:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.residual_path_loop0
   (self : motion.MotionWorkspace) (target : Std.Usize) (read : Std.Usize)
@@ -6644,7 +6644,7 @@ def motion.MotionWorkspace.residual_path_loop0
     (self, read, written)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]:
-    Source: 'src/motion.rs', lines 374:4-394:5 -/
+    Source: 'src/motion.rs', lines 376:4-396:5 -/
 def motion.MotionWorkspace.residual_path
   (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
   Result (Bool × motion.MotionWorkspace)
@@ -6658,7 +6658,7 @@ def motion.MotionWorkspace.residual_path
   ok (i != core.num.Usize.MAX, self2)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::eligible]:
-    Source: 'src/motion.rs', lines 324:4-332:5 -/
+    Source: 'src/motion.rs', lines 326:4-334:5 -/
 def motion.MotionWorkspace.eligible
   (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
   (cell : Std.Usize) :
@@ -6682,7 +6682,7 @@ def motion.MotionWorkspace.eligible
          ok (cell = i1)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 0:
-    Source: 'src/motion.rs', lines 336:8-339:9 -/
+    Source: 'src/motion.rs', lines 338:8-341:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.reset_flow_loop0.body
   (self : motion.MotionWorkspace) (a : Std.Usize) :
@@ -6713,7 +6713,7 @@ def motion.MotionWorkspace.reset_flow_loop0.body
       self.second))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 0:
-    Source: 'src/motion.rs', lines 336:8-339:9 -/
+    Source: 'src/motion.rs', lines 338:8-341:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.reset_flow_loop0
   (self : motion.MotionWorkspace) (a : Std.Usize) :
@@ -6731,7 +6731,7 @@ def motion.MotionWorkspace.reset_flow_loop0
     (self, a)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 1:
-    Source: 'src/motion.rs', lines 342:8-347:9 -/
+    Source: 'src/motion.rs', lines 344:8-349:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.reset_flow_loop1.body
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6793,7 +6793,7 @@ def motion.MotionWorkspace.reset_flow_loop1.body
   else ok (done v16)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 1:
-    Source: 'src/motion.rs', lines 342:8-347:9 -/
+    Source: 'src/motion.rs', lines 344:8-349:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.reset_flow_loop1
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6816,7 +6816,7 @@ def motion.MotionWorkspace.reset_flow_loop1
     (v12, v17)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 2:
-    Source: 'src/motion.rs', lines 351:8-361:9 -/
+    Source: 'src/motion.rs', lines 353:8-363:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.reset_flow_loop2.body
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6920,7 +6920,7 @@ def motion.MotionWorkspace.reset_flow_loop2.body
   else ok (done v16)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 2:
-    Source: 'src/motion.rs', lines 351:8-361:9 -/
+    Source: 'src/motion.rs', lines 353:8-363:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.reset_flow_loop2
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -6942,7 +6942,7 @@ def motion.MotionWorkspace.reset_flow_loop2
     (v12, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]:
-    Source: 'src/motion.rs', lines 334:4-362:5 -/
+    Source: 'src/motion.rs', lines 336:4-364:5 -/
 def motion.MotionWorkspace.reset_flow
   (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
   (pivot : Std.Usize) :
@@ -7000,7 +7000,7 @@ def motion.MotionWorkspace.reset_flow
     }
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 0:
-    Source: 'src/motion.rs', lines 455:8-461:9 -/
+    Source: 'src/motion.rs', lines 457:8-463:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.route_through_loop0.body
   (source : Std.Usize) (target : Std.Usize) (self : motion.MotionWorkspace)
@@ -7024,7 +7024,7 @@ def motion.MotionWorkspace.route_through_loop0.body
   else ok (done (self, units))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 0:
-    Source: 'src/motion.rs', lines 455:8-461:9 -/
+    Source: 'src/motion.rs', lines 457:8-463:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.route_through_loop0
   (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize)
@@ -7038,7 +7038,7 @@ def motion.MotionWorkspace.route_through_loop0
     (self, units, possible)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 1:
-    Source: 'src/motion.rs', lines 473:8-477:9 -/
+    Source: 'src/motion.rs', lines 475:8-479:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.route_through_loop1.body
   (v : alloc.vec.Vec Std.Usize) (circle : Std.Usize)
@@ -7061,7 +7061,7 @@ def motion.MotionWorkspace.route_through_loop1.body
   else ok (done v1)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 1:
-    Source: 'src/motion.rs', lines 473:8-477:9 -/
+    Source: 'src/motion.rs', lines 475:8-479:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.route_through_loop1
   (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec Std.Usize)
@@ -7074,7 +7074,7 @@ def motion.MotionWorkspace.route_through_loop1
     (v, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 2:
-    Source: 'src/motion.rs', lines 479:8-483:9 -/
+    Source: 'src/motion.rs', lines 481:8-485:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.route_through_loop2.body
   (v : alloc.vec.Vec Std.Usize) (circle : Std.Usize)
@@ -7097,7 +7097,7 @@ def motion.MotionWorkspace.route_through_loop2.body
   else ok (done v1)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 2:
-    Source: 'src/motion.rs', lines 479:8-483:9 -/
+    Source: 'src/motion.rs', lines 481:8-485:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.route_through_loop2
   (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec Std.Usize)
@@ -7110,7 +7110,7 @@ def motion.MotionWorkspace.route_through_loop2
     (v, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]:
-    Source: 'src/motion.rs', lines 444:4-487:5 -/
+    Source: 'src/motion.rs', lines 446:4-489:5 -/
 def motion.MotionWorkspace.route_through
   (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
   (pivot : Std.Usize) :
@@ -7181,7 +7181,7 @@ def motion.MotionWorkspace.route_through
       ok (r1, self3)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]: loop body 0:
-    Source: 'src/motion.rs', lines 297:8-303:9 -/
+    Source: 'src/motion.rs', lines 299:8-305:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.edge_index_loop.body
   (i : Std.Usize) (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -7222,7 +7222,7 @@ def motion.MotionWorkspace.edge_index_loop.body
   else ok (done found)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]: loop 0:
-    Source: 'src/motion.rs', lines 297:8-303:9 -/
+    Source: 'src/motion.rs', lines 299:8-305:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.edge_index_loop
   (i : Std.Usize) (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
@@ -7236,7 +7236,7 @@ def motion.MotionWorkspace.edge_index_loop
     (pos, found)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]:
-    Source: 'src/motion.rs', lines 292:4-305:5 -/
+    Source: 'src/motion.rs', lines 294:4-307:5 -/
 def motion.MotionWorkspace.edge_index
   (self : motion.MotionWorkspace) (edge : topology.Edge) :
   Result (core.result.Result Std.Usize topology.Error)
@@ -7256,7 +7256,7 @@ def motion.MotionWorkspace.edge_index
   core.option.Option.ok_or found topology.Error.InvalidCarrier
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]: loop body 0:
-    Source: 'src/motion.rs', lines 312:8-319:9 -/
+    Source: 'src/motion.rs', lines 314:8-321:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.route_admissible_loop.body
   (cells : Slice Std.Usize) (self : motion.MotionWorkspace) (keep : Bool)
@@ -7295,7 +7295,7 @@ def motion.MotionWorkspace.route_admissible_loop.body
   else ok (done (keep, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]: loop 0:
-    Source: 'src/motion.rs', lines 312:8-319:9 -/
+    Source: 'src/motion.rs', lines 314:8-321:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.route_admissible_loop
   (self : motion.MotionWorkspace) (cells : Slice Std.Usize) (keep : Bool)
@@ -7309,7 +7309,7 @@ def motion.MotionWorkspace.route_admissible_loop
     (self, keep, i, status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]:
-    Source: 'src/motion.rs', lines 308:4-322:5 -/
+    Source: 'src/motion.rs', lines 310:4-324:5 -/
 def motion.MotionWorkspace.route_admissible
   (self : motion.MotionWorkspace) (cells : Slice Std.Usize) :
   Result (core.result.Result Bool topology.Error)
@@ -7326,7 +7326,7 @@ def motion.MotionWorkspace.route_admissible
       Bool (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]: loop body 0:
-    Source: 'src/motion.rs', lines 508:8-524:9 -/
+    Source: 'src/motion.rs', lines 510:8-526:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_route_loop.body
   (current : scene.Scene) (circle : Std.Usize) (self : motion.MotionWorkspace)
@@ -7400,7 +7400,7 @@ def motion.MotionWorkspace.plan_route_loop.body
       self.second, found, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]: loop 0:
-    Source: 'src/motion.rs', lines 508:8-524:9 -/
+    Source: 'src/motion.rs', lines 510:8-526:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_route_loop
   (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
@@ -7423,7 +7423,7 @@ def motion.MotionWorkspace.plan_route_loop
     (self, found, v, status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]:
-    Source: 'src/motion.rs', lines 489:4-531:5 -/
+    Source: 'src/motion.rs', lines 491:4-533:5 -/
 def motion.MotionWorkspace.plan_route
   (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
   :
@@ -7600,7 +7600,7 @@ def motion.MotionWorkspace.plan_route
     ok (r2, self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 0:
-    Source: 'src/motion.rs', lines 568:8-573:9 -/
+    Source: 'src/motion.rs', lines 570:8-575:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop0.body
   (i : Std.Usize) (v : alloc.vec.Vec Bool) (current : scene.Scene)
@@ -7629,7 +7629,7 @@ def motion.MotionWorkspace.plan_loop0.body
   else ok (done (v1, v2))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 0:
-    Source: 'src/motion.rs', lines 568:8-573:9 -/
+    Source: 'src/motion.rs', lines 570:8-575:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop0
   (i : Std.Usize) (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Bool)
@@ -7642,7 +7642,7 @@ def motion.MotionWorkspace.plan_loop0
     (v, v1, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 2:
-    Source: 'src/motion.rs', lines 579:12-586:13 -/
+    Source: 'src/motion.rs', lines 581:12-588:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop1_loop0.body
   (r : Std.Usize) (self : motion.MotionWorkspace)
@@ -7703,7 +7703,7 @@ def motion.MotionWorkspace.plan_loop1_loop0.body
       self.second, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 2:
-    Source: 'src/motion.rs', lines 579:12-586:13 -/
+    Source: 'src/motion.rs', lines 581:12-588:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop1_loop0
   (self : motion.MotionWorkspace) (r : Std.Usize)
@@ -7724,7 +7724,7 @@ def motion.MotionWorkspace.plan_loop1_loop0
     (self, status, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 1:
-    Source: 'src/motion.rs', lines 576:8-588:9 -/
+    Source: 'src/motion.rs', lines 578:8-590:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop1.body
   (current : scene.Scene) (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -7802,7 +7802,7 @@ def motion.MotionWorkspace.plan_loop1.body
       v12, v13, v14, v15, v16, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 1:
-    Source: 'src/motion.rs', lines 576:8-588:9 -/
+    Source: 'src/motion.rs', lines 578:8-590:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop1
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -7835,7 +7835,7 @@ def motion.MotionWorkspace.plan_loop1
       v14, v15, v16, r, status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 3:
-    Source: 'src/motion.rs', lines 592:8-602:9 -/
+    Source: 'src/motion.rs', lines 594:8-604:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop2.body
   (i : Std.Usize) (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Bool)
@@ -7880,7 +7880,7 @@ def motion.MotionWorkspace.plan_loop2.body
   else ok (done (v2, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 3:
-    Source: 'src/motion.rs', lines 592:8-602:9 -/
+    Source: 'src/motion.rs', lines 594:8-604:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop2
   (i : Std.Usize) (v : alloc.vec.Vec topology.Edge) (v1 : alloc.vec.Vec Bool)
@@ -7895,7 +7895,7 @@ def motion.MotionWorkspace.plan_loop2
     (v, status, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 6:
-    Source: 'src/motion.rs', lines 614:24-626:25 -/
+    Source: 'src/motion.rs', lines 616:24-628:25 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop3_loop0_loop0.body
   (self : motion.MotionWorkspace) (i : Std.Usize)
@@ -7933,7 +7933,7 @@ def motion.MotionWorkspace.plan_loop3_loop0_loop0.body
   else ok (done (self, status, cut))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 6:
-    Source: 'src/motion.rs', lines 614:24-626:25 -/
+    Source: 'src/motion.rs', lines 616:24-628:25 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop3_loop0_loop0
   (self : motion.MotionWorkspace)
@@ -7949,7 +7949,7 @@ def motion.MotionWorkspace.plan_loop3_loop0_loop0
     (status, cell, cut)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 5:
-    Source: 'src/motion.rs', lines 608:12-639:13 -/
+    Source: 'src/motion.rs', lines 610:12-641:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop3_loop0.body
   (current : scene.Scene) (r : Std.Usize) (self : motion.MotionWorkspace)
@@ -8040,7 +8040,7 @@ def motion.MotionWorkspace.plan_loop3_loop0.body
       self.second, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 5:
-    Source: 'src/motion.rs', lines 608:12-639:13 -/
+    Source: 'src/motion.rs', lines 610:12-641:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop3_loop0
   (self : motion.MotionWorkspace) (current : scene.Scene)
@@ -8062,7 +8062,7 @@ def motion.MotionWorkspace.plan_loop3_loop0
     (self, status, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 4:
-    Source: 'src/motion.rs', lines 606:8-641:9 -/
+    Source: 'src/motion.rs', lines 608:8-643:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop3.body
   (current : scene.Scene) (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -8138,7 +8138,7 @@ def motion.MotionWorkspace.plan_loop3.body
       v12, v13, v14, v15, v16, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 4:
-    Source: 'src/motion.rs', lines 606:8-641:9 -/
+    Source: 'src/motion.rs', lines 608:8-643:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop3
   (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
@@ -8171,7 +8171,7 @@ def motion.MotionWorkspace.plan_loop3
       v14, v15, v16, status, r)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 7:
-    Source: 'src/motion.rs', lines 645:8-654:9 -/
+    Source: 'src/motion.rs', lines 647:8-656:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.plan_loop4.body
   (current : scene.Scene) (self : motion.MotionWorkspace) (e : Std.Usize) :
@@ -8230,7 +8230,7 @@ def motion.MotionWorkspace.plan_loop4.body
       self.second))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 7:
-    Source: 'src/motion.rs', lines 645:8-654:9 -/
+    Source: 'src/motion.rs', lines 647:8-656:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.plan_loop4
   (self : motion.MotionWorkspace) (current : scene.Scene) (e : Std.Usize) :
@@ -8249,7 +8249,7 @@ def motion.MotionWorkspace.plan_loop4
     (self, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]:
-    Source: 'src/motion.rs', lines 563:4-659:5 -/
+    Source: 'src/motion.rs', lines 565:4-661:5 -/
 def motion.MotionWorkspace.plan
   (self : motion.MotionWorkspace) (current : scene.Scene) :
   Result ((core.result.Result Unit topology.Error) × motion.MotionWorkspace)
@@ -8446,7 +8446,7 @@ def motion.MotionWorkspace.plan
       })
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{impl core::ops::function::FnOnce<(u64,), ()> for labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}}::call_once]:
-    Source: 'src/motion.rs', lines 248:71-248:77 -/
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
 def
   motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple.call_once
   (c : motion.MotionWorkspace.advance.closure) (tupled_args : Std.U64) :
@@ -8455,7 +8455,7 @@ def
   ok ()
 
 /-- Trait implementation: [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{impl core::ops::function::FnOnce<(u64,), ()> for labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}}]
-    Source: 'src/motion.rs', lines 248:71-248:77 -/
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
 @[reducible]
 def
   motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple
@@ -8466,7 +8466,7 @@ def
 }
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 0:
-    Source: 'src/motion.rs', lines 222:8-225:9 -/
+    Source: 'src/motion.rs', lines 224:8-227:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.advance_loop0.body
   (requested : Slice Std.I32) (maximum : Std.Usize) (i : Std.Usize) :
@@ -8483,7 +8483,7 @@ def motion.MotionWorkspace.advance_loop0.body
   else ok (done maximum)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 0:
-    Source: 'src/motion.rs', lines 222:8-225:9 -/
+    Source: 'src/motion.rs', lines 224:8-227:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.advance_loop0
   (requested : Slice Std.I32) (maximum : Std.Usize) (i : Std.Usize) :
@@ -8495,7 +8495,7 @@ def motion.MotionWorkspace.advance_loop0
     (maximum, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 1:
-    Source: 'src/motion.rs', lines 233:8-237:9 -/
+    Source: 'src/motion.rs', lines 235:8-239:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.advance_loop1.body
   (current : scene.Scene) (self : motion.MotionWorkspace) (e : Std.Usize) :
@@ -8538,7 +8538,7 @@ def motion.MotionWorkspace.advance_loop1.body
       self.second))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 1:
-    Source: 'src/motion.rs', lines 233:8-237:9 -/
+    Source: 'src/motion.rs', lines 235:8-239:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.advance_loop1
   (self : motion.MotionWorkspace) (current : scene.Scene) (e : Std.Usize) :
@@ -8557,7 +8557,7 @@ def motion.MotionWorkspace.advance_loop1
     (self, e)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 3:
-    Source: 'src/motion.rs', lines 244:12-247:13 -/
+    Source: 'src/motion.rs', lines 246:12-249:13 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.advance_loop2_loop0.body
   (requested : Slice Std.I32) (divisor : Std.Usize)
@@ -8581,7 +8581,7 @@ def motion.MotionWorkspace.advance_loop2_loop0.body
   else ok (done self)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 3:
-    Source: 'src/motion.rs', lines 244:12-247:13 -/
+    Source: 'src/motion.rs', lines 246:12-249:13 -/
 @[rust_loop]
 def motion.MotionWorkspace.advance_loop2_loop0
   (self : motion.MotionWorkspace) (requested : Slice Std.I32)
@@ -8594,7 +8594,7 @@ def motion.MotionWorkspace.advance_loop2_loop0
     (self, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 4:
-    Source: 'src/motion.rs', lines 262:16-268:17 -/
+    Source: 'src/motion.rs', lines 264:16-270:17 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.advance_loop2_loop1.body
   (self : motion.MotionWorkspace) (requested : Slice Std.I32)
@@ -8624,7 +8624,7 @@ def motion.MotionWorkspace.advance_loop2_loop1.body
   else ok (done (self, next))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 4:
-    Source: 'src/motion.rs', lines 262:16-268:17 -/
+    Source: 'src/motion.rs', lines 264:16-270:17 -/
 @[rust_loop]
 def motion.MotionWorkspace.advance_loop2_loop1
   (self : motion.MotionWorkspace) (requested : Slice Std.I32)
@@ -8637,7 +8637,7 @@ def motion.MotionWorkspace.advance_loop2_loop1
     (next, i)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 2:
-    Source: 'src/motion.rs', lines 242:8-271:9 -/
+    Source: 'src/motion.rs', lines 244:8-273:9 -/
 @[rust_loop_body]
 def motion.MotionWorkspace.advance_loop2.body
   (expected : walker.Stamp) (requested : Slice Std.I32) (maximum : Std.Usize)
@@ -8713,7 +8713,7 @@ def motion.MotionWorkspace.advance_loop2.body
   else ok (done (self, current, divisor, planned, failure, status))
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 2:
-    Source: 'src/motion.rs', lines 242:8-271:9 -/
+    Source: 'src/motion.rs', lines 244:8-273:9 -/
 @[rust_loop]
 def motion.MotionWorkspace.advance_loop2
   (self : motion.MotionWorkspace) (current : scene.Scene)
@@ -8730,7 +8730,7 @@ def motion.MotionWorkspace.advance_loop2
     (self, current, divisor, planned, failure, status)
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]:
-    Source: 'src/motion.rs', lines 211:4-290:5 -/
+    Source: 'src/motion.rs', lines 213:4-292:5 -/
 def motion.MotionWorkspace.advance
   (self : motion.MotionWorkspace) (current : scene.Scene)
   (expected : walker.Stamp) (requested : Slice Std.I32) :
@@ -11046,7 +11046,7 @@ def topology.Edge.Insts.CoreCloneClone : core.clone.Clone topology.Edge := {
 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 0:
-    Source: 'src/topology.rs', lines 195:8-198:9
+    Source: 'src/topology.rs', lines 197:8-200:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop0.body
@@ -11080,7 +11080,7 @@ def topology.Carrier.from_csr_loop0.body
   else ok (done valid_offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 0:
-    Source: 'src/topology.rs', lines 195:8-198:9
+    Source: 'src/topology.rs', lines 197:8-200:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop0
@@ -11094,7 +11094,7 @@ def topology.Carrier.from_csr_loop0
     (u, valid_offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 2:
-    Source: 'src/topology.rs', lines 206:12-209:13
+    Source: 'src/topology.rs', lines 208:12-211:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop1_loop0.body
@@ -11122,7 +11122,7 @@ def topology.Carrier.from_csr_loop1_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 2:
-    Source: 'src/topology.rs', lines 206:12-209:13
+    Source: 'src/topology.rs', lines 208:12-211:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop1_loop0
@@ -11137,7 +11137,7 @@ def topology.Carrier.from_csr_loop1_loop0
     (status, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 1:
-    Source: 'src/topology.rs', lines 204:8-211:9
+    Source: 'src/topology.rs', lines 206:8-213:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop1.body
@@ -11163,7 +11163,7 @@ def topology.Carrier.from_csr_loop1.body
   else ok (done (u, status))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 1:
-    Source: 'src/topology.rs', lines 204:8-211:9
+    Source: 'src/topology.rs', lines 206:8-213:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop1
@@ -11178,7 +11178,7 @@ def topology.Carrier.from_csr_loop1
     (u, status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 4:
-    Source: 'src/topology.rs', lines 223:12-232:13
+    Source: 'src/topology.rs', lines 225:12-234:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop2_loop0.body
@@ -11221,7 +11221,7 @@ def topology.Carrier.from_csr_loop2_loop0.body
   else ok (done (seen, stack, depth, reached))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 4:
-    Source: 'src/topology.rs', lines 223:12-232:13
+    Source: 'src/topology.rs', lines 225:12-234:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop2_loop0
@@ -11238,7 +11238,7 @@ def topology.Carrier.from_csr_loop2_loop0
     (seen, stack, depth, reached, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 3:
-    Source: 'src/topology.rs', lines 219:8-233:9
+    Source: 'src/topology.rs', lines 221:8-235:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop2.body
@@ -11264,7 +11264,7 @@ def topology.Carrier.from_csr_loop2.body
   else ok (done reached)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 3:
-    Source: 'src/topology.rs', lines 219:8-233:9
+    Source: 'src/topology.rs', lines 221:8-235:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop2
@@ -11280,7 +11280,7 @@ def topology.Carrier.from_csr_loop2
     (u, seen, stack, depth, reached)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 6:
-    Source: 'src/topology.rs', lines 243:12-250:13
+    Source: 'src/topology.rs', lines 245:12-252:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop3_loop0.body
@@ -11316,7 +11316,7 @@ def topology.Carrier.from_csr_loop3_loop0.body
   else ok (done (edges, count))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 6:
-    Source: 'src/topology.rs', lines 243:12-250:13
+    Source: 'src/topology.rs', lines 245:12-252:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop3_loop0
@@ -11331,7 +11331,7 @@ def topology.Carrier.from_csr_loop3_loop0
     (edges, count, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 5:
-    Source: 'src/topology.rs', lines 241:8-252:9
+    Source: 'src/topology.rs', lines 243:8-254:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop3.body
@@ -11353,7 +11353,7 @@ def topology.Carrier.from_csr_loop3.body
   else ok (done edges)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 5:
-    Source: 'src/topology.rs', lines 241:8-252:9
+    Source: 'src/topology.rs', lines 243:8-254:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop3
@@ -11368,7 +11368,7 @@ def topology.Carrier.from_csr_loop3
     (u, edges, count)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]:
-    Source: 'src/topology.rs', lines 185:4-258:5
+    Source: 'src/topology.rs', lines 187:4-260:5
     Visibility: public -/
 def topology.Carrier.from_csr
   (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize) :
@@ -11545,7 +11545,7 @@ def topology.count_edge
           ok (r1, offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 0:
-    Source: 'src/topology.rs', lines 156:8-159:9
+    Source: 'src/topology.rs', lines 157:8-160:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop0.body
@@ -11572,7 +11572,7 @@ def topology.Carrier.from_edges_loop0.body
   else ok (done (offsets, status))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 0:
-    Source: 'src/topology.rs', lines 156:8-159:9
+    Source: 'src/topology.rs', lines 157:8-160:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop0
@@ -11588,7 +11588,7 @@ def topology.Carrier.from_edges_loop0
     (offsets, i, status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 1:
-    Source: 'src/topology.rs', lines 164:8-167:9
+    Source: 'src/topology.rs', lines 165:8-168:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop1.body
@@ -11611,7 +11611,7 @@ def topology.Carrier.from_edges_loop1.body
   else ok (done next)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 1:
-    Source: 'src/topology.rs', lines 164:8-167:9
+    Source: 'src/topology.rs', lines 165:8-168:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop1
@@ -11625,7 +11625,7 @@ def topology.Carrier.from_edges_loop1
     (i, next)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 2:
-    Source: 'src/topology.rs', lines 170:8-177:9
+    Source: 'src/topology.rs', lines 171:8-178:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop2.body
@@ -11667,7 +11667,7 @@ def topology.Carrier.from_edges_loop2.body
   else ok (done neighbors)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 2:
-    Source: 'src/topology.rs', lines 170:8-177:9
+    Source: 'src/topology.rs', lines 171:8-178:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop2
@@ -11681,7 +11681,7 @@ def topology.Carrier.from_edges_loop2
     (i, next, neighbors)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]:
-    Source: 'src/topology.rs', lines 144:4-179:5
+    Source: 'src/topology.rs', lines 145:4-180:5
     Visibility: public -/
 def topology.Carrier.from_edges
   (cell_count : Std.Usize) (edges : Slice topology.Edge) :
@@ -11767,7 +11767,7 @@ def topology.Carrier.from_edges
         topology.Carrier (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector_pair]:
-    Source: 'src/scene.rs', lines 506:4-541:5 -/
+    Source: 'src/scene.rs', lines 510:4-545:5 -/
 def scene.Layout.check_connector_pair
   (self : scene.Layout) (portal : scene.Portal) (corridor : grid.Rect)
   (other : scene.Portal) (phases : Slice Std.I32) :
@@ -11815,7 +11815,7 @@ def scene.Layout.check_connector_pair
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 0:
-    Source: 'src/scene.rs', lines 482:8-486:9 -/
+    Source: 'src/scene.rs', lines 486:8-490:9 -/
 @[rust_loop_body]
 def scene.Layout.check_connector_loop0.body
   (v : alloc.vec.Vec scene.Cell) (i : Std.Usize) (corridor : grid.Rect)
@@ -11837,7 +11837,7 @@ def scene.Layout.check_connector_loop0.body
   else ok (done blocked)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 0:
-    Source: 'src/scene.rs', lines 482:8-486:9 -/
+    Source: 'src/scene.rs', lines 486:8-490:9 -/
 @[rust_loop]
 def scene.Layout.check_connector_loop0
   (v : alloc.vec.Vec scene.Cell) (i : Std.Usize) (corridor : grid.Rect)
@@ -11850,7 +11850,7 @@ def scene.Layout.check_connector_loop0
     (blocked, cell)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 1:
-    Source: 'src/scene.rs', lines 488:8-493:9 -/
+    Source: 'src/scene.rs', lines 492:8-497:9 -/
 @[rust_loop_body]
 def scene.Layout.check_connector_loop1.body
   (v : alloc.vec.Vec polar.Circle) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize)
@@ -11880,7 +11880,7 @@ def scene.Layout.check_connector_loop1.body
   else ok (done blocked)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 1:
-    Source: 'src/scene.rs', lines 488:8-493:9 -/
+    Source: 'src/scene.rs', lines 492:8-497:9 -/
 @[rust_loop]
 def scene.Layout.check_connector_loop1
   (v : alloc.vec.Vec polar.Circle) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize)
@@ -11894,7 +11894,7 @@ def scene.Layout.check_connector_loop1
     (blocked, other)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 2:
-    Source: 'src/scene.rs', lines 499:8-502:9 -/
+    Source: 'src/scene.rs', lines 503:8-506:9 -/
 @[rust_loop_body]
 def scene.Layout.check_connector_loop2.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -11939,7 +11939,7 @@ def scene.Layout.check_connector_loop2.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 2:
-    Source: 'src/scene.rs', lines 499:8-502:9 -/
+    Source: 'src/scene.rs', lines 503:8-506:9 -/
 @[rust_loop]
 def scene.Layout.check_connector_loop2
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -11957,7 +11957,7 @@ def scene.Layout.check_connector_loop2
     (status, other)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]:
-    Source: 'src/scene.rs', lines 466:4-504:5 -/
+    Source: 'src/scene.rs', lines 470:4-508:5 -/
 def scene.Layout.check_connector
   (self : scene.Layout) (index : Std.Usize) (phases : Slice Std.I32) :
   Result (core.result.Result Unit topology.Error)
@@ -12006,7 +12006,7 @@ def scene.Layout.check_connector
       Unit (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 0:
-    Source: 'src/scene.rs', lines 282:8-295:9
+    Source: 'src/scene.rs', lines 286:8-299:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop0.body
@@ -12042,7 +12042,7 @@ def scene.Layout.new_loop0.body
     else ok (cont (iter1, circles, transforms, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 0:
-    Source: 'src/scene.rs', lines 282:8-295:9
+    Source: 'src/scene.rs', lines 286:8-299:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop0
@@ -12058,7 +12058,7 @@ def scene.Layout.new_loop0
     (iter, circles, transforms, status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 1:
-    Source: 'src/scene.rs', lines 300:8-308:9
+    Source: 'src/scene.rs', lines 304:8-312:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop1.body
@@ -12107,7 +12107,7 @@ def scene.Layout.new_loop1.body
   else ok (done (status, bands, portal_counts))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 1:
-    Source: 'src/scene.rs', lines 300:8-308:9
+    Source: 'src/scene.rs', lines 304:8-312:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop1
@@ -12125,7 +12125,7 @@ def scene.Layout.new_loop1
     (status, bands, portal_counts, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 2:
-    Source: 'src/scene.rs', lines 311:8-314:9
+    Source: 'src/scene.rs', lines 315:8-318:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop2.body
@@ -12151,7 +12151,7 @@ def scene.Layout.new_loop2.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 2:
-    Source: 'src/scene.rs', lines 311:8-314:9
+    Source: 'src/scene.rs', lines 315:8-318:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop2
@@ -12167,7 +12167,7 @@ def scene.Layout.new_loop2
     (status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 5:
-    Source: 'src/scene.rs', lines 324:16-329:17
+    Source: 'src/scene.rs', lines 328:16-333:17
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop3_loop0_loop0.body
@@ -12195,7 +12195,7 @@ def scene.Layout.new_loop3_loop0_loop0.body
   else ok (done removed)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 5:
-    Source: 'src/scene.rs', lines 324:16-329:17
+    Source: 'src/scene.rs', lines 328:16-333:17
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop3_loop0_loop0
@@ -12209,7 +12209,7 @@ def scene.Layout.new_loop3_loop0_loop0
     (removed, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 4:
-    Source: 'src/scene.rs', lines 320:12-339:13
+    Source: 'src/scene.rs', lines 324:12-343:13
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop3_loop0.body
@@ -12242,7 +12242,7 @@ def scene.Layout.new_loop3_loop0.body
   else ok (done (cell_grid, cells))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 4:
-    Source: 'src/scene.rs', lines 320:12-339:13
+    Source: 'src/scene.rs', lines 324:12-343:13
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop3_loop0
@@ -12257,7 +12257,7 @@ def scene.Layout.new_loop3_loop0
     (cell_grid, cells, column)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 3:
-    Source: 'src/scene.rs', lines 318:8-341:9
+    Source: 'src/scene.rs', lines 322:8-345:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop3.body
@@ -12278,7 +12278,7 @@ def scene.Layout.new_loop3.body
   else ok (done (cell_grid, cells))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 3:
-    Source: 'src/scene.rs', lines 318:8-341:9
+    Source: 'src/scene.rs', lines 322:8-345:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop3
@@ -12294,7 +12294,7 @@ def scene.Layout.new_loop3
     (cell_grid, cells, row)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 8:
-    Source: 'src/scene.rs', lines 351:16-358:17
+    Source: 'src/scene.rs', lines 355:16-362:17
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop4_loop0_loop0.body
@@ -12317,7 +12317,7 @@ def scene.Layout.new_loop4_loop0_loop0.body
   else ok (done cells)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 8:
-    Source: 'src/scene.rs', lines 351:16-358:17
+    Source: 'src/scene.rs', lines 355:16-362:17
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop4_loop0_loop0
@@ -12331,7 +12331,7 @@ def scene.Layout.new_loop4_loop0_loop0
     (cells, sector)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 7:
-    Source: 'src/scene.rs', lines 348:12-360:13
+    Source: 'src/scene.rs', lines 352:12-364:13
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop4_loop0.body
@@ -12363,7 +12363,7 @@ def scene.Layout.new_loop4_loop0.body
   else ok (done (circles, cells))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 7:
-    Source: 'src/scene.rs', lines 348:12-360:13
+    Source: 'src/scene.rs', lines 352:12-364:13
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop4_loop0
@@ -12377,7 +12377,7 @@ def scene.Layout.new_loop4_loop0
     (circles, cells, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 6:
-    Source: 'src/scene.rs', lines 343:8-362:9
+    Source: 'src/scene.rs', lines 347:8-366:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop4.body
@@ -12403,7 +12403,7 @@ def scene.Layout.new_loop4.body
   else ok (done (circles, cells))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 6:
-    Source: 'src/scene.rs', lines 343:8-362:9
+    Source: 'src/scene.rs', lines 347:8-366:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop4
@@ -12417,7 +12417,7 @@ def scene.Layout.new_loop4
     (circles, cells, ci)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 9:
-    Source: 'src/scene.rs', lines 365:8-374:9
+    Source: 'src/scene.rs', lines 369:8-378:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop5.body
@@ -12455,7 +12455,7 @@ def scene.Layout.new_loop5.body
   else ok (done (status, cells, portals))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 9:
-    Source: 'src/scene.rs', lines 365:8-374:9
+    Source: 'src/scene.rs', lines 369:8-378:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop5
@@ -12472,7 +12472,7 @@ def scene.Layout.new_loop5
     (status, cells, portals, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 10:
-    Source: 'src/scene.rs', lines 385:8-395:9
+    Source: 'src/scene.rs', lines 389:8-399:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop6.body
@@ -12510,7 +12510,7 @@ def scene.Layout.new_loop6.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 10:
-    Source: 'src/scene.rs', lines 385:8-395:9
+    Source: 'src/scene.rs', lines 389:8-399:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop6
@@ -12524,7 +12524,7 @@ def scene.Layout.new_loop6
     (edges, cell)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 14:
-    Source: 'src/scene.rs', lines 417:24-420:25
+    Source: 'src/scene.rs', lines 421:24-424:25
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop7_loop0_loop0_loop0.body
@@ -12542,7 +12542,7 @@ def scene.Layout.new_loop7_loop0_loop0_loop0.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 14:
-    Source: 'src/scene.rs', lines 417:24-420:25
+    Source: 'src/scene.rs', lines 421:24-424:25
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop7_loop0_loop0_loop0
@@ -12556,7 +12556,7 @@ def scene.Layout.new_loop7_loop0_loop0_loop0
     (edges, inner)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 13:
-    Source: 'src/scene.rs', lines 405:16-423:17
+    Source: 'src/scene.rs', lines 409:16-427:17
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop7_loop0_loop0.body
@@ -12603,7 +12603,7 @@ def scene.Layout.new_loop7_loop0_loop0.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 13:
-    Source: 'src/scene.rs', lines 405:16-423:17
+    Source: 'src/scene.rs', lines 409:16-427:17
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop7_loop0_loop0
@@ -12618,7 +12618,7 @@ def scene.Layout.new_loop7_loop0_loop0
     (edges, sector)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 12:
-    Source: 'src/scene.rs', lines 401:12-425:13
+    Source: 'src/scene.rs', lines 405:12-429:13
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop7_loop0.body
@@ -12647,7 +12647,7 @@ def scene.Layout.new_loop7_loop0.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 12:
-    Source: 'src/scene.rs', lines 401:12-425:13
+    Source: 'src/scene.rs', lines 405:12-429:13
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop7_loop0
@@ -12662,7 +12662,7 @@ def scene.Layout.new_loop7_loop0
     (edges, ring)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 11:
-    Source: 'src/scene.rs', lines 397:8-427:9
+    Source: 'src/scene.rs', lines 401:8-431:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop7.body
@@ -12686,7 +12686,7 @@ def scene.Layout.new_loop7.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 11:
-    Source: 'src/scene.rs', lines 397:8-427:9
+    Source: 'src/scene.rs', lines 401:8-431:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop7
@@ -12699,7 +12699,7 @@ def scene.Layout.new_loop7
     (edges, ci)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 16:
-    Source: 'src/scene.rs', lines 435:12-442:13
+    Source: 'src/scene.rs', lines 439:12-446:13
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop8_loop0.body
@@ -12723,7 +12723,7 @@ def scene.Layout.new_loop8_loop0.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 16:
-    Source: 'src/scene.rs', lines 435:12-442:13
+    Source: 'src/scene.rs', lines 439:12-446:13
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop8_loop0
@@ -12737,7 +12737,7 @@ def scene.Layout.new_loop8_loop0
     (edges, sector)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 15:
-    Source: 'src/scene.rs', lines 429:8-444:9
+    Source: 'src/scene.rs', lines 433:8-448:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop8.body
@@ -12767,7 +12767,7 @@ def scene.Layout.new_loop8.body
   else ok (done edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 15:
-    Source: 'src/scene.rs', lines 429:8-444:9
+    Source: 'src/scene.rs', lines 433:8-448:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop8
@@ -12780,7 +12780,7 @@ def scene.Layout.new_loop8
     (edges, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 17:
-    Source: 'src/scene.rs', lines 458:8-461:9
+    Source: 'src/scene.rs', lines 462:8-465:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Layout.new_loop9.body
@@ -12818,7 +12818,7 @@ def scene.Layout.new_loop9.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 17:
-    Source: 'src/scene.rs', lines 458:8-461:9
+    Source: 'src/scene.rs', lines 462:8-465:9
     Visibility: public -/
 @[rust_loop]
 def scene.Layout.new_loop9
@@ -12835,7 +12835,7 @@ def scene.Layout.new_loop9
     (status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]:
-    Source: 'src/scene.rs', lines 265:4-464:5
+    Source: 'src/scene.rs', lines 269:4-468:5
     Visibility: public -/
 def scene.Layout.new
   (grid_spec : grid.GridSpec) (specs : alloc.vec.Vec polar.PolarSpec)
@@ -13007,33 +13007,33 @@ def scene.Layout.new
       scene.Layout (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::grid]:
-    Source: 'src/scene.rs', lines 543:4-545:5
+    Source: 'src/scene.rs', lines 547:4-549:5
     Visibility: public -/
 def scene.Layout.grid (self : scene.Layout) : Result grid.Grid := do
   ok self.cell_grid
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::portals]:
-    Source: 'src/scene.rs', lines 552:4-554:5
+    Source: 'src/scene.rs', lines 556:4-558:5
     Visibility: public -/
 def scene.Layout.impl.portals
   (self : scene.Layout) : Result (Slice scene.Portal) := do
   ok (alloc.vec.Vec.deref self.portals)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::transform_count]:
-    Source: 'src/scene.rs', lines 558:4-560:5
+    Source: 'src/scene.rs', lines 562:4-564:5
     Visibility: public -/
 def scene.Layout.transform_count (self : scene.Layout) : Result Std.Usize := do
   ok self.transforms
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::geometry]:
-    Source: 'src/scene.rs', lines 561:4-563:5
+    Source: 'src/scene.rs', lines 565:4-567:5
     Visibility: public -/
 def scene.Layout.impl.geometry
   (self : scene.Layout) : Result grid.Geometry := do
   ok self.geometry
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::adapter_band]:
-    Source: 'src/scene.rs', lines 565:4-567:5
+    Source: 'src/scene.rs', lines 569:4-571:5
     Visibility: public -/
 def scene.Layout.adapter_band
   (self : scene.Layout) (circle : Std.Usize) : Result (Option Std.I32) := do
@@ -13044,7 +13044,7 @@ def scene.Layout.adapter_band
   core.option.OptionShared0T.copied core.marker.CopyI32 o
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 2:
-    Source: 'src/scene.rs', lines 835:20-858:21 -/
+    Source: 'src/scene.rs', lines 839:20-862:21 -/
 @[rust_loop_body]
 def scene.Layout.check_spinning_portals_loop0_loop0_loop0.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -13126,7 +13126,7 @@ def scene.Layout.check_spinning_portals_loop0_loop0_loop0.body
   else ok (done matched)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 2:
-    Source: 'src/scene.rs', lines 835:20-858:21 -/
+    Source: 'src/scene.rs', lines 839:20-862:21 -/
 @[rust_loop]
 def scene.Layout.check_spinning_portals_loop0_loop0_loop0
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -13146,7 +13146,7 @@ def scene.Layout.check_spinning_portals_loop0_loop0_loop0
     (entrance_neighbor, exit_neighbor, matched, sector)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 1:
-    Source: 'src/scene.rs', lines 828:16-863:17 -/
+    Source: 'src/scene.rs', lines 832:16-867:17 -/
 @[rust_loop_body]
 def scene.Layout.check_spinning_portals_loop0_loop0.body
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -13182,7 +13182,7 @@ def scene.Layout.check_spinning_portals_loop0_loop0.body
   else ok (done (phases, next, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 1:
-    Source: 'src/scene.rs', lines 828:16-863:17 -/
+    Source: 'src/scene.rs', lines 832:16-867:17 -/
 @[rust_loop]
 def scene.Layout.check_spinning_portals_loop0_loop0
   (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
@@ -13202,7 +13202,7 @@ def scene.Layout.check_spinning_portals_loop0_loop0
     (phases, next, status, phase)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 0:
-    Source: 'src/scene.rs', lines 817:8-868:9 -/
+    Source: 'src/scene.rs', lines 821:8-872:9 -/
 @[rust_loop_body]
 def scene.Layout.check_spinning_portals_loop0.body
   (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
@@ -13260,7 +13260,7 @@ def scene.Layout.check_spinning_portals_loop0.body
   else ok (done (status, phases, next))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 0:
-    Source: 'src/scene.rs', lines 817:8-868:9 -/
+    Source: 'src/scene.rs', lines 821:8-872:9 -/
 @[rust_loop]
 def scene.Layout.check_spinning_portals_loop0
   (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
@@ -13276,7 +13276,7 @@ def scene.Layout.check_spinning_portals_loop0
     (phases, next, status, r)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]:
-    Source: 'src/scene.rs', lines 809:4-870:5 -/
+    Source: 'src/scene.rs', lines 813:4-874:5 -/
 @[reducible]
 def scene.Layout.check_spinning_portals
   (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
@@ -13288,7 +13288,7 @@ def scene.Layout.check_spinning_portals
     (core.result.Result.Ok ()) 0#usize
 
 /-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Route}::clone]:
-    Source: 'src/scene.rs', lines 873:16-873:21
+    Source: 'src/scene.rs', lines 877:16-877:21
     Visibility: public -/
 def scene.Route.Insts.CoreCloneClone.clone
   (self : scene.Route) : Result scene.Route := do
@@ -13297,21 +13297,21 @@ def scene.Route.Insts.CoreCloneClone.clone
   ok { circle := i, cells := v }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Route}]
-    Source: 'src/scene.rs', lines 873:16-873:21 -/
+    Source: 'src/scene.rs', lines 877:16-877:21 -/
 @[reducible]
 def scene.Route.Insts.CoreCloneClone : core.clone.Clone scene.Route := {
   clone := scene.Route.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Route}]
-    Source: 'src/scene.rs', lines 873:23-873:32 -/
+    Source: 'src/scene.rs', lines 877:23-877:32 -/
 @[reducible]
 def scene.Route.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq scene.Route := {
 }
 
 /-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Route> for labyrinth_core::scene::Route}::eq]:
-    Source: 'src/scene.rs', lines 873:23-873:32
+    Source: 'src/scene.rs', lines 877:23-877:32
     Visibility: public -/
 def scene.Route.Insts.CoreCmpPartialEqRoute.eq
   (self : scene.Route) (other : scene.Route) : Result Bool := do
@@ -13322,7 +13322,7 @@ def scene.Route.Insts.CoreCmpPartialEqRoute.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Route> for labyrinth_core::scene::Route}]
-    Source: 'src/scene.rs', lines 873:23-873:32 -/
+    Source: 'src/scene.rs', lines 877:23-877:32 -/
 @[reducible]
 impl_def scene.Route.Insts.CoreCmpPartialEqRoute : core.cmp.PartialEq
   scene.Route scene.Route := {
@@ -13332,14 +13332,14 @@ impl_def scene.Route.Insts.CoreCmpPartialEqRoute : core.cmp.PartialEq
 }
 
 /-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Route}::assert_fields_are_eq]:
-    Source: 'src/scene.rs', lines 873:34-873:36
+    Source: 'src/scene.rs', lines 877:34-877:36
     Visibility: public -/
 def scene.Route.Insts.CoreCmpEq.assert_fields_are_eq
   (self : scene.Route) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Route}]
-    Source: 'src/scene.rs', lines 873:34-873:36 -/
+    Source: 'src/scene.rs', lines 877:34-877:36 -/
 @[reducible]
 def scene.Route.Insts.CoreCmpEq : core.cmp.Eq scene.Route := {
   partialEqInst := scene.Route.Insts.CoreCmpPartialEqRoute
@@ -13347,42 +13347,42 @@ def scene.Route.Insts.CoreCmpEq : core.cmp.Eq scene.Route := {
 }
 
 /-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Edit<'a>}::clone]:
-    Source: 'src/scene.rs', lines 879:9-879:14
+    Source: 'src/scene.rs', lines 886:9-886:14
     Visibility: public -/
 def scene.Edit.Insts.CoreCloneClone.clone
   (self : scene.Edit) : Result scene.Edit := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Edit<'a>}]
-    Source: 'src/scene.rs', lines 879:9-879:14 -/
+    Source: 'src/scene.rs', lines 886:9-886:14 -/
 @[reducible]
 def scene.Edit.Insts.CoreCloneClone : core.clone.Clone scene.Edit := {
   clone := scene.Edit.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Edit<'a>}]
-    Source: 'src/scene.rs', lines 879:16-879:20 -/
+    Source: 'src/scene.rs', lines 886:16-886:20 -/
 @[reducible]
 def scene.Edit.Insts.CoreMarkerCopy : core.marker.Copy scene.Edit := {
   cloneInst := scene.Edit.Insts.CoreCloneClone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::default::Default for labyrinth_core::scene::Edit<'a>}]
-    Source: 'src/scene.rs', lines 879:22-879:29 -/
+    Source: 'src/scene.rs', lines 886:22-886:29 -/
 @[reducible]
 def scene.Edit.Insts.CoreDefaultDefault : core.default.Default scene.Edit := {
   default := scene.Edit.Insts.CoreDefaultDefault.default
 }
 
 /-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::MotionEvent}::clone]:
-    Source: 'src/scene.rs', lines 886:16-886:21
+    Source: 'src/scene.rs', lines 893:16-893:21
     Visibility: public -/
 def scene.MotionEvent.Insts.CoreCloneClone.clone
   (self : scene.MotionEvent) : Result scene.MotionEvent := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:16-886:21 -/
+    Source: 'src/scene.rs', lines 893:16-893:21 -/
 @[reducible]
 def scene.MotionEvent.Insts.CoreCloneClone : core.clone.Clone scene.MotionEvent
   := {
@@ -13390,7 +13390,7 @@ def scene.MotionEvent.Insts.CoreCloneClone : core.clone.Clone scene.MotionEvent
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:23-886:27 -/
+    Source: 'src/scene.rs', lines 893:23-893:27 -/
 @[reducible]
 def scene.MotionEvent.Insts.CoreMarkerCopy : core.marker.Copy scene.MotionEvent
   := {
@@ -13398,14 +13398,14 @@ def scene.MotionEvent.Insts.CoreMarkerCopy : core.marker.Copy scene.MotionEvent
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:29-886:38 -/
+    Source: 'src/scene.rs', lines 893:29-893:38 -/
 @[reducible]
 def scene.MotionEvent.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq scene.MotionEvent := {
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::MotionEvent> for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:29-886:38 -/
+    Source: 'src/scene.rs', lines 893:29-893:38 -/
 @[reducible]
 impl_def scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent :
   core.cmp.PartialEq scene.MotionEvent scene.MotionEvent := {
@@ -13415,14 +13415,14 @@ impl_def scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent :
 }
 
 /-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::MotionEvent}::assert_fields_are_eq]:
-    Source: 'src/scene.rs', lines 886:40-886:42
+    Source: 'src/scene.rs', lines 893:40-893:42
     Visibility: public -/
 def scene.MotionEvent.Insts.CoreCmpEq.assert_fields_are_eq
   (self : scene.MotionEvent) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::MotionEvent}]
-    Source: 'src/scene.rs', lines 886:40-886:42 -/
+    Source: 'src/scene.rs', lines 893:40-893:42 -/
 @[reducible]
 def scene.MotionEvent.Insts.CoreCmpEq : core.cmp.Eq scene.MotionEvent := {
   partialEqInst := scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent
@@ -13431,7 +13431,7 @@ def scene.MotionEvent.Insts.CoreCmpEq : core.cmp.Eq scene.MotionEvent := {
 }
 
 /-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Retired}::fmt]:
-    Source: 'src/scene.rs', lines 893:9-893:14
+    Source: 'src/scene.rs', lines 900:9-900:14
     Visibility: public -/
 def scene.Retired.Insts.CoreFmtDebug.fmt
   (self : scene.Retired) (f : core.fmt.Formatter) :
@@ -13447,42 +13447,42 @@ def scene.Retired.Insts.CoreFmtDebug.fmt
     "released_reservations") dyn2
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:9-893:14 -/
+    Source: 'src/scene.rs', lines 900:9-900:14 -/
 @[reducible]
 def scene.Retired.Insts.CoreFmtDebug : core.fmt.Debug scene.Retired := {
   fmt := scene.Retired.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Retired}::clone]:
-    Source: 'src/scene.rs', lines 893:16-893:21
+    Source: 'src/scene.rs', lines 900:16-900:21
     Visibility: public -/
 def scene.Retired.Insts.CoreCloneClone.clone
   (self : scene.Retired) : Result scene.Retired := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:16-893:21 -/
+    Source: 'src/scene.rs', lines 900:16-900:21 -/
 @[reducible]
 def scene.Retired.Insts.CoreCloneClone : core.clone.Clone scene.Retired := {
   clone := scene.Retired.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:23-893:27 -/
+    Source: 'src/scene.rs', lines 900:23-900:27 -/
 @[reducible]
 def scene.Retired.Insts.CoreMarkerCopy : core.marker.Copy scene.Retired := {
   cloneInst := scene.Retired.Insts.CoreCloneClone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:29-893:38 -/
+    Source: 'src/scene.rs', lines 900:29-900:38 -/
 @[reducible]
 def scene.Retired.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq scene.Retired := {
 }
 
 /-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Retired> for labyrinth_core::scene::Retired}::eq]:
-    Source: 'src/scene.rs', lines 893:29-893:38
+    Source: 'src/scene.rs', lines 900:29-900:38
     Visibility: public -/
 def scene.Retired.Insts.CoreCmpPartialEqRetired.eq
   (self : scene.Retired) (other : scene.Retired) : Result Bool := do
@@ -13494,7 +13494,7 @@ def scene.Retired.Insts.CoreCmpPartialEqRetired.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Retired> for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:29-893:38 -/
+    Source: 'src/scene.rs', lines 900:29-900:38 -/
 @[reducible]
 impl_def scene.Retired.Insts.CoreCmpPartialEqRetired : core.cmp.PartialEq
   scene.Retired scene.Retired := {
@@ -13504,14 +13504,14 @@ impl_def scene.Retired.Insts.CoreCmpPartialEqRetired : core.cmp.PartialEq
 }
 
 /-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Retired}::assert_fields_are_eq]:
-    Source: 'src/scene.rs', lines 893:40-893:42
+    Source: 'src/scene.rs', lines 900:40-900:42
     Visibility: public -/
 def scene.Retired.Insts.CoreCmpEq.assert_fields_are_eq
   (self : scene.Retired) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Retired}]
-    Source: 'src/scene.rs', lines 893:40-893:42 -/
+    Source: 'src/scene.rs', lines 900:40-900:42 -/
 @[reducible]
 def scene.Retired.Insts.CoreCmpEq : core.cmp.Eq scene.Retired := {
   partialEqInst := scene.Retired.Insts.CoreCmpPartialEqRetired
@@ -13739,7 +13739,7 @@ def spanning_tree.Workspace.Insts.CoreFmtDebug : core.fmt.Debug
 }
 
 /-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Stage}::fmt]:
-    Source: 'src/shatter.rs', lines 14:9-14:14
+    Source: 'src/shatter.rs', lines 16:9-16:14
     Visibility: public -/
 def shatter.Stage.Insts.CoreFmtDebug.fmt
   (self : shatter.Stage) (f : core.fmt.Formatter) :
@@ -13760,14 +13760,14 @@ def shatter.Stage.Insts.CoreFmtDebug.fmt
       "until") __self_01
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:9-14:14 -/
+    Source: 'src/shatter.rs', lines 16:9-16:14 -/
 @[reducible]
 def shatter.Stage.Insts.CoreFmtDebug : core.fmt.Debug shatter.Stage := {
   fmt := shatter.Stage.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Patch}::fmt]:
-    Source: 'src/shatter.rs', lines 24:9-24:14
+    Source: 'src/shatter.rs', lines 26:9-26:14
     Visibility: public -/
 def shatter.Patch.Insts.CoreFmtDebug.fmt
   (self : shatter.Patch) (f : core.fmt.Formatter) :
@@ -13782,14 +13782,14 @@ def shatter.Patch.Insts.CoreFmtDebug.fmt
     "serial") dyn (toStr "stage") dyn1 (toStr "cells") dyn2
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Patch}]
-    Source: 'src/shatter.rs', lines 24:9-24:14 -/
+    Source: 'src/shatter.rs', lines 26:9-26:14 -/
 @[reducible]
 def shatter.Patch.Insts.CoreFmtDebug : core.fmt.Debug shatter.Patch := {
   fmt := shatter.Patch.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Scene}::fmt]:
-    Source: 'src/scene.rs', lines 900:9-900:14
+    Source: 'src/scene.rs', lines 907:9-907:14
     Visibility: public -/
 def scene.Scene.Insts.CoreFmtDebug.fmt
   (self : scene.Scene) (f : core.fmt.Formatter) :
@@ -13839,21 +13839,21 @@ def scene.Scene.Insts.CoreFmtDebug.fmt
   core.fmt.Formatter.debug_struct_fields_finish f (toStr "Scene") s values
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Scene}]
-    Source: 'src/scene.rs', lines 900:9-900:14 -/
+    Source: 'src/scene.rs', lines 907:9-907:14 -/
 @[reducible]
 def scene.Scene.Insts.CoreFmtDebug : core.fmt.Debug scene.Scene := {
   fmt := scene.Scene.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}::clone]:
-    Source: 'src/scene.rs', lines 923:9-923:14
+    Source: 'src/scene.rs', lines 930:9-930:14
     Visibility: public -/
 def scene.RoutePublication.Insts.CoreCloneClone.clone
   (self : scene.RoutePublication) : Result scene.RoutePublication := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}]
-    Source: 'src/scene.rs', lines 923:9-923:14 -/
+    Source: 'src/scene.rs', lines 930:9-930:14 -/
 @[reducible]
 def scene.RoutePublication.Insts.CoreCloneClone : core.clone.Clone
   scene.RoutePublication := {
@@ -13861,7 +13861,7 @@ def scene.RoutePublication.Insts.CoreCloneClone : core.clone.Clone
 }
 
 /-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}]
-    Source: 'src/scene.rs', lines 923:16-923:20 -/
+    Source: 'src/scene.rs', lines 930:16-930:20 -/
 @[reducible]
 def scene.RoutePublication.Insts.CoreMarkerCopy : core.marker.Copy
   scene.RoutePublication := {
@@ -14972,13 +14972,13 @@ def spanning_tree.Workspace.new
         spanning_tree.Workspace (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::new]:
-    Source: 'src/shatter.rs', lines 32:4-38:5 -/
+    Source: 'src/shatter.rs', lines 34:4-40:5 -/
 def shatter.Patch.new (cell_count : Std.Usize) : Result shatter.Patch := do
   let v ← alloc.vec.from_elem core.clone.CloneBool false cell_count
   ok { serial := 0#u64, stage := shatter.Stage.Idle, cells := v }
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 0:
-    Source: 'src/scene.rs', lines 1099:8-1105:9
+    Source: 'src/scene.rs', lines 1110:8-1116:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.new_loop0.body
@@ -15019,7 +15019,7 @@ def scene.Scene.new_loop0.body
   else ok (done live_edges)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 0:
-    Source: 'src/scene.rs', lines 1099:8-1105:9
+    Source: 'src/scene.rs', lines 1110:8-1116:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.new_loop0
@@ -15036,7 +15036,7 @@ def scene.Scene.new_loop0
     (live_edges, i1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 1:
-    Source: 'src/scene.rs', lines 1111:8-1119:9
+    Source: 'src/scene.rs', lines 1122:8-1130:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.new_loop1.body
@@ -15060,7 +15060,7 @@ def scene.Scene.new_loop1.body
   else ok (done saved_routes)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 1:
-    Source: 'src/scene.rs', lines 1111:8-1119:9
+    Source: 'src/scene.rs', lines 1122:8-1130:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.new_loop1
@@ -15074,7 +15074,7 @@ def scene.Scene.new_loop1
     (saved_routes, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 2:
-    Source: 'src/scene.rs', lines 1123:8-1134:9
+    Source: 'src/scene.rs', lines 1134:8-1145:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.new_loop2.body
@@ -15118,7 +15118,7 @@ def scene.Scene.new_loop2.body
   else ok (done (walkers, valid))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 2:
-    Source: 'src/scene.rs', lines 1123:8-1134:9
+    Source: 'src/scene.rs', lines 1134:8-1145:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.new_loop2
@@ -15135,7 +15135,7 @@ def scene.Scene.new_loop2
     (walkers, valid, i1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 3:
-    Source: 'src/scene.rs', lines 1140:8-1143:9
+    Source: 'src/scene.rs', lines 1151:8-1154:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.new_loop3.body
@@ -15153,7 +15153,7 @@ def scene.Scene.new_loop3.body
   else ok (done patches)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 3:
-    Source: 'src/scene.rs', lines 1140:8-1143:9
+    Source: 'src/scene.rs', lines 1151:8-1154:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.new_loop3
@@ -15167,7 +15167,7 @@ def scene.Scene.new_loop3
     (patches, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]:
-    Source: 'src/scene.rs', lines 1065:4-1165:5
+    Source: 'src/scene.rs', lines 1074:4-1176:5
     Visibility: public -/
 def scene.Scene.new
   {R : Type _} (treeRngInst : tree.Rng R) (layout : scene.Layout)
@@ -15391,45 +15391,45 @@ def scene.Scene.new
     ok (r1, rng)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::holds]:
-    Source: 'src/scene.rs', lines 1182:4-1184:5
+    Source: 'src/scene.rs', lines 1193:4-1195:5
     Visibility: public -/
 def scene.Scene.impl.holds
   (self : scene.Scene) : Result (Slice Std.Usize) := do
   ok (alloc.vec.Vec.deref self.holds)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::walkers]:
-    Source: 'src/scene.rs', lines 1185:4-1187:5
+    Source: 'src/scene.rs', lines 1196:4-1198:5
     Visibility: public -/
 def scene.Scene.impl.walkers
   (self : scene.Scene) : Result (Slice walker.Walker) := do
   ok (alloc.vec.Vec.deref self.walkers)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::clock]:
-    Source: 'src/scene.rs', lines 1188:4-1190:5
+    Source: 'src/scene.rs', lines 1199:4-1201:5
     Visibility: public -/
 def scene.Scene.impl.clock (self : scene.Scene) : Result Std.U64 := do
   ok self.clock
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::trail_revision]:
-    Source: 'src/scene.rs', lines 1192:4-1194:5
+    Source: 'src/scene.rs', lines 1203:4-1205:5
     Visibility: public -/
 def scene.Scene.impl.trail_revision (self : scene.Scene) : Result Std.U64 := do
   ok self.trail_revision
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::is_suspended]:
-    Source: 'src/scene.rs', lines 1195:4-1197:5
+    Source: 'src/scene.rs', lines 1206:4-1208:5
     Visibility: public -/
 def scene.Scene.is_suspended (self : scene.Scene) : Result Bool := do
   ok self.suspended
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::is_inactive]:
-    Source: 'src/scene.rs', lines 1198:4-1200:5
+    Source: 'src/scene.rs', lines 1209:4-1211:5
     Visibility: public -/
 def scene.Scene.is_inactive (self : scene.Scene) : Result Bool := do
   ok self.inactive
 
 /-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::contains]:
-    Source: 'src/shatter.rs', lines 40:4-42:5 -/
+    Source: 'src/shatter.rs', lines 42:4-44:5 -/
 def shatter.Patch.contains
   (self : shatter.Patch) (cell : Std.Usize) : Result Bool := do
   let b ←
@@ -15446,7 +15446,7 @@ def shatter.Patch.contains
   else ok false
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]: loop body 0:
-    Source: 'src/scene.rs', lines 1221:8-1224:9 -/
+    Source: 'src/scene.rs', lines 1232:8-1235:9 -/
 @[rust_loop_body]
 def scene.Scene.admission_loop.body
   (v : alloc.vec.Vec shatter.Patch) (cell : Std.Usize) (occupied : Bool)
@@ -15468,7 +15468,7 @@ def scene.Scene.admission_loop.body
   else ok (done occupied)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]: loop 0:
-    Source: 'src/scene.rs', lines 1221:8-1224:9 -/
+    Source: 'src/scene.rs', lines 1232:8-1235:9 -/
 @[rust_loop]
 def scene.Scene.admission_loop
   (v : alloc.vec.Vec shatter.Patch) (cell : Std.Usize) (occupied : Bool)
@@ -15481,7 +15481,7 @@ def scene.Scene.admission_loop
     (occupied, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]:
-    Source: 'src/scene.rs', lines 1212:4-1230:5 -/
+    Source: 'src/scene.rs', lines 1223:4-1241:5 -/
 def scene.Scene.admission
   (self : scene.Scene) (cell : Std.Usize) :
   Result (core.result.Result Unit topology.Error)
@@ -15507,7 +15507,7 @@ def scene.Scene.admission
           else ok (core.result.Result.Ok ())
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::cell_pose]:
-    Source: 'src/scene.rs', lines 1232:4-1239:5
+    Source: 'src/scene.rs', lines 1243:4-1250:5
     Visibility: public -/
 def scene.Scene.cell_pose
   (self : scene.Scene) (cell : Std.Usize) :
@@ -15591,7 +15591,7 @@ def walker.Path.pose
         ok (walker.LocalPose.Polar circle to_radius angle)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::walker_pose]:
-    Source: 'src/scene.rs', lines 1241:4-1251:5
+    Source: 'src/scene.rs', lines 1252:4-1262:5
     Visibility: public -/
 def scene.Scene.walker_pose
   (self : scene.Scene) (walker_index : Std.Usize) :
@@ -15622,7 +15622,7 @@ def scene.Scene.walker_pose
       grid.Point (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::doorway_bounds]:
-    Source: 'src/scene.rs', lines 1253:4-1258:5
+    Source: 'src/scene.rs', lines 1264:4-1269:5
     Visibility: public -/
 def scene.Scene.doorway_bounds
   (self : scene.Scene) (edge : topology.Edge) :
@@ -15640,7 +15640,7 @@ def scene.Scene.doorway_bounds
       grid.Rect (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]: loop body 0:
-    Source: 'src/scene.rs', lines 1267:8-1274:9
+    Source: 'src/scene.rs', lines 1278:8-1285:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.swept_doorway_loop.body
@@ -15683,7 +15683,7 @@ def scene.Scene.swept_doorway_loop.body
   else ok (done (v1, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]: loop 0:
-    Source: 'src/scene.rs', lines 1267:8-1274:9
+    Source: 'src/scene.rs', lines 1278:8-1285:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.swept_doorway_loop
@@ -15698,7 +15698,7 @@ def scene.Scene.swept_doorway_loop
     (v1, status, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]:
-    Source: 'src/scene.rs', lines 1261:4-1280:5
+    Source: 'src/scene.rs', lines 1272:4-1291:5
     Visibility: public -/
 def scene.Scene.swept_doorway
   (self : scene.Scene) (edge : topology.Edge) (steps : Slice Std.I32) :
@@ -15746,7 +15746,7 @@ def walker.Reservation.Insts.CoreCmpPartialEqReservation.eq
   else ok false
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reservation]:
-    Source: 'src/scene.rs', lines 1283:4-1292:5
+    Source: 'src/scene.rs', lines 1294:4-1303:5
     Visibility: public -/
 def scene.Scene.reservation
   (self : scene.Scene) (token : walker.Reservation) :
@@ -15960,7 +15960,7 @@ impl_def walker.WalkerState.Insts.CoreCmpPartialEqWalkerState :
 }
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_crossing]:
-    Source: 'src/scene.rs', lines 1294:4-1335:5
+    Source: 'src/scene.rs', lines 1305:4-1346:5
     Visibility: public -/
 def scene.Scene.begin_crossing
   (self : scene.Scene) (stamp : walker.Stamp) (walker_index : Std.Usize)
@@ -16100,7 +16100,7 @@ def scene.Scene.begin_crossing
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]: loop body 0:
-    Source: 'src/scene.rs', lines 1526:8-1529:9
+    Source: 'src/scene.rs', lines 1542:8-1545:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.carve_loop.body
@@ -16122,7 +16122,7 @@ def scene.Scene.carve_loop.body
   else ok (done v1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]: loop 0:
-    Source: 'src/scene.rs', lines 1526:8-1529:9
+    Source: 'src/scene.rs', lines 1542:8-1545:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.carve_loop
@@ -16134,7 +16134,7 @@ def scene.Scene.carve_loop
     (v1, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]:
-    Source: 'src/scene.rs', lines 1507:4-1536:5
+    Source: 'src/scene.rs', lines 1523:4-1552:5
     Visibility: public -/
 def scene.Scene.carve
   (self : scene.Scene) (stamp : walker.Stamp) (walker_index : Std.Usize)
@@ -16234,7 +16234,7 @@ def scene.Scene.carve
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 1:
-    Source: 'src/scene.rs', lines 1544:16-1553:17 -/
+    Source: 'src/scene.rs', lines 1560:16-1569:17 -/
 @[rust_loop_body]
 def scene.Scene.drain_patches_loop0_loop0.body
   (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
@@ -16271,7 +16271,7 @@ def scene.Scene.drain_patches_loop0_loop0.body
   else ok (done crossing)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 1:
-    Source: 'src/scene.rs', lines 1544:16-1553:17 -/
+    Source: 'src/scene.rs', lines 1560:16-1569:17 -/
 @[rust_loop]
 def scene.Scene.drain_patches_loop0_loop0
   (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
@@ -16284,7 +16284,7 @@ def scene.Scene.drain_patches_loop0_loop0
     (crossing, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 2:
-    Source: 'src/scene.rs', lines 1557:20-1562:21 -/
+    Source: 'src/scene.rs', lines 1573:20-1578:21 -/
 @[rust_loop_body]
 def scene.Scene.drain_patches_loop0_loop1.body
   (v : alloc.vec.Vec shatter.Patch) (p : Std.Usize)
@@ -16316,7 +16316,7 @@ def scene.Scene.drain_patches_loop0_loop1.body
   else ok (done v1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 2:
-    Source: 'src/scene.rs', lines 1557:20-1562:21 -/
+    Source: 'src/scene.rs', lines 1573:20-1578:21 -/
 @[rust_loop]
 def scene.Scene.drain_patches_loop0_loop1
   (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
@@ -16328,7 +16328,7 @@ def scene.Scene.drain_patches_loop0_loop1
     (v, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 0:
-    Source: 'src/scene.rs', lines 1540:8-1566:9 -/
+    Source: 'src/scene.rs', lines 1556:8-1582:9 -/
 @[rust_loop_body]
 def scene.Scene.drain_patches_loop0.body
   (self : scene.Scene) (p : Std.Usize) :
@@ -16375,7 +16375,7 @@ def scene.Scene.drain_patches_loop0.body
       self.inactive, self.latest_request, self.pending, self.trail_revision))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 0:
-    Source: 'src/scene.rs', lines 1540:8-1566:9 -/
+    Source: 'src/scene.rs', lines 1556:8-1582:9 -/
 @[rust_loop]
 def scene.Scene.drain_patches_loop0
   (self : scene.Scene) (p : Std.Usize) :
@@ -16391,7 +16391,7 @@ def scene.Scene.drain_patches_loop0
     (self, p)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]:
-    Source: 'src/scene.rs', lines 1538:4-1567:5 -/
+    Source: 'src/scene.rs', lines 1554:4-1583:5 -/
 def scene.Scene.drain_patches (self : scene.Scene) : Result scene.Scene := do
   let (l, t, w, v, v1, v2, v3, v4, v5, v6, s, i, i1, b, b1, b2, i2, o, i3) ←
     scene.Scene.drain_patches_loop0 self 0#usize
@@ -16419,7 +16419,7 @@ def scene.Scene.drain_patches (self : scene.Scene) : Result scene.Scene := do
     }
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 1:
-    Source: 'src/scene.rs', lines 1597:20-1600:21
+    Source: 'src/scene.rs', lines 1613:20-1616:21
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.tick_loop0_loop0.body
@@ -16440,7 +16440,7 @@ def scene.Scene.tick_loop0_loop0.body
   else ok (done v)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 1:
-    Source: 'src/scene.rs', lines 1597:20-1600:21
+    Source: 'src/scene.rs', lines 1613:20-1616:21
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.tick_loop0_loop0
@@ -16452,7 +16452,7 @@ def scene.Scene.tick_loop0_loop0
     (v, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 0:
-    Source: 'src/scene.rs', lines 1589:8-1607:9
+    Source: 'src/scene.rs', lines 1605:8-1623:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.tick_loop0.body
@@ -16517,7 +16517,7 @@ def scene.Scene.tick_loop0.body
   else ok (done (v, v1))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 0:
-    Source: 'src/scene.rs', lines 1589:8-1607:9
+    Source: 'src/scene.rs', lines 1605:8-1623:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.tick_loop0
@@ -16530,7 +16530,7 @@ def scene.Scene.tick_loop0
     (v, v1, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 3:
-    Source: 'src/scene.rs', lines 1616:20-1621:21
+    Source: 'src/scene.rs', lines 1632:20-1637:21
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.tick_loop1_loop0.body
@@ -16563,7 +16563,7 @@ def scene.Scene.tick_loop1_loop0.body
   else ok (done v1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 3:
-    Source: 'src/scene.rs', lines 1616:20-1621:21
+    Source: 'src/scene.rs', lines 1632:20-1637:21
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.tick_loop1_loop0
@@ -16576,7 +16576,7 @@ def scene.Scene.tick_loop1_loop0
     (v, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 2:
-    Source: 'src/scene.rs', lines 1612:8-1626:9
+    Source: 'src/scene.rs', lines 1628:8-1642:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.tick_loop1.body
@@ -16626,7 +16626,7 @@ def scene.Scene.tick_loop1.body
       self.inactive, self.latest_request, self.pending, self.trail_revision))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 2:
-    Source: 'src/scene.rs', lines 1612:8-1626:9
+    Source: 'src/scene.rs', lines 1628:8-1642:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.tick_loop1
@@ -16643,7 +16643,7 @@ def scene.Scene.tick_loop1
     (self, p)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]:
-    Source: 'src/scene.rs', lines 1570:4-1629:5
+    Source: 'src/scene.rs', lines 1586:4-1645:5
     Visibility: public -/
 def scene.Scene.tick
   (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
@@ -16733,7 +16733,7 @@ def scene.Scene.tick
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::suspend]:
-    Source: 'src/scene.rs', lines 1631:4-1640:5
+    Source: 'src/scene.rs', lines 1647:4-1656:5
     Visibility: public -/
 def scene.Scene.suspend
   (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
@@ -16761,7 +16761,7 @@ def scene.Scene.suspend
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::resume]:
-    Source: 'src/scene.rs', lines 1642:4-1652:5
+    Source: 'src/scene.rs', lines 1658:4-1668:5
     Visibility: public -/
 def scene.Scene.resume
   (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
@@ -16803,7 +16803,7 @@ def scene.Scene.resume
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 1:
-    Source: 'src/scene.rs', lines 1667:12-1672:13
+    Source: 'src/scene.rs', lines 1683:12-1688:13
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.begin_shatter_loop0_loop0.body
@@ -16829,7 +16829,7 @@ def scene.Scene.begin_shatter_loop0_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 1:
-    Source: 'src/scene.rs', lines 1667:12-1672:13
+    Source: 'src/scene.rs', lines 1683:12-1688:13
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.begin_shatter_loop0_loop0
@@ -16843,7 +16843,7 @@ def scene.Scene.begin_shatter_loop0_loop0
     (status, j)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 0:
-    Source: 'src/scene.rs', lines 1664:8-1674:9
+    Source: 'src/scene.rs', lines 1680:8-1690:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.begin_shatter_loop0.body
@@ -16896,7 +16896,7 @@ def scene.Scene.begin_shatter_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 0:
-    Source: 'src/scene.rs', lines 1664:8-1674:9
+    Source: 'src/scene.rs', lines 1680:8-1690:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.begin_shatter_loop0
@@ -16916,7 +16916,7 @@ def scene.Scene.begin_shatter_loop0
     (status, i4)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 2:
-    Source: 'src/scene.rs', lines 1677:8-1679:9
+    Source: 'src/scene.rs', lines 1693:8-1695:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.begin_shatter_loop1.body
@@ -16939,7 +16939,7 @@ def scene.Scene.begin_shatter_loop1.body
   else ok (done slot)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 2:
-    Source: 'src/scene.rs', lines 1677:8-1679:9
+    Source: 'src/scene.rs', lines 1693:8-1695:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.begin_shatter_loop1
@@ -16949,7 +16949,7 @@ def scene.Scene.begin_shatter_loop1
     slot
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 3:
-    Source: 'src/scene.rs', lines 1685:8-1688:9
+    Source: 'src/scene.rs', lines 1701:8-1704:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.begin_shatter_loop2.body
@@ -16975,7 +16975,7 @@ def scene.Scene.begin_shatter_loop2.body
   else ok (done v)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 3:
-    Source: 'src/scene.rs', lines 1685:8-1688:9
+    Source: 'src/scene.rs', lines 1701:8-1704:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.begin_shatter_loop2
@@ -16988,7 +16988,7 @@ def scene.Scene.begin_shatter_loop2
     (v, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]:
-    Source: 'src/scene.rs', lines 1654:4-1699:5
+    Source: 'src/scene.rs', lines 1670:4-1715:5
     Visibility: public -/
 def scene.Scene.begin_shatter
   (self : scene.Scene) (stamp : walker.Stamp) (cells : Slice Std.Usize) :
@@ -17075,7 +17075,7 @@ def scene.Scene.begin_shatter
     ok (r1, self)
 
 /-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::validate]:
-    Source: 'src/shatter.rs', lines 44:4-49:5 -/
+    Source: 'src/shatter.rs', lines 46:4-51:5 -/
 def shatter.Patch.validate
   (self : shatter.Patch) (id : shatter.PatchId) :
   Result (core.result.Result Unit topology.Error)
@@ -17090,7 +17090,7 @@ def shatter.Patch.validate
     else ok (core.result.Result.Ok ())
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::patch_slot]:
-    Source: 'src/scene.rs', lines 1701:4-1708:5 -/
+    Source: 'src/scene.rs', lines 1717:4-1724:5 -/
 def scene.Scene.patch_slot
   (self : scene.Scene) (id : shatter.PatchId) :
   Result (core.result.Result Std.Usize topology.Error)
@@ -17119,7 +17119,7 @@ def scene.Scene.patch_slot
         Std.Usize (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::patch_stage]:
-    Source: 'src/scene.rs', lines 1710:4-1712:5
+    Source: 'src/scene.rs', lines 1726:4-1728:5
     Visibility: public -/
 def scene.Scene.patch_stage
   (self : scene.Scene) (id : shatter.PatchId) :
@@ -17138,7 +17138,7 @@ def scene.Scene.patch_stage
       shatter.Stage (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]: loop body 0:
-    Source: 'src/scene.rs', lines 1724:8-1729:9
+    Source: 'src/scene.rs', lines 1740:8-1745:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.hide_patch_loop.body
@@ -17171,7 +17171,7 @@ def scene.Scene.hide_patch_loop.body
   else ok (done v1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]: loop 0:
-    Source: 'src/scene.rs', lines 1724:8-1729:9
+    Source: 'src/scene.rs', lines 1740:8-1745:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.hide_patch_loop
@@ -17184,7 +17184,7 @@ def scene.Scene.hide_patch_loop
     (v, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]:
-    Source: 'src/scene.rs', lines 1714:4-1733:5
+    Source: 'src/scene.rs', lines 1730:4-1749:5
     Visibility: public -/
 def scene.Scene.hide_patch
   (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId) :
@@ -17247,7 +17247,7 @@ def scene.Scene.hide_patch
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::scatter_patch]:
-    Source: 'src/scene.rs', lines 1735:4-1755:5
+    Source: 'src/scene.rs', lines 1751:4-1771:5
     Visibility: public -/
 def scene.Scene.scatter_patch
   (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId)
@@ -17328,7 +17328,7 @@ def scene.Scene.scatter_patch
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 0:
-    Source: 'src/scene.rs', lines 1777:8-1781:9
+    Source: 'src/scene.rs', lines 1793:8-1797:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.reform_patch_loop0.body
@@ -17358,7 +17358,7 @@ def scene.Scene.reform_patch_loop0.body
   else ok (done outside)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 0:
-    Source: 'src/scene.rs', lines 1777:8-1781:9
+    Source: 'src/scene.rs', lines 1793:8-1797:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.reform_patch_loop0
@@ -17372,7 +17372,7 @@ def scene.Scene.reform_patch_loop0
     (outside, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 1:
-    Source: 'src/scene.rs', lines 1783:8-1787:9
+    Source: 'src/scene.rs', lines 1799:8-1803:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.reform_patch_loop1.body
@@ -17402,7 +17402,7 @@ def scene.Scene.reform_patch_loop1.body
   else ok (done outside)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 1:
-    Source: 'src/scene.rs', lines 1783:8-1787:9
+    Source: 'src/scene.rs', lines 1799:8-1803:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.reform_patch_loop1
@@ -17416,7 +17416,7 @@ def scene.Scene.reform_patch_loop1
     (outside, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 2:
-    Source: 'src/scene.rs', lines 1792:8-1795:9
+    Source: 'src/scene.rs', lines 1808:8-1811:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.reform_patch_loop2.body
@@ -17438,7 +17438,7 @@ def scene.Scene.reform_patch_loop2.body
   else ok (done v1)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 2:
-    Source: 'src/scene.rs', lines 1792:8-1795:9
+    Source: 'src/scene.rs', lines 1808:8-1811:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.reform_patch_loop2
@@ -17450,7 +17450,7 @@ def scene.Scene.reform_patch_loop2
     (v1, i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]:
-    Source: 'src/scene.rs', lines 1758:4-1805:5
+    Source: 'src/scene.rs', lines 1774:4-1821:5
     Visibility: public -/
 def scene.Scene.reform_patch
   (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId)
@@ -17601,7 +17601,7 @@ def scene.Scene.reform_patch
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::request_layout]:
-    Source: 'src/scene.rs', lines 1807:4-1815:5
+    Source: 'src/scene.rs', lines 1823:4-1831:5
     Visibility: public -/
 def scene.Scene.request_layout
   (self : scene.Scene) (stamp : walker.Stamp) :
@@ -17637,7 +17637,7 @@ def scene.Scene.request_layout
     ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]: loop body 0:
-    Source: 'src/scene.rs', lines 1833:8-1839:9
+    Source: 'src/scene.rs', lines 1849:8-1855:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.publish_layout_loop.body
@@ -17667,7 +17667,7 @@ def scene.Scene.publish_layout_loop.body
   else ok (done i)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]: loop 0:
-    Source: 'src/scene.rs', lines 1833:8-1839:9
+    Source: 'src/scene.rs', lines 1849:8-1855:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.publish_layout_loop
@@ -17679,7 +17679,7 @@ def scene.Scene.publish_layout_loop
     (v, i, w)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]:
-    Source: 'src/scene.rs', lines 1817:4-1847:5
+    Source: 'src/scene.rs', lines 1833:4-1863:5
     Visibility: public -/
 def scene.Scene.publish_layout
   (self : scene.Scene) (request : Std.U64) (candidate : scene.Scene) :
@@ -17722,7 +17722,7 @@ def scene.Scene.publish_layout
             })
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::cell_fits]:
-    Source: 'src/scene.rs', lines 1849:4-1860:5 -/
+    Source: 'src/scene.rs', lines 1865:4-1876:5 -/
 def scene.Scene.cell_fits
   (self : scene.Scene) (cell : Std.Usize) (viewport : grid.Rect) :
   Result (core.result.Result Bool topology.Error)
@@ -17769,7 +17769,7 @@ def scene.Scene.cell_fits
         Bool (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]: loop body 0:
-    Source: 'src/scene.rs', lines 1872:8-1878:9
+    Source: 'src/scene.rs', lines 1888:8-1894:9
     Visibility: public -/
 @[rust_loop_body]
 def scene.Scene.reject_layout_loop.body
@@ -17831,7 +17831,7 @@ def scene.Scene.reject_layout_loop.body
   else ok (done (fits, status))
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]: loop 0:
-    Source: 'src/scene.rs', lines 1872:8-1878:9
+    Source: 'src/scene.rs', lines 1888:8-1894:9
     Visibility: public -/
 @[rust_loop]
 def scene.Scene.reject_layout_loop
@@ -17853,7 +17853,7 @@ def scene.Scene.reject_layout_loop
     (fits, status, cell)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]:
-    Source: 'src/scene.rs', lines 1863:4-1884:5
+    Source: 'src/scene.rs', lines 1879:4-1900:5
     Visibility: public -/
 def scene.Scene.reject_layout
   (self : scene.Scene) (request : Std.U64) (viewport : grid.Rect) :
@@ -17914,7 +17914,7 @@ def scene.Scene.reject_layout
         ok (r1, self)
 
 /-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::advance_motion]:
-    Source: 'src/scene.rs', lines 1945:4-1952:5
+    Source: 'src/scene.rs', lines 1961:4-1968:5
     Visibility: public -/
 def scene.Scene.advance_motion
   (self : scene.Scene) (expected : walker.Stamp)
@@ -17927,7 +17927,7 @@ def scene.Scene.advance_motion
   ok (r, self1, work1)
 
 /-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::PatchId}::fmt]:
-    Source: 'src/shatter.rs', lines 7:9-7:14
+    Source: 'src/shatter.rs', lines 9:9-9:14
     Visibility: public -/
 def shatter.PatchId.Insts.CoreFmtDebug.fmt
   (self : shatter.PatchId) (f : core.fmt.Formatter) :
@@ -17940,21 +17940,21 @@ def shatter.PatchId.Insts.CoreFmtDebug.fmt
     "epoch") dyn (toStr "slot") dyn1 (toStr "serial") dyn2
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:9-7:14 -/
+    Source: 'src/shatter.rs', lines 9:9-9:14 -/
 @[reducible]
 def shatter.PatchId.Insts.CoreFmtDebug : core.fmt.Debug shatter.PatchId := {
   fmt := shatter.PatchId.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::PatchId}::clone]:
-    Source: 'src/shatter.rs', lines 7:16-7:21
+    Source: 'src/shatter.rs', lines 9:16-9:21
     Visibility: public -/
 def shatter.PatchId.Insts.CoreCloneClone.clone
   (self : shatter.PatchId) : Result shatter.PatchId := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:16-7:21 -/
+    Source: 'src/shatter.rs', lines 9:16-9:21 -/
 @[reducible]
 def shatter.PatchId.Insts.CoreCloneClone : core.clone.Clone shatter.PatchId
   := {
@@ -17962,7 +17962,7 @@ def shatter.PatchId.Insts.CoreCloneClone : core.clone.Clone shatter.PatchId
 }
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::Copy for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:23-7:27 -/
+    Source: 'src/shatter.rs', lines 9:23-9:27 -/
 @[reducible]
 def shatter.PatchId.Insts.CoreMarkerCopy : core.marker.Copy shatter.PatchId
   := {
@@ -17970,14 +17970,14 @@ def shatter.PatchId.Insts.CoreMarkerCopy : core.marker.Copy shatter.PatchId
 }
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::StructuralPartialEq for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:29-7:38 -/
+    Source: 'src/shatter.rs', lines 9:29-9:38 -/
 @[reducible]
 def shatter.PatchId.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq shatter.PatchId := {
 }
 
 /-- [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::PatchId> for labyrinth_core::shatter::PatchId}::eq]:
-    Source: 'src/shatter.rs', lines 7:29-7:38
+    Source: 'src/shatter.rs', lines 9:29-9:38
     Visibility: public -/
 def shatter.PatchId.Insts.CoreCmpPartialEqPatchId.eq
   (self : shatter.PatchId) (other : shatter.PatchId) : Result Bool := do
@@ -17989,7 +17989,7 @@ def shatter.PatchId.Insts.CoreCmpPartialEqPatchId.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::PatchId> for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:29-7:38 -/
+    Source: 'src/shatter.rs', lines 9:29-9:38 -/
 @[reducible]
 impl_def shatter.PatchId.Insts.CoreCmpPartialEqPatchId : core.cmp.PartialEq
   shatter.PatchId shatter.PatchId := {
@@ -17999,14 +17999,14 @@ impl_def shatter.PatchId.Insts.CoreCmpPartialEqPatchId : core.cmp.PartialEq
 }
 
 /-- [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::PatchId}::assert_fields_are_eq]:
-    Source: 'src/shatter.rs', lines 7:40-7:42
+    Source: 'src/shatter.rs', lines 9:40-9:42
     Visibility: public -/
 def shatter.PatchId.Insts.CoreCmpEq.assert_fields_are_eq
   (self : shatter.PatchId) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::PatchId}]
-    Source: 'src/shatter.rs', lines 7:40-7:42 -/
+    Source: 'src/shatter.rs', lines 9:40-9:42 -/
 @[reducible]
 def shatter.PatchId.Insts.CoreCmpEq : core.cmp.Eq shatter.PatchId := {
   partialEqInst := shatter.PatchId.Insts.CoreCmpPartialEqPatchId
@@ -18014,42 +18014,42 @@ def shatter.PatchId.Insts.CoreCmpEq : core.cmp.Eq shatter.PatchId := {
 }
 
 /-- [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::Stage}::clone]:
-    Source: 'src/shatter.rs', lines 14:16-14:21
+    Source: 'src/shatter.rs', lines 16:16-16:21
     Visibility: public -/
 def shatter.Stage.Insts.CoreCloneClone.clone
   (self : shatter.Stage) : Result shatter.Stage := do
   ok self
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:16-14:21 -/
+    Source: 'src/shatter.rs', lines 16:16-16:21 -/
 @[reducible]
 def shatter.Stage.Insts.CoreCloneClone : core.clone.Clone shatter.Stage := {
   clone := shatter.Stage.Insts.CoreCloneClone.clone
 }
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::Copy for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:23-14:27 -/
+    Source: 'src/shatter.rs', lines 16:23-16:27 -/
 @[reducible]
 def shatter.Stage.Insts.CoreMarkerCopy : core.marker.Copy shatter.Stage := {
   cloneInst := shatter.Stage.Insts.CoreCloneClone
 }
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::StructuralPartialEq for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:29-14:38 -/
+    Source: 'src/shatter.rs', lines 16:29-16:38 -/
 @[reducible]
 def shatter.Stage.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq shatter.Stage := {
 }
 
 /-- [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::Stage}::assert_fields_are_eq]:
-    Source: 'src/shatter.rs', lines 14:40-14:42
+    Source: 'src/shatter.rs', lines 16:40-16:42
     Visibility: public -/
 def shatter.Stage.Insts.CoreCmpEq.assert_fields_are_eq
   (self : shatter.Stage) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::Stage}]
-    Source: 'src/shatter.rs', lines 14:40-14:42 -/
+    Source: 'src/shatter.rs', lines 16:40-16:42 -/
 @[reducible]
 def shatter.Stage.Insts.CoreCmpEq : core.cmp.Eq shatter.Stage := {
   partialEqInst := shatter.Stage.Insts.CoreCmpPartialEqStage
@@ -18110,7 +18110,7 @@ def spanning_tree.Tree.Insts.CoreCmpEq : core.cmp.Eq spanning_tree.Tree := {
 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::storage]:
-    Source: 'src/topology.rs', lines 292:4-294:5 -/
+    Source: 'src/topology.rs', lines 294:4-296:5 -/
 def topology.Carrier.storage
   (self : topology.Carrier) :
   Result ((Slice Std.Usize) × (Slice Std.Usize))
@@ -18674,7 +18674,7 @@ def topology.Carrier.Insts.CoreCmpEq : core.cmp.Eq topology.Carrier := {
 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::is_empty]:
-    Source: 'src/topology.rs', lines 264:4-266:5
+    Source: 'src/topology.rs', lines 266:4-268:5
     Visibility: public -/
 def topology.Carrier.is_empty (self : topology.Carrier) : Result Bool := do
   let i ← topology.Carrier.len self

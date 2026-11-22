@@ -64,7 +64,7 @@ structure grid.Geometry where
   clearance : Std.I32
 
 /-- [labyrinth_core::grid::GridSpec]
-    Source: 'src/grid.rs', lines 189:0-194:1
+    Source: 'src/grid.rs', lines 191:0-196:1
     Visibility: public -/
 structure grid.GridSpec where
   columns : Std.Usize
@@ -73,7 +73,7 @@ structure grid.GridSpec where
   cell_size : Std.I32
 
 /-- [labyrinth_core::grid::Grid]
-    Source: 'src/grid.rs', lines 197:0-200:1
+    Source: 'src/grid.rs', lines 199:0-202:1
     Visibility: public -/
 structure grid.Grid where
   spec : grid.GridSpec
@@ -87,7 +87,7 @@ structure walker.Stamp where
   revision : Std.U64
 
 /-- [labyrinth_core::scene::MotionEvent]
-    Source: 'src/scene.rs', lines 887:0-891:1
+    Source: 'src/scene.rs', lines 894:0-898:1
     Visibility: public -/
 structure scene.MotionEvent where
   stamp : walker.Stamp
@@ -109,14 +109,14 @@ structure topology.Edge where
   v : Std.Usize
 
 /-- [labyrinth_core::scene::Route]
-    Source: 'src/scene.rs', lines 874:0-877:1
+    Source: 'src/scene.rs', lines 878:0-881:1
     Visibility: public -/
 structure scene.Route where
   circle : Std.Usize
   cells : alloc.vec.Vec Std.Usize
 
 /-- [labyrinth_core::motion::MotionWorkspace]
-    Source: 'src/motion.rs', lines 20:0-43:1
+    Source: 'src/motion.rs', lines 22:0-45:1
     Visibility: public -/
 structure motion.MotionWorkspace where
   epoch : Std.U64
@@ -247,7 +247,7 @@ structure spanning_tree.Workspace where
   edge_capacity : Std.Usize
 
 /-- [labyrinth_core::shatter::Stage]
-    Source: 'src/shatter.rs', lines 15:0-22:1
+    Source: 'src/shatter.rs', lines 17:0-24:1
     Visibility: public -/
 @[discriminant isize]
 inductive shatter.Stage where
@@ -259,7 +259,7 @@ inductive shatter.Stage where
 | Reforming : Std.U64 → shatter.Stage
 
 /-- [labyrinth_core::shatter::Patch]
-    Source: 'src/shatter.rs', lines 25:0-29:1 -/
+    Source: 'src/shatter.rs', lines 27:0-31:1 -/
 structure shatter.Patch where
   serial : Std.U64
   stage : shatter.Stage
@@ -351,7 +351,7 @@ structure scene.Layout where
   transforms : Std.Usize
 
 /-- [labyrinth_core::scene::Scene]
-    Source: 'src/scene.rs', lines 901:0-921:1
+    Source: 'src/scene.rs', lines 908:0-928:1
     Visibility: public -/
 structure scene.Scene where
   layout : scene.Layout
@@ -375,7 +375,7 @@ structure scene.Scene where
   trail_revision : Std.U64
 
 /-- [labyrinth_core::scene::Edit]
-    Source: 'src/scene.rs', lines 880:0-884:1
+    Source: 'src/scene.rs', lines 887:0-891:1
     Visibility: public -/
 structure scene.Edit where
   remove : Slice topology.Edge
@@ -390,19 +390,19 @@ structure scene.Doorway where
   holds : walker.Holds
 
 /-- [labyrinth_core::scene::RoutePublication]
-    Source: 'src/scene.rs', lines 924:0-928:1 -/
+    Source: 'src/scene.rs', lines 931:0-935:1 -/
 structure scene.RoutePublication where
   current_tree : Option spanning_tree.Tree
   remove : Slice topology.Edge
   add : Slice topology.Edge
 
 /-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}]
-    Source: 'src/motion.rs', lines 248:71-248:77 -/
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
 @[reducible]
 def motion.MotionWorkspace.advance.closure := Unit
 
 /-- [labyrinth_core::scene::Retired]
-    Source: 'src/scene.rs', lines 894:0-898:1
+    Source: 'src/scene.rs', lines 901:0-905:1
     Visibility: public -/
 structure scene.Retired where
   epoch : Std.U64
@@ -416,7 +416,7 @@ structure tree.Rng (Self : Type _) where
   next_below : Self → Std.Usize → Result (Std.Usize × Self)
 
 /-- [labyrinth_core::shatter::PatchId]
-    Source: 'src/shatter.rs', lines 8:0-12:1
+    Source: 'src/shatter.rs', lines 10:0-14:1
     Visibility: public -/
 structure shatter.PatchId where
   epoch : Std.U64
