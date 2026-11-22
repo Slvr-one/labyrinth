@@ -20,6 +20,409 @@ set_option maxRecDepth 2048
 
 namespace labyrinth_core
 
+/-- [labyrinth_core::grid::Point]
+    Source: 'src/grid.rs', lines 11:0-14:1
+    Visibility: public -/
+structure grid.Point where
+  x : Std.I32
+  y : Std.I32
+
+/-- [labyrinth_core::topology::Error]
+    Source: 'src/topology.rs', lines 8:0-23:1
+    Visibility: public -/
+@[discriminant isize]
+inductive topology.Error where
+| InvalidSize : topology.Error
+| InvalidIndex : topology.Error
+| InvalidCarrier : topology.Error
+| Disconnected : topology.Error
+| InvalidChoice : topology.Error
+| InvalidForest : topology.Error
+| InvalidTree : topology.Error
+| InvalidTransition : topology.Error
+| InsufficientWorkspace : topology.Error
+| Overflow : topology.Error
+| StaleEpoch : topology.Error
+| StaleRevision : topology.Error
+| Occupied : topology.Error
+| InvalidGeometry : topology.Error
+
+/-- [labyrinth_core::grid::Rect]
+    Source: 'src/grid.rs', lines 30:0-33:1
+    Visibility: public -/
+structure grid.Rect where
+  min : grid.Point
+  max : grid.Point
+
+/-- [labyrinth_core::grid::Geometry]
+    Source: 'src/grid.rs', lines 131:0-136:1
+    Visibility: public -/
+structure grid.Geometry where
+  viewport : grid.Rect
+  obstacles : alloc.vec.Vec grid.Rect
+  walker_radius : Std.I32
+  clearance : Std.I32
+
+/-- [labyrinth_core::grid::GridSpec]
+    Source: 'src/grid.rs', lines 191:0-196:1
+    Visibility: public -/
+structure grid.GridSpec where
+  columns : Std.Usize
+  rows : Std.Usize
+  origin : grid.Point
+  cell_size : Std.I32
+
+/-- [labyrinth_core::grid::Grid]
+    Source: 'src/grid.rs', lines 199:0-202:1
+    Visibility: public -/
+structure grid.Grid where
+  spec : grid.GridSpec
+  ids : alloc.vec.Vec (Option Std.Usize)
+
+/-- [labyrinth_core::walker::Stamp]
+    Source: 'src/walker.rs', lines 8:0-11:1
+    Visibility: public -/
+structure walker.Stamp where
+  epoch : Std.U64
+  revision : Std.U64
+
+/-- [labyrinth_core::scene::MotionEvent]
+    Source: 'src/scene.rs', lines 894:0-898:1
+    Visibility: public -/
+structure scene.MotionEvent where
+  stamp : walker.Stamp
+  replaced : Std.Usize
+  moving_doorways : Std.Usize
+
+/-- [labyrinth_core::motion::MotionAdvance]
+    Source: 'src/motion.rs', lines 11:0-16:1
+    Visibility: public -/
+structure motion.MotionAdvance where
+  event : scene.MotionEvent
+  divisor : Std.Usize
+
+/-- [labyrinth_core::topology::Edge]
+    Source: 'src/topology.rs', lines 50:0-53:1
+    Visibility: public -/
+structure topology.Edge where
+  u : Std.Usize
+  v : Std.Usize
+
+/-- [labyrinth_core::scene::Route]
+    Source: 'src/scene.rs', lines 878:0-881:1
+    Visibility: public -/
+structure scene.Route where
+  circle : Std.Usize
+  cells : alloc.vec.Vec Std.Usize
+
+/-- [labyrinth_core::motion::MotionWorkspace]
+    Source: 'src/motion.rs', lines 22:0-45:1
+    Visibility: public -/
+structure motion.MotionWorkspace where
+  epoch : Std.U64
+  cells : Std.Usize
+  edges : Std.Usize
+  endpoints : alloc.vec.Vec (Array Std.Usize 4#usize)
+  steps : alloc.vec.Vec Std.I32
+  routes : alloc.vec.Vec scene.Route
+  routes_changed : Bool
+  remove : alloc.vec.Vec topology.Edge
+  add : alloc.vec.Vec topology.Edge
+  admissible : alloc.vec.Vec Bool
+  «protected» : alloc.vec.Vec Bool
+  locked : alloc.vec.Vec Bool
+  «from» : alloc.vec.Vec Std.Usize
+  «to» : alloc.vec.Vec Std.Usize
+  offsets : alloc.vec.Vec Std.Usize
+  arcs : alloc.vec.Vec Std.Usize
+  residual : alloc.vec.Vec Std.U8
+  parent : alloc.vec.Vec Std.Usize
+  queue : alloc.vec.Vec Std.Usize
+  first : alloc.vec.Vec Std.Usize
+  second : alloc.vec.Vec Std.Usize
+
+/-- [labyrinth_core::topology::Carrier]
+    Source: 'src/topology.rs', lines 133:0-137:1
+    Visibility: public -/
+structure topology.Carrier where
+  offsets : alloc.vec.Vec Std.Usize
+  neighbors : alloc.vec.Vec Std.Usize
+  edges : alloc.vec.Vec topology.Edge
+
+/-- [labyrinth_core::walker::Holds]
+    Source: 'src/walker.rs', lines 99:0-102:1 -/
+structure walker.Holds where
+  ids : Array Std.Usize 4#usize
+  count : Std.Usize
+
+/-- [labyrinth_core::walker::Path]
+    Source: 'src/walker.rs', lines 31:0-44:1 -/
+@[discriminant isize]
+inductive walker.Path where
+| Cartesian : grid.Point → grid.Point → walker.Path
+| Polar :
+  Std.Usize →
+  Std.I32 →
+  Std.I32 →
+  Std.I32 →
+  Std.I32 →
+  Std.I32 →
+  walker.Path
+
+/-- [labyrinth_core::walker::LocalPose]
+    Source: 'src/walker.rs', lines 21:0-28:1
+    Visibility: public -/
+@[discriminant isize]
+inductive walker.LocalPose where
+| Cartesian : grid.Point → walker.LocalPose
+| Polar : Std.Usize → Std.I32 → Std.I32 → walker.LocalPose
+
+/-- [labyrinth_core::walker::Reservation]
+    Source: 'src/walker.rs', lines 14:0-18:1
+    Visibility: public -/
+structure walker.Reservation where
+  epoch : Std.U64
+  walker : Std.Usize
+  serial : Std.U64
+
+/-- [labyrinth_core::walker::Crossing]
+    Source: 'src/walker.rs', lines 129:0-139:1
+    Visibility: public -/
+structure walker.Crossing where
+  source : Std.Usize
+  target : Std.Usize
+  elapsed : Std.U32
+  duration : Std.U32
+  reservation : walker.Reservation
+  corridor : grid.Rect
+  path : walker.Path
+  target_pose : walker.LocalPose
+  holds : walker.Holds
+
+/-- [labyrinth_core::walker::WalkerState]
+    Source: 'src/walker.rs', lines 148:0-154:1
+    Visibility: public -/
+@[discriminant isize]
+inductive walker.WalkerState where
+| Ready : walker.WalkerState
+| Crossing : walker.Crossing → walker.WalkerState
+| Parked : walker.WalkerState
+| Hidden : walker.WalkerState
+| Terminated : walker.WalkerState
+
+/-- [labyrinth_core::walker::Walker]
+    Source: 'src/walker.rs', lines 157:0-161:1
+    Visibility: public -/
+structure walker.Walker where
+  cell : Std.Usize
+  «local» : walker.LocalPose
+  state : walker.WalkerState
+
+/-- [labyrinth_core::spanning_tree::Tree]
+    Source: 'src/spanning_tree.rs', lines 204:0-207:1
+    Visibility: public -/
+structure spanning_tree.Tree where
+  parents : alloc.vec.Vec Std.Usize
+  root : Std.Usize
+
+/-- [labyrinth_core::spanning_tree::Frame]
+    Source: 'src/spanning_tree.rs', lines 10:0-14:1 -/
+structure spanning_tree.Frame where
+  cell : Std.Usize
+  next : Std.Usize
+  remaining : Std.Usize
+
+/-- [labyrinth_core::spanning_tree::Workspace]
+    Source: 'src/spanning_tree.rs', lines 17:0-27:1
+    Visibility: public -/
+structure spanning_tree.Workspace where
+  seen : alloc.vec.Vec Bool
+  frames : alloc.vec.Vec spanning_tree.Frame
+  path : alloc.vec.Vec Std.Usize
+  parents : alloc.vec.Vec Std.Usize
+  incoming : alloc.vec.Vec Std.Usize
+  edit_slots : alloc.vec.Vec Std.Usize
+  edit_nodes : alloc.vec.Vec Std.Usize
+  edit_count : Std.Usize
+  edge_capacity : Std.Usize
+
+/-- [labyrinth_core::shatter::Stage]
+    Source: 'src/shatter.rs', lines 17:0-24:1
+    Visibility: public -/
+@[discriminant isize]
+inductive shatter.Stage where
+| Idle : shatter.Stage
+| Draining : shatter.Stage
+| Parked : shatter.Stage
+| Hidden : shatter.Stage
+| Scattered : Std.U64 → shatter.Stage
+| Reforming : Std.U64 → shatter.Stage
+
+/-- [labyrinth_core::shatter::Patch]
+    Source: 'src/shatter.rs', lines 27:0-31:1 -/
+structure shatter.Patch where
+  serial : Std.U64
+  stage : shatter.Stage
+  cells : alloc.vec.Vec Bool
+
+/-- [labyrinth_core::polar::Arc]
+    Source: 'src/polar.rs', lines 61:0-64:1
+    Visibility: public -/
+structure polar.Arc where
+  start : Std.I32
+  length : Std.I32
+
+/-- [labyrinth_core::polar::PortalSpec]
+    Source: 'src/polar.rs', lines 260:0-266:1
+    Visibility: public -/
+structure polar.PortalSpec where
+  circle : Std.Usize
+  column : Std.Usize
+  row : Std.Usize
+  mouth : polar.Arc
+  band : Std.I32
+
+/-- [labyrinth_core::scene::Portal]
+    Source: 'src/scene.rs', lines 37:0-41:1
+    Visibility: public -/
+structure scene.Portal where
+  spec : polar.PortalSpec
+  grid_cell : Std.Usize
+  transition_cell : Std.Usize
+
+/-- [labyrinth_core::scene::Cell]
+    Source: 'src/scene.rs', lines 17:0-34:1
+    Visibility: public -/
+@[discriminant isize]
+inductive scene.Cell where
+| Grid : Std.Usize → Std.Usize → grid.Rect → scene.Cell
+| Center : Std.Usize → scene.Cell
+| Sector : Std.Usize → Std.Usize → Std.Usize → scene.Cell
+| Transition : Std.Usize → scene.Cell
+
+/-- [labyrinth_core::polar::MotionMode]
+    Source: 'src/polar.rs', lines 240:0-247:1
+    Visibility: public -/
+@[discriminant isize]
+inductive polar.MotionMode where
+| Spinning : polar.MotionMode
+| Twisting : Std.I32 → Std.I32 → polar.MotionMode
+
+/-- [labyrinth_core::polar::Direction]
+    Source: 'src/polar.rs', lines 225:0-228:1
+    Visibility: public -/
+@[discriminant isize]
+inductive polar.Direction where
+| Clockwise : polar.Direction
+| Counterclockwise : polar.Direction
+
+/-- [labyrinth_core::polar::PolarSpec]
+    Source: 'src/polar.rs', lines 250:0-257:1
+    Visibility: public -/
+structure polar.PolarSpec where
+  center : grid.Point
+  center_radius : Std.I32
+  ring_width : Std.I32
+  sectors : alloc.vec.Vec Std.Usize
+  directions : alloc.vec.Vec polar.Direction
+  mode : polar.MotionMode
+
+/-- [labyrinth_core::polar::Circle]
+    Source: 'src/polar.rs', lines 269:0-275:1
+    Visibility: public -/
+structure polar.Circle where
+  spec : polar.PolarSpec
+  center_cell : Std.Usize
+  ring_starts : alloc.vec.Vec Std.Usize
+  transform_start : Std.Usize
+  outer : Std.I32
+
+/-- [labyrinth_core::scene::Layout]
+    Source: 'src/scene.rs', lines 44:0-53:1
+    Visibility: public -/
+structure scene.Layout where
+  cell_grid : grid.Grid
+  cells : alloc.vec.Vec scene.Cell
+  circles : alloc.vec.Vec polar.Circle
+  portals : alloc.vec.Vec scene.Portal
+  bands : alloc.vec.Vec Std.I32
+  geometry : grid.Geometry
+  carrier : topology.Carrier
+  transforms : Std.Usize
+
+/-- [labyrinth_core::scene::Scene]
+    Source: 'src/scene.rs', lines 908:0-928:1
+    Visibility: public -/
+structure scene.Scene where
+  layout : scene.Layout
+  tree : spanning_tree.Tree
+  work : spanning_tree.Workspace
+  routes : alloc.vec.Vec scene.Route
+  required : alloc.vec.Vec topology.Edge
+  phases : alloc.vec.Vec Std.I32
+  next_phases : alloc.vec.Vec Std.I32
+  holds : alloc.vec.Vec Std.Usize
+  walkers : alloc.vec.Vec walker.Walker
+  patches : alloc.vec.Vec shatter.Patch
+  stamp : walker.Stamp
+  clock : Std.U64
+  wall : Std.U64
+  reanchor : Bool
+  suspended : Bool
+  inactive : Bool
+  latest_request : Std.U64
+  pending : Option Std.U64
+  trail_revision : Std.U64
+
+/-- [labyrinth_core::scene::Edit]
+    Source: 'src/scene.rs', lines 887:0-891:1
+    Visibility: public -/
+structure scene.Edit where
+  remove : Slice topology.Edge
+  add : Slice topology.Edge
+  routes : Option (Slice scene.Route)
+
+/-- [labyrinth_core::scene::Doorway]
+    Source: 'src/scene.rs', lines 56:0-60:1 -/
+structure scene.Doorway where
+  corridor : grid.Rect
+  path : walker.Path
+  holds : walker.Holds
+
+/-- [labyrinth_core::scene::RoutePublication]
+    Source: 'src/scene.rs', lines 931:0-935:1 -/
+structure scene.RoutePublication where
+  current_tree : Option spanning_tree.Tree
+  remove : Slice topology.Edge
+  add : Slice topology.Edge
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}]
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
+@[reducible]
+def motion.MotionWorkspace.advance.closure := Unit
+
+/-- [labyrinth_core::scene::Retired]
+    Source: 'src/scene.rs', lines 901:0-905:1
+    Visibility: public -/
+structure scene.Retired where
+  epoch : Std.U64
+  terminated_walkers : Std.Usize
+  released_reservations : Std.Usize
+
+/-- Trait declaration: [labyrinth_core::tree::Rng]
+    Source: 'src/tree.rs', lines 9:0-11:1
+    Visibility: public -/
+structure tree.Rng (Self : Type _) where
+  next_below : Self → Std.Usize → Result (Std.Usize × Self)
+
+/-- [labyrinth_core::shatter::PatchId]
+    Source: 'src/shatter.rs', lines 10:0-14:1
+    Visibility: public -/
+structure shatter.PatchId where
+  epoch : Std.U64
+  slot : Std.Usize
+  serial : Std.U64
+
 /-- [labyrinth_core::tree::Error]
     Source: 'src/tree.rs', lines 2:0-6:1
     Visibility: public -/
@@ -28,11 +431,5 @@ inductive tree.Error where
 | InvalidIndex : tree.Error
 | SelfParent : tree.Error
 | Cycle : tree.Error
-
-/-- Trait declaration: [labyrinth_core::tree::Rng]
-    Source: 'src/tree.rs', lines 9:0-11:1
-    Visibility: public -/
-structure tree.Rng (Self : Type _) where
-  next_below : Self → Std.Usize → Result (Std.Usize × Self)
 
 end labyrinth_core
