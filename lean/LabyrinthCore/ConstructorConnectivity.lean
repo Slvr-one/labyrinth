@@ -6,8 +6,9 @@ open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
 
 namespace Labyrinth
 
-/-- Every generated connectivity-row scan terminates, records precisely its newly discovered
-vertices, and closes the active row while preserving all pending reachability obligations. -/
+/-- Every generated connectivity-row scan terminates, closes the active row (every row neighbour
+is visited), and keeps the depth/reached balance. The final visited set is not bounded by the
+row, so exact discovery is not stated. -/
 theorem constructor_connectivity_row_spec
     (offsets neighbors : alloc.vec.Vec Usize) (cell lo hi : Usize)
     (seen : alloc.vec.Vec Bool) (stack : alloc.vec.Vec Usize) (depth reached : Usize)
@@ -181,7 +182,8 @@ theorem constructor_connectivity_row_spec
     dsimp only at hjh
     omega
 
-/-- The complete generated work-stack traversal terminates and counts the root component.
+/-- The complete generated work-stack traversal terminates and returns `n` exactly when every
+vertex is reachable from vertex 0; the size of the root component is not stated.
 Its decreasing measure accounts for both newly discovered vertices and pending stack entries. -/
 theorem constructor_connectivity_spec
     (offsets neighbors : alloc.vec.Vec Usize) (unused : Usize)

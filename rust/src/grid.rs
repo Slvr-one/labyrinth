@@ -185,6 +185,8 @@ impl Geometry {
     }
 }
 
+/// `Layout::new` allocates and scans `columns * rows` slots, so memory and time grow with the
+/// product. Only sizes above `isize::MAX` bytes are rejected; the caller bounds the grid.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GridSpec {
     pub columns: usize,
@@ -207,12 +209,16 @@ impl Grid {
         }
         let count = spec.columns.checked_mul(spec.rows).ok_or(Error::Overflow)?;
         check_storage(count, const { core::mem::size_of::<Option<usize>>() })?;
-        let width = i32::try_from(spec.columns)
-            .map_err(|_| Error::Overflow)?
+        if spec.columns > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let width = (spec.columns as i32)
             .checked_mul(spec.cell_size)
             .ok_or(Error::Overflow)?;
-        let height = i32::try_from(spec.rows)
-            .map_err(|_| Error::Overflow)?
+        if spec.rows > i32::MAX as usize {
+            return Err(Error::Overflow);
+        }
+        let height = (spec.rows as i32)
             .checked_mul(spec.cell_size)
             .ok_or(Error::Overflow)?;
         Point {

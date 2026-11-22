@@ -138,6 +138,7 @@ pub struct Carrier {
 
 impl Carrier {
     /// Input order determines each reciprocal row's order.
+    /// Validation runs through `from_csr`, so it costs O(sum of squared row degrees).
     ///
     /// # Errors
     /// Rejects empty, overflowing, malformed, duplicate, or disconnected input.
@@ -179,6 +180,7 @@ impl Carrier {
     }
 
     /// Rows retain their supplied order; invalid storage is never indexed first.
+    /// Validation costs O(sum of squared row degrees); intended for bounded-degree carriers.
     ///
     /// # Errors
     /// Rejects empty, malformed, asymmetric, nonsimple, or disconnected storage.

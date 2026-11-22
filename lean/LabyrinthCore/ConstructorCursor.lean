@@ -88,8 +88,9 @@ theorem constructor_degree_zero_slot (edges : List topology.Edge) (count : Nat) 
     · exact ih
     · split <;> omega
 
-/-- Exact degree counts and the real prefix operation produce disjoint, exhaustive
-CSR rows. The premises are scalar contents, not a successful constructor evaluation. -/
+/-- Numeric layout lemma over `getD` lookups: exact degree counts and the real prefix operation
+give disjoint, exhaustive CSR rows. The premises are scalar contents, not a successful
+constructor evaluation; callers carry `offsets.length = n + 1`. -/
 theorem constructor_degree_offsets_layout (n : Nat) (edges : List topology.Edge)
     (counts offsets : List Usize)
     (hcountsLength : counts.length = n + 1)

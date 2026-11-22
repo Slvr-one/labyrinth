@@ -7,6 +7,7 @@ open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
 namespace Labyrinth
 
 /-- One crossing original edge writes both directed quotient slots with that same original witness.
+Retaining both entries needs `a ≠ b`, which the full-loop proof derives from row ownership.
 The hypotheses are storage/cursor bounds, not an assumption that the extracted fill succeeds. -/
 theorem constructor_quotient_fill_crossing_spec
     (components : alloc.vec.Vec Usize) (edges : Slice topology.Edge) (index : Usize)
