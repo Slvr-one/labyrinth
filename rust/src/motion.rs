@@ -15,7 +15,9 @@ pub struct MotionAdvance {
     pub divisor: usize,
 }
 
-/// Reusable, epoch-bound planner storage. Construct again after replacing a scene's layout.
+/// Reusable, epoch-bound planner storage. Construct again after replacing a scene's layout,
+/// and after any edit that changes or reverses a route's endpoint cells; the workspace keeps
+/// rejecting such scenes with `InvalidTransition`.
 #[derive(Debug)]
 pub struct MotionWorkspace {
     epoch: u64,

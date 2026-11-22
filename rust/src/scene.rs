@@ -262,6 +262,10 @@ fn resolve_portal(
 
 impl Layout {
     /// Removes replaced and obstructed grid cells before assigning dense navigable IDs.
+    ///
+    /// Allocates and scans `columns * rows` grid slots and iterates over every circle for each
+    /// slot: O(columns * rows * circles) time and memory. Only sizes above `isize::MAX` bytes
+    /// are rejected, so the caller bounds the grid; allocation failure aborts.
     pub fn new(
         grid_spec: GridSpec,
         specs: Vec<PolarSpec>,
@@ -876,6 +880,9 @@ pub struct Route {
     pub cells: Vec<usize>,
 }
 
+/// A caller-supplied tree edit. `routes: Some(..)` is validated only on the current interval;
+/// the all-phase spinning pair admission is a `Scene::new` check, so replacing a route with
+/// a different portal pair is not re-admitted over every sweep.
 #[derive(Clone, Copy, Default)]
 pub struct Edit<'a> {
     pub remove: &'a [Edge],
@@ -1062,6 +1069,8 @@ fn check_route_edge(
 }
 
 impl Scene {
+    /// `epoch` is a caller-owned namespace for `Stamp`, `Reservation` and `PatchId` handles.
+    /// Scenes that are live together and whose handles could be mixed must use distinct epochs.
     pub fn new<R: Rng>(
         layout: Layout,
         routes: &[Route],
@@ -1093,6 +1102,8 @@ impl Scene {
         )?;
         // Exact chosen-pair two-matching over every quantized one-unit outer-ring sweep.
         // Neighbor sets may overlap: only the two selected neighbors must be distinct.
+        // Unused portals need no sweep check: a spinning circle's connector doorway does not
+        // depend on phase and `Layout::new` already checked it.
         layout.check_spinning_portals(routes, &mut phases, &mut next_phases)?;
         let mut live_edges = Vec::with_capacity(layout.carrier.edges().len());
         let mut i = 0;
@@ -1469,6 +1480,11 @@ impl Scene {
 
     /// Publishes a boundary-event replacement and its whole-interval geometry together.
     /// Steps are bounded to one eighth-turn; rejected steps consume no phase time.
+    ///
+    /// A replacement `routes` edit is checked only on the current interval. The all-phase
+    /// spinning pair admission runs once, in `Scene::new`; an edit that changes or reverses a
+    /// route's endpoints can leave that ring unable to advance, and the `MotionWorkspace`
+    /// must then be rebuilt.
     pub fn motion(
         &mut self,
         stamp: Stamp,

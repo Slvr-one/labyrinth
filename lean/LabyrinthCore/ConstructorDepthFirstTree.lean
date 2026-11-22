@@ -8,7 +8,8 @@ open Aeneas Aeneas.Std Result labyrinth_core
 
 namespace Labyrinth
 
-/-- The production wrapper publishes exactly the proved parent prefix, not a reconstructed tree. -/
+/-- The production wrapper publishes a valid tree rooted at `root` and preserves the workspace
+frame; the statement does not expose the published parent array itself. -/
 theorem constructor_tree_dfs_accepts {R : Type*} (adapter : tree.Rng R)
     (hrng : constructorLegalRng adapter) (carrier : topology.Carrier) (root : Usize)
     (rng : R) (work : spanning_tree.Workspace) (hc : CarrierValid carrier)

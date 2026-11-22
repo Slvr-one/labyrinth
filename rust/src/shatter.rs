@@ -4,6 +4,8 @@ use crate::topology::Error;
 use alloc::vec;
 use alloc::vec::Vec;
 
+/// The `epoch` is a caller-owned namespace: handles are stale-handle checks, not capabilities,
+/// so scenes live together must use distinct epochs.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct PatchId {
     pub epoch: u64,

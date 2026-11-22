@@ -534,6 +534,10 @@ do not independently certify those translators, native machine code, LLVM, Wasm 
 bindings, or allocation failure. Source-revision/version checks are not a reproducible-build
 attestation of tool binaries. The runner's mutation check covers `set_parent_spec` only.
 
+Construction cost is also outside the model: `Layout::new` allocates and scans
+`columns × rows` grid slots and aborts on allocation failure, and `Carrier::from_csr` validation is
+O(Σ deg²). The caller bounds grid size and row degree.
+
 The extraction runs on stock Aeneas `87cfe2f5` with no fork or patch. Stock Aeneas leaves eight
 external operations as templates (`alloc.vec.Vec.clear`, `core.num.I32.abs`,
 `core.num.I32.rem_euclid`, `core.ops.range.RangeInclusive.contains`, and the `Option`
@@ -567,8 +571,11 @@ boundary-event planning with reusable flow/search storage and sparse edge propos
 about it (partial correctness only) is in "The motion planner"; that it always returns and always
 proposes an acceptable edit is not proved.
 
-Spinning admission uses conservative radius/clearance bounds and checks the chosen exterior
-portal pair over every quantized one-unit outer-ring sweep. Some geometrically feasible
+Spinning admission uses conservative radius/clearance bounds. `Scene::new` checks the chosen exterior
+portal pair over every quantized one-unit outer-ring sweep; this check runs only at construction.
+An edit through `Scene::motion` that replaces a route is checked on the current interval only, so a
+replacement that changes or reverses the portal pair can leave that ring unable to advance (safety
+is unaffected; this is a liveness limit). Some geometrically feasible
 layouts can be rejected by these conservative bounds. Accepted proposals still pass the
 geometry, route, reservation and tree checks before publication. The returned positive subdivision
 divisor specifies the consumed phase increments.

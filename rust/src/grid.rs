@@ -185,6 +185,8 @@ impl Geometry {
     }
 }
 
+/// `Layout::new` allocates and scans `columns * rows` slots, so memory and time grow with the
+/// product. Only sizes above `isize::MAX` bytes are rejected; the caller bounds the grid.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct GridSpec {
     pub columns: usize,
