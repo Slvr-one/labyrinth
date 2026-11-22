@@ -3,6 +3,7 @@
 module
 public import Aeneas
 public import LabyrinthCore.Types
+public import LabyrinthCore.FunsExternal
 @[expose] public section
 open Aeneas Aeneas.Std Result ControlFlow Error
 set_option linter.dupNamespace false
@@ -21,94 +22,812 @@ set_option maxRecDepth 2048
 
 namespace labyrinth_core
 
-/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}::fmt]:
-    Source: 'src/spanning_tree.rs', lines 9:9-9:14
-    Visibility: public -/
-def spanning_tree.Frame.Insts.CoreFmtDebug.fmt
-  (self : spanning_tree.Frame) (f : core.fmt.Formatter) :
-  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
-  := do
-  let dyn := Dyn.mk _ core.fmt.DebugUsize self.cell
-  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.next
-  let dyn2 :=
-    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.remaining
-  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Frame") (toStr
-    "cell") dyn (toStr "next") dyn1 (toStr "remaining") dyn2
-
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}]
-    Source: 'src/spanning_tree.rs', lines 9:9-9:14 -/
-@[reducible]
-def spanning_tree.Frame.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Frame
-  := {
-  fmt := spanning_tree.Frame.Insts.CoreFmtDebug.fmt
+/-- Trait implementation: [core::option::{impl core::fmt::Debug for core::option::Option<T>}]
+    Source: '/rustc/library/core/src/option.rs', lines 592:15-592:20
+    Name pattern: [core::fmt::Debug<core::option::Option<@T>>] -/
+@[reducible, rust_trait_impl "core::fmt::Debug<core::option::Option<@T>>"]
+def core.option.Option.Insts.CoreFmtDebug {T : Type _} (fmtDebugInst :
+  core.fmt.Debug T) : core.fmt.Debug (Option T) := {
+  fmt := core.option.Option.Insts.CoreFmtDebug.fmt fmtDebugInst
 }
 
-/-- [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}::clone]:
-    Source: 'src/spanning_tree.rs', lines 9:16-9:21
+/-- Trait implementation: [core::option::{impl core::clone::Clone for core::option::Option<T>}]
+    Source: '/rustc/library/core/src/option.rs', lines 2271:0-2275:40
+    Name pattern: [core::clone::Clone<core::option::Option<@T>>] -/
+@[reducible, rust_trait_impl "core::clone::Clone<core::option::Option<@T>>"]
+def core.option.Option.Insts.CoreCloneClone {T : Type _} (cloneCloneInst :
+  core.clone.Clone T) : core.clone.Clone (Option T) := {
+  clone := core.option.Option.Insts.CoreCloneClone.clone cloneCloneInst
+}
+
+/-- [core::option::{impl core::default::Default for core::option::Option<T>}::default]:
+    Source: '/rustc/library/core/src/option.rs', lines 2314:4-2314:29
+    Name pattern: [core::option::{core::default::Default<core::option::Option<@T>>}::default]
     Visibility: public -/
-def spanning_tree.Frame.Insts.CoreCloneClone.clone
-  (self : spanning_tree.Frame) : Result spanning_tree.Frame := do
+@[rust_fun
+  "core::option::{core::default::Default<core::option::Option<@T>>}::default"]
+def core.option.Option.Insts.CoreDefaultDefault.default
+  (T : Type _) : Result (Option T) := do
+  ok none
+
+/-- Trait implementation: [core::option::{impl core::cmp::PartialEq<core::option::Option<T>> for core::option::Option<T>}]
+    Source: '/rustc/library/core/src/option.rs', lines 2439:0-2439:56
+    Name pattern: [core::cmp::PartialEq<core::option::Option<@T>, core::option::Option<@T>>] -/
+@[reducible, rust_trait_impl
+  "core::cmp::PartialEq<core::option::Option<@T>, core::option::Option<@T>>"]
+impl_def core.option.Option.Insts.CoreCmpPartialEqOption {T : Type _}
+  (cmpPartialEqInst : core.cmp.PartialEq T T) : core.cmp.PartialEq (Option T)
+  (Option T) := {
+  eq := core.option.Option.Insts.CoreCmpPartialEqOption.eq cmpPartialEqInst
+  ne := core.cmp.PartialEq.ne.trait_default
+    (core.option.Option.Insts.CoreCmpPartialEqOption cmpPartialEqInst)
+}
+
+/-- [core::result::{core::result::Result<T, E>}::is_err]:
+    Source: '/rustc/library/core/src/result.rs', lines 647:4-647:38
+    Name pattern: [core::result::{core::result::Result<@T, @E>}::is_err]
+    Visibility: public -/
+@[rust_fun "core::result::{core::result::Result<@T, @E>}::is_err"]
+def core.result.Result.is_err
+  {T : Type _} {E : Type _} (self : core.result.Result T E) : Result Bool := do
+  let b ← core.result.Result.is_ok self
+  ok (¬ b)
+
+/-- [core::slice::{impl core::default::Default for &'_0 [T]}::default]:
+    Source: '/rustc/library/core/src/slice/mod.rs', lines 5655:4-5655:24
+    Name pattern: [core::slice::{core::default::Default<&'0 [@T]>}::default]
+    Visibility: public -/
+@[rust_fun "core::slice::{core::default::Default<&'0 [@T]>}::default"]
+def Shared0Slice.Insts.CoreDefaultDefault.default
+  (T : Type _) : Result (Slice T) := do
+  ok (Array.to_slice (Std.Array.empty T))
+
+/-- [labyrinth_core::grid::COORD_LIMIT]
+    Source: 'src/grid.rs', lines 8:0-8:39
+    Visibility: public -/
+@[global_simps, irreducible] def grid.COORD_LIMIT : Std.I32 := 1000000#i32
+
+/-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Point}::fmt]:
+    Source: 'src/grid.rs', lines 10:9-10:14
+    Visibility: public -/
+def grid.Point.Insts.CoreFmtDebug.fmt
+  (self : grid.Point) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugI32 self.x
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.y
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Point") (toStr "x")
+    dyn (toStr "y") dyn1
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:9-10:14 -/
+@[reducible]
+def grid.Point.Insts.CoreFmtDebug : core.fmt.Debug grid.Point := {
+  fmt := grid.Point.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Point}::clone]:
+    Source: 'src/grid.rs', lines 10:16-10:21
+    Visibility: public -/
+def grid.Point.Insts.CoreCloneClone.clone
+  (self : grid.Point) : Result grid.Point := do
   ok self
 
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}]
-    Source: 'src/spanning_tree.rs', lines 9:16-9:21 -/
+/-- Trait implementation: [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:16-10:21 -/
 @[reducible]
-def spanning_tree.Frame.Insts.CoreCloneClone : core.clone.Clone
-  spanning_tree.Frame := {
-  clone := spanning_tree.Frame.Insts.CoreCloneClone.clone
+def grid.Point.Insts.CoreCloneClone : core.clone.Clone grid.Point := {
+  clone := grid.Point.Insts.CoreCloneClone.clone
 }
 
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::Copy for labyrinth_core::spanning_tree::Frame}]
-    Source: 'src/spanning_tree.rs', lines 9:23-9:27 -/
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::Copy for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:23-10:27 -/
 @[reducible]
-def spanning_tree.Frame.Insts.CoreMarkerCopy : core.marker.Copy
-  spanning_tree.Frame := {
-  cloneInst := spanning_tree.Frame.Insts.CoreCloneClone
+def grid.Point.Insts.CoreMarkerCopy : core.marker.Copy grid.Point := {
+  cloneInst := grid.Point.Insts.CoreCloneClone
 }
 
-/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}::fmt]:
-    Source: 'src/spanning_tree.rs', lines 16:9-16:14
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::StructuralPartialEq for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:29-10:38 -/
+@[reducible]
+def grid.Point.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq grid.Point := {
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Point> for labyrinth_core::grid::Point}::eq]:
+    Source: 'src/grid.rs', lines 10:29-10:38
     Visibility: public -/
-def spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
-  (self : spanning_tree.Workspace) (f : core.fmt.Formatter) :
+def grid.Point.Insts.CoreCmpPartialEqPoint.eq
+  (self : grid.Point) (other : grid.Point) : Result Bool := do
+  if self.x = other.x
+  then ok (self.y = other.y)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Point> for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:29-10:38 -/
+@[reducible]
+impl_def grid.Point.Insts.CoreCmpPartialEqPoint : core.cmp.PartialEq grid.Point
+  grid.Point := {
+  eq := grid.Point.Insts.CoreCmpPartialEqPoint.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    grid.Point.Insts.CoreCmpPartialEqPoint
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Point}::assert_fields_are_eq]:
+    Source: 'src/grid.rs', lines 10:40-10:42
+    Visibility: public -/
+def grid.Point.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : grid.Point) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Point}]
+    Source: 'src/grid.rs', lines 10:40-10:42 -/
+@[reducible]
+def grid.Point.Insts.CoreCmpEq : core.cmp.Eq grid.Point := {
+  partialEqInst := grid.Point.Insts.CoreCmpPartialEqPoint
+  assert_fields_are_eq := grid.Point.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Point}::validate]:
+    Source: 'src/grid.rs', lines 17:4-26:5
+    Visibility: public -/
+def grid.Point.validate
+  (self : grid.Point) : Result (core.result.Result Unit topology.Error) := do
+  let i ← -. grid.COORD_LIMIT
+  if self.x < i
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    if self.x > grid.COORD_LIMIT
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      if self.y < i
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        if self.y > grid.COORD_LIMIT
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Rect}::fmt]:
+    Source: 'src/grid.rs', lines 29:9-29:14
+    Visibility: public -/
+def grid.Rect.Insts.CoreFmtDebug.fmt
+  (self : grid.Rect) (f : core.fmt.Formatter) :
   Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
   := do
-  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.seen
+  let dyn := Dyn.mk _ grid.Point.Insts.CoreFmtDebug self.min
   let dyn1 :=
-    Dyn.mk _ (core.fmt.DebugVec spanning_tree.Frame.Insts.CoreFmtDebug)
-      self.frames
-  let dyn2 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.path
-  let dyn3 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
-  let dyn4 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.incoming
-  let dyn5 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_slots
-  let dyn6 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_nodes
-  let dyn7 := Dyn.mk _ core.fmt.DebugUsize self.edit_count
-  let dyn8 :=
-    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.edge_capacity
-  let values :=
-    Array.to_slice
-      (Array.make 9#usize [
-        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8
-        ])
-  let s ←
-    lift (Array.to_slice
-      (Array.make 9#usize [
-        toStr "seen", toStr "frames", toStr "path", toStr "parents", toStr
-        "incoming", toStr "edit_slots", toStr "edit_nodes", toStr "edit_count",
-        toStr "edge_capacity"
-        ]))
-  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Workspace") s values
+    Dyn.mk _ (core.fmt.DebugShared grid.Point.Insts.CoreFmtDebug) self.max
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Rect") (toStr "min")
+    dyn (toStr "max") dyn1
 
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}]
-    Source: 'src/spanning_tree.rs', lines 16:9-16:14 -/
+/-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:9-29:14 -/
 @[reducible]
-def spanning_tree.Workspace.Insts.CoreFmtDebug : core.fmt.Debug
-  spanning_tree.Workspace := {
-  fmt := spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
+def grid.Rect.Insts.CoreFmtDebug : core.fmt.Debug grid.Rect := {
+  fmt := grid.Rect.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Rect}::clone]:
+    Source: 'src/grid.rs', lines 29:16-29:21
+    Visibility: public -/
+def grid.Rect.Insts.CoreCloneClone.clone
+  (self : grid.Rect) : Result grid.Rect := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:16-29:21 -/
+@[reducible]
+def grid.Rect.Insts.CoreCloneClone : core.clone.Clone grid.Rect := {
+  clone := grid.Rect.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::Copy for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:23-29:27 -/
+@[reducible]
+def grid.Rect.Insts.CoreMarkerCopy : core.marker.Copy grid.Rect := {
+  cloneInst := grid.Rect.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::StructuralPartialEq for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:29-29:38 -/
+@[reducible]
+def grid.Rect.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq grid.Rect := {
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Rect> for labyrinth_core::grid::Rect}::eq]:
+    Source: 'src/grid.rs', lines 29:29-29:38
+    Visibility: public -/
+def grid.Rect.Insts.CoreCmpPartialEqRect.eq
+  (self : grid.Rect) (other : grid.Rect) : Result Bool := do
+  let b ← grid.Point.Insts.CoreCmpPartialEqPoint.eq self.min other.min
+  if b
+  then grid.Point.Insts.CoreCmpPartialEqPoint.eq self.max other.max
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Rect> for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:29-29:38 -/
+@[reducible]
+impl_def grid.Rect.Insts.CoreCmpPartialEqRect : core.cmp.PartialEq grid.Rect
+  grid.Rect := {
+  eq := grid.Rect.Insts.CoreCmpPartialEqRect.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    grid.Rect.Insts.CoreCmpPartialEqRect
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Rect}::assert_fields_are_eq]:
+    Source: 'src/grid.rs', lines 29:40-29:42
+    Visibility: public -/
+def grid.Rect.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : grid.Rect) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Rect}]
+    Source: 'src/grid.rs', lines 29:40-29:42 -/
+@[reducible]
+def grid.Rect.Insts.CoreCmpEq : core.cmp.Eq grid.Rect := {
+  partialEqInst := grid.Rect.Insts.CoreCmpPartialEqRect
+  assert_fields_are_eq := grid.Rect.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::validate]:
+    Source: 'src/grid.rs', lines 36:4-43:5
+    Visibility: public -/
+def grid.Rect.validate
+  (self : grid.Rect) : Result (core.result.Result Unit topology.Error) := do
+  let r ← grid.Point.validate self.min
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let r1 ← grid.Point.validate self.max
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      if self.min.x >= self.max.x
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        if self.min.y >= self.max.y
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok (core.result.Result.Ok ())
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::contains]:
+    Source: 'src/grid.rs', lines 45:4-50:5
+    Visibility: public -/
+def grid.Rect.contains
+  (self : grid.Rect) (other : grid.Rect) : Result Bool := do
+  if self.min.x <= other.min.x
+  then
+    if self.min.y <= other.min.y
+    then
+      if self.max.x >= other.max.x
+      then ok (self.max.y >= other.max.y)
+      else ok false
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::contains_point]:
+    Source: 'src/grid.rs', lines 52:4-57:5
+    Visibility: public -/
+def grid.Rect.contains_point
+  (self : grid.Rect) (point : grid.Point) : Result Bool := do
+  if point.x >= self.min.x
+  then
+    if point.x <= self.max.x
+    then if point.y >= self.min.y
+         then ok (point.y <= self.max.y)
+         else ok false
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::intersects]:
+    Source: 'src/grid.rs', lines 59:4-64:5
+    Visibility: public -/
+def grid.Rect.intersects
+  (self : grid.Rect) (other : grid.Rect) : Result Bool := do
+  if self.min.x <= other.max.x
+  then
+    if other.min.x <= self.max.x
+    then
+      if self.min.y <= other.max.y
+      then ok (other.min.y <= self.max.y)
+      else ok false
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::union]:
+    Source: 'src/grid.rs', lines 66:4-77:5
+    Visibility: public -/
+def grid.Rect.union
+  (self : grid.Rect) (other : grid.Rect) : Result grid.Rect := do
+  let i ← lift (core.cmp.impls.OrdI32.min self.min.x other.min.x)
+  let i1 ← lift (core.cmp.impls.OrdI32.min self.min.y other.min.y)
+  let i2 ← lift (core.cmp.impls.OrdI32.max self.max.x other.max.x)
+  let i3 ← lift (core.cmp.impls.OrdI32.max self.max.y other.max.y)
+  ok { min := { x := i, y := i1 }, max := { x := i2, y := i3 } }
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::expand]:
+    Source: 'src/grid.rs', lines 79:4-95:5
+    Visibility: public -/
+def grid.Rect.expand
+  (self : grid.Rect) (margin : Std.I32) :
+  Result (core.result.Result grid.Rect topology.Error)
+  := do
+  if margin < 0#i32
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    let o ← lift (I32.checked_sub self.min.x margin)
+    let r ← core.option.Option.ok_or o topology.Error.Overflow
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let o1 ← lift (I32.checked_sub self.min.y margin)
+      let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let o2 ← lift (I32.checked_add self.max.x margin)
+        let r2 ← core.option.Option.ok_or o2 topology.Error.Overflow
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue val2 =>
+          let o3 ← lift (I32.checked_add self.max.y margin)
+          let r3 ← core.option.Option.ok_or o3 topology.Error.Overflow
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue val3 =>
+            let r4 ←
+              grid.Rect.validate
+                {
+                  min := { x := val, y := val1 },
+                  max := { x := val2, y := val3 }
+                }
+            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+            match cf4 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              ok (core.result.Result.Ok
+                {
+                  min := { x := val, y := val1 },
+                  max := { x := val2, y := val3 }
+                })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                grid.Rect (core.convert.FromSame topology.Error) residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              grid.Rect (core.convert.FromSame topology.Error) residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            grid.Rect (core.convert.FromSame topology.Error) residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Rect (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        grid.Rect (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::center]:
+    Source: 'src/grid.rs', lines 97:4-102:5 -/
+def grid.Rect.center (self : grid.Rect) : Result grid.Point := do
+  let i ← self.max.x - self.min.x
+  let i1 ← i / 2#i32
+  let i2 ← self.min.x + i1
+  let i3 ← self.max.y - self.min.y
+  let i4 ← i3 / 2#i32
+  let i5 ← self.min.y + i4
+  ok { x := i2, y := i5 }
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::between]:
+    Source: 'src/grid.rs', lines 104:4-119:5
+    Visibility: public -/
+def grid.Rect.between
+  (a : grid.Point) (b : grid.Point) (margin : Std.I32) :
+  Result (core.result.Result grid.Rect topology.Error)
+  := do
+  if margin <= 0#i32
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    let i ← lift (core.cmp.impls.OrdI32.min a.x b.x)
+    let i1 ← lift (core.cmp.impls.OrdI32.min a.y b.y)
+    let i2 ← lift (core.cmp.impls.OrdI32.max a.x b.x)
+    let i3 ← lift (core.cmp.impls.OrdI32.max a.y b.y)
+    grid.Rect.expand
+      { min := { x := i, y := i1 }, max := { x := i2, y := i3 } } margin
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Rect}::touches_disk]:
+    Source: 'src/grid.rs', lines 121:4-127:5 -/
+def grid.Rect.touches_disk
+  (self : grid.Rect) (center : grid.Point) (radius : Std.I32) :
+  Result Bool
+  := do
+  let x ← core.cmp.impls.OrdI32.clamp center.x self.min.x self.max.x
+  let y ← core.cmp.impls.OrdI32.clamp center.y self.min.y self.max.y
+  let i ← lift (core.convert.num.FromI64I32.from center.x)
+  let i1 ← lift (core.convert.num.FromI64I32.from x)
+  let dx ← i - i1
+  let i2 ← lift (core.convert.num.FromI64I32.from center.y)
+  let i3 ← lift (core.convert.num.FromI64I32.from y)
+  let dy ← i2 - i3
+  let i4 ← dx * dx
+  let i5 ← dy * dy
+  let i6 ← i4 + i5
+  let i7 ← lift (core.convert.num.FromI64I32.from radius)
+  let i8 ← lift (core.convert.num.FromI64I32.from radius)
+  let i9 ← i7 * i8
+  ok (i6 <= i9)
+
+/-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Geometry}::fmt]:
+    Source: 'src/grid.rs', lines 130:9-130:14
+    Visibility: public -/
+def grid.Geometry.Insts.CoreFmtDebug.fmt
+  (self : grid.Geometry) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ grid.Rect.Insts.CoreFmtDebug self.viewport
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugVec grid.Rect.Insts.CoreFmtDebug) self.obstacles
+  let dyn2 := Dyn.mk _ core.fmt.DebugI32 self.walker_radius
+  let dyn3 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.clearance
+  core.fmt.Formatter.debug_struct_field4_finish f (toStr "Geometry") (toStr
+    "viewport") dyn (toStr "obstacles") dyn1 (toStr "walker_radius") dyn2
+    (toStr "clearance") dyn3
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Geometry}]
+    Source: 'src/grid.rs', lines 130:9-130:14 -/
+@[reducible]
+def grid.Geometry.Insts.CoreFmtDebug : core.fmt.Debug grid.Geometry := {
+  fmt := grid.Geometry.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Geometry}::clone]:
+    Source: 'src/grid.rs', lines 130:16-130:21
+    Visibility: public -/
+def grid.Geometry.Insts.CoreCloneClone.clone
+  (self : grid.Geometry) : Result grid.Geometry := do
+  let r ← grid.Rect.Insts.CoreCloneClone.clone self.viewport
+  let v ←
+    alloc.vec.CloneVec.clone grid.Rect.Insts.CoreCloneClone self.obstacles
+  let i ← lift (core.clone.impls.CloneI32.clone self.walker_radius)
+  let i1 ← lift (core.clone.impls.CloneI32.clone self.clearance)
+  ok { viewport := r, obstacles := v, walker_radius := i, clearance := i1 }
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::Geometry}]
+    Source: 'src/grid.rs', lines 130:16-130:21 -/
+@[reducible]
+def grid.Geometry.Insts.CoreCloneClone : core.clone.Clone grid.Geometry := {
+  clone := grid.Geometry.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::StructuralPartialEq for labyrinth_core::grid::Geometry}]
+    Source: 'src/grid.rs', lines 130:23-130:32 -/
+@[reducible]
+def grid.Geometry.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq grid.Geometry := {
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Geometry> for labyrinth_core::grid::Geometry}::eq]:
+    Source: 'src/grid.rs', lines 130:23-130:32
+    Visibility: public -/
+def grid.Geometry.Insts.CoreCmpPartialEqGeometry.eq
+  (self : grid.Geometry) (other : grid.Geometry) : Result Bool := do
+  if self.walker_radius = other.walker_radius
+  then
+    if self.clearance = other.clearance
+    then
+      let b ←
+        grid.Rect.Insts.CoreCmpPartialEqRect.eq self.viewport other.viewport
+      if b
+      then
+        alloc.vec.partial_eq.PartialEqVec.eq
+          grid.Rect.Insts.CoreCmpPartialEqRect self.obstacles other.obstacles
+      else ok false
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::Geometry> for labyrinth_core::grid::Geometry}]
+    Source: 'src/grid.rs', lines 130:23-130:32 -/
+@[reducible]
+impl_def grid.Geometry.Insts.CoreCmpPartialEqGeometry : core.cmp.PartialEq
+  grid.Geometry grid.Geometry := {
+  eq := grid.Geometry.Insts.CoreCmpPartialEqGeometry.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    grid.Geometry.Insts.CoreCmpPartialEqGeometry
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Geometry}::assert_fields_are_eq]:
+    Source: 'src/grid.rs', lines 130:34-130:36
+    Visibility: public -/
+def grid.Geometry.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : grid.Geometry) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::Geometry}]
+    Source: 'src/grid.rs', lines 130:34-130:36 -/
+@[reducible]
+def grid.Geometry.Insts.CoreCmpEq : core.cmp.Eq grid.Geometry := {
+  partialEqInst := grid.Geometry.Insts.CoreCmpPartialEqGeometry
+  assert_fields_are_eq := grid.Geometry.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::margin]:
+    Source: 'src/grid.rs', lines 154:4-167:5
+    Visibility: public -/
+def grid.Geometry.margin
+  (self : grid.Geometry) :
+  Result (core.result.Result Std.I32 topology.Error)
+  := do
+  if self.walker_radius <= 0#i32
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    if self.clearance < 0#i32
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      let o ← lift (I32.checked_add self.walker_radius self.clearance)
+      let r ← core.option.Option.ok_or o topology.Error.Overflow
+      let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf with
+      | core.ops.control_flow.ControlFlow.Continue val =>
+        let o1 ← lift (I32.checked_add val 2#i32)
+        let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue val1 =>
+          if val1 > grid.COORD_LIMIT
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok (core.result.Result.Ok val1)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Std.I32 (core.convert.FromSame topology.Error) residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Std.I32 (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::validate]: loop body 0:
+    Source: 'src/grid.rs', lines 147:8-150:9
+    Visibility: public -/
+@[rust_loop_body]
+def grid.Geometry.validate_loop.body
+  (v : alloc.vec.Vec grid.Rect)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let r ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice grid.Rect) v
+          i
+      let status1 ← grid.Rect.validate r
+      let i2 ← i + 1#usize
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::validate]: loop 0:
+    Source: 'src/grid.rs', lines 147:8-150:9
+    Visibility: public -/
+@[rust_loop]
+def grid.Geometry.validate_loop
+  (v : alloc.vec.Vec grid.Rect)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => grid.Geometry.validate_loop.body v status1 i1)
+    (status, i)
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::validate]:
+    Source: 'src/grid.rs', lines 139:4-152:5
+    Visibility: public -/
+def grid.Geometry.validate
+  (self : grid.Geometry) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let r ← grid.Rect.validate self.viewport
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    if self.walker_radius <= 0#i32
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      if self.clearance < 0#i32
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        let r1 ← grid.Geometry.margin self
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          grid.Geometry.validate_loop self.obstacles (core.result.Result.Ok ())
+            0#usize
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Unit (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::check]: loop body 0:
+    Source: 'src/grid.rs', lines 176:8-179:9
+    Visibility: public -/
+@[rust_loop_body]
+def grid.Geometry.check_loop.body
+  (v : alloc.vec.Vec grid.Rect) (swept : grid.Rect) (blocked : Bool)
+  (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    if blocked
+    then ok (done blocked)
+    else
+      let r ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice grid.Rect) v
+          i
+      let blocked1 ← grid.Rect.intersects swept r
+      let i2 ← i + 1#usize
+      ok (cont (blocked1, i2))
+  else ok (done blocked)
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::check]: loop 0:
+    Source: 'src/grid.rs', lines 176:8-179:9
+    Visibility: public -/
+@[rust_loop]
+def grid.Geometry.check_loop
+  (v : alloc.vec.Vec grid.Rect) (swept : grid.Rect) (blocked : Bool)
+  (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (blocked1, i1) => grid.Geometry.check_loop.body v swept blocked1 i1)
+    (blocked, i)
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Geometry}::check]:
+    Source: 'src/grid.rs', lines 169:4-185:5
+    Visibility: public -/
+def grid.Geometry.check
+  (self : grid.Geometry) (swept : grid.Rect) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let r ← grid.Rect.validate swept
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let b ← grid.Rect.contains self.viewport swept
+    if b
+    then
+      let blocked ←
+        grid.Geometry.check_loop self.obstacles swept false 0#usize
+      if blocked
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else ok (core.result.Result.Ok ())
+    else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::GridSpec}::fmt]:
+    Source: 'src/grid.rs', lines 190:9-190:14
+    Visibility: public -/
+def grid.GridSpec.Insts.CoreFmtDebug.fmt
+  (self : grid.GridSpec) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.columns
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.rows
+  let dyn2 := Dyn.mk _ grid.Point.Insts.CoreFmtDebug self.origin
+  let dyn3 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.cell_size
+  core.fmt.Formatter.debug_struct_field4_finish f (toStr "GridSpec") (toStr
+    "columns") dyn (toStr "rows") dyn1 (toStr "origin") dyn2 (toStr
+    "cell_size") dyn3
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:9-190:14 -/
+@[reducible]
+def grid.GridSpec.Insts.CoreFmtDebug : core.fmt.Debug grid.GridSpec := {
+  fmt := grid.GridSpec.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::GridSpec}::clone]:
+    Source: 'src/grid.rs', lines 190:16-190:21
+    Visibility: public -/
+def grid.GridSpec.Insts.CoreCloneClone.clone
+  (self : grid.GridSpec) : Result grid.GridSpec := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::clone::Clone for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:16-190:21 -/
+@[reducible]
+def grid.GridSpec.Insts.CoreCloneClone : core.clone.Clone grid.GridSpec := {
+  clone := grid.GridSpec.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::Copy for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:23-190:27 -/
+@[reducible]
+def grid.GridSpec.Insts.CoreMarkerCopy : core.marker.Copy grid.GridSpec := {
+  cloneInst := grid.GridSpec.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::marker::StructuralPartialEq for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:29-190:38 -/
+@[reducible]
+def grid.GridSpec.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq grid.GridSpec := {
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::GridSpec> for labyrinth_core::grid::GridSpec}::eq]:
+    Source: 'src/grid.rs', lines 190:29-190:38
+    Visibility: public -/
+def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec.eq
+  (self : grid.GridSpec) (other : grid.GridSpec) : Result Bool := do
+  if self.cell_size = other.cell_size
+  then
+    if self.columns = other.columns
+    then
+      if self.rows = other.rows
+      then grid.Point.Insts.CoreCmpPartialEqPoint.eq self.origin other.origin
+      else ok false
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::PartialEq<labyrinth_core::grid::GridSpec> for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:29-190:38 -/
+@[reducible]
+impl_def grid.GridSpec.Insts.CoreCmpPartialEqGridSpec : core.cmp.PartialEq
+  grid.GridSpec grid.GridSpec := {
+  eq := grid.GridSpec.Insts.CoreCmpPartialEqGridSpec.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    grid.GridSpec.Insts.CoreCmpPartialEqGridSpec
+}
+
+/-- [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::GridSpec}::assert_fields_are_eq]:
+    Source: 'src/grid.rs', lines 190:40-190:42
+    Visibility: public -/
+def grid.GridSpec.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : grid.GridSpec) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::cmp::Eq for labyrinth_core::grid::GridSpec}]
+    Source: 'src/grid.rs', lines 190:40-190:42 -/
+@[reducible]
+def grid.GridSpec.Insts.CoreCmpEq : core.cmp.Eq grid.GridSpec := {
+  partialEqInst := grid.GridSpec.Insts.CoreCmpPartialEqGridSpec
+  assert_fields_are_eq := grid.GridSpec.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Grid}::fmt]:
+    Source: 'src/grid.rs', lines 198:9-198:14
+    Visibility: public -/
+def grid.Grid.Insts.CoreFmtDebug.fmt
+  (self : grid.Grid) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ grid.GridSpec.Insts.CoreFmtDebug self.spec
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec
+      (core.option.Option.Insts.CoreFmtDebug core.fmt.DebugUsize))) self.ids
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Grid") (toStr "spec")
+    dyn (toStr "ids") dyn1
+
+/-- Trait implementation: [labyrinth_core::grid::{impl core::fmt::Debug for labyrinth_core::grid::Grid}]
+    Source: 'src/grid.rs', lines 198:9-198:14 -/
+@[reducible]
+def grid.Grid.Insts.CoreFmtDebug : core.fmt.Debug grid.Grid := {
+  fmt := grid.Grid.Insts.CoreFmtDebug.fmt
 }
 
 /-- [labyrinth_core::topology::check_storage]:
-    Source: 'src/topology.rs', lines 65:0-73:1 -/
+    Source: 'src/topology.rs', lines 65:0-71:1 -/
 def topology.check_storage
   (count : Std.Usize) (element_bytes : Std.Usize) :
   Result (core.result.Result Unit topology.Error)
@@ -126,154 +845,2091 @@ def topology.check_storage
     core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
       Unit (core.convert.FromSame topology.Error) residual
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::new]:
-    Source: 'src/spanning_tree.rs', lines 34:4-54:5
-    Visibility: public -/
-def spanning_tree.Workspace.new
-  (cell_count : Std.Usize) (edge_count : Std.Usize) :
-  Result (core.result.Result spanning_tree.Workspace topology.Error)
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::new]:
+    Source: 'src/grid.rs', lines 205:4-233:5 -/
+def grid.Grid.new
+  (spec : grid.GridSpec) :
+  Result (core.result.Result grid.Grid topology.Error)
   := do
-  if cell_count = 0#usize
-  then ok (core.result.Result.Err topology.Error.InvalidSize)
-  else
-    let r ← topology.check_storage cell_count 8#usize
-    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
-    match cf with
-    | core.ops.control_flow.ControlFlow.Continue _ =>
-      let r1 ← topology.check_storage cell_count 24#usize
-      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
-      match cf1 with
-      | core.ops.control_flow.ControlFlow.Continue _ =>
-        let r2 ← topology.check_storage edge_count 16#usize
-        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
-        match cf2 with
-        | core.ops.control_flow.ControlFlow.Continue _ =>
-          let o ← lift (Usize.checked_mul edge_count 2#usize)
-          let r3 ← core.option.Option.ok_or o topology.Error.Overflow
-          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
-          match cf3 with
+  let r ← grid.Point.validate spec.origin
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    if spec.columns = 0#usize
+    then ok (core.result.Result.Err topology.Error.InvalidSize)
+    else
+      if spec.rows = 0#usize
+      then ok (core.result.Result.Err topology.Error.InvalidSize)
+      else
+        if spec.cell_size <= 0#i32
+        then ok (core.result.Result.Err topology.Error.InvalidSize)
+        else
+          let o ← lift (Usize.checked_mul spec.columns spec.rows)
+          let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+          let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+          match cf1 with
           | core.ops.control_flow.ControlFlow.Continue val =>
-            let r4 ← topology.check_storage val 8#usize
-            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
-            match cf4 with
+            let r2 ← topology.check_storage val 16#usize
+            let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+            match cf2 with
             | core.ops.control_flow.ControlFlow.Continue _ =>
-              let v ←
-                alloc.vec.from_elem core.clone.CloneBool false cell_count
-              let v1 ←
-                alloc.vec.from_elem spanning_tree.Frame.Insts.CoreCloneClone
-                  { cell := 0#usize, next := 0#usize, remaining := 0#usize }
-                  cell_count
-              let v2 ←
-                alloc.vec.from_elem core.clone.CloneUsize 0#usize cell_count
-              let v3 ←
-                alloc.vec.from_elem core.clone.CloneUsize core.num.Usize.MAX
-                  cell_count
-              ok (core.result.Result.Ok
-                {
-                  seen := v,
-                  frames := v1,
-                  path := v2,
-                  parents := v2,
-                  incoming := v2,
-                  edit_slots := v3,
-                  edit_nodes := v2,
-                  edit_count := 0#usize,
-                  edge_capacity := edge_count
-                })
+              let i ← lift (IScalar.hcast .Usize core.num.I32.MAX)
+              if spec.columns > i
+              then ok (core.result.Result.Err topology.Error.Overflow)
+              else
+                let i1 ← lift (UScalar.hcast .I32 spec.columns)
+                let o1 ← lift (I32.checked_mul i1 spec.cell_size)
+                let r3 ← core.option.Option.ok_or o1 topology.Error.Overflow
+                let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                match cf3 with
+                | core.ops.control_flow.ControlFlow.Continue val1 =>
+                  let i2 ← lift (IScalar.hcast .Usize core.num.I32.MAX)
+                  if spec.rows > i2
+                  then ok (core.result.Result.Err topology.Error.Overflow)
+                  else
+                    let i3 ← lift (UScalar.hcast .I32 spec.rows)
+                    let o2 ← lift (I32.checked_mul i3 spec.cell_size)
+                    let r4 ←
+                      core.option.Option.ok_or o2 topology.Error.Overflow
+                    let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                    match cf4 with
+                    | core.ops.control_flow.ControlFlow.Continue val2 =>
+                      let o3 ← lift (I32.checked_add spec.origin.x val1)
+                      let r5 ←
+                        core.option.Option.ok_or o3 topology.Error.Overflow
+                      let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+                      match cf5 with
+                      | core.ops.control_flow.ControlFlow.Continue val3 =>
+                        let o4 ← lift (I32.checked_add spec.origin.y val2)
+                        let r6 ←
+                          core.option.Option.ok_or o4 topology.Error.Overflow
+                        let cf6 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r6
+                        match cf6 with
+                        | core.ops.control_flow.ControlFlow.Continue val4 =>
+                          let r7 ←
+                            grid.Point.validate { x := val3, y := val4 }
+                          let cf7 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r7
+                          match cf7 with
+                          | core.ops.control_flow.ControlFlow.Continue _ =>
+                            let v ←
+                              alloc.vec.from_elem
+                                (core.option.Option.Insts.CoreCloneClone
+                                core.clone.CloneUsize) none val
+                            ok (core.result.Result.Ok { spec, ids := v })
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              grid.Grid (core.convert.FromSame topology.Error)
+                              residual
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            grid.Grid (core.convert.FromSame topology.Error)
+                            residual
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          grid.Grid (core.convert.FromSame topology.Error)
+                          residual
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        grid.Grid (core.convert.FromSame topology.Error)
+                        residual
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    grid.Grid (core.convert.FromSame topology.Error) residual
             | core.ops.control_flow.ControlFlow.Break residual =>
               core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-                spanning_tree.Workspace (core.convert.FromSame topology.Error)
+                grid.Grid (core.convert.FromSame topology.Error) residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              grid.Grid (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      grid.Grid (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::cell]:
+    Source: 'src/grid.rs', lines 235:4-240:5
+    Visibility: public -/
+def grid.Grid.cell
+  (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) :
+  Result (Option Std.Usize)
+  := do
+  if column >= self.spec.columns
+  then ok none
+  else
+    if row >= self.spec.rows
+    then ok none
+    else
+      let i ← row * self.spec.columns
+      let i1 ← i + column
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Option
+        Std.Usize)) self.ids i1
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::spec]:
+    Source: 'src/grid.rs', lines 242:4-244:5
+    Visibility: public -/
+def grid.Grid.impl.spec (self : grid.Grid) : Result grid.GridSpec := do
+  ok self.spec
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::retain]:
+    Source: 'src/grid.rs', lines 246:4-248:5 -/
+def grid.Grid.retain
+  (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) (id : Std.Usize) :
+  Result grid.Grid
+  := do
+  let i ← row * self.spec.columns
+  let i1 ← i + column
+  let (_, index_mut_back) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice (Option
+      Std.Usize)) self.ids i1
+  let v := index_mut_back (some id)
+  ok { self with ids := v }
+
+/-- [labyrinth_core::grid::{labyrinth_core::grid::Grid}::bounds]:
+    Source: 'src/grid.rs', lines 250:4-260:5 -/
+def grid.Grid.bounds
+  (self : grid.Grid) (column : Std.Usize) (row : Std.Usize) :
+  Result grid.Rect
+  := do
+  let i ← lift (UScalar.hcast .I32 column)
+  let i1 ← i * self.spec.cell_size
+  let x ← self.spec.origin.x + i1
+  let i2 ← lift (UScalar.hcast .I32 row)
+  let i3 ← i2 * self.spec.cell_size
+  let y ← self.spec.origin.y + i3
+  let i4 ← x + self.spec.cell_size
+  let i5 ← y + self.spec.cell_size
+  ok { min := { x, y }, max := { x := i4, y := i5 } }
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Stamp}::fmt]:
+    Source: 'src/walker.rs', lines 7:9-7:14
+    Visibility: public -/
+def walker.Stamp.Insts.CoreFmtDebug.fmt
+  (self : walker.Stamp) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.epoch
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) self.revision
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Stamp") (toStr
+    "epoch") dyn (toStr "revision") dyn1
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:9-7:14 -/
+@[reducible]
+def walker.Stamp.Insts.CoreFmtDebug : core.fmt.Debug walker.Stamp := {
+  fmt := walker.Stamp.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::MotionEvent}::fmt]:
+    Source: 'src/scene.rs', lines 893:9-893:14
+    Visibility: public -/
+def scene.MotionEvent.Insts.CoreFmtDebug.fmt
+  (self : scene.MotionEvent) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ walker.Stamp.Insts.CoreFmtDebug self.stamp
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.replaced
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.moving_doorways
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "MotionEvent") (toStr
+    "stamp") dyn (toStr "replaced") dyn1 (toStr "moving_doorways") dyn2
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:9-893:14 -/
+@[reducible]
+def scene.MotionEvent.Insts.CoreFmtDebug : core.fmt.Debug scene.MotionEvent
+  := {
+  fmt := scene.MotionEvent.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionAdvance}::fmt]:
+    Source: 'src/motion.rs', lines 10:9-10:14
+    Visibility: public -/
+def motion.MotionAdvance.Insts.CoreFmtDebug.fmt
+  (self : motion.MotionAdvance) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ scene.MotionEvent.Insts.CoreFmtDebug self.event
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.divisor
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "MotionAdvance")
+    (toStr "event") dyn (toStr "divisor") dyn1
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:9-10:14 -/
+@[reducible]
+def motion.MotionAdvance.Insts.CoreFmtDebug : core.fmt.Debug
+  motion.MotionAdvance := {
+  fmt := motion.MotionAdvance.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::motion::{impl core::clone::Clone for labyrinth_core::motion::MotionAdvance}::clone]:
+    Source: 'src/motion.rs', lines 10:16-10:21
+    Visibility: public -/
+def motion.MotionAdvance.Insts.CoreCloneClone.clone
+  (self : motion.MotionAdvance) : Result motion.MotionAdvance := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::clone::Clone for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:16-10:21 -/
+@[reducible]
+def motion.MotionAdvance.Insts.CoreCloneClone : core.clone.Clone
+  motion.MotionAdvance := {
+  clone := motion.MotionAdvance.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::marker::Copy for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:23-10:27 -/
+@[reducible]
+def motion.MotionAdvance.Insts.CoreMarkerCopy : core.marker.Copy
+  motion.MotionAdvance := {
+  cloneInst := motion.MotionAdvance.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::marker::StructuralPartialEq for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:29-10:38 -/
+@[reducible]
+def motion.MotionAdvance.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq motion.MotionAdvance := {
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Stamp> for labyrinth_core::walker::Stamp}::eq]:
+    Source: 'src/walker.rs', lines 7:29-7:38
+    Visibility: public -/
+def walker.Stamp.Insts.CoreCmpPartialEqStamp.eq
+  (self : walker.Stamp) (other : walker.Stamp) : Result Bool := do
+  if self.epoch = other.epoch
+  then ok (self.revision = other.revision)
+  else ok false
+
+/-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::MotionEvent> for labyrinth_core::scene::MotionEvent}::eq]:
+    Source: 'src/scene.rs', lines 893:29-893:38
+    Visibility: public -/
+def scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent.eq
+  (self : scene.MotionEvent) (other : scene.MotionEvent) : Result Bool := do
+  let b ← walker.Stamp.Insts.CoreCmpPartialEqStamp.eq self.stamp other.stamp
+  if b
+  then
+    if self.replaced = other.replaced
+    then ok (self.moving_doorways = other.moving_doorways)
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::motion::{impl core::cmp::PartialEq<labyrinth_core::motion::MotionAdvance> for labyrinth_core::motion::MotionAdvance}::eq]:
+    Source: 'src/motion.rs', lines 10:29-10:38
+    Visibility: public -/
+def motion.MotionAdvance.Insts.CoreCmpPartialEqMotionAdvance.eq
+  (self : motion.MotionAdvance) (other : motion.MotionAdvance) :
+  Result Bool
+  := do
+  let b ←
+    scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent.eq self.event
+      other.event
+  if b
+  then ok (self.divisor = other.divisor)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::cmp::PartialEq<labyrinth_core::motion::MotionAdvance> for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:29-10:38 -/
+@[reducible]
+impl_def motion.MotionAdvance.Insts.CoreCmpPartialEqMotionAdvance :
+  core.cmp.PartialEq motion.MotionAdvance motion.MotionAdvance := {
+  eq := motion.MotionAdvance.Insts.CoreCmpPartialEqMotionAdvance.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    motion.MotionAdvance.Insts.CoreCmpPartialEqMotionAdvance
+}
+
+/-- [labyrinth_core::motion::{impl core::cmp::Eq for labyrinth_core::motion::MotionAdvance}::assert_fields_are_eq]:
+    Source: 'src/motion.rs', lines 10:40-10:42
+    Visibility: public -/
+def motion.MotionAdvance.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : motion.MotionAdvance) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::cmp::Eq for labyrinth_core::motion::MotionAdvance}]
+    Source: 'src/motion.rs', lines 10:40-10:42 -/
+@[reducible]
+def motion.MotionAdvance.Insts.CoreCmpEq : core.cmp.Eq motion.MotionAdvance
+  := {
+  partialEqInst := motion.MotionAdvance.Insts.CoreCmpPartialEqMotionAdvance
+  assert_fields_are_eq :=
+    motion.MotionAdvance.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}::fmt]:
+    Source: 'src/topology.rs', lines 49:9-49:14
+    Visibility: public -/
+def topology.Edge.Insts.CoreFmtDebug.fmt
+  (self : topology.Edge) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.u
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.v
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Edge") (toStr "u")
+    dyn (toStr "v") dyn1
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:9-49:14 -/
+@[reducible]
+def topology.Edge.Insts.CoreFmtDebug : core.fmt.Debug topology.Edge := {
+  fmt := topology.Edge.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Route}::fmt]:
+    Source: 'src/scene.rs', lines 877:9-877:14
+    Visibility: public -/
+def scene.Route.Insts.CoreFmtDebug.fmt
+  (self : scene.Route) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.circle
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec core.fmt.DebugUsize))
+      self.cells
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Route") (toStr
+    "circle") dyn (toStr "cells") dyn1
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Route}]
+    Source: 'src/scene.rs', lines 877:9-877:14 -/
+@[reducible]
+def scene.Route.Insts.CoreFmtDebug : core.fmt.Debug scene.Route := {
+  fmt := scene.Route.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionWorkspace}::fmt]:
+    Source: 'src/motion.rs', lines 21:9-21:14
+    Visibility: public -/
+def motion.MotionWorkspace.Insts.CoreFmtDebug.fmt
+  (self : motion.MotionWorkspace) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.epoch
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.cells
+  let dyn2 := Dyn.mk _ core.fmt.DebugUsize self.edges
+  let dyn3 :=
+    Dyn.mk _ (core.fmt.DebugVec (Array.Insts.CoreFmtDebug 4#usize
+      core.fmt.DebugUsize)) self.endpoints
+  let dyn4 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugI32) self.steps
+  let dyn5 :=
+    Dyn.mk _ (core.fmt.DebugVec scene.Route.Insts.CoreFmtDebug) self.routes
+  let dyn6 := Dyn.mk _ core.fmt.DebugBool self.routes_changed
+  let dyn7 :=
+    Dyn.mk _ (core.fmt.DebugVec topology.Edge.Insts.CoreFmtDebug) self.remove
+  let dyn8 :=
+    Dyn.mk _ (core.fmt.DebugVec topology.Edge.Insts.CoreFmtDebug) self.add
+  let dyn9 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.admissible
+  let dyn10 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.protected
+  let dyn11 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.locked
+  let dyn12 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.from
+  let dyn13 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.to
+  let dyn14 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.offsets
+  let dyn15 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.arcs
+  let dyn16 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugU8) self.residual
+  let dyn17 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parent
+  let dyn18 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.queue
+  let dyn19 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.first
+  let dyn20 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec core.fmt.DebugUsize))
+      self.second
+  let values :=
+    Array.to_slice
+      (Array.make 21#usize [
+        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8, dyn9, dyn10,
+        dyn11, dyn12, dyn13, dyn14, dyn15, dyn16, dyn17, dyn18, dyn19, dyn20
+        ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 21#usize [
+        toStr "epoch", toStr "cells", toStr "edges", toStr "endpoints", toStr
+        "steps", toStr "routes", toStr "routes_changed", toStr "remove", toStr
+        "add", toStr "admissible", toStr "protected", toStr "locked", toStr
+        "from", toStr "to", toStr "offsets", toStr "arcs", toStr "residual",
+        toStr "parent", toStr "queue", toStr "first", toStr "second"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "MotionWorkspace") s
+    values
+
+/-- Trait implementation: [labyrinth_core::motion::{impl core::fmt::Debug for labyrinth_core::motion::MotionWorkspace}]
+    Source: 'src/motion.rs', lines 21:9-21:14 -/
+@[reducible]
+def motion.MotionWorkspace.Insts.CoreFmtDebug : core.fmt.Debug
+  motion.MotionWorkspace := {
+  fmt := motion.MotionWorkspace.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::motion::network_sizes]:
+    Source: 'src/motion.rs', lines 47:0-56:1 -/
+def motion.network_sizes
+  (cells : Std.Usize) (edges : Std.Usize) :
+  Result (core.result.Result (Std.Usize × Std.Usize) topology.Error)
+  := do
+  let o ← lift (Usize.checked_mul cells 2#usize)
+  let r ← core.option.Option.ok_or o topology.Error.Overflow
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let o1 ← lift (Usize.checked_add val 1#usize)
+    let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      let o2 ← lift (Usize.checked_add cells edges)
+      let r2 ← core.option.Option.ok_or o2 topology.Error.Overflow
+      let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+      match cf2 with
+      | core.ops.control_flow.ControlFlow.Continue val2 =>
+        let o3 ← lift (Usize.checked_mul val2 4#usize)
+        let r3 ← core.option.Option.ok_or o3 topology.Error.Overflow
+        let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+        match cf3 with
+        | core.ops.control_flow.ControlFlow.Continue val3 =>
+          let o4 ← lift (Usize.checked_add val1 1#usize)
+          let r4 ← core.option.Option.ok_or o4 topology.Error.Overflow
+          let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+          match cf4 with
+          | core.ops.control_flow.ControlFlow.Continue val4 =>
+            let r5 ← topology.check_storage val3 8#usize
+            let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+            match cf5 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let r6 ← topology.check_storage val4 8#usize
+              let cf6 ← core.result.Result.Insts.CoreOpsTry.branch r6
+              match cf6 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                ok (core.result.Result.Ok (val1, val3))
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  (Std.Usize × Std.Usize) (core.convert.FromSame
+                  topology.Error) residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error)
                 residual
           | core.ops.control_flow.ControlFlow.Break residual =>
             core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-              spanning_tree.Workspace (core.convert.FromSame topology.Error)
+              (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error)
               residual
         | core.ops.control_flow.ControlFlow.Break residual =>
           core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-            spanning_tree.Workspace (core.convert.FromSame topology.Error)
+            (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error)
             residual
       | core.ops.control_flow.ControlFlow.Break residual =>
         core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-          spanning_tree.Workspace (core.convert.FromSame topology.Error)
+          (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error)
           residual
     | core.ops.control_flow.ControlFlow.Break residual =>
       core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-        spanning_tree.Workspace (core.convert.FromSame topology.Error) residual
+        (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error)
+        residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      (Std.Usize × Std.Usize) (core.convert.FromSame topology.Error) residual
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::ensure]:
-    Source: 'src/spanning_tree.rs', lines 56:4-61:5 -/
-def spanning_tree.Workspace.ensure
-  (self : spanning_tree.Workspace) (cells : Std.Usize) (edges : Std.Usize) :
-  Result (core.result.Result Unit topology.Error)
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::edges]:
+    Source: 'src/topology.rs', lines 290:4-292:5
+    Visibility: public -/
+def topology.Carrier.impl.edges
+  (self : topology.Carrier) : Result (Slice topology.Edge) := do
+  ok (alloc.vec.Vec.deref self.edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::phases]:
+    Source: 'src/scene.rs', lines 1190:4-1192:5
+    Visibility: public -/
+def scene.Scene.impl.phases (self : scene.Scene) : Result (Slice Std.I32) := do
+  ok (alloc.vec.Vec.deref self.phases)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::routes]:
+    Source: 'src/scene.rs', lines 1187:4-1189:5
+    Visibility: public -/
+def scene.Scene.impl.routes
+  (self : scene.Scene) : Result (Slice scene.Route) := do
+  ok (alloc.vec.Vec.deref self.routes)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::layout]:
+    Source: 'src/scene.rs', lines 1181:4-1183:5
+    Visibility: public -/
+def scene.Scene.impl.layout (self : scene.Scene) : Result scene.Layout := do
+  ok self.layout
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::stamp]:
+    Source: 'src/scene.rs', lines 1178:4-1180:5
+    Visibility: public -/
+def scene.Scene.impl.stamp (self : scene.Scene) : Result walker.Stamp := do
+  ok self.stamp
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::carrier]:
+    Source: 'src/scene.rs', lines 559:4-561:5
+    Visibility: public -/
+def scene.Layout.impl.carrier
+  (self : scene.Layout) : Result topology.Carrier := do
+  ok self.carrier
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cells]:
+    Source: 'src/scene.rs', lines 550:4-552:5
+    Visibility: public -/
+def scene.Layout.impl.cells
+  (self : scene.Layout) : Result (Slice scene.Cell) := do
+  ok (alloc.vec.Vec.deref self.cells)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::arc_pair]:
+    Source: 'src/motion.rs', lines 162:4-167:5 -/
+def motion.MotionWorkspace.arc_pair
+  (self : motion.MotionWorkspace) («from» : Std.Usize) («to» : Std.Usize) :
+  Result motion.MotionWorkspace
   := do
-  let i := alloc.vec.Vec.len self.path
-  if cells > i
-  then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
-  else
-    if edges > self.edge_capacity
-    then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
-    else ok (core.result.Result.Ok ())
+  let v ← alloc.vec.Vec.push self.from «from»
+  let v1 ← alloc.vec.Vec.push self.to «to»
+  let v2 ← alloc.vec.Vec.push v «to»
+  let v3 ← alloc.vec.Vec.push v1 «from»
+  ok { self with «from» := v2, «to» := v3 }
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 65:8-68:9 -/
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 0:
+    Source: 'src/motion.rs', lines 109:8-123:9
+    Visibility: public -/
 @[rust_loop_body]
-def spanning_tree.Workspace.clear_edits_loop.body
-  (self : spanning_tree.Workspace) (i : Std.Usize) :
-  Result (ControlFlow (spanning_tree.Workspace × Std.Usize) ((alloc.vec.Vec
-    Bool) × (alloc.vec.Vec spanning_tree.Frame) × (alloc.vec.Vec Std.Usize)
-    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize))
+def motion.MotionWorkspace.new_loop0.body
+  (current : scene.Scene) (cells : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize))
+  (v1 : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec scene.Route) × Std.Usize) ((alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec scene.Route)))
   := do
-  if i < self.edit_count
+  let s ← scene.Scene.impl.routes current
+  let i1 := Slice.len s
+  if i < i1
   then
-    let i1 ←
+    let route ← Slice.index_usize s i
+    let i2 := alloc.vec.Vec.len route.cells
+    let last ← i2 - 1#usize
+    let i3 ←
       alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        self.edit_nodes i
-    let (_, index_mut_back) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        self.edit_slots i1
-    let i2 ← i + 1#usize
-    let v := index_mut_back core.num.Usize.MAX
-    ok (cont ({ self with edit_slots := v }, i2))
-  else
-    ok (done (self.seen, self.frames, self.path, self.parents, self.incoming,
-      self.edit_slots, self.edit_nodes, self.edge_capacity))
+        route.cells 0#usize
+    let i4 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        route.cells 1#usize
+    let i5 ← last - 1#usize
+    let i6 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        route.cells i5
+    let i7 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        route.cells last
+    let v2 ←
+      alloc.vec.Vec.push v (Array.make 4#usize [ i3, i4, i6, i7 ] : Array
+        Std.Usize 4#usize)
+    let v3 := alloc.vec.Vec.with_capacity Std.Usize cells
+    let v4 ←
+      alloc.vec.Vec.push v1 ({ circle := i, cells := v3 } : scene.Route)
+    let i8 ← i + 1#usize
+    ok (cont (v2, v4, i8))
+  else ok (done (v, v1))
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 65:8-68:9 -/
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 0:
+    Source: 'src/motion.rs', lines 109:8-123:9
+    Visibility: public -/
 @[rust_loop]
-def spanning_tree.Workspace.clear_edits_loop
-  (self : spanning_tree.Workspace) (i : Std.Usize) :
-  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
-    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
-    Std.Usize)
+def motion.MotionWorkspace.new_loop0
+  (current : scene.Scene) (cells : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize))
+  (v1 : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result ((alloc.vec.Vec (Array Std.Usize 4#usize)) × (alloc.vec.Vec
+    scene.Route))
   := do
   loop
-    (fun (self1, i1) => spanning_tree.Workspace.clear_edits_loop.body self1 i1)
-    (self, i)
+    (fun (v2, v3, i1) => motion.MotionWorkspace.new_loop0.body current cells v2
+      v3 i1)
+    (v, v1, i)
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]:
-    Source: 'src/spanning_tree.rs', lines 63:4-70:5 -/
-def spanning_tree.Workspace.clear_edits
-  (self : spanning_tree.Workspace) : Result spanning_tree.Workspace := do
-  let (v, v1, v2, v3, v4, v5, v6, i) ←
-    spanning_tree.Workspace.clear_edits_loop self 0#usize
-  ok
-    {
-      seen := v,
-      frames := v1,
-      path := v2,
-      parents := v3,
-      incoming := v4,
-      edit_slots := v5,
-      edit_nodes := v6,
-      edit_count := 0#usize,
-      edge_capacity := i
-    }
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 1:
+    Source: 'src/motion.rs', lines 126:8-130:9
+    Visibility: public -/
+@[rust_loop_body]
+def motion.MotionWorkspace.new_loop1.body
+  (cells : Std.Usize) (source : Std.Usize) (work : motion.MotionWorkspace)
+  (v : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if v < cells
+  then
+    let i ← v * 2#usize
+    let i1 ← i + 1#usize
+    let work1 ← motion.MotionWorkspace.arc_pair work i i1
+    let work2 ← motion.MotionWorkspace.arc_pair work1 source i
+    let v1 ← v + 1#usize
+    ok (cont (work2, v1))
+  else ok (done work)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 1:
+    Source: 'src/motion.rs', lines 126:8-130:9
+    Visibility: public -/
+@[rust_loop]
+def motion.MotionWorkspace.new_loop1
+  (cells : Std.Usize) (work : motion.MotionWorkspace) (source : Std.Usize)
+  (v : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (work1, v1) => motion.MotionWorkspace.new_loop1.body cells source
+      work1 v1)
+    (work, v)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 2:
+    Source: 'src/motion.rs', lines 132:8-137:9
+    Visibility: public -/
+@[rust_loop_body]
+def motion.MotionWorkspace.new_loop2.body
+  (current : scene.Scene) (edges : Std.Usize) (work : motion.MotionWorkspace)
+  (e : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if e < edges
+  then
+    let l ← scene.Scene.impl.layout current
+    let c ← scene.Layout.impl.carrier l
+    let s ← topology.Carrier.impl.edges c
+    let edge ← Slice.index_usize s e
+    let i ← edge.u * 2#usize
+    let i1 ← i + 1#usize
+    let i2 ← edge.v * 2#usize
+    let work1 ← motion.MotionWorkspace.arc_pair work i1 i2
+    let i3 ← i2 + 1#usize
+    let work2 ← motion.MotionWorkspace.arc_pair work1 i3 i
+    let e1 ← e + 1#usize
+    ok (cont (work2, e1))
+  else ok (done work)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 2:
+    Source: 'src/motion.rs', lines 132:8-137:9
+    Visibility: public -/
+@[rust_loop]
+def motion.MotionWorkspace.new_loop2
+  (current : scene.Scene) (edges : Std.Usize) (work : motion.MotionWorkspace)
+  (e : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (work1, e1) => motion.MotionWorkspace.new_loop2.body current edges
+      work1 e1)
+    (work, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 3:
+    Source: 'src/motion.rs', lines 139:8-143:9
+    Visibility: public -/
+@[rust_loop_body]
+def motion.MotionWorkspace.new_loop3.body
+  (arc_count : Std.Usize) (work : motion.MotionWorkspace) (a : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if a < arc_count
+  then
+    let node ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.from a
+    let i ← node + 1#usize
+    let (i1, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.offsets i
+    let i2 ← i1 + 1#usize
+    let a1 ← a + 1#usize
+    let v := index_mut_back i2
+    ok (cont ({ work with offsets := v }, a1))
+  else ok (done work)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 3:
+    Source: 'src/motion.rs', lines 139:8-143:9
+    Visibility: public -/
+@[rust_loop]
+def motion.MotionWorkspace.new_loop3
+  (arc_count : Std.Usize) (work : motion.MotionWorkspace) (a : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (work1, a1) => motion.MotionWorkspace.new_loop3.body arc_count work1
+      a1)
+    (work, a)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 4:
+    Source: 'src/motion.rs', lines 145:8-150:9
+    Visibility: public -/
+@[rust_loop_body]
+def motion.MotionWorkspace.new_loop4.body
+  (nodes : Std.Usize) (work : motion.MotionWorkspace) (node : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if node < nodes
+  then
+    let count ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.offsets node
+    let i ← node + 1#usize
+    let (i1, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.offsets i
+    let i2 ← i1 + count
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parent node
+    let v := index_mut_back1 count
+    let v1 := index_mut_back i2
+    ok (cont ({ work with offsets := v1, parent := v }, i))
+  else ok (done work)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 4:
+    Source: 'src/motion.rs', lines 145:8-150:9
+    Visibility: public -/
+@[rust_loop]
+def motion.MotionWorkspace.new_loop4
+  (nodes : Std.Usize) (work : motion.MotionWorkspace) (node : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (work1, node1) => motion.MotionWorkspace.new_loop4.body nodes work1
+      node1)
+    (work, node)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop body 5:
+    Source: 'src/motion.rs', lines 152:8-158:9
+    Visibility: public -/
+@[rust_loop_body]
+def motion.MotionWorkspace.new_loop5.body
+  (arc_count : Std.Usize) (work : motion.MotionWorkspace) (a : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if a < arc_count
+  then
+    let node ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.from a
+    let slot ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parent node
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.arcs slot
+    let (i, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parent node
+    let i1 ← i + 1#usize
+    let a1 ← a + 1#usize
+    let v := index_mut_back1 i1
+    let v1 := index_mut_back a
+    ok (cont ({ work with arcs := v1, parent := v }, a1))
+  else ok (done work)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]: loop 5:
+    Source: 'src/motion.rs', lines 152:8-158:9
+    Visibility: public -/
+@[rust_loop]
+def motion.MotionWorkspace.new_loop5
+  (arc_count : Std.Usize) (work : motion.MotionWorkspace) (a : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (work1, a1) => motion.MotionWorkspace.new_loop5.body arc_count work1
+      a1)
+    (work, a)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::new]:
+    Source: 'src/motion.rs', lines 63:4-160:5
+    Visibility: public -/
+def motion.MotionWorkspace.new
+  (current : scene.Scene) :
+  Result (core.result.Result motion.MotionWorkspace topology.Error)
+  := do
+  let l ← scene.Scene.impl.layout current
+  let s ← scene.Layout.impl.cells l
+  let cells := Slice.len s
+  let c ← scene.Layout.impl.carrier l
+  let s1 ← topology.Carrier.impl.edges c
+  let edges := Slice.len s1
+  let r ← motion.network_sizes cells edges
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let (nodes, arc_count) := val
+    let offset_count ← nodes + 1#usize
+    let s2 ← scene.Scene.impl.routes current
+    let i := Slice.len s2
+    let o ← lift (Usize.checked_mul cells i)
+    let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      let r2 ← topology.check_storage val1 8#usize
+      let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+      match cf2 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let r3 ← topology.check_storage cells 16#usize
+        let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+        match cf3 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let i1 := Slice.len s2
+          let r4 ← topology.check_storage i1 32#usize
+          let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+          match cf4 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let i2 := Slice.len s2
+            let r5 ← topology.check_storage i2 32#usize
+            let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+            match cf5 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let s3 ← scene.Scene.impl.phases current
+              let i3 := Slice.len s3
+              let r6 ← topology.check_storage i3 4#usize
+              let cf6 ← core.result.Result.Insts.CoreOpsTry.branch r6
+              match cf6 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let s4 ← scene.Scene.impl.stamp current
+                let i4 := Slice.len s2
+                let v :=
+                  alloc.vec.Vec.with_capacity (Array Std.Usize 4#usize) i4
+                let i5 := Slice.len s3
+                let v1 ← alloc.vec.from_elem core.clone.CloneI32 0#i32 i5
+                let i6 := Slice.len s2
+                let v2 := alloc.vec.Vec.with_capacity scene.Route i6
+                let v3 := alloc.vec.Vec.with_capacity topology.Edge cells
+                let v4 := alloc.vec.Vec.with_capacity topology.Edge cells
+                let v5 ← alloc.vec.from_elem core.clone.CloneBool false edges
+                let v6 := alloc.vec.Vec.with_capacity Std.Usize arc_count
+                let v7 := alloc.vec.Vec.with_capacity Std.Usize arc_count
+                let v8 ←
+                  alloc.vec.from_elem core.clone.CloneUsize 0#usize
+                    offset_count
+                let v9 ←
+                  alloc.vec.from_elem core.clone.CloneUsize 0#usize arc_count
+                let v10 ←
+                  alloc.vec.from_elem core.clone.CloneU8 0#u8 arc_count
+                let v11 ←
+                  alloc.vec.from_elem core.clone.CloneUsize core.num.Usize.MAX
+                    nodes
+                let v12 ←
+                  alloc.vec.from_elem core.clone.CloneUsize 0#usize nodes
+                let v13 := alloc.vec.Vec.with_capacity Std.Usize cells
+                let v14 := alloc.vec.Vec.with_capacity Std.Usize cells
+                let (v15, v16) ←
+                  motion.MotionWorkspace.new_loop0 current cells v v2 0#usize
+                let source ← cells * 2#usize
+                let work ←
+                  motion.MotionWorkspace.new_loop1 cells
+                    {
+                      epoch := s4.epoch,
+                      cells,
+                      edges,
+                      endpoints := v15,
+                      steps := v1,
+                      routes := v16,
+                      routes_changed := false,
+                      remove := v3,
+                      add := v4,
+                      admissible := v5,
+                      «protected» := v5,
+                      locked := v5,
+                      «from» := v6,
+                      «to» := v7,
+                      offsets := v8,
+                      arcs := v9,
+                      residual := v10,
+                      parent := v11,
+                      queue := v12,
+                      first := v13,
+                      second := v14
+                    } source 0#usize
+                let work1 ←
+                  motion.MotionWorkspace.new_loop2 current edges work 0#usize
+                let work2 ←
+                  motion.MotionWorkspace.new_loop3 arc_count work1 0#usize
+                let work3 ←
+                  motion.MotionWorkspace.new_loop4 nodes work2 0#usize
+                let work4 ←
+                  motion.MotionWorkspace.new_loop5 arc_count work3 0#usize
+                ok (core.result.Result.Ok work4)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  motion.MotionWorkspace (core.convert.FromSame topology.Error)
+                  residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                motion.MotionWorkspace (core.convert.FromSame topology.Error)
+                residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              motion.MotionWorkspace (core.convert.FromSame topology.Error)
+              residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            motion.MotionWorkspace (core.convert.FromSame topology.Error)
+            residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          motion.MotionWorkspace (core.convert.FromSame topology.Error)
+          residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        motion.MotionWorkspace (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      motion.MotionWorkspace (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_route_endpoints]:
+    Source: 'src/motion.rs', lines 169:4-180:5 -/
+def motion.MotionWorkspace.check_route_endpoints
+  (cells : Slice Std.Usize) (ends : Array Std.Usize 4#usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := Slice.len cells
+  let last ← i - 1#usize
+  let i1 ← Array.index_usize ends 0#usize
+  let i2 ← Slice.index_usize cells 0#usize
+  if i1 != i2
+  then ok (core.result.Result.Err topology.Error.InvalidTransition)
+  else
+    let i3 ← Array.index_usize ends 1#usize
+    let i4 ← Slice.index_usize cells 1#usize
+    if i3 != i4
+    then ok (core.result.Result.Err topology.Error.InvalidTransition)
+    else
+      let i5 ← Array.index_usize ends 2#usize
+      let i6 ← last - 1#usize
+      let i7 ← Slice.index_usize cells i6
+      if i5 != i7
+      then ok (core.result.Result.Err topology.Error.InvalidTransition)
+      else
+        let i8 ← Array.index_usize ends 3#usize
+        let i9 ← Slice.index_usize cells last
+        if i8 != i9
+        then ok (core.result.Result.Err topology.Error.InvalidTransition)
+        else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop body 0:
+    Source: 'src/motion.rs', lines 196:8-203:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.check_scene_loop0.body
+  (i : Std.Usize) (i1 : Std.Usize) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (e : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error))
+    (core.result.Result Unit topology.Error))
+  := do
+  if e < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let l ← scene.Scene.impl.layout current
+      let c ← scene.Layout.impl.carrier l
+      let s ← topology.Carrier.impl.edges c
+      let edge ← Slice.index_usize s e
+      let i2 ← i * 4#usize
+      let i3 ← e * 4#usize
+      let a ← i2 + i3
+      let i4 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+          a
+      let i5 ← edge.u * 2#usize
+      let i6 ← i5 + 1#usize
+      let status1 ←
+        if i4 != i6
+        then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+        else
+          do
+          let i7 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v1 a
+          let i8 ← edge.v * 2#usize
+          if i7 != i8
+          then ok (core.result.Result.Err topology.Error.InvalidCarrier)
+          else ok status
+      let e1 ← e + 1#usize
+      ok (cont (e1, status1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop 0:
+    Source: 'src/motion.rs', lines 196:8-203:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.check_scene_loop0
+  (i : Std.Usize) (i1 : Std.Usize) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (e : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (e1, status1) => motion.MotionWorkspace.check_scene_loop0.body i i1 v
+      v1 current e1 status1)
+    (e, status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop body 1:
+    Source: 'src/motion.rs', lines 206:8-209:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.check_scene_loop1.body
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize))
+  (v1 : alloc.vec.Vec scene.Route) (current : scene.Scene)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i := alloc.vec.Vec.len v1
+  if r < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let s ← scene.Scene.impl.routes current
+      let r1 ← Slice.index_usize s r
+      let s1 := alloc.vec.Vec.deref r1.cells
+      let a ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Array
+          Std.Usize 4#usize)) v r
+      let status1 ← motion.MotionWorkspace.check_route_endpoints s1 a
+      let r2 ← r + 1#usize
+      ok (cont (status1, r2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]: loop 1:
+    Source: 'src/motion.rs', lines 206:8-209:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.check_scene_loop1
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize))
+  (v1 : alloc.vec.Vec scene.Route) (current : scene.Scene)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, r1) => motion.MotionWorkspace.check_scene_loop1.body v v1
+      current status1 r1)
+    (status, r)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::check_scene]:
+    Source: 'src/motion.rs', lines 182:4-211:5 -/
+def motion.MotionWorkspace.check_scene
+  (self : motion.MotionWorkspace) (current : scene.Scene) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let s ← scene.Scene.impl.stamp current
+  if self.epoch != s.epoch
+  then ok (core.result.Result.Err topology.Error.StaleEpoch)
+  else
+    let l ← scene.Scene.impl.layout current
+    let s1 ← scene.Layout.impl.cells l
+    let i := Slice.len s1
+    if self.cells != i
+    then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+    else
+      let c ← scene.Layout.impl.carrier l
+      let s2 ← topology.Carrier.impl.edges c
+      let i1 := Slice.len s2
+      if self.edges != i1
+      then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+      else
+        let i2 := alloc.vec.Vec.len self.steps
+        let s3 ← scene.Scene.impl.phases current
+        let i3 := Slice.len s3
+        if i2 != i3
+        then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+        else
+          let i4 := alloc.vec.Vec.len self.routes
+          let s4 ← scene.Scene.impl.routes current
+          let i5 := Slice.len s4
+          if i4 != i5
+          then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+          else
+            let status ←
+              motion.MotionWorkspace.check_scene_loop0 self.cells self.edges
+                self.from self.to current 0#usize (core.result.Result.Ok ())
+            let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+            match cf with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              motion.MotionWorkspace.check_scene_loop1 self.endpoints
+                self.routes current status 0#usize
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::has_edge]:
+    Source: 'src/spanning_tree.rs', lines 378:4-383:5
+    Visibility: public -/
+def spanning_tree.Tree.has_edge
+  (self : spanning_tree.Tree) (edge : topology.Edge) : Result Bool := do
+  let i := alloc.vec.Vec.len self.parents
+  if edge.u < i
+  then
+    let i1 := alloc.vec.Vec.len self.parents
+    if edge.v < i1
+    then
+      if edge.u != edge.v
+      then
+        let i2 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            self.parents edge.u
+        if i2 = edge.v
+        then ok true
+        else
+          let i3 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) self.parents edge.v
+          ok (i3 = edge.u)
+      else ok false
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::Stage> for labyrinth_core::shatter::Stage}::eq]:
+    Source: 'src/shatter.rs', lines 16:29-16:38
+    Visibility: public -/
+def shatter.Stage.Insts.CoreCmpPartialEqStage.eq
+  (self : shatter.Stage) (other : shatter.Stage) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | shatter.Stage.Idle => ok true
+    | shatter.Stage.Draining => ok true
+    | shatter.Stage.Parked => ok true
+    | shatter.Stage.Hidden => ok true
+    | shatter.Stage.Scattered __self_0 =>
+      match other with
+      | shatter.Stage.Idle => ok true
+      | shatter.Stage.Draining => ok true
+      | shatter.Stage.Parked => ok true
+      | shatter.Stage.Hidden => ok true
+      | shatter.Stage.Scattered __arg1_0 =>
+        lift (core.cmp.impls.PartialEqU64.eq __self_0 __arg1_0)
+      | shatter.Stage.Reforming _ => ok true
+    | shatter.Stage.Reforming __self_0 =>
+      match other with
+      | shatter.Stage.Idle => ok true
+      | shatter.Stage.Draining => ok true
+      | shatter.Stage.Parked => ok true
+      | shatter.Stage.Hidden => ok true
+      | shatter.Stage.Scattered _ => ok true
+      | shatter.Stage.Reforming __arg1_0 =>
+        lift (core.cmp.impls.PartialEqU64.eq __self_0 __arg1_0)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::Stage> for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:29-16:38 -/
+@[reducible]
+impl_def shatter.Stage.Insts.CoreCmpPartialEqStage : core.cmp.PartialEq
+  shatter.Stage shatter.Stage := {
+  eq := shatter.Stage.Insts.CoreCmpPartialEqStage.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    shatter.Stage.Insts.CoreCmpPartialEqStage
+}
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Holds}::new]:
+    Source: 'src/walker.rs', lines 105:4-110:5 -/
+def walker.Holds.new : Result walker.Holds := do
+  let a := Array.repeat 4#usize 0#usize
+  ok { ids := a, count := 0#usize }
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Holds}::insert]: loop body 0:
+    Source: 'src/walker.rs', lines 114:8-116:9 -/
+@[rust_loop_body]
+def walker.Holds.insert_loop.body
+  (self : walker.Holds) (id : Std.Usize) (slot : Std.Usize) :
+  Result (ControlFlow Std.Usize ((Array Std.Usize 4#usize) × Std.Usize ×
+    Std.Usize))
+  := do
+  if slot < self.count
+  then
+    let i ← Array.index_usize self.ids slot
+    if i != id
+    then let slot1 ← slot + 1#usize
+         ok (cont slot1)
+    else ok (done (self.ids, self.count, slot))
+  else ok (done (self.ids, self.count, slot))
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Holds}::insert]: loop 0:
+    Source: 'src/walker.rs', lines 114:8-116:9 -/
+@[rust_loop]
+def walker.Holds.insert_loop
+  (self : walker.Holds) (id : Std.Usize) (slot : Std.Usize) :
+  Result ((Array Std.Usize 4#usize) × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun slot1 => walker.Holds.insert_loop.body self id slot1)
+    slot
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Holds}::insert]:
+    Source: 'src/walker.rs', lines 112:4-125:5 -/
+def walker.Holds.insert
+  (self : walker.Holds) (id : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × walker.Holds)
+  := do
+  let (a, i, slot) ← walker.Holds.insert_loop self id 0#usize
+  if slot = i
+  then
+    let s ← lift (Array.to_slice a)
+    let i1 := Slice.len s
+    if i = i1
+    then
+      ok (core.result.Result.Err topology.Error.InsufficientWorkspace,
+        { ids := a, count := i })
+    else
+      let a1 ← Array.update a slot id
+      let i2 ← i + 1#usize
+      ok (core.result.Result.Ok (), { ids := a1, count := i2 })
+  else ok (core.result.Result.Ok (), { ids := a, count := i })
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::circle_of]:
+    Source: 'src/scene.rs', lines 573:4-579:5 -/
+def scene.Layout.circle_of
+  (self : scene.Layout) (cell : Std.Usize) : Result (Option Std.Usize) := do
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+      self.cells cell
+  match c with
+  | scene.Cell.Grid _ _ _ => ok none
+  | scene.Cell.Center circle => ok (some circle)
+  | scene.Cell.Sector circle _ _ => ok (some circle)
+  | scene.Cell.Transition portal =>
+    let p ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Portal)
+        self.portals portal
+    ok (some p.spec.circle)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::mode]:
+    Source: 'src/polar.rs', lines 407:4-409:5
+    Visibility: public -/
+def polar.Circle.mode (self : polar.Circle) : Result polar.MotionMode := do
+  ok self.spec.mode
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::ring_count]:
+    Source: 'src/polar.rs', lines 404:4-406:5
+    Visibility: public -/
+def polar.Circle.ring_count (self : polar.Circle) : Result Std.Usize := do
+  ok (alloc.vec.Vec.len self.spec.sectors)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 0:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop_body]
+def scene.Layout.holds_loop0.body
+  (c : polar.Circle) (result : walker.Holds)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow (walker.Holds × (core.result.Result Unit topology.Error)
+    × Std.Usize) ((core.result.Result Unit topology.Error) × walker.Holds))
+  := do
+  if ring <= 0#usize
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let id ← c.transform_start + ring
+      let (status1, result1) ← walker.Holds.insert result id
+      let ring1 ← ring + 1#usize
+      ok (cont (result1, status1, ring1))
+    else ok (done (status, result))
+  else ok (done (status, result))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 0:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop]
+def scene.Layout.holds_loop0
+  (result : walker.Holds) (c : polar.Circle)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × walker.Holds)
+  := do
+  loop
+    (fun (result1, status1, ring1) => scene.Layout.holds_loop0.body c result1
+      status1 ring1)
+    (result, status, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 1:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop_body]
+def scene.Layout.holds_loop1.body
+  (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow (walker.Holds × (core.result.Result Unit topology.Error)
+    × Std.Usize) ((core.result.Result Unit topology.Error) × walker.Holds))
+  := do
+  if ring <= last
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let id ← c.transform_start + ring
+      let (status1, result1) ← walker.Holds.insert result id
+      let ring1 ← ring + 1#usize
+      ok (cont (result1, status1, ring1))
+    else ok (done (status, result))
+  else ok (done (status, result))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 1:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop]
+def scene.Layout.holds_loop1
+  (result : walker.Holds) (c : polar.Circle) (last : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × walker.Holds)
+  := do
+  loop
+    (fun (result1, status1, ring1) => scene.Layout.holds_loop1.body c last
+      result1 status1 ring1)
+    (result, status, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop body 2:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop_body]
+def scene.Layout.holds_loop2.body
+  (c : polar.Circle) (last : Std.Usize) (result : walker.Holds)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow (walker.Holds × (core.result.Result Unit topology.Error)
+    × Std.Usize) ((core.result.Result Unit topology.Error) × walker.Holds))
+  := do
+  if ring <= last
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let id ← c.transform_start + ring
+      let (status1, result1) ← walker.Holds.insert result id
+      let ring1 ← ring + 1#usize
+      ok (cont (result1, status1, ring1))
+    else ok (done (status, result))
+  else ok (done (status, result))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]: loop 2:
+    Source: 'src/scene.rs', lines 699:8-703:9 -/
+@[rust_loop]
+def scene.Layout.holds_loop2
+  (result : walker.Holds) (c : polar.Circle) (last : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × walker.Holds)
+  := do
+  loop
+    (fun (result1, status1, ring1) => scene.Layout.holds_loop2.body c last
+      result1 status1 ring1)
+    (result, status, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::holds]:
+    Source: 'src/scene.rs', lines 678:4-705:5 -/
+def scene.Layout.holds
+  (self : scene.Layout) (cell : Std.Usize) (result : walker.Holds) :
+  Result ((core.result.Result Unit topology.Error) × walker.Holds)
+  := do
+  let o ← scene.Layout.circle_of self cell
+  match o with
+  | none => ok (core.result.Result.Ok (), result)
+  | some circle =>
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles circle
+    let c1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+        self.cells cell
+    match c1 with
+    | scene.Cell.Grid _ _ _ => ok (core.result.Result.Ok (), result)
+    | scene.Cell.Center _ =>
+      let mm ← polar.Circle.mode c
+      match mm with
+      | polar.MotionMode.Spinning => ok (core.result.Result.Ok (), result)
+      | polar.MotionMode.Twisting _ _ =>
+        scene.Layout.holds_loop0 result c (core.result.Result.Ok ()) 0#usize
+    | scene.Cell.Sector _ ring _ =>
+      let mm ← polar.Circle.mode c
+      let (first, last) ←
+        match mm with
+        | polar.MotionMode.Spinning => ok (ring, ring)
+        | polar.MotionMode.Twisting _ _ =>
+          do
+          let i ← lift (core.num.Usize.saturating_sub ring 1#usize)
+          let i1 ← ring + 1#usize
+          let i2 ← polar.Circle.ring_count c
+          let i3 ← i2 - 1#usize
+          let i4 ← lift (core.cmp.impls.OrdUsize.min i1 i3)
+          ok (i, i4)
+      scene.Layout.holds_loop1 result c last (core.result.Result.Ok ()) first
+    | scene.Cell.Transition _ =>
+      let i ← polar.Circle.ring_count c
+      let first ← i - 1#usize
+      let last ← i - 1#usize
+      scene.Layout.holds_loop2 result c last (core.result.Result.Ok ()) first
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]: loop body 0:
+    Source: 'src/scene.rs', lines 1450:8-1453:9 -/
+@[rust_loop_body]
+def scene.Scene.check_patch_motion_loop.body
+  (steps : Slice Std.I32) (dependencies : walker.Holds) (occupied : Bool)
+  (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < dependencies.count
+  then
+    if occupied
+    then ok (done occupied)
+    else
+      let i ← Array.index_usize dependencies.ids j
+      let i1 ← Slice.index_usize steps i
+      let j1 ← j + 1#usize
+      ok (cont (i1 != 0#i32, j1))
+  else ok (done occupied)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]: loop 0:
+    Source: 'src/scene.rs', lines 1450:8-1453:9 -/
+@[rust_loop]
+def scene.Scene.check_patch_motion_loop
+  (steps : Slice Std.I32) (dependencies : walker.Holds) (occupied : Bool)
+  (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (occupied1, j1) => scene.Scene.check_patch_motion_loop.body steps
+      dependencies occupied1 j1)
+    (occupied, j)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_patch_motion]:
+    Source: 'src/scene.rs', lines 1445:4-1459:5 -/
+def scene.Scene.check_patch_motion
+  (self : scene.Scene) (cell : Std.Usize) (steps : Slice Std.I32) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let dependencies ← walker.Holds.new
+  let (r, dependencies1) ← scene.Layout.holds self.layout cell dependencies
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let occupied ←
+      scene.Scene.check_patch_motion_loop steps dependencies1 false 0#usize
+    if occupied
+    then ok (core.result.Result.Err topology.Error.Occupied)
+    else ok (core.result.Result.Ok ())
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_stamp]:
+    Source: 'src/scene.rs', lines 1213:4-1221:5 -/
+def scene.Scene.check_stamp
+  (self : scene.Scene) (stamp : walker.Stamp) :
+  Result (core.result.Result Std.U64 topology.Error)
+  := do
+  if stamp.epoch != self.stamp.epoch
+  then ok (core.result.Result.Err topology.Error.StaleEpoch)
+  else
+    if stamp.revision != self.stamp.revision
+    then ok (core.result.Result.Err topology.Error.StaleRevision)
+    else
+      let o ← lift (U64.checked_add self.stamp.revision 1#u64)
+      core.option.Option.ok_or o topology.Error.Overflow
+
+/-- [labyrinth_core::polar::TURN]
+    Source: 'src/polar.rs', lines 10:0-10:27
+    Visibility: public -/
+@[global_simps, irreducible] def polar.TURN : Std.I32 := 4096#i32
+
+/-- [labyrinth_core::polar::normalize]:
+    Source: 'src/polar.rs', lines 47:0-49:1
+    Visibility: public -/
+def polar.normalize (angle : Std.I32) : Result Std.I32 := do
+  core.num.I32.rem_euclid angle polar.TURN
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 0:
+    Source: 'src/scene.rs', lines 1911:8-1920:9 -/
+@[rust_loop_body]
+def scene.Scene.prepare_motion_loop0.body
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.Usize)
+  (steps : Slice Std.I32) (v2 : alloc.vec.Vec Std.I32)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.I32) × (core.result.Result Unit
+    topology.Error) × Std.Usize) ((alloc.vec.Vec Std.I32) ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let i1 := Slice.len steps
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← Slice.index_usize steps i
+      let (v3, status1) ←
+        if i2 < 0#i32
+        then ok (v2, core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          do
+          let i3 ← polar.TURN / 8#i32
+          if i2 > i3
+          then ok (v2, core.result.Result.Err topology.Error.InvalidGeometry)
+          else
+            if i2 != 0#i32
+            then
+              let i4 ←
+                alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                  Std.Usize) v1 i
+              if i4 != 0#usize
+              then ok (v2, core.result.Result.Err topology.Error.Occupied)
+              else
+                let i5 ←
+                  alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                    Std.I32) v i
+                let i6 ← i5 + i2
+                let i7 ← polar.normalize i6
+                let (_, index_mut_back) ←
+                  alloc.vec.Vec.index_mut
+                    (core.slice.index.SliceIndexUsizeSlice Std.I32) v2 i
+                let v4 := index_mut_back i7
+                ok (v4, status)
+            else
+              let i4 ←
+                alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                  Std.I32) v i
+              let i5 ← i4 + i2
+              let i6 ← polar.normalize i5
+              let (_, index_mut_back) ←
+                alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                  Std.I32) v2 i
+              let v4 := index_mut_back i6
+              ok (v4, status)
+      let i3 ← i + 1#usize
+      ok (cont (v3, status1, i3))
+    else ok (done (v2, status))
+  else ok (done (v2, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 0:
+    Source: 'src/scene.rs', lines 1911:8-1920:9 -/
+@[rust_loop]
+def scene.Scene.prepare_motion_loop0
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec Std.Usize) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result ((alloc.vec.Vec Std.I32) × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (v3, status1, i1) => scene.Scene.prepare_motion_loop0.body v v2 steps
+      v3 status1 i1)
+    (v1, status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 2:
+    Source: 'src/scene.rs', lines 1927:16-1932:17 -/
+@[rust_loop_body]
+def scene.Scene.prepare_motion_loop1_loop0.body
+  (steps : Slice Std.I32) (c : polar.Circle)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i ← polar.Circle.ring_count c
+  if ring < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i1 ← c.transform_start + ring
+      let i2 ← Slice.index_usize steps i1
+      let i3 ← Slice.index_usize steps c.transform_start
+      let status1 ←
+        if i2 != i3
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok status
+      let ring1 ← ring + 1#usize
+      ok (cont (status1, ring1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 2:
+    Source: 'src/scene.rs', lines 1927:16-1932:17 -/
+@[rust_loop]
+def scene.Scene.prepare_motion_loop1_loop0
+  (steps : Slice Std.I32) (status : core.result.Result Unit topology.Error)
+  (c : polar.Circle) (ring : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, ring1) => scene.Scene.prepare_motion_loop1_loop0.body steps
+      c status1 ring1)
+    (status, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 1:
+    Source: 'src/scene.rs', lines 1923:8-1935:9 -/
+@[rust_loop_body]
+def scene.Scene.prepare_motion_loop1.body
+  (l : scene.Layout) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (ci : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (grid.Grid × (alloc.vec.Vec scene.Cell) × (alloc.vec.Vec polar.Circle) ×
+    (alloc.vec.Vec scene.Portal) × (alloc.vec.Vec Std.I32) × grid.Geometry ×
+    topology.Carrier × Std.Usize × (core.result.Result Unit topology.Error)))
+  := do
+  let i := alloc.vec.Vec.len l.circles
+  if ci < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let c ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Circle) l.circles ci
+      let mm ← polar.Circle.mode c
+      match mm with
+      | polar.MotionMode.Spinning =>
+        let ci1 ← ci + 1#usize
+        ok (cont (status, ci1))
+      | polar.MotionMode.Twisting _ _ =>
+        let status1 ←
+          scene.Scene.prepare_motion_loop1_loop0 steps status c 1#usize
+        let ci1 ← ci + 1#usize
+        ok (cont (status1, ci1))
+    else
+      ok (done (l.cell_grid, l.cells, l.circles, l.portals, l.bands,
+        l.geometry, l.carrier, l.transforms, status))
+  else
+    ok (done (l.cell_grid, l.cells, l.circles, l.portals, l.bands, l.geometry,
+      l.carrier, l.transforms, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 1:
+    Source: 'src/scene.rs', lines 1923:8-1935:9 -/
+@[rust_loop]
+def scene.Scene.prepare_motion_loop1
+  (l : scene.Layout) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (ci : Std.Usize) :
+  Result (grid.Grid × (alloc.vec.Vec scene.Cell) × (alloc.vec.Vec
+    polar.Circle) × (alloc.vec.Vec scene.Portal) × (alloc.vec.Vec Std.I32) ×
+    grid.Geometry × topology.Carrier × Std.Usize × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (status1, ci1) => scene.Scene.prepare_motion_loop1.body l steps
+      status1 ci1)
+    (status, ci)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 4:
+    Source: 'src/scene.rs', lines 1941:16-1946:17 -/
+@[rust_loop_body]
+def scene.Scene.prepare_motion_loop2_loop0.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v4 : alloc.vec.Vec scene.Route) (v5 : alloc.vec.Vec topology.Edge)
+  (v6 : alloc.vec.Vec Std.I32) (v7 : alloc.vec.Vec Std.I32)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec walker.Walker)
+  (v10 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i1 : Std.U64)
+  (i2 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i3 : Std.U64)
+  (o : Option Std.U64) (i4 : Std.U64) (steps : Slice Std.I32) (p : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (cell : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i5 := alloc.vec.Vec.len v
+  if cell < i5
+  then
+    let b3 ← core.result.Result.is_ok status
+    if b3
+    then
+      let p1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          shatter.Patch) v10 p
+      let b4 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+          p1.cells cell
+      let status1 ←
+        if b4
+        then
+          scene.Scene.check_patch_motion
+            {
+              layout :=
+                {
+                  cell_grid := g,
+                  cells := v,
+                  circles := v1,
+                  portals := v2,
+                  bands := v3,
+                  geometry := g1,
+                  carrier := c,
+                  transforms := i
+                },
+              tree := t,
+              work := w,
+              routes := v4,
+              required := v5,
+              phases := v6,
+              next_phases := v7,
+              holds := v8,
+              walkers := v9,
+              patches := v10,
+              stamp := s,
+              clock := i1,
+              wall := i2,
+              reanchor := b,
+              suspended := b1,
+              inactive := b2,
+              latest_request := i3,
+              pending := o,
+              trail_revision := i4
+            } cell steps
+        else ok status
+      let cell1 ← cell + 1#usize
+      ok (cont (status1, cell1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 4:
+    Source: 'src/scene.rs', lines 1941:16-1946:17 -/
+@[rust_loop]
+def scene.Scene.prepare_motion_loop2_loop0
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v4 : alloc.vec.Vec scene.Route) (v5 : alloc.vec.Vec topology.Edge)
+  (v6 : alloc.vec.Vec Std.I32) (v7 : alloc.vec.Vec Std.I32)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec walker.Walker)
+  (v10 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i1 : Std.U64)
+  (i2 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i3 : Std.U64)
+  (o : Option Std.U64) (i4 : Std.U64) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (p : Std.Usize)
+  (cell : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, cell1) => scene.Scene.prepare_motion_loop2_loop0.body g v v1
+      v2 v3 g1 c i t w v4 v5 v6 v7 v8 v9 v10 s i1 i2 b b1 b2 i3 o i4 steps p
+      status1 cell1)
+    (status, cell)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop body 3:
+    Source: 'src/scene.rs', lines 1938:8-1949:9 -/
+@[rust_loop_body]
+def scene.Scene.prepare_motion_loop2.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v4 : alloc.vec.Vec scene.Route) (v5 : alloc.vec.Vec topology.Edge)
+  (v6 : alloc.vec.Vec Std.I32) (v7 : alloc.vec.Vec Std.I32)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec walker.Walker)
+  (v10 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i1 : Std.U64)
+  (i2 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i3 : Std.U64)
+  (o : Option Std.U64) (i4 : Std.U64) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (p : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i5 := alloc.vec.Vec.len v10
+  if p < i5
+  then
+    let b3 ← core.result.Result.is_ok status
+    if b3
+    then
+      let p1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          shatter.Patch) v10 p
+      let b4 ←
+        core.cmp.PartialEq.ne.trait_default
+          shatter.Stage.Insts.CoreCmpPartialEqStage p1.stage shatter.Stage.Idle
+      if b4
+      then
+        let status1 ←
+          scene.Scene.prepare_motion_loop2_loop0 g v v1 v2 v3 g1 c i t w v4 v5
+            v6 v7 v8 v9 v10 s i1 i2 b b1 b2 i3 o i4 steps status p 0#usize
+        let p2 ← p + 1#usize
+        ok (cont (status1, p2))
+      else let p2 ← p + 1#usize
+           ok (cont (status, p2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]: loop 3:
+    Source: 'src/scene.rs', lines 1938:8-1949:9 -/
+@[rust_loop]
+def scene.Scene.prepare_motion_loop2
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v4 : alloc.vec.Vec scene.Route) (v5 : alloc.vec.Vec topology.Edge)
+  (v6 : alloc.vec.Vec Std.I32) (v7 : alloc.vec.Vec Std.I32)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec walker.Walker)
+  (v10 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i1 : Std.U64)
+  (i2 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i3 : Std.U64)
+  (o : Option Std.U64) (i4 : Std.U64) (steps : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (p : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, p1) => scene.Scene.prepare_motion_loop2.body g v v1 v2 v3 g1
+      c i t w v4 v5 v6 v7 v8 v9 v10 s i1 i2 b b1 b2 i3 o i4 steps status1 p1)
+    (status, p)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::prepare_motion]:
+    Source: 'src/scene.rs', lines 1901:4-1952:5 -/
+def scene.Scene.prepare_motion
+  (self : scene.Scene) (stamp : walker.Stamp) (steps : Slice Std.I32) :
+  Result ((core.result.Result Std.U64 topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    if self.suspended
+    then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+    else
+      if self.inactive
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        let b := core.option.Option.is_some self.pending
+        if b
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          let i := Slice.len steps
+          let i1 := alloc.vec.Vec.len self.phases
+          if i != i1
+          then ok (core.result.Result.Err topology.Error.InvalidSize, self)
+          else
+            let (v, status) ←
+              scene.Scene.prepare_motion_loop0 self.phases self.next_phases
+                self.holds steps (core.result.Result.Ok ()) 0#usize
+            let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+            match cf1 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let (g, v1, v2, v3, v4, g1, c, i2, status1) ←
+                scene.Scene.prepare_motion_loop1 self.layout steps status
+                  0#usize
+              let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status1
+              match cf2 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let status2 ←
+                  scene.Scene.prepare_motion_loop2 g v1 v2 v3 v4 g1 c i2
+                    self.tree self.work self.routes self.required self.phases v
+                    self.holds self.walkers self.patches self.stamp self.clock
+                    self.wall self.reanchor self.suspended self.inactive
+                    self.latest_request self.pending self.trail_revision steps
+                    status1 0#usize
+                let cf3 ← core.result.Result.Insts.CoreOpsTry.branch status2
+                match cf3 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  ok (core.result.Result.Ok val,
+                    {
+                      self
+                        with
+                        layout :=
+                          {
+                            cell_grid := g,
+                            cells := v1,
+                            circles := v2,
+                            portals := v3,
+                            bands := v4,
+                            geometry := g1,
+                            carrier := c,
+                            transforms := i2
+                          },
+                        next_phases := v
+                    })
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r1 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      Std.U64 (core.convert.FromSame topology.Error) residual
+                  ok (r1,
+                    {
+                      self
+                        with
+                        layout :=
+                          {
+                            cell_grid := g,
+                            cells := v1,
+                            circles := v2,
+                            portals := v3,
+                            bands := v4,
+                            geometry := g1,
+                            carrier := c,
+                            transforms := i2
+                          },
+                        next_phases := v
+                    })
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r1 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    Std.U64 (core.convert.FromSame topology.Error) residual
+                ok (r1,
+                  {
+                    self
+                      with
+                      layout :=
+                        {
+                          cell_grid := g,
+                          cells := v1,
+                          circles := v2,
+                          portals := v3,
+                          bands := v4,
+                          geometry := g1,
+                          carrier := c,
+                          transforms := i2
+                        },
+                      next_phases := v
+                  })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r1 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  Std.U64 (core.convert.FromSame topology.Error) residual
+              ok (r1, { self with next_phases := v })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Std.U64 (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::len]:
+    Source: 'src/topology.rs', lines 262:4-264:5
+    Visibility: public -/
+def topology.Carrier.len (self : topology.Carrier) : Result Std.Usize := do
+  let i := alloc.vec.Vec.len self.offsets
+  i - 1#usize
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::neighbors]:
+    Source: 'src/topology.rs', lines 271:4-276:5
+    Visibility: public -/
+def topology.Carrier.impl.neighbors
+  (self : topology.Carrier) (cell : Std.Usize) : Result (Slice Std.Usize) := do
+  let i ← topology.Carrier.len self
+  if cell >= i
+  then ok (Array.to_slice (Std.Array.empty Std.Usize))
+  else
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.offsets cell
+    let i2 ← cell + 1#usize
+    let i3 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.offsets i2
+    alloc.vec.Vec.index (core.slice.index.SliceIndexRangeUsizeSlice Std.Usize)
+      self.neighbors { start := i1, «end» := i3 }
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop body 0:
+    Source: 'src/topology.rs', lines 284:8-286:9
+    Visibility: public -/
+@[rust_loop_body]
+def topology.Carrier.contains_edge_loop.body
+  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i2 := Slice.len row
+  if i1 < i2
+  then
+    let i3 ← Slice.index_usize row i1
+    if i3 != i
+    then let i4 ← i1 + 1#usize
+         ok (cont i4)
+    else ok (done i1)
+  else ok (done i1)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop 0:
+    Source: 'src/topology.rs', lines 284:8-286:9
+    Visibility: public -/
+@[rust_loop]
+def topology.Carrier.contains_edge_loop
+  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun i2 => topology.Carrier.contains_edge_loop.body i row i2)
+    i1
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]:
+    Source: 'src/topology.rs', lines 278:4-288:5
+    Visibility: public -/
+def topology.Carrier.contains_edge
+  (self : topology.Carrier) (edge : topology.Edge) : Result Bool := do
+  let i ← topology.Carrier.len self
+  if edge.u >= i
+  then ok false
+  else
+    if edge.v >= i
+    then ok false
+    else
+      if edge.u = edge.v
+      then ok false
+      else
+        let row ← topology.Carrier.impl.neighbors self edge.u
+        let i1 ← topology.Carrier.contains_edge_loop edge.v row 0#usize
+        let i2 := Slice.len row
+        ok (i1 < i2)
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Edge}::new]:
+    Source: 'src/topology.rs', lines 56:4-62:5
+    Visibility: public -/
+def topology.Edge.new
+  (u : Std.Usize) (v : Std.Usize) : Result topology.Edge := do
+  if u <= v
+  then ok { u, v }
+  else ok { u := v, v := u }
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 591:8-594:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.check_carrier_loop.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (cell : Std.Usize) (valid : Bool) :
+  Result (ControlFlow (Std.Usize × Bool) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if cell < i1
+  then
+    if valid
+    then
+      let valid1 ←
+        if cell = i
+        then ok true
+        else
+          do
+          let i2 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v cell
+          let e ← topology.Edge.new cell i2
+          topology.Carrier.contains_edge carrier e
+      let cell1 ← cell + 1#usize
+      ok (cont (cell1, valid1))
+    else ok (done valid)
+  else ok (done valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 591:8-594:9 -/
+@[rust_loop]
+def spanning_tree.Tree.check_carrier_loop
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (cell : Std.Usize) (valid : Bool) :
+  Result Bool
+  := do
+  loop
+    (fun (cell1, valid1) => spanning_tree.Tree.check_carrier_loop.body v i
+      carrier cell1 valid1)
+    (cell, valid)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]:
+    Source: 'src/spanning_tree.rs', lines 582:4-600:5 -/
+def spanning_tree.Tree.check_carrier
+  (self : spanning_tree.Tree) (carrier : topology.Carrier) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.parents
+  let i1 ← topology.Carrier.len carrier
+  if i != i1
+  then ok (core.result.Result.Err topology.Error.InvalidTree)
+  else
+    let i2 := alloc.vec.Vec.len self.parents
+    if self.root >= i2
+    then ok (core.result.Result.Err topology.Error.InvalidTree)
+    else
+      let i3 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.parents self.root
+      if i3 != self.root
+      then ok (core.result.Result.Err topology.Error.InvalidTree)
+      else
+        let valid ←
+          spanning_tree.Tree.check_carrier_loop self.parents self.root carrier
+            0#usize true
+        if valid
+        then ok (core.result.Result.Ok ())
+        else ok (core.result.Result.Err topology.Error.InvalidTree)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::parent]:
-    Source: 'src/spanning_tree.rs', lines 72:4-79:5 -/
+    Source: 'src/spanning_tree.rs', lines 79:4-86:5 -/
 def spanning_tree.Workspace.parent
   (self : spanning_tree.Workspace) (published : Slice Std.Usize)
   (cell : Std.Usize) :
@@ -288,8 +2944,62 @@ def spanning_tree.Workspace.parent
     alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
       self.parents slot
 
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 566:8-574:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.virtual_root_loop.body
+  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
+  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
+  Result (ControlFlow (Std.Usize × Std.Usize × Bool) (Std.Usize × Bool))
+  := do
+  let i := alloc.vec.Vec.len self.parents
+  if steps < i
+  then
+    let i1 := alloc.vec.Vec.len self.parents
+    if cell < i1
+    then
+      if found
+      then ok (done (cell, found))
+      else
+        let s := alloc.vec.Vec.deref self.parents
+        let parent ← spanning_tree.Workspace.parent work s cell
+        let (cell1, found1) ←
+          if parent = cell
+          then ok (cell, true)
+          else ok (parent, found)
+        let steps1 ← steps + 1#usize
+        ok (cont (cell1, steps1, found1))
+    else ok (done (cell, found))
+  else ok (done (cell, found))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 566:8-574:9 -/
+@[rust_loop]
+def spanning_tree.Tree.virtual_root_loop
+  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
+  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
+  Result (Std.Usize × Bool)
+  := do
+  loop
+    (fun (cell1, steps1, found1) => spanning_tree.Tree.virtual_root_loop.body
+      self work cell1 steps1 found1)
+    (cell, steps, found)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]:
+    Source: 'src/spanning_tree.rs', lines 562:4-580:5 -/
+def spanning_tree.Tree.virtual_root
+  (self : spanning_tree.Tree) (start : Std.Usize)
+  (work : spanning_tree.Workspace) :
+  Result (core.result.Result Std.Usize topology.Error)
+  := do
+  let (cell, found) ←
+    spanning_tree.Tree.virtual_root_loop self work start 0#usize false
+  if found
+  then ok (core.result.Result.Ok cell)
+  else ok (core.result.Result.Err topology.Error.InvalidTree)
+
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::set_parent]:
-    Source: 'src/spanning_tree.rs', lines 81:4-90:5 -/
+    Source: 'src/spanning_tree.rs', lines 88:4-97:5 -/
 def spanning_tree.Workspace.set_parent
   (self : spanning_tree.Workspace) (cell : Std.Usize) (parent : Std.Usize) :
   Result spanning_tree.Workspace
@@ -323,515 +3033,7914 @@ def spanning_tree.Workspace.set_parent
         parents := v2, edit_slots := v, edit_nodes := v1, edit_count := i
     }
 
-/-- [labyrinth_core::spanning_tree::enter]:
-    Source: 'src/spanning_tree.rs', lines 93:0-108:1 -/
-def spanning_tree.enter
-  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
-  (cell : Std.Usize) (rng : R) :
-  Result ((core.result.Result spanning_tree.Frame topology.Error) × R)
-  := do
-  let i ← cell + 1#usize
-  let i1 ← Slice.index_usize offsets i
-  let i2 ← Slice.index_usize offsets cell
-  let degree ← i1 - i2
-  if degree > 0#usize
-  then
-    let (choice, rng1) ← treeRngInst.next_below rng degree
-    if choice >= degree
-    then ok (core.result.Result.Err topology.Error.InvalidChoice, rng1)
-    else
-      let next ← i2 + choice
-      ok (core.result.Result.Ok { cell, next, remaining := degree }, rng1)
-  else
-    ok (core.result.Result.Ok { cell, next := i2, remaining := degree }, rng)
-
-/-- [labyrinth_core::spanning_tree::depth_first]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 120:4-125:5 -/
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 543:8-547:9 -/
 @[rust_loop_body]
-def spanning_tree.depth_first_loop0.body
-  (root : Std.Usize) (n : Std.Usize) (work : spanning_tree.Workspace)
-  (i : Std.Usize) :
+def spanning_tree.Tree.attach_virtual_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (n : Std.Usize) (component_root : Std.Usize)
+  (work : spanning_tree.Workspace) (cell : Std.Usize) (count : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize × Std.Usize)
+    (spanning_tree.Workspace × Std.Usize × Std.Usize))
+  := do
+  if cell < n
+  then
+    if count < n
+    then
+      if cell != component_root
+      then
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.Usize) work.path count
+        let count1 ← count + 1#usize
+        let v1 := index_mut_back cell
+        let s := alloc.vec.Vec.deref v
+        let cell1 ←
+          spanning_tree.Workspace.parent { work with path := v1 } s cell
+        ok (cont ({ work with path := v1 }, cell1, count1))
+      else ok (done (work, cell, count))
+    else ok (done (work, cell, count))
+  else ok (done (work, cell, count))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 543:8-547:9 -/
+@[rust_loop]
+def spanning_tree.Tree.attach_virtual_loop0
+  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
+  (n : Std.Usize) (component_root : Std.Usize) (cell : Std.Usize)
+  (count : Std.Usize) :
+  Result (spanning_tree.Workspace × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun (work1, cell1, count1) => spanning_tree.Tree.attach_virtual_loop0.body
+      v n component_root work1 cell1 count1)
+    (work, cell, count)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 554:8-557:9 -/
+@[rust_loop_body]
+def spanning_tree.Tree.attach_virtual_loop1.body
+  (count : Std.Usize) (work : spanning_tree.Workspace) (j : Std.Usize) :
   Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
     spanning_tree.Workspace)
   := do
-  if i < n
+  if j < count
   then
-    let (_, index_mut_back) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
-        work.seen i
-    let (_, index_mut_back1) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.parents i
-    let (_, index_mut_back2) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.incoming i
-    let i1 ← i + 1#usize
-    let v := index_mut_back2 0#usize
-    let v1 := index_mut_back1 root
-    let v2 := index_mut_back false
-    ok (cont ({ work with seen := v2, parents := v1, incoming := v }, i1))
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.path j
+    let i1 ← j - 1#usize
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.path i1
+    let work1 ← spanning_tree.Workspace.set_parent work i i2
+    let j1 ← j + 1#usize
+    ok (cont (work1, j1))
   else ok (done work)
 
-/-- [labyrinth_core::spanning_tree::depth_first]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 120:4-125:5 -/
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 554:8-557:9 -/
 @[rust_loop]
-def spanning_tree.depth_first_loop0
-  (root : Std.Usize) (work : spanning_tree.Workspace) (n : Std.Usize)
-  (i : Std.Usize) :
+def spanning_tree.Tree.attach_virtual_loop1
+  (work : spanning_tree.Workspace) (count : Std.Usize) (j : Std.Usize) :
   Result spanning_tree.Workspace
   := do
   loop
-    (fun (work1, i1) => spanning_tree.depth_first_loop0.body root n work1 i1)
-    (work, i)
+    (fun (work1, j1) => spanning_tree.Tree.attach_virtual_loop1.body count
+      work1 j1)
+    (work, j)
 
-/-- [labyrinth_core::spanning_tree::depth_first]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 131:4-158:5 -/
-@[rust_loop_body]
-def spanning_tree.depth_first_loop1.body
-  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
-  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
-  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
-  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (ControlFlow (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
-    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × Std.Usize × Std.Usize × (core.result.Result Unit
-    topology.Error)) (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
-    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × Std.Usize × (core.result.Result Unit topology.Error)))
-  := do
-  if depth > 0#usize
-  then
-    let b ← core.result.Result.is_ok status
-    if b
-    then
-      let i ← depth - 1#usize
-      let frame ←
-        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
-          spanning_tree.Frame) v1 i
-      if frame.remaining = 0#usize
-      then ok (cont (rng, v, v1, v2, v3, reached, i, status))
-      else
-        let neighbor ← Slice.index_usize neighbors frame.next
-        let next ← frame.next + 1#usize
-        let i1 ← frame.cell + 1#usize
-        let i2 ← Slice.index_usize offsets i1
-        let next1 ←
-          if next = i2
-          then Slice.index_usize offsets frame.cell
-          else ok next
-        let (f, index_mut_back) ←
-          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-            spanning_tree.Frame) v1 i
-        let v4 := index_mut_back { f with next := next1 }
-        let (f1, index_mut_back1) ←
-          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-            spanning_tree.Frame) v4 i
-        let i3 ← f1.remaining - 1#usize
-        let b1 ←
-          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v
-            neighbor
-        if b1
-        then
-          let v5 := index_mut_back1 { f1 with remaining := i3 }
-          ok (cont (rng, v, v5, v2, v3, reached, depth, status))
-        else
-          let (r, rng1) ←
-            spanning_tree.enter treeRngInst offsets neighbor rng
-          match r with
-          | core.result.Result.Ok child_frame =>
-            let (_, index_mut_back2) ←
-              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-                Std.Usize) v2 neighbor
-            let (_, index_mut_back3) ←
-              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-                Std.Usize) v3 neighbor
-            let (_, index_mut_back4) ←
-              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-                Bool) v neighbor
-            let v5 := index_mut_back1 { f1 with remaining := i3 }
-            let (_, index_mut_back5) ←
-              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-                spanning_tree.Frame) v5 depth
-            let depth1 ← depth + 1#usize
-            let reached1 ← reached + 1#usize
-            let v6 := index_mut_back5 child_frame
-            let v7 := index_mut_back4 true
-            let v8 := index_mut_back3 frame.next
-            let v9 := index_mut_back2 frame.cell
-            ok (cont (rng1, v7, v6, v9, v8, reached1, depth1, status))
-          | core.result.Result.Err error =>
-            let v5 := index_mut_back1 { f1 with remaining := i3 }
-            ok (cont (rng1, v, v5, v2, v3, reached, depth,
-              core.result.Result.Err error))
-    else ok (done (rng, v, v1, v2, v3, reached, status))
-  else ok (done (rng, v, v1, v2, v3, reached, status))
-
-/-- [labyrinth_core::spanning_tree::depth_first]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 131:4-158:5 -/
-@[rust_loop]
-def spanning_tree.depth_first_loop1
-  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
-  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
-  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
-  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
-    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize ×
-    (core.result.Result Unit topology.Error))
-  := do
-  loop
-    (fun (rng1, v4, v5, v6, v7, reached1, depth1, status1) =>
-      spanning_tree.depth_first_loop1.body treeRngInst offsets neighbors rng1
-      v4 v5 v6 v7 reached1 depth1 status1)
-    (rng, v, v1, v2, v3, reached, depth, status)
-
-/-- [labyrinth_core::spanning_tree::depth_first]:
-    Source: 'src/spanning_tree.rs', lines 110:0-164:1 -/
-def spanning_tree.depth_first
-  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
-  (neighbors : Slice Std.Usize) (root : Std.Usize) (rng : R)
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]:
+    Source: 'src/spanning_tree.rs', lines 529:4-560:5 -/
+def spanning_tree.Tree.attach_virtual
+  (self : spanning_tree.Tree) (edge : topology.Edge)
   (work : spanning_tree.Workspace) :
-  Result ((core.result.Result Unit topology.Error) × R ×
-    spanning_tree.Workspace)
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Workspace)
   := do
-  let i := Slice.len offsets
-  let n ← i - 1#usize
-  let work1 ← spanning_tree.Workspace.clear_edits work
-  let work2 ← spanning_tree.depth_first_loop0 root work1 n 0#usize
-  let (r, rng1) ← spanning_tree.enter treeRngInst offsets root rng
+  let n := alloc.vec.Vec.len self.parents
+  let r ← spanning_tree.Tree.virtual_root self edge.u work
   let cf ← core.result.Result.Insts.CoreOpsTry.branch r
   match cf with
   | core.ops.control_flow.ControlFlow.Continue val =>
-    let (_, index_mut_back) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-        spanning_tree.Frame) work2.frames 0#usize
-    let (_, index_mut_back1) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
-        work2.seen root
-    let v := index_mut_back1 true
-    let v1 := index_mut_back val
-    let (rng2, v2, v3, v4, v5, reached, status) ←
-      spanning_tree.depth_first_loop1 treeRngInst offsets neighbors rng1 v v1
-        work2.parents work2.incoming 1#usize 1#usize (core.result.Result.Ok ())
-    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+    let r1 ← spanning_tree.Tree.virtual_root self edge.v work
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
     match cf1 with
-    | core.ops.control_flow.ControlFlow.Continue _ =>
-      if reached != n
-      then
-        ok (core.result.Result.Err topology.Error.Disconnected, rng2,
-          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
-          })
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      if val = val1
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, work)
       else
-        ok (core.result.Result.Ok (), rng2,
-          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
-          })
+        let (inside, outside, component_root) ←
+          if val = self.root
+          then ok (edge.v, edge.u, val1)
+          else ok (edge.u, edge.v, val)
+        let (work1, cell, count) ←
+          spanning_tree.Tree.attach_virtual_loop0 self.parents work n
+            component_root inside 0#usize
+        if cell >= n
+        then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
+        else
+          if count >= n
+          then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
+          else
+            let (_, index_mut_back) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) work1.path count
+            let count1 ← count + 1#usize
+            let v := index_mut_back cell
+            let work2 ←
+              spanning_tree.Tree.attach_virtual_loop1 { work1 with path := v }
+                count1 1#usize
+            let work3 ←
+              spanning_tree.Workspace.set_parent work2 inside outside
+            ok (core.result.Result.Ok (), work3)
     | core.ops.control_flow.ControlFlow.Break residual =>
-      let r1 ←
+      let r2 ←
         core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
           Unit (core.convert.FromSame topology.Error) residual
-      ok (r1, rng2,
-        { work2 with seen := v2, frames := v3, parents := v4, incoming := v5 })
+      ok (r2, work)
   | core.ops.control_flow.ControlFlow.Break residual =>
     let r1 ←
       core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
         Unit (core.convert.FromSame topology.Error) residual
-    ok (r1, rng1, work2)
+    ok (r1, work)
 
-/-- [labyrinth_core::spanning_tree::representative]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 168:4-170:5 -/
-@[rust_loop_body]
-def spanning_tree.representative_loop.body
-  (links : Slice Std.Usize) (cell : Std.Usize) :
-  Result (ControlFlow Std.Usize Std.Usize)
-  := do
-  let i ← Slice.index_usize links cell
-  if i != cell
-  then ok (cont i)
-  else ok (done cell)
+/-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}::eq]:
+    Source: 'src/topology.rs', lines 49:29-49:38
+    Visibility: public -/
+def topology.Edge.Insts.CoreCmpPartialEqEdge.eq
+  (self : topology.Edge) (other : topology.Edge) : Result Bool := do
+  if self.u = other.u
+  then ok (self.v = other.v)
+  else ok false
 
-/-- [labyrinth_core::spanning_tree::representative]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 168:4-170:5 -/
-@[rust_loop]
-def spanning_tree.representative_loop
-  (links : Slice Std.Usize) (cell : Std.Usize) : Result Std.Usize := do
-  loop
-    (fun cell1 => spanning_tree.representative_loop.body links cell1)
-    cell
-
-/-- [labyrinth_core::spanning_tree::representative]:
-    Source: 'src/spanning_tree.rs', lines 166:0-172:1 -/
+/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}]
+    Source: 'src/topology.rs', lines 49:29-49:38 -/
 @[reducible]
-def spanning_tree.representative
-  (links : Slice Std.Usize) (start : Std.Usize) : Result Std.Usize := do
-  spanning_tree.representative_loop links start
+impl_def topology.Edge.Insts.CoreCmpPartialEqEdge : core.cmp.PartialEq
+  topology.Edge topology.Edge := {
+  eq := topology.Edge.Insts.CoreCmpPartialEqEdge.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    topology.Edge.Insts.CoreCmpPartialEqEdge
+}
 
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::len]:
-    Source: 'src/topology.rs', lines 267:4-269:5
-    Visibility: public -/
-def topology.Carrier.len (self : topology.Carrier) : Result Std.Usize := do
-  let i := alloc.vec.Vec.len self.offsets
-  i - 1#usize
-
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::neighbors]:
-    Source: 'src/topology.rs', lines 276:4-281:5
-    Visibility: public -/
-def topology.Carrier.impl.neighbors
-  (self : topology.Carrier) (cell : Std.Usize) : Result (Slice Std.Usize) := do
-  let i ← topology.Carrier.len self
-  if cell >= i
-  then ok (Array.to_slice (Std.Array.empty Std.Usize))
-  else
-    let i1 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        self.offsets cell
-    let i2 ← cell + 1#usize
-    let i3 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        self.offsets i2
-    alloc.vec.Vec.index (core.slice.index.SliceIndexRangeUsizeSlice Std.Usize)
-      self.neighbors { start := i1, «end» := i3 }
-
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop body 0:
-    Source: 'src/topology.rs', lines 289:8-291:9
-    Visibility: public -/
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 509:8-513:9 -/
 @[rust_loop_body]
-def topology.Carrier.contains_edge_loop.body
-  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+def spanning_tree.Tree.check_edit_loop0.body
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
+  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < index
+  then
+    if duplicate
+    then ok (done duplicate)
+    else
+      let e ← Slice.index_usize remove j
+      let e1 ← topology.Edge.new e.u e.v
+      let b ←
+        topology.Edge.Insts.CoreCmpPartialEqEdge.eq e1 { u := i, v := i1 }
+      let duplicate1 ←
+        if b
+        then ok true
+        else
+          do
+          let e2 ← Slice.index_usize add j
+          let e3 ← topology.Edge.new e2.u e2.v
+          topology.Edge.Insts.CoreCmpPartialEqEdge.eq e3 { u := i2, v := i3 }
+      let j1 ← j + 1#usize
+      ok (cont (duplicate1, j1))
+  else ok (done duplicate)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 509:8-513:9 -/
+@[rust_loop]
+def spanning_tree.Tree.check_edit_loop0
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
+  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (duplicate1, j1) => spanning_tree.Tree.check_edit_loop0.body remove
+      add index i i1 i2 i3 duplicate1 j1)
+    (duplicate, j)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 519:12-521:13 -/
+@[rust_loop_body]
+def spanning_tree.Tree.check_edit_loop1.body
+  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
+  (j : Std.Usize) :
   Result (ControlFlow Std.Usize Std.Usize)
   := do
-  let i2 := Slice.len row
-  if i1 < i2
+  let i2 := Slice.len remove
+  if j < i2
   then
-    let i3 ← Slice.index_usize row i1
-    if i3 != i
-    then let i4 ← i1 + 1#usize
-         ok (cont i4)
-    else ok (done i1)
-  else ok (done i1)
+    let e ← Slice.index_usize remove j
+    let e1 ← topology.Edge.new e.u e.v
+    let b ←
+      core.cmp.PartialEq.ne.trait_default
+        topology.Edge.Insts.CoreCmpPartialEqEdge e1 { u := i, v := i1 }
+    if b
+    then let j1 ← j + 1#usize
+         ok (cont j1)
+    else ok (done j)
+  else ok (done j)
 
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]: loop 0:
-    Source: 'src/topology.rs', lines 289:8-291:9
-    Visibility: public -/
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 519:12-521:13 -/
 @[rust_loop]
-def topology.Carrier.contains_edge_loop
-  (i : Std.Usize) (row : Slice Std.Usize) (i1 : Std.Usize) :
+def spanning_tree.Tree.check_edit_loop1
+  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
+  (j : Std.Usize) :
   Result Std.Usize
   := do
   loop
-    (fun i2 => topology.Carrier.contains_edge_loop.body i row i2)
-    i1
+    (fun j1 => spanning_tree.Tree.check_edit_loop1.body remove i i1 j1)
+    j
 
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::contains_edge]:
-    Source: 'src/topology.rs', lines 283:4-293:5
-    Visibility: public -/
-def topology.Carrier.contains_edge
-  (self : topology.Carrier) (edge : topology.Edge) : Result Bool := do
-  let i ← topology.Carrier.len self
-  if edge.u >= i
-  then ok false
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]:
+    Source: 'src/spanning_tree.rs', lines 491:4-527:5 -/
+def spanning_tree.Tree.check_edit
+  (self : spanning_tree.Tree) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (index : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  let e ← Slice.index_usize remove index
+  let removal ← topology.Edge.new e.u e.v
+  let e1 ← Slice.index_usize add index
+  let addition ← topology.Edge.new e1.u e1.v
+  if removal.u >= n
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
   else
-    if edge.v >= i
-    then ok false
+    if removal.v >= n
+    then ok (core.result.Result.Err topology.Error.InvalidIndex)
     else
-      if edge.u = edge.v
-      then ok false
+      if addition.u >= n
+      then ok (core.result.Result.Err topology.Error.InvalidIndex)
       else
-        let row ← topology.Carrier.impl.neighbors self edge.u
-        let i1 ← topology.Carrier.contains_edge_loop edge.v row 0#usize
-        let i2 := Slice.len row
-        ok (i1 < i2)
+        if addition.v >= n
+        then ok (core.result.Result.Err topology.Error.InvalidIndex)
+        else
+          let b ← spanning_tree.Tree.has_edge self removal
+          if b
+          then
+            let b1 ← topology.Carrier.contains_edge carrier addition
+            if b1
+            then
+              let duplicate ←
+                spanning_tree.Tree.check_edit_loop0 remove add index 
+                  removal.u removal.v addition.u addition.v false 0#usize
+              if duplicate
+              then ok (core.result.Result.Err topology.Error.InvalidTransition)
+              else
+                let b2 ← spanning_tree.Tree.has_edge self addition
+                if b2
+                then
+                  let j ←
+                    spanning_tree.Tree.check_edit_loop1 remove addition.u
+                      addition.v 0#usize
+                  let i := Slice.len remove
+                  if j = i
+                  then
+                    ok (core.result.Result.Err
+                      topology.Error.InvalidTransition)
+                  else ok (core.result.Result.Ok ())
+                else ok (core.result.Result.Ok ())
+            else ok (core.result.Result.Err topology.Error.InvalidTransition)
+          else ok (core.result.Result.Err topology.Error.InvalidTransition)
 
-/-- [labyrinth_core::spanning_tree::join_required]:
-    Source: 'src/spanning_tree.rs', lines 174:0-194:1 -/
-def spanning_tree.join_required
-  (carrier : topology.Carrier) (links : Slice Std.Usize)
-  (sizes : Slice Std.Usize) (edge : topology.Edge) :
-  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize) ×
-    (Slice Std.Usize))
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 72:8-75:9 -/
+@[rust_loop_body]
+def spanning_tree.Workspace.clear_edits_loop.body
+  (self : spanning_tree.Workspace) (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize) ((alloc.vec.Vec
+    Bool) × (alloc.vec.Vec spanning_tree.Frame) × (alloc.vec.Vec Std.Usize)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize))
   := do
-  let b ← topology.Carrier.contains_edge carrier edge
-  if b
+  if i < self.edit_count
   then
-    let u ← spanning_tree.representative links edge.u
-    let v ← spanning_tree.representative links edge.v
-    if u = v
-    then ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
-    else
-      let i ← Slice.index_usize sizes u
-      let i1 ← Slice.index_usize sizes v
-      let (u1, v1) ← if i < i1
-                       then ok (core.mem.swap u v)
-                       else ok (u, v)
-      let links1 ← Slice.update links v1 u1
-      let i2 ← Slice.index_usize sizes v1
-      let i3 ← Slice.index_usize sizes u1
-      let i4 ← i3 + i2
-      let sizes1 ← Slice.update sizes u1 i4
-      ok (core.result.Result.Ok (), links1, sizes1)
-  else ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.edit_nodes i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.edit_slots i1
+    let i2 ← i + 1#usize
+    let v := index_mut_back core.num.Usize.MAX
+    ok (cont ({ self with edit_slots := v }, i2))
+  else
+    ok (done (self.seen, self.frames, self.path, self.parents, self.incoming,
+      self.edit_slots, self.edit_nodes, self.edge_capacity))
 
-/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}::fmt]:
-    Source: 'src/spanning_tree.rs', lines 196:9-196:14
-    Visibility: public -/
-def spanning_tree.Tree.Insts.CoreFmtDebug.fmt
-  (self : spanning_tree.Tree) (f : core.fmt.Formatter) :
-  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 72:8-75:9 -/
+@[rust_loop]
+def spanning_tree.Workspace.clear_edits_loop
+  (self : spanning_tree.Workspace) (i : Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize)
   := do
-  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
-  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.root
-  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Tree") (toStr
-    "parents") dyn (toStr "root") dyn1
+  loop
+    (fun (self1, i1) => spanning_tree.Workspace.clear_edits_loop.body self1 i1)
+    (self, i)
 
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}]
-    Source: 'src/spanning_tree.rs', lines 196:9-196:14 -/
-@[reducible]
-def spanning_tree.Tree.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Tree
-  := {
-  fmt := spanning_tree.Tree.Insts.CoreFmtDebug.fmt
-}
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::clear_edits]:
+    Source: 'src/spanning_tree.rs', lines 70:4-77:5 -/
+def spanning_tree.Workspace.clear_edits
+  (self : spanning_tree.Workspace) : Result spanning_tree.Workspace := do
+  let (v, v1, v2, v3, v4, v5, v6, i) ←
+    spanning_tree.Workspace.clear_edits_loop self 0#usize
+  ok
+    {
+      seen := v,
+      frames := v1,
+      path := v2,
+      parents := v3,
+      incoming := v4,
+      edit_slots := v5,
+      edit_nodes := v6,
+      edit_count := 0#usize,
+      edge_capacity := i
+    }
 
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::StructuralPartialEq for labyrinth_core::spanning_tree::Tree}]
-    Source: 'src/spanning_tree.rs', lines 196:16-196:25 -/
-@[reducible]
-def spanning_tree.Tree.Insts.CoreMarkerStructuralPartialEq :
-  core.marker.StructuralPartialEq spanning_tree.Tree := {
-}
-
-/-- [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}::eq]:
-    Source: 'src/spanning_tree.rs', lines 196:16-196:25
-    Visibility: public -/
-def spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
-  (self : spanning_tree.Tree) (other : spanning_tree.Tree) : Result Bool := do
-  let b ←
-    alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize self.parents
-      other.parents
-  if b
-  then ok (self.root = other.root)
-  else ok false
-
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}]
-    Source: 'src/spanning_tree.rs', lines 196:16-196:25 -/
-@[reducible]
-impl_def spanning_tree.Tree.Insts.CoreCmpPartialEqTree : core.cmp.PartialEq
-  spanning_tree.Tree spanning_tree.Tree := {
-  eq := spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
-  ne := core.cmp.PartialEq.ne.trait_default
-    spanning_tree.Tree.Insts.CoreCmpPartialEqTree
-}
-
-/-- [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}::assert_fields_are_eq]:
-    Source: 'src/spanning_tree.rs', lines 196:27-196:29
-    Visibility: public -/
-def spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
-  (self : spanning_tree.Tree) : Result Unit := do
-  ok ()
-
-/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}]
-    Source: 'src/spanning_tree.rs', lines 196:27-196:29 -/
-@[reducible]
-def spanning_tree.Tree.Insts.CoreCmpEq : core.cmp.Eq spanning_tree.Tree := {
-  partialEqInst := spanning_tree.Tree.Insts.CoreCmpPartialEqTree
-  assert_fields_are_eq :=
-    spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
-}
-
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::storage]:
-    Source: 'src/topology.rs', lines 299:4-301:5 -/
-def topology.Carrier.storage
-  (self : topology.Carrier) :
-  Result ((Slice Std.Usize) × (Slice Std.Usize))
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::ensure]:
+    Source: 'src/spanning_tree.rs', lines 63:4-68:5 -/
+def spanning_tree.Workspace.ensure
+  (self : spanning_tree.Workspace) (cells : Std.Usize) (edges : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
   := do
-  let s := alloc.vec.Vec.deref self.offsets
-  let s1 := alloc.vec.Vec.deref self.neighbors
-  ok (s, s1)
+  let i := alloc.vec.Vec.len self.path
+  if cells > i
+  then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+  else
+    if edges > self.edge_capacity
+    then ok (core.result.Result.Err topology.Error.InsufficientWorkspace)
+    else ok (core.result.Result.Ok ())
 
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::edges]:
-    Source: 'src/topology.rs', lines 295:4-297:5
-    Visibility: public -/
-def topology.Carrier.impl.edges
-  (self : topology.Carrier) : Result (Slice topology.Edge) := do
-  ok (alloc.vec.Vec.deref self.edges)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 221:8-224:9
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 460:8-463:9
     Visibility: public -/
 @[rust_loop_body]
-def spanning_tree.Tree.dfs_loop.body
-  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
-  (i : Std.Usize) :
-  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize)
-    (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize)))
+def spanning_tree.Tree.edit_edges_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error))
+    (core.result.Result Unit topology.Error))
   := do
-  let i1 := alloc.vec.Vec.len parents
+  let i2 := Slice.len remove
+  if i1 < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let status1 ←
+        spanning_tree.Tree.check_edit { parents := v, root := i } carrier
+          remove add i1
+      let i3 ← i1 + 1#usize
+      ok (cont (i3, status1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 460:8-463:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop0
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (i2, status1) => spanning_tree.Tree.edit_edges_loop0.body v i carrier
+      remove add i2 status1)
+    (i1, status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 467:8-476:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop1.body
+  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    spanning_tree.Workspace)
+  := do
+  let i1 := Slice.len remove
+  if i < i1
+  then
+    let edge ← Slice.index_usize remove i
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        edge.u
+    let child ← if i2 = edge.v
+                  then ok edge.u
+                  else ok edge.v
+    let work1 ← spanning_tree.Workspace.set_parent work child child
+    let i3 ← i + 1#usize
+    ok (cont (work1, i3))
+  else ok (done work)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 467:8-476:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop1
+  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  loop
+    (fun (work1, i1) => spanning_tree.Tree.edit_edges_loop1.body v remove work1
+      i1)
+    (work, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 2:
+    Source: 'src/spanning_tree.rs', lines 478:8-481:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop2.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize ×
+    (core.result.Result Unit topology.Error)) (spanning_tree.Workspace ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let i2 := Slice.len add
+  if i1 < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let e ← Slice.index_usize add i1
+      let (status1, work1) ←
+        spanning_tree.Tree.attach_virtual { parents := v, root := i } e work
+      let i3 ← i1 + 1#usize
+      ok (cont (work1, i3, status1))
+    else ok (done (work, status))
+  else ok (done (work, status))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 2:
+    Source: 'src/spanning_tree.rs', lines 478:8-481:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop2
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) (i1 : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (spanning_tree.Workspace × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (work1, i2, status1) => spanning_tree.Tree.edit_edges_loop2.body v i
+      add work1 i2 status1)
+    (work, i1, status)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 3:
+    Source: 'src/spanning_tree.rs', lines 484:8-487:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.edit_edges_loop3.body
+  (work : spanning_tree.Workspace) (v : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) ((alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × Std.Usize))
+  := do
+  if i < work.edit_count
+  then
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.edit_nodes i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        v i2
+    let i3 ← i + 1#usize
+    let v1 := index_mut_back i1
+    ok (cont (v1, i3))
+  else
+    ok (done (v, work.seen, work.frames, work.path, work.parents,
+      work.incoming, work.edit_slots, work.edit_nodes, work.edit_count,
+      work.edge_capacity))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 3:
+    Source: 'src/spanning_tree.rs', lines 484:8-487:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.edit_edges_loop3
+  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
+  (i : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × Std.Usize × Std.Usize)
+  := do
+  loop
+    (fun (v1, i1) => spanning_tree.Tree.edit_edges_loop3.body work v1 i1)
+    (v, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]:
+    Source: 'src/spanning_tree.rs', lines 445:4-489:5
+    Visibility: public -/
+def spanning_tree.Tree.edit_edges
+  (self : spanning_tree.Tree) (carrier : topology.Carrier)
+  (remove : Slice topology.Edge) (add : Slice topology.Edge)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × spanning_tree.Tree ×
+    spanning_tree.Workspace)
+  := do
+  let n := alloc.vec.Vec.len self.parents
+  let s ← topology.Carrier.impl.edges carrier
+  let i := Slice.len s
+  let r ← spanning_tree.Workspace.ensure work n i
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let r1 ← spanning_tree.Tree.check_carrier self carrier
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let i1 := Slice.len remove
+      let i2 := Slice.len add
+      if i1 != i2
+      then
+        ok (core.result.Result.Err topology.Error.InvalidTransition, self,
+          work)
+      else
+        let i3 := Slice.len remove
+        if i3 >= n
+        then
+          ok (core.result.Result.Err topology.Error.InvalidTransition, self,
+            work)
+        else
+          let status ←
+            spanning_tree.Tree.edit_edges_loop0 self.parents self.root carrier
+              remove add 0#usize (core.result.Result.Ok ())
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let work1 ← spanning_tree.Workspace.clear_edits work
+            let work2 ←
+              spanning_tree.Tree.edit_edges_loop1 self.parents remove work1
+                0#usize
+            let (work3, status1) ←
+              spanning_tree.Tree.edit_edges_loop2 self.parents self.root add
+                work2 0#usize status
+            let cf3 ← core.result.Result.Insts.CoreOpsTry.branch status1
+            match cf3 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let (v, v1, v2, v3, v4, v5, v6, v7, i4, i5) ←
+                spanning_tree.Tree.edit_edges_loop3 self.parents work3 0#usize
+              ok (core.result.Result.Ok (), { self with parents := v },
+                {
+                  seen := v1,
+                  frames := v2,
+                  path := v3,
+                  parents := v4,
+                  incoming := v5,
+                  edit_slots := v6,
+                  edit_nodes := v7,
+                  edit_count := i4,
+                  edge_capacity := i5
+                })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r2 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  Unit (core.convert.FromSame topology.Error) residual
+              ok (r2, self, work3)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                Unit (core.convert.FromSame topology.Error) residual
+            ok (r2, self, work)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r2, self, work)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r1, self, work)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 0:
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
+@[rust_loop_body]
+def scene.Scene.commit_edit_loop0.body
+  (self : scene.Scene) (i : Std.Usize) :
+  Result (ControlFlow (scene.Scene × Std.Usize) (scene.Layout ×
+    spanning_tree.Tree × spanning_tree.Workspace × (alloc.vec.Vec
+    scene.Route) × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker) × (alloc.vec.Vec shatter.Patch) × walker.Stamp × Std.U64
+    × Std.U64 × Bool × Bool × Bool × Std.U64 × (Option Std.U64) ×
+    Std.U64))
+  := do
+  let i1 := alloc.vec.Vec.len self.phases
   if i < i1
   then
     let i2 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.parents i
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.next_phases i
     let (_, index_mut_back) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        parents i
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.phases i
     let i3 ← i + 1#usize
-    let parents1 := index_mut_back i2
-    ok (cont (parents1, i3))
-  else ok (done (work, parents))
+    let v := index_mut_back i2
+    ok (cont ({ self with phases := v }, i3))
+  else
+    ok (done (self.layout, self.tree, self.work, self.routes, self.required,
+      self.phases, self.next_phases, self.holds, self.walkers, self.patches,
+      self.stamp, self.clock, self.wall, self.reanchor, self.suspended,
+      self.inactive, self.latest_request, self.pending, self.trail_revision))
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 221:8-224:9
-    Visibility: public -/
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 0:
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
 @[rust_loop]
-def spanning_tree.Tree.dfs_loop
-  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
-  (i : Std.Usize) :
-  Result (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize))
+def scene.Scene.commit_edit_loop0
+  (self : scene.Scene) (i : Std.Usize) :
+  Result (scene.Layout × spanning_tree.Tree × spanning_tree.Workspace ×
+    (alloc.vec.Vec scene.Route) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec walker.Walker) × (alloc.vec.Vec
+    shatter.Patch) × walker.Stamp × Std.U64 × Std.U64 × Bool × Bool ×
+    Bool × Std.U64 × (Option Std.U64) × Std.U64)
   := do
   loop
-    (fun (parents1, i1) => spanning_tree.Tree.dfs_loop.body work parents1 i1)
-    (parents, i)
+    (fun (self1, i1) => scene.Scene.commit_edit_loop0.body self1 i1)
+    (self, i)
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]:
-    Source: 'src/spanning_tree.rs', lines 207:4-226:5
-    Visibility: public -/
-def spanning_tree.Tree.dfs
-  {R : Type _} (treeRngInst : tree.Rng R) (carrier : topology.Carrier)
-  (root : Std.Usize) (rng : R) (work : spanning_tree.Workspace) :
-  Result ((core.result.Result spanning_tree.Tree topology.Error) × R ×
-    spanning_tree.Workspace)
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 1:
+    Source: 'src/scene.rs', lines 1464:12-1468:13 -/
+@[rust_loop_body]
+def scene.Scene.commit_edit_loop1.body
+  (routes : Slice scene.Route) (self : scene.Scene) (i : Std.Usize) :
+  Result (ControlFlow (scene.Scene × Std.Usize) scene.Scene)
   := do
-  let i ← topology.Carrier.len carrier
-  if root >= i
-  then ok (core.result.Result.Err topology.Error.InvalidIndex, rng, work)
+  let i1 := Slice.len routes
+  if i < i1
+  then
+    let (r, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        scene.Route) self.routes i
+    let v ← alloc.vec.Vec.clear alloc.alloc.Global r.cells
+    let v1 := index_mut_back { r with cells := v }
+    let (r1, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        scene.Route) v1 i
+    let r2 ← Slice.index_usize routes i
+    let s := alloc.vec.Vec.deref r2.cells
+    let v2 ← alloc.vec.Vec.extend_from_slice core.clone.CloneUsize r1.cells s
+    let i2 ← i + 1#usize
+    let v3 := index_mut_back1 { r1 with cells := v2 }
+    ok (cont ({ self with routes := v3 }, i2))
+  else ok (done self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 1:
+    Source: 'src/scene.rs', lines 1464:12-1468:13 -/
+@[rust_loop]
+def scene.Scene.commit_edit_loop1
+  (self : scene.Scene) (routes : Slice scene.Route) (i : Std.Usize) :
+  Result scene.Scene
+  := do
+  loop
+    (fun (self1, i1) => scene.Scene.commit_edit_loop1.body routes self1 i1)
+    (self, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop body 2:
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
+@[rust_loop_body]
+def scene.Scene.commit_edit_loop2.body
+  (self : scene.Scene) (i : Std.Usize) :
+  Result (ControlFlow (scene.Scene × Std.Usize) (scene.Layout ×
+    spanning_tree.Tree × spanning_tree.Workspace × (alloc.vec.Vec
+    scene.Route) × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker) × (alloc.vec.Vec shatter.Patch) × walker.Stamp × Std.U64
+    × Std.U64 × Bool × Bool × Bool × Std.U64 × (Option Std.U64) ×
+    Std.U64))
+  := do
+  let i1 := alloc.vec.Vec.len self.phases
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.next_phases i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.phases i
+    let i3 ← i + 1#usize
+    let v := index_mut_back i2
+    ok (cont ({ self with phases := v }, i3))
   else
-    let s ← topology.Carrier.impl.edges carrier
+    ok (done (self.layout, self.tree, self.work, self.routes, self.required,
+      self.phases, self.next_phases, self.holds, self.walkers, self.patches,
+      self.stamp, self.clock, self.wall, self.reanchor, self.suspended,
+      self.inactive, self.latest_request, self.pending, self.trail_revision))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]: loop 2:
+    Source: 'src/scene.rs', lines 1471:8-1474:9 -/
+@[rust_loop]
+def scene.Scene.commit_edit_loop2
+  (self : scene.Scene) (i : Std.Usize) :
+  Result (scene.Layout × spanning_tree.Tree × spanning_tree.Workspace ×
+    (alloc.vec.Vec scene.Route) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec walker.Walker) × (alloc.vec.Vec
+    shatter.Patch) × walker.Stamp × Std.U64 × Std.U64 × Bool × Bool ×
+    Bool × Std.U64 × (Option Std.U64) × Std.U64)
+  := do
+  loop
+    (fun (self1, i1) => scene.Scene.commit_edit_loop2.body self1 i1)
+    (self, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::commit_edit]:
+    Source: 'src/scene.rs', lines 1461:4-1479:5 -/
+def scene.Scene.commit_edit
+  (self : scene.Scene) (edit : scene.Edit) (revision : Std.U64) :
+  Result scene.Scene
+  := do
+  match edit.routes with
+  | none =>
+    let (l, t, w, v, v1, v2, v3, v4, v5, v6, s, i, i1, b, b1, b2, i2, o, i3)
+      ←
+      scene.Scene.commit_edit_loop0 self 0#usize
+    let b3 ← core.slice.Slice.is_empty edit.remove
+    if b3
+    then
+      ok
+        {
+          layout := l,
+          tree := t,
+          work := w,
+          routes := v,
+          required := v1,
+          phases := v2,
+          next_phases := v3,
+          holds := v4,
+          walkers := v5,
+          patches := v6,
+          stamp := { s with revision },
+          clock := i,
+          wall := i1,
+          reanchor := b,
+          suspended := b1,
+          inactive := b2,
+          latest_request := i2,
+          pending := o,
+          trail_revision := i3
+        }
+    else
+      ok
+        {
+          layout := l,
+          tree := t,
+          work := w,
+          routes := v,
+          required := v1,
+          phases := v2,
+          next_phases := v3,
+          holds := v4,
+          walkers := v5,
+          patches := v6,
+          stamp := { s with revision },
+          clock := i,
+          wall := i1,
+          reanchor := b,
+          suspended := b1,
+          inactive := b2,
+          latest_request := i2,
+          pending := o,
+          trail_revision := revision
+        }
+  | some routes =>
+    let self1 ← scene.Scene.commit_edit_loop1 self routes 0#usize
+    let (l, t, w, v, v1, v2, v3, v4, v5, v6, s, i, i1, b, b1, b2, i2, o, i3)
+      ←
+      scene.Scene.commit_edit_loop2 self1 0#usize
+    let b3 ← core.slice.Slice.is_empty edit.remove
+    if b3
+    then
+      ok
+        {
+          layout := l,
+          tree := t,
+          work := w,
+          routes := v,
+          required := v1,
+          phases := v2,
+          next_phases := v3,
+          holds := v4,
+          walkers := v5,
+          patches := v6,
+          stamp := { s with revision },
+          clock := i,
+          wall := i1,
+          reanchor := b,
+          suspended := b1,
+          inactive := b2,
+          latest_request := i2,
+          pending := o,
+          trail_revision := i3
+        }
+    else
+      ok
+        {
+          layout := l,
+          tree := t,
+          work := w,
+          routes := v,
+          required := v1,
+          phases := v2,
+          next_phases := v3,
+          holds := v4,
+          walkers := v5,
+          patches := v6,
+          stamp := { s with revision },
+          clock := i,
+          wall := i1,
+          reanchor := b,
+          suspended := b1,
+          inactive := b2,
+          latest_request := i2,
+          pending := o,
+          trail_revision := revision
+        }
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::parents]:
+    Source: 'src/spanning_tree.rs', lines 370:4-372:5
+    Visibility: public -/
+def spanning_tree.Tree.impl.parents
+  (self : spanning_tree.Tree) : Result (Slice Std.Usize) := do
+  ok (alloc.vec.Vec.deref self.parents)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Direction}::sign]:
+    Source: 'src/polar.rs', lines 231:4-236:5 -/
+def polar.Direction.sign (self : polar.Direction) : Result Std.I32 := do
+  match self with
+  | polar.Direction.Clockwise => ok 1#i32
+  | polar.Direction.Counterclockwise => ok (-1)#i32
+
+/-- [labyrinth_core::polar::ATAN]
+    Source: 'src/polar.rs', lines 13:0-45:2 -/
+@[global_simps, irreducible]
+def polar.ATAN : Array Std.I64 31#usize :=
+  Array.make 31#usize [
+    536870912#i64, 316933406#i64, 167458907#i64, 85004756#i64, 42667331#i64,
+    21354465#i64, 10679838#i64, 5340245#i64, 2670163#i64, 1335087#i64,
+    667544#i64, 333772#i64, 166886#i64, 83443#i64, 41722#i64, 20861#i64,
+    10430#i64, 5215#i64, 2608#i64, 1304#i64, 652#i64, 326#i64, 163#i64, 81#i64,
+    41#i64, 20#i64, 10#i64, 5#i64, 3#i64, 1#i64, 1#i64
+    ]
+
+/-- [labyrinth_core::polar::CORDIC_GAIN]
+    Source: 'src/polar.rs', lines 12:0-12:37 -/
+@[global_simps, irreducible] def polar.CORDIC_GAIN : Std.I64 := 652032874#i64
+
+/-- [labyrinth_core::polar::SCALE]
+    Source: 'src/polar.rs', lines 11:0-11:27 -/
+@[global_simps, irreducible]
+def polar.SCALE : Result Std.I64 := 1#i64 <<< 30#i32
+
+/-- [labyrinth_core::polar::unit_vector]: loop body 0:
+    Source: 'src/polar.rs', lines 144:4-156:5 -/
+@[rust_loop_body]
+def polar.unit_vector_loop.body
+  («local» : Std.I32) (x : Std.I64) (y : Std.I64) (residual : Std.I64)
+  (i : Std.Usize) :
+  Result (ControlFlow (Std.I64 × Std.I64 × Std.I64 × Std.Usize) (Std.I64 ×
+    Std.I64))
+  := do
+  if «local» != 0#i32
+  then
+    let s ← lift (Array.to_slice polar.ATAN)
     let i1 := Slice.len s
-    let r ← spanning_tree.Workspace.ensure work i i1
-    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
-    match cf with
-    | core.ops.control_flow.ControlFlow.Continue _ =>
-      let (offsets, neighbors) ← topology.Carrier.storage carrier
-      let (r1, rng1, work1) ←
-        spanning_tree.depth_first treeRngInst offsets neighbors root rng work
+    if i < i1
+    then
+      let (x1, y1, residual1) ←
+        if residual >= 0#i64
+        then
+          do
+          let i2 ← y >>> i
+          let x2 ← x - i2
+          let i3 ← x >>> i
+          let y2 ← y + i3
+          let i4 ← Array.index_usize polar.ATAN i
+          let residual2 ← residual - i4
+          ok (x2, y2, residual2)
+        else
+          do
+          let i2 ← y >>> i
+          let x2 ← x + i2
+          let i3 ← x >>> i
+          let y2 ← y - i3
+          let i4 ← Array.index_usize polar.ATAN i
+          let residual2 ← residual + i4
+          ok (x2, y2, residual2)
+      let i2 ← i + 1#usize
+      ok (cont (x1, y1, residual1, i2))
+    else ok (done (x, y))
+  else ok (done (x, y))
+
+/-- [labyrinth_core::polar::unit_vector]: loop 0:
+    Source: 'src/polar.rs', lines 144:4-156:5 -/
+@[rust_loop]
+def polar.unit_vector_loop
+  («local» : Std.I32) (x : Std.I64) (y : Std.I64) (residual : Std.I64)
+  (i : Std.Usize) :
+  Result (Std.I64 × Std.I64)
+  := do
+  loop
+    (fun (x1, y1, residual1, i1) => polar.unit_vector_loop.body «local» x1 y1
+      residual1 i1)
+    (x, y, residual, i)
+
+/-- [labyrinth_core::polar::unit_vector]:
+    Source: 'src/polar.rs', lines 136:0-165:1 -/
+def polar.unit_vector (angle : Std.I32) : Result (Std.I64 × Std.I64) := do
+  let angle1 ← polar.normalize angle
+  let i ← polar.TURN / 4#i32
+  let quadrant ← angle1 / i
+  let «local» ← angle1 % i
+  let x ← if «local» = 0#i32
+            then polar.SCALE
+            else ok polar.CORDIC_GAIN
+  let i1 ← lift (core.convert.num.FromI64I32.from «local»)
+  let residual ← i1 <<< 20#i32
+  let (x1, y) ← polar.unit_vector_loop «local» x 0#i64 residual 0#usize
+  let i2 ← polar.SCALE
+  let i3 ← -. i2
+  let x2 ← core.cmp.impls.OrdI64.clamp x1 i3 i2
+  let i4 ← -. i2
+  let y1 ← core.cmp.impls.OrdI64.clamp y i4 i2
+  match quadrant with
+  | 0#iscalar => ok (x2, y1)
+  | 1#iscalar => let i5 ← -. y1
+                 ok (i5, x2)
+  | 2#iscalar => let i5 ← -. x2
+                 let i6 ← -. y1
+                 ok (i5, i6)
+  | _ => let i5 ← -. x2
+         ok (y1, i5)
+
+/-- [labyrinth_core::polar::point]:
+    Source: 'src/polar.rs', lines 168:0-174:1 -/
+def polar.point
+  (center : grid.Point) (radius : Std.I32) (angle : Std.I32) :
+  Result grid.Point
+  := do
+  let (x, y) ← polar.unit_vector angle
+  let i ← lift (core.convert.num.FromI64I32.from radius)
+  let i1 ← i * x
+  let i2 ← polar.SCALE
+  let i3 ← i1 / i2
+  let i4 ← lift (IScalar.cast .I32 i3)
+  let i5 ← center.x + i4
+  let i6 ← lift (core.convert.num.FromI64I32.from radius)
+  let i7 ← i6 * y
+  let i8 ← i7 / i2
+  let i9 ← lift (IScalar.cast .I32 i8)
+  let i10 ← center.y + i9
+  ok { x := i5, y := i10 }
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::offset]:
+    Source: 'src/polar.rs', lines 458:4-468:5 -/
+def polar.Circle.offset
+  (self : polar.Circle) (ring : Std.Usize) (phases : Slice Std.I32) :
+  Result Std.I32
+  := do
+  let i ← self.transform_start + ring
+  let phase ← Slice.index_usize phases i
+  let offset ←
+    match self.spec.mode with
+    | polar.MotionMode.Spinning =>
+      do
+      let i1 ← polar.normalize phase
+      let d ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Direction) self.spec.directions ring
+      let i2 ← polar.Direction.sign d
+      i1 * i2
+    | polar.MotionMode.Twisting amplitude _ =>
+      do
+      let p ← polar.point { x := 0#i32, y := 0#i32 } amplitude phase
+      let d ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Direction) self.spec.directions ring
+      let i1 ← polar.Direction.sign d
+      p.y * i1
+  polar.normalize offset
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::arc]:
+    Source: 'src/polar.rs', lines 444:4-452:5 -/
+def polar.Circle.arc
+  (self : polar.Circle) (ring : Std.Usize) (sector : Std.Usize) :
+  Result polar.Arc
+  := do
+  let i ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.spec.sectors ring
+  let count ← lift (UScalar.hcast .I32 i)
+  let i1 ← lift (UScalar.hcast .I32 sector)
+  let i2 ← i1 * polar.TURN
+  let start ← i2 / count
+  let i3 ← lift (UScalar.hcast .I32 sector)
+  let i4 ← i3 + 1#i32
+  let i5 ← i4 * polar.TURN
+  let «end» ← i5 / count
+  let i6 ← «end» - start
+  ok { start, length := i6 }
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Arc}::shifted]:
+    Source: 'src/polar.rs', lines 74:4-79:5 -/
+def polar.Arc.shifted
+  (self : polar.Arc) (amount : Std.I32) : Result polar.Arc := do
+  let i ← self.start + amount
+  let i1 ← polar.normalize i
+  ok { self with start := i1 }
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cell_arc]:
+    Source: 'src/scene.rs', lines 610:4-630:5 -/
+def scene.Layout.cell_arc
+  (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32) :
+  Result polar.Arc
+  := do
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+      self.cells cell
+  match c with
+  | scene.Cell.Grid _ _ _ => ok { start := 0#i32, length := polar.TURN }
+  | scene.Cell.Center _ => ok { start := 0#i32, length := polar.TURN }
+  | scene.Cell.Sector circle ring sector =>
+    let c1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles circle
+    let arc ← polar.Circle.arc c1 ring sector
+    let mm ← polar.Circle.mode c1
+    match mm with
+    | polar.MotionMode.Spinning =>
+      let i ← polar.Circle.offset c1 ring phases
+      polar.Arc.shifted arc i
+    | polar.MotionMode.Twisting _ _ => ok arc
+  | scene.Cell.Transition portal =>
+    let p ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Portal)
+        self.portals portal
+    ok p.spec.mouth
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Arc}::swept]:
+    Source: 'src/polar.rs', lines 81:4-92:5 -/
+def polar.Arc.swept
+  (self : polar.Arc) (delta : Std.I32) : Result polar.Arc := do
+  let i ← core.num.I32.abs delta
+  let i1 ← self.length + i
+  if i1 >= polar.TURN
+  then ok { start := 0#i32, length := polar.TURN }
+  else
+    let i2 ← lift (core.cmp.impls.OrdI32.min delta 0#i32)
+    let i3 ← self.start + i2
+    let i4 ← polar.normalize i3
+    let i5 ← self.length + i
+    ok { start := i4, length := i5 }
+
+/-- [labyrinth_core::polar::angle_delta]:
+    Source: 'src/polar.rs', lines 51:0-58:1 -/
+def polar.angle_delta
+  («from» : Std.I32) («to» : Std.I32) : Result Std.I32 := do
+  let i ← «to» - «from»
+  let difference ← polar.normalize i
+  let i1 ← polar.TURN / 2#i32
+  if difference > i1
+  then difference - polar.TURN
+  else ok difference
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::swept_arc]:
+    Source: 'src/scene.rs', lines 632:4-640:5 -/
+def scene.Layout.swept_arc
+  (self : scene.Layout) (cell : Std.Usize) (arc : polar.Arc)
+  (mode : polar.MotionMode) (next : Slice Std.I32) :
+  Result polar.Arc
+  := do
+  match mode with
+  | polar.MotionMode.Spinning =>
+    let a ← scene.Layout.cell_arc self cell next
+    let i ← polar.angle_delta arc.start a.start
+    polar.Arc.swept arc i
+  | polar.MotionMode.Twisting amplitude _ =>
+    let i ← -. amplitude
+    let a ← polar.Arc.shifted arc i
+    let i1 ← amplitude * 2#i32
+    polar.Arc.swept a i1
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::center]:
+    Source: 'src/polar.rs', lines 413:4-415:5
+    Visibility: public -/
+def polar.Circle.center (self : polar.Circle) : Result grid.Point := do
+  ok self.spec.center
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Arc}::contains]:
+    Source: 'src/polar.rs', lines 98:4-100:5 -/
+def polar.Arc.contains (self : polar.Arc) (angle : Std.I32) : Result Bool := do
+  if self.length = polar.TURN
+  then ok true
+  else
+    let i ← angle - self.start
+    let i1 ← polar.normalize i
+    ok (i1 <= self.length)
+
+/-- [labyrinth_core::polar::bounds]: loop body 1:
+    Source: 'src/polar.rs', lines 210:12-217:13 -/
+@[rust_loop_body]
+def polar.bounds_loop0_loop0.body
+  (center : grid.Point) (inner : Std.I32) (outer : Std.I32) (angle : Std.I32)
+  (first : grid.Point) (first1 : grid.Point) (r : Std.I32) :
+  Result (ControlFlow (grid.Point × grid.Point × Std.I32) (grid.Point ×
+    grid.Point))
+  := do
+  if r < 2#i32
+  then
+    let inner1 ← if r = 0#i32
+                   then ok inner
+                   else ok outer
+    let p ← polar.point center inner1 angle
+    let i ← lift (core.cmp.impls.OrdI32.min first.x p.x)
+    let i1 ← lift (core.cmp.impls.OrdI32.min first.y p.y)
+    let i2 ← lift (core.cmp.impls.OrdI32.max first1.x p.x)
+    let i3 ← lift (core.cmp.impls.OrdI32.max first1.y p.y)
+    let r1 ← r + 1#i32
+    ok (cont ({ x := i, y := i1 }, { x := i2, y := i3 }, r1))
+  else ok (done (first, first1))
+
+/-- [labyrinth_core::polar::bounds]: loop 1:
+    Source: 'src/polar.rs', lines 210:12-217:13 -/
+@[rust_loop]
+def polar.bounds_loop0_loop0
+  (center : grid.Point) (inner : Std.I32) (outer : Std.I32)
+  (first : grid.Point) (first1 : grid.Point) (angle : Std.I32) (r : Std.I32) :
+  Result (grid.Point × grid.Point)
+  := do
+  loop
+    (fun (first2, first3, r1) => polar.bounds_loop0_loop0.body center inner
+      outer angle first2 first3 r1)
+    (first, first1, r)
+
+/-- [labyrinth_core::polar::bounds]: loop body 0:
+    Source: 'src/polar.rs', lines 200:4-220:5 -/
+@[rust_loop_body]
+def polar.bounds_loop0.body
+  (center : grid.Point) (inner : Std.I32) (outer : Std.I32) (angle : Std.I32)
+  (i : Std.I32) (first : grid.Point) (first1 : grid.Point) (i1 : Std.I32) :
+  Result (ControlFlow (grid.Point × grid.Point × Std.I32) (grid.Point ×
+    grid.Point))
+  := do
+  if i1 < 18#i32
+  then
+    let angle1 ←
+      if i1 = 16#i32
+      then ok angle
+      else
+        if i1 = 17#i32
+        then do
+             let i2 ← angle + i
+             polar.normalize i2
+        else i1 * 256#i32
+    let b ← polar.Arc.contains { start := angle, length := i } angle1
+    if b
+    then
+      let (p, p1) ←
+        polar.bounds_loop0_loop0 center inner outer first first1 angle1 0#i32
+      let i2 ← i1 + 1#i32
+      ok (cont (p, p1, i2))
+    else let i2 ← i1 + 1#i32
+         ok (cont (first, first1, i2))
+  else ok (done (first, first1))
+
+/-- [labyrinth_core::polar::bounds]: loop 0:
+    Source: 'src/polar.rs', lines 200:4-220:5 -/
+@[rust_loop]
+def polar.bounds_loop0
+  (center : grid.Point) (inner : Std.I32) (outer : Std.I32) (angle : Std.I32)
+  (i : Std.I32) (first : grid.Point) (first1 : grid.Point) (i1 : Std.I32) :
+  Result (grid.Point × grid.Point)
+  := do
+  loop
+    (fun (first2, first3, i2) => polar.bounds_loop0.body center inner outer
+      angle i first2 first3 i2)
+    (first, first1, i1)
+
+/-- [labyrinth_core::polar::bounds]:
+    Source: 'src/polar.rs', lines 187:0-222:1 -/
+def polar.bounds
+  (center : grid.Point) (inner : Std.I32) (outer : Std.I32) (arc : polar.Arc)
+  (margin : Std.I32) :
+  Result (core.result.Result grid.Rect topology.Error)
+  := do
+  let first ← polar.point center inner arc.start
+  let (p, p1) ←
+    polar.bounds_loop0 center inner outer arc.start arc.length first first
+      0#i32
+  grid.Rect.expand { min := p, max := p1 } margin
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::cell_sweep]:
+    Source: 'src/scene.rs', lines 707:4-732:5 -/
+def scene.Layout.cell_sweep
+  (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32)
+  (next : Slice Std.I32) :
+  Result (core.result.Result grid.Rect topology.Error)
+  := do
+  let r ← grid.Geometry.margin self.geometry
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+        self.cells cell
+    match c with
+    | scene.Cell.Grid _ _ bounds => ok (core.result.Result.Ok bounds)
+    | scene.Cell.Center _ =>
+      let o ← scene.Layout.circle_of self cell
+      let r1 ← core.option.Option.ok_or o topology.Error.InvalidGeometry
       let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
       match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let c1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            polar.Circle) self.circles val1
+        let center ← polar.Circle.center c1
+        let mode ← polar.Circle.mode c1
+        match c with
+        | scene.Cell.Grid _ _ _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Center _ =>
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center 0#i32 c1.spec.center_radius swept val
+        | scene.Cell.Sector _ ring _ =>
+          let i ← lift (UScalar.hcast .I32 ring)
+          let i1 ← i * c1.spec.ring_width
+          let inner ← c1.spec.center_radius + i1
+          let outer ← inner + c1.spec.ring_width
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center inner outer swept val
+        | scene.Cell.Transition _ =>
+          let i ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+              self.bands val1
+          let outer ← c1.outer + i
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center c1.outer outer swept val
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Rect (core.convert.FromSame topology.Error) residual
+    | scene.Cell.Sector _ _ _ =>
+      let o ← scene.Layout.circle_of self cell
+      let r1 ← core.option.Option.ok_or o topology.Error.InvalidGeometry
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let c1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            polar.Circle) self.circles val1
+        let center ← polar.Circle.center c1
+        let mode ← polar.Circle.mode c1
+        match c with
+        | scene.Cell.Grid _ _ _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Center _ =>
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center 0#i32 c1.spec.center_radius swept val
+        | scene.Cell.Sector _ ring _ =>
+          let i ← lift (UScalar.hcast .I32 ring)
+          let i1 ← i * c1.spec.ring_width
+          let inner ← c1.spec.center_radius + i1
+          let outer ← inner + c1.spec.ring_width
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center inner outer swept val
+        | scene.Cell.Transition _ =>
+          let i ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+              self.bands val1
+          let outer ← c1.outer + i
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center c1.outer outer swept val
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Rect (core.convert.FromSame topology.Error) residual
+    | scene.Cell.Transition _ =>
+      let o ← scene.Layout.circle_of self cell
+      let r1 ← core.option.Option.ok_or o topology.Error.InvalidGeometry
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let c1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            polar.Circle) self.circles val1
+        let center ← polar.Circle.center c1
+        let mode ← polar.Circle.mode c1
+        match c with
+        | scene.Cell.Grid _ _ _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Center _ =>
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center 0#i32 c1.spec.center_radius swept val
+        | scene.Cell.Sector _ ring _ =>
+          let i ← lift (UScalar.hcast .I32 ring)
+          let i1 ← i * c1.spec.ring_width
+          let inner ← c1.spec.center_radius + i1
+          let outer ← inner + c1.spec.ring_width
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center inner outer swept val
+        | scene.Cell.Transition _ =>
+          let i ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+              self.bands val1
+          let outer ← c1.outer + i
+          let arc ← scene.Layout.cell_arc self cell phases
+          let swept ← scene.Layout.swept_arc self cell arc mode next
+          polar.bounds center c1.outer outer swept val
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Rect (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      grid.Rect (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::radius]:
+    Source: 'src/polar.rs', lines 454:4-456:5 -/
+def polar.Circle.radius
+  (self : polar.Circle) (ring : Std.Usize) : Result Std.I32 := do
+  let i ← lift (UScalar.hcast .I32 ring)
+  let i1 ← i * self.spec.ring_width
+  let i2 ← self.spec.center_radius + i1
+  let i3 ← self.spec.ring_width / 2#i32
+  i2 + i3
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::offset_at_valid]: loop body 0:
+    Source: 'src/polar.rs', lines 493:8-495:9 -/
+@[rust_loop_body]
+def polar.Circle.offset_at_valid_loop.body
+  (self : polar.Circle) (radius : Std.I32) (ring : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i ← ring + 1#usize
+  let i1 ← polar.Circle.ring_count self
+  if i < i1
+  then
+    let i2 ← polar.Circle.radius self i
+    if radius >= i2
+    then ok (cont i)
+    else ok (done ring)
+  else ok (done ring)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::offset_at_valid]: loop 0:
+    Source: 'src/polar.rs', lines 493:8-495:9 -/
+@[rust_loop]
+def polar.Circle.offset_at_valid_loop
+  (self : polar.Circle) (radius : Std.I32) (ring : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun ring1 => polar.Circle.offset_at_valid_loop.body self radius ring1)
+    ring
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::offset_at_valid]:
+    Source: 'src/polar.rs', lines 487:4-515:5 -/
+def polar.Circle.offset_at_valid
+  (self : polar.Circle) (radius : Std.I32) (adapter_band : Std.I32)
+  (phases : Slice Std.I32) :
+  Result Std.I32
+  := do
+  let first ← polar.Circle.radius self 0#usize
+  if radius <= first
+  then polar.Circle.offset self 0#usize phases
+  else
+    let ring ← polar.Circle.offset_at_valid_loop self radius 0#usize
+    let low ← polar.Circle.radius self ring
+    let i ← ring + 1#usize
+    let i1 ← polar.Circle.ring_count self
+    let (self1, high) ←
+      if i < i1
+      then do
+           let high1 ← polar.Circle.radius self i
+           ok (self, high1)
+      else do
+           let high1 ← self.outer + adapter_band
+           ok (self, high1)
+    if radius >= high
+    then ok 0#i32
+    else
+      let «from» ← polar.Circle.offset self1 ring phases
+      let i2 ← polar.Circle.ring_count self1
+      let «to» ←
+        if i < i2
+        then polar.Circle.offset self1 i phases
+        else ok 0#i32
+      let i3 ← polar.angle_delta «from» «to»
+      let i4 ← lift (core.convert.num.FromI64I32.from i3)
+      let i5 ← radius - low
+      let i6 ← lift (core.convert.num.FromI64I32.from i5)
+      let i7 ← i4 * i6
+      let i8 ← high - low
+      let i9 ← lift (core.convert.num.FromI64I32.from i8)
+      let i10 ← i7 / i9
+      let i11 ← lift (IScalar.cast .I32 i10)
+      let i12 ← «from» + i11
+      polar.normalize i12
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::world]:
+    Source: 'src/scene.rs', lines 658:4-676:5 -/
+def scene.Layout.world
+  (self : scene.Layout) (pose : walker.LocalPose) (phases : Slice Std.I32) :
+  Result grid.Point
+  := do
+  match pose with
+  | walker.LocalPose.Cartesian point => ok point
+  | walker.LocalPose.Polar circle radius angle =>
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles circle
+    let mm ← polar.Circle.mode c
+    let offset ←
+      match mm with
+      | polar.MotionMode.Spinning => ok 0#i32
+      | polar.MotionMode.Twisting _ _ =>
+        do
+        let i ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+            self.bands circle
+        polar.Circle.offset_at_valid c radius i phases
+    let p ← polar.Circle.center c
+    let i ← angle + offset
+    polar.point p radius i
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Arc}::middle]:
+    Source: 'src/polar.rs', lines 94:4-96:5 -/
+def polar.Arc.middle (self : polar.Arc) : Result Std.I32 := do
+  let i ← self.length / 2#i32
+  let i1 ← self.start + i
+  polar.normalize i1
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::local_pose]:
+    Source: 'src/scene.rs', lines 581:4-608:5 -/
+def scene.Layout.local_pose
+  (self : scene.Layout) (cell : Std.Usize) : Result walker.LocalPose := do
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+      self.cells cell
+  match c with
+  | scene.Cell.Grid _ _ bounds =>
+    let p ← grid.Rect.center bounds
+    ok (walker.LocalPose.Cartesian p)
+  | scene.Cell.Center circle => ok (walker.LocalPose.Polar circle 0#i32 0#i32)
+  | scene.Cell.Sector circle ring sector =>
+    let c1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles circle
+    let i ← polar.Circle.radius c1 ring
+    let a ← polar.Circle.arc c1 ring sector
+    let i1 ← polar.Arc.middle a
+    ok (walker.LocalPose.Polar circle i i1)
+  | scene.Cell.Transition portal =>
+    let portal1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Portal)
+        self.portals portal
+    let c1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles portal1.spec.circle
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.bands portal1.spec.circle
+    let i1 ← c1.outer + i
+    let i2 ← polar.Arc.middle portal1.spec.mouth
+    ok (walker.LocalPose.Polar portal1.spec.circle i1 i2)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::frame_pose]:
+    Source: 'src/scene.rs', lines 642:4-656:5 -/
+def scene.Layout.frame_pose
+  (self : scene.Layout) (cell : Std.Usize) (phases : Slice Std.I32) :
+  Result walker.LocalPose
+  := do
+  let «local» ← scene.Layout.local_pose self cell
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+      self.cells cell
+  match c with
+  | scene.Cell.Grid _ _ _ => ok «local»
+  | scene.Cell.Center _ => ok «local»
+  | scene.Cell.Sector circle ring _ =>
+    let c1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles circle
+    let mm ← polar.Circle.mode c1
+    match mm with
+    | polar.MotionMode.Spinning =>
+      match «local» with
+      | walker.LocalPose.Cartesian _ => ok «local»
+      | walker.LocalPose.Polar _ radius angle =>
+        let i ← polar.Circle.offset c1 ring phases
+        let i1 ← angle + i
+        let i2 ← polar.normalize i1
+        ok (walker.LocalPose.Polar circle radius i2)
+    | polar.MotionMode.Twisting _ _ => ok «local»
+  | scene.Cell.Transition _ => ok «local»
+
+/-- [labyrinth_core::scene::same_ring]:
+    Source: 'src/scene.rs', lines 100:0-105:1 -/
+def scene.same_ring
+  (first : scene.Cell) (second : scene.Cell) : Result Bool := do
+  match first with
+  | scene.Cell.Grid _ _ _ => ok false
+  | scene.Cell.Center _ => ok false
+  | scene.Cell.Sector _ first1 _ =>
+    match second with
+    | scene.Cell.Grid _ _ _ => ok false
+    | scene.Cell.Center _ => ok false
+    | scene.Cell.Sector _ second1 _ => ok (first1 = second1)
+    | scene.Cell.Transition _ => ok false
+  | scene.Cell.Transition _ => ok false
+
+/-- [labyrinth_core::polar::overlap]: loop body 1:
+    Source: 'src/polar.rs', lines 114:8-124:9 -/
+@[rust_loop_body]
+def polar.overlap_loop0_loop0.body
+  (arcs : Array polar.Arc 4#usize) (start : Std.I32) (length : Std.I32)
+  (j : Std.Usize) :
+  Result (ControlFlow (Std.I32 × Std.Usize) Std.I32)
+  := do
+  let s ← lift (Array.to_slice arcs)
+  let i := Slice.len s
+  if j < i
+  then
+    let a ← Array.index_usize arcs j
+    if a.length != polar.TURN
+    then
+      let i1 ← start - a.start
+      let offset ← polar.normalize i1
+      if offset > a.length
+      then ok (done 0#i32)
+      else
+        let i2 ← a.length - offset
+        let length1 ← lift (core.cmp.impls.OrdI32.min length i2)
+        let j1 ← j + 1#usize
+        ok (cont (length1, j1))
+    else let j1 ← j + 1#usize
+         ok (cont (length, j1))
+  else ok (done length)
+
+/-- [labyrinth_core::polar::overlap]: loop 1:
+    Source: 'src/polar.rs', lines 114:8-124:9 -/
+@[rust_loop]
+def polar.overlap_loop0_loop0
+  (arcs : Array polar.Arc 4#usize) (start : Std.I32) (length : Std.I32)
+  (j : Std.Usize) :
+  Result Std.I32
+  := do
+  loop
+    (fun (length1, j1) => polar.overlap_loop0_loop0.body arcs start length1 j1)
+    (length, j)
+
+/-- [labyrinth_core::polar::overlap]: loop body 0:
+    Source: 'src/polar.rs', lines 110:4-129:5 -/
+@[rust_loop_body]
+def polar.overlap_loop0.body
+  (arcs : Array polar.Arc 4#usize) (i : Std.I32) (i1 : Std.I32)
+  (i2 : Std.Usize) :
+  Result (ControlFlow (Std.I32 × Std.I32 × Std.Usize) (Std.I32 × Std.I32))
+  := do
+  let s ← lift (Array.to_slice arcs)
+  let i3 := Slice.len s
+  if i2 < i3
+  then
+    let a ← Array.index_usize arcs i2
+    let length ← polar.overlap_loop0_loop0 arcs a.start polar.TURN 0#usize
+    let (i4, i5) ← if length > i1
+                     then ok (a.start, length)
+                     else ok (i, i1)
+    let i6 ← i2 + 1#usize
+    ok (cont (i4, i5, i6))
+  else ok (done (i, i1))
+
+/-- [labyrinth_core::polar::overlap]: loop 0:
+    Source: 'src/polar.rs', lines 110:4-129:5 -/
+@[rust_loop]
+def polar.overlap_loop0
+  (arcs : Array polar.Arc 4#usize) (i : Std.I32) (i1 : Std.I32)
+  (i2 : Std.Usize) :
+  Result (Std.I32 × Std.I32)
+  := do
+  loop
+    (fun (i3, i4, i5) => polar.overlap_loop0.body arcs i3 i4 i5)
+    (i, i1, i2)
+
+/-- [labyrinth_core::polar::overlap]:
+    Source: 'src/polar.rs', lines 104:0-134:1 -/
+def polar.overlap
+  (arcs : Array polar.Arc 4#usize) (minimum : Std.I32) :
+  Result (core.result.Result polar.Arc topology.Error)
+  := do
+  let (i, i1) ← polar.overlap_loop0 arcs 0#i32 0#i32 0#usize
+  if i1 < minimum
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else ok (core.result.Result.Ok { start := i, length := i1 })
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::doorway]:
+    Source: 'src/scene.rs', lines 734:4-812:5 -/
+def scene.Layout.doorway
+  (self : scene.Layout) (edge : topology.Edge) (phases : Slice Std.I32)
+  (next : Slice Std.I32) :
+  Result (core.result.Result scene.Doorway topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.cells
+  if edge.u >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    let i1 := alloc.vec.Vec.len self.cells
+    if edge.v >= i1
+    then ok (core.result.Result.Err topology.Error.InvalidIndex)
+    else
+      let b ← topology.Carrier.contains_edge self.carrier edge
+      if b
+      then
+        let r ← grid.Geometry.margin self.geometry
+        let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+        match cf with
+        | core.ops.control_flow.ControlFlow.Continue val =>
+          let holds ← walker.Holds.new
+          let (r1, holds1) ← scene.Layout.holds self edge.u holds
+          let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+          match cf1 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let (r2, holds2) ← scene.Layout.holds self edge.v holds1
+            let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+            match cf2 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let «from» ← scene.Layout.frame_pose self edge.u phases
+              let «to» ← scene.Layout.frame_pose self edge.v phases
+              match «from» with
+              | walker.LocalPose.Cartesian _ =>
+                let from1 ← scene.Layout.world self «from» phases
+                let to1 ← scene.Layout.world self «to» phases
+                let r3 ← grid.Rect.between from1 to1 val
+                let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                match cf3 with
+                | core.ops.control_flow.ControlFlow.Continue val1 =>
+                  let r4 ← grid.Geometry.check self.geometry val1
+                  let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                  match cf4 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    ok (core.result.Result.Ok
+                      {
+                        corridor := val1,
+                        path := (walker.Path.Cartesian from1 to1),
+                        holds := holds2
+                      })
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      scene.Doorway (core.convert.FromSame topology.Error)
+                      residual
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    scene.Doorway (core.convert.FromSame topology.Error)
+                    residual
+              | walker.LocalPose.Polar circle from_radius from_angle =>
+                match «to» with
+                | walker.LocalPose.Cartesian _ =>
+                  let from1 ← scene.Layout.world self «from» phases
+                  let to1 ← scene.Layout.world self «to» phases
+                  let r3 ← grid.Rect.between from1 to1 val
+                  let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                  match cf3 with
+                  | core.ops.control_flow.ControlFlow.Continue val1 =>
+                    let r4 ← grid.Geometry.check self.geometry val1
+                    let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                    match cf4 with
+                    | core.ops.control_flow.ControlFlow.Continue _ =>
+                      ok (core.result.Result.Ok
+                        {
+                          corridor := val1,
+                          path := (walker.Path.Cartesian from1 to1),
+                          holds := holds2
+                        })
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        scene.Doorway (core.convert.FromSame topology.Error)
+                        residual
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      scene.Doorway (core.convert.FromSame topology.Error)
+                      residual
+                | walker.LocalPose.Polar other to_radius to_angle =>
+                  if circle != other
+                  then
+                    ok (core.result.Result.Err topology.Error.InvalidGeometry)
+                  else
+                    let c ←
+                      alloc.vec.Vec.index
+                        (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+                        self.circles circle
+                    let a ← scene.Layout.cell_arc self edge.u phases
+                    let b1 ← scene.Layout.cell_arc self edge.v phases
+                    let a_next ← scene.Layout.cell_arc self edge.u next
+                    let b_next ← scene.Layout.cell_arc self edge.v next
+                    let c1 ←
+                      alloc.vec.Vec.index
+                        (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+                        self.cells edge.u
+                    let c2 ←
+                      alloc.vec.Vec.index
+                        (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+                        self.cells edge.v
+                    let same_ring ← scene.same_ring c1 c2
+                    if same_ring
+                    then
+                      let b2 ← polar.Arc.contains a b1.start
+                      let from_angle1 ←
+                        if b2
+                        then ok b1.start
+                        else ok a.start
+                      let from_angle2 ←
+                        if from_radius = 0#i32
+                        then ok from_angle1
+                        else ok from_angle
+                      let to_angle1 ←
+                        if to_radius = 0#i32
+                        then ok from_angle1
+                        else ok to_angle
+                      let r3 ←
+                        scene.Layout.cell_sweep self edge.u phases next
+                      let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                      match cf3 with
+                      | core.ops.control_flow.ControlFlow.Continue val1 =>
+                        let r4 ←
+                          scene.Layout.cell_sweep self edge.v phases next
+                        let cf4 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r4
+                        match cf4 with
+                        | core.ops.control_flow.ControlFlow.Continue val2 =>
+                          let corridor ← grid.Rect.union val1 val2
+                          let r5 ← grid.Geometry.check self.geometry corridor
+                          let cf5 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r5
+                          match cf5 with
+                          | core.ops.control_flow.ControlFlow.Continue _ =>
+                            ok (core.result.Result.Ok
+                              {
+                                corridor,
+                                path :=
+                                  (walker.Path.Polar
+                                    circle
+                                    from_radius
+                                    to_radius
+                                    from_angle2
+                                    from_angle1
+                                    to_angle1),
+                                holds := holds2
+                              })
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              scene.Doorway (core.convert.FromSame
+                              topology.Error) residual
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            scene.Doorway (core.convert.FromSame
+                            topology.Error) residual
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          scene.Doorway (core.convert.FromSame topology.Error)
+                          residual
+                    else
+                      let i2 ←
+                        lift (core.cmp.impls.OrdI32.min from_radius to_radius)
+                      let radius ←
+                        lift (core.cmp.impls.OrdI32.max i2
+                          c.spec.center_radius)
+                      let i3 ← lift (core.convert.num.FromI64I32.from val)
+                      let i4 ← i3 * 2#i64
+                      let i5 ←
+                        lift (core.convert.num.FromI64I32.from polar.TURN)
+                      let i6 ← i4 * i5
+                      let i7 ← lift (core.convert.num.FromI64I32.from radius)
+                      let i8 ← i6 + i7
+                      let i9 ← i8 - 1#i64
+                      let i10 ←
+                        lift (core.convert.num.FromI64I32.from radius)
+                      let i11 ← i9 / i10
+                      let minimum ← lift (IScalar.cast .I32 i11)
+                      let r3 ←
+                        polar.overlap
+                          (Array.make 4#usize [ a, b1, a_next, b_next ])
+                          minimum
+                      let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                      match cf3 with
+                      | core.ops.control_flow.ControlFlow.Continue val1 =>
+                        let angle ← polar.Arc.middle val1
+                        let from_angle1 ←
+                          if from_radius = 0#i32
+                          then ok angle
+                          else ok from_angle
+                        let to_angle1 ←
+                          if to_radius = 0#i32
+                          then ok angle
+                          else ok to_angle
+                        let r4 ←
+                          scene.Layout.cell_sweep self edge.u phases next
+                        let cf4 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r4
+                        match cf4 with
+                        | core.ops.control_flow.ControlFlow.Continue val2 =>
+                          let r5 ←
+                            scene.Layout.cell_sweep self edge.v phases next
+                          let cf5 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r5
+                          match cf5 with
+                          | core.ops.control_flow.ControlFlow.Continue val3 =>
+                            let corridor ← grid.Rect.union val2 val3
+                            let r6 ←
+                              grid.Geometry.check self.geometry corridor
+                            let cf6 ←
+                              core.result.Result.Insts.CoreOpsTry.branch r6
+                            match cf6 with
+                            | core.ops.control_flow.ControlFlow.Continue _ =>
+                              ok (core.result.Result.Ok
+                                {
+                                  corridor,
+                                  path :=
+                                    (walker.Path.Polar
+                                      circle
+                                      from_radius
+                                      to_radius
+                                      from_angle1
+                                      angle
+                                      to_angle1),
+                                  holds := holds2
+                                })
+                            | core.ops.control_flow.ControlFlow.Break residual
+                              =>
+                              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                scene.Doorway (core.convert.FromSame
+                                topology.Error) residual
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              scene.Doorway (core.convert.FromSame
+                              topology.Error) residual
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            scene.Doorway (core.convert.FromSame
+                            topology.Error) residual
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          scene.Doorway (core.convert.FromSame topology.Error)
+                          residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                scene.Doorway (core.convert.FromSame topology.Error) residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              scene.Doorway (core.convert.FromSame topology.Error) residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            scene.Doorway (core.convert.FromSame topology.Error) residual
+      else ok (core.result.Result.Err topology.Error.InvalidIndex)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]: loop body 0:
+    Source: 'src/scene.rs', lines 1355:8-1360:9 -/
+@[rust_loop_body]
+def scene.Scene.check_removal_loop.body
+  (v : alloc.vec.Vec walker.Walker) (removed : scene.Doorway) (occupied : Bool)
+  (w : Std.Usize) :
+  Result (ControlFlow (scene.Doorway × Bool × Std.Usize) Bool)
+  := do
+  let i := alloc.vec.Vec.len v
+  if w < i
+  then
+    if occupied
+    then ok (done occupied)
+    else
+      let w1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          walker.Walker) v w
+      let (removed1, occupied1) ←
+        match w1.state with
+        | walker.WalkerState.Ready => ok (removed, occupied)
+        | walker.WalkerState.Crossing crossing =>
+          do
+          let occupied2 ←
+            grid.Rect.intersects removed.corridor crossing.corridor
+          ok (removed, occupied2)
+        | walker.WalkerState.Parked => ok (removed, occupied)
+        | walker.WalkerState.Hidden => ok (removed, occupied)
+        | walker.WalkerState.Terminated => ok (removed, occupied)
+      let w2 ← w + 1#usize
+      ok (cont (removed1, occupied1, w2))
+  else ok (done occupied)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]: loop 0:
+    Source: 'src/scene.rs', lines 1355:8-1360:9 -/
+@[rust_loop]
+def scene.Scene.check_removal_loop
+  (v : alloc.vec.Vec walker.Walker) (removed : scene.Doorway) (occupied : Bool)
+  (w : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (removed1, occupied1, w1) => scene.Scene.check_removal_loop.body v
+      removed1 occupied1 w1)
+    (removed, occupied, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::check_removal]:
+    Source: 'src/scene.rs', lines 1348:4-1366:5 -/
+def scene.Scene.check_removal
+  (self : scene.Scene) (edge : topology.Edge) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let b ← spanning_tree.Tree.has_edge self.tree edge
+  if b
+  then
+    let s := alloc.vec.Vec.deref self.phases
+    let s1 := alloc.vec.Vec.deref self.phases
+    let r ← scene.Layout.doorway self.layout edge s s1
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let occupied ←
+        scene.Scene.check_removal_loop self.walkers val false 0#usize
+      if occupied
+      then ok (core.result.Result.Err topology.Error.Occupied)
+      else ok (core.result.Result.Ok ())
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+  else ok (core.result.Result.Err topology.Error.InvalidTransition)
+
+/-- [labyrinth_core::scene::contains]: loop body 0:
+    Source: 'src/scene.rs', lines 151:4-154:5 -/
+@[rust_loop_body]
+def scene.contains_loop.body
+  (edges : Slice topology.Edge) (edge : topology.Edge) (found : Bool)
+  (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := Slice.len edges
+  if i < i1
+  then
+    if found
+    then ok (done found)
+    else
+      let e ← Slice.index_usize edges i
+      let e1 ← topology.Edge.new e.u e.v
+      let found1 ← topology.Edge.Insts.CoreCmpPartialEqEdge.eq e1 edge
+      let i2 ← i + 1#usize
+      ok (cont (found1, i2))
+  else ok (done found)
+
+/-- [labyrinth_core::scene::contains]: loop 0:
+    Source: 'src/scene.rs', lines 151:4-154:5 -/
+@[rust_loop]
+def scene.contains_loop
+  (edges : Slice topology.Edge) (edge : topology.Edge) (found : Bool)
+  (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (found1, i1) => scene.contains_loop.body edges edge found1 i1)
+    (found, i)
+
+/-- [labyrinth_core::scene::contains]:
+    Source: 'src/scene.rs', lines 148:0-156:1 -/
+@[reducible]
+def scene.contains
+  (edges : Slice topology.Edge) (edge : topology.Edge) : Result Bool := do
+  scene.contains_loop edges edge false 0#usize
+
+/-- [labyrinth_core::scene::check_route_edge]:
+    Source: 'src/scene.rs', lines 1041:0-1069:1 -/
+def scene.check_route_edge
+  (layout : scene.Layout)
+  (edge : core.result.Result (Option topology.Edge) topology.Error)
+  (phases : Slice Std.I32) (next : Slice Std.I32)
+  (publication : scene.RoutePublication)
+  (required : alloc.vec.Vec topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    topology.Edge))
+  := do
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch edge
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    match val with
+    | none => ok (core.result.Result.Ok (), required)
+    | some edge1 =>
+      let r ← scene.Layout.doorway layout edge1 phases next
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf1 with
       | core.ops.control_flow.ControlFlow.Continue _ =>
-        let parents ← alloc.vec.from_elem core.clone.CloneUsize root i
-        let (work2, parents1) ←
-          spanning_tree.Tree.dfs_loop work1 parents 0#usize
-        ok (core.result.Result.Ok { parents := parents1, root }, rng1, work2)
+        match publication.current_tree with
+        | none =>
+          let s := alloc.vec.Vec.deref required
+          let b ←
+            core.slice.Slice.contains topology.Edge.Insts.CoreCmpPartialEqEdge
+              s edge1
+          if b
+          then ok (core.result.Result.Ok (), required)
+          else
+            let i := alloc.vec.Vec.len required
+            let s1 ← topology.Carrier.impl.edges layout.carrier
+            let i1 := Slice.len s1
+            if i = i1
+            then
+              ok (core.result.Result.Err topology.Error.InsufficientWorkspace,
+                required)
+            else
+              let required1 ← alloc.vec.Vec.push required edge1
+              ok (core.result.Result.Ok (), required1)
+        | some current =>
+          let b ← scene.contains publication.add edge1
+          if b
+          then
+            let s := alloc.vec.Vec.deref required
+            let b1 ←
+              core.slice.Slice.contains
+                topology.Edge.Insts.CoreCmpPartialEqEdge s edge1
+            if b1
+            then ok (core.result.Result.Ok (), required)
+            else
+              let i := alloc.vec.Vec.len required
+              let s1 ← topology.Carrier.impl.edges layout.carrier
+              let i1 := Slice.len s1
+              if i = i1
+              then
+                ok (core.result.Result.Err
+                  topology.Error.InsufficientWorkspace, required)
+              else
+                let required1 ← alloc.vec.Vec.push required edge1
+                ok (core.result.Result.Ok (), required1)
+          else
+            let b1 ← spanning_tree.Tree.has_edge current edge1
+            if b1
+            then
+              let b2 ← scene.contains publication.remove edge1
+              if b2
+              then
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  required)
+              else
+                let s := alloc.vec.Vec.deref required
+                let b3 ←
+                  core.slice.Slice.contains
+                    topology.Edge.Insts.CoreCmpPartialEqEdge s edge1
+                if b3
+                then ok (core.result.Result.Ok (), required)
+                else
+                  let i := alloc.vec.Vec.len required
+                  let s1 ← topology.Carrier.impl.edges layout.carrier
+                  let i1 := Slice.len s1
+                  if i = i1
+                  then
+                    ok (core.result.Result.Err
+                      topology.Error.InsufficientWorkspace, required)
+                  else
+                    let required1 ← alloc.vec.Vec.push required edge1
+                    ok (core.result.Result.Ok (), required1)
+            else
+              ok (core.result.Result.Err topology.Error.InvalidTransition,
+                required)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r1 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Unit (core.convert.FromSame topology.Error) residual
+        ok (r1, required)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r, required)
+
+/-- [labyrinth_core::scene::check_route_cell]: loop body 0:
+    Source: 'src/scene.rs', lines 1008:4-1011:5 -/
+@[rust_loop_body]
+def scene.check_route_cell_loop.body
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (cell : Std.Usize)
+  (duplicate : Bool) (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < i
+  then
+    if duplicate
+    then ok (done duplicate)
+    else
+      let i1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+          j
+      let j1 ← j + 1#usize
+      ok (cont (i1 = cell, j1))
+  else ok (done duplicate)
+
+/-- [labyrinth_core::scene::check_route_cell]: loop 0:
+    Source: 'src/scene.rs', lines 1008:4-1011:5 -/
+@[rust_loop]
+def scene.check_route_cell_loop
+  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (cell : Std.Usize)
+  (duplicate : Bool) (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (duplicate1, j1) => scene.check_route_cell_loop.body v i cell
+      duplicate1 j1)
+    (duplicate, j)
+
+/-- [labyrinth_core::scene::check_route_cell]:
+    Source: 'src/scene.rs', lines 1001:0-1039:1 -/
+def scene.check_route_cell
+  (layout : scene.Layout) (route : scene.Route) (i : Std.Usize) :
+  Result (core.result.Result Bool topology.Error)
+  := do
+  let cell ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      route.cells i
+  let i1 := alloc.vec.Vec.len layout.cells
+  if cell >= i1
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    let duplicate ←
+      scene.check_route_cell_loop route.cells i cell false 0#usize
+    if duplicate
+    then ok (core.result.Result.Err topology.Error.InvalidForest)
+    else
+      let i2 := alloc.vec.Vec.len route.cells
+      let last ← i2 - 1#usize
+      let cell1 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+          layout.cells cell
+      match cell1 with
+      | scene.Cell.Grid _ _ _ =>
+        if i = 0#usize
+        then ok (core.result.Result.Ok false)
+        else
+          if i = last
+          then ok (core.result.Result.Ok false)
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      | scene.Cell.Center circle =>
+        if i > 1#usize
+        then
+          let i3 ← last - 1#usize
+          if i < i3
+          then
+            if circle = route.circle
+            then ok (core.result.Result.Ok true)
+            else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      | scene.Cell.Sector circle ring _ =>
+        if i > 1#usize
+        then
+          let i3 ← last - 1#usize
+          if i < i3
+          then
+            if circle = route.circle
+            then
+              let i4 ← ring + 1#usize
+              let c ←
+                alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                  polar.Circle) layout.circles circle
+              let i5 ← polar.Circle.ring_count c
+              if i4 < i5
+              then ok (core.result.Result.Ok true)
+              else ok (core.result.Result.Ok false)
+            else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      | scene.Cell.Transition portal =>
+        if i = 1#usize
+        then
+          let portal1 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              scene.Portal) layout.portals portal
+          let exterior_index ← if i = 1#usize
+                                 then ok 0#usize
+                                 else ok last
+          let exterior ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) route.cells exterior_index
+          if portal1.spec.circle != route.circle
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else
+            if portal1.grid_cell != exterior
+            then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+            else ok (core.result.Result.Ok false)
+        else
+          let i3 ← last - 1#usize
+          if i = i3
+          then
+            let portal1 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                scene.Portal) layout.portals portal
+            let exterior_index ← if i = 1#usize
+                                   then ok 0#usize
+                                   else ok last
+            let exterior ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) route.cells exterior_index
+            if portal1.spec.circle != route.circle
+            then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+            else
+              if portal1.grid_cell != exterior
+              then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+              else ok (core.result.Result.Ok false)
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+
+/-- [labyrinth_core::scene::route_cell_status]:
+    Source: 'src/scene.rs', lines 129:0-142:1 -/
+def scene.route_cell_status
+  (interior : Bool) (result : core.result.Result Bool topology.Error)
+  (first : Bool) (edge : topology.Edge) :
+  Result (Bool × (core.result.Result (Option topology.Edge) topology.Error))
+  := do
+  match result with
+  | core.result.Result.Ok cell_interior =>
+    let edge1 ← if first
+                  then ok none
+                  else ok (some edge)
+    if interior
+    then ok (true, core.result.Result.Ok edge1)
+    else ok (cell_interior, core.result.Result.Ok edge1)
+  | core.result.Result.Err error => ok (interior, core.result.Result.Err error)
+
+/-- [labyrinth_core::scene::check_route]: loop body 0:
+    Source: 'src/scene.rs', lines 980:4-992:5 -/
+@[rust_loop_body]
+def scene.check_route_loop.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (i1 : Std.Usize) (v4 : alloc.vec.Vec Std.Usize)
+  (phases : Slice Std.I32) (next : Slice Std.I32)
+  (o : Option spanning_tree.Tree) (s : Slice topology.Edge)
+  (s1 : Slice topology.Edge) (required : alloc.vec.Vec topology.Edge)
+  (status : core.result.Result Unit topology.Error) (interior : Bool)
+  (previous : Std.Usize) (i2 : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × (core.result.Result
+    Unit topology.Error) × Bool × Std.Usize × Std.Usize) ((alloc.vec.Vec
+    topology.Edge) × (core.result.Result Unit topology.Error) × Bool))
+  := do
+  let i3 := alloc.vec.Vec.len v4
+  if i2 < i3
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let cell ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          v4 i2
+      let r ←
+        scene.check_route_cell
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          } { circle := i1, cells := v4 } i2
+      let e ← topology.Edge.new previous cell
+      let (interior1, r1) ←
+        scene.route_cell_status interior r (i2 = 0#usize) e
+      let (status1, required1) ←
+        scene.check_route_edge
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          } r1 phases next { current_tree := o, remove := s, add := s1 }
+          required
+      let i4 ← i2 + 1#usize
+      ok (cont (required1, status1, interior1, cell, i4))
+    else ok (done (required, status, interior))
+  else ok (done (required, status, interior))
+
+/-- [labyrinth_core::scene::check_route]: loop 0:
+    Source: 'src/scene.rs', lines 980:4-992:5 -/
+@[rust_loop]
+def scene.check_route_loop
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (i1 : Std.Usize) (v4 : alloc.vec.Vec Std.Usize)
+  (phases : Slice Std.I32) (next : Slice Std.I32)
+  (o : Option spanning_tree.Tree) (s : Slice topology.Edge)
+  (s1 : Slice topology.Edge) (required : alloc.vec.Vec topology.Edge)
+  (status : core.result.Result Unit topology.Error) (interior : Bool)
+  (previous : Std.Usize) (i2 : Std.Usize) :
+  Result ((alloc.vec.Vec topology.Edge) × (core.result.Result Unit
+    topology.Error) × Bool)
+  := do
+  loop
+    (fun (required1, status1, interior1, previous1, i3) =>
+      scene.check_route_loop.body g v v1 v2 v3 g1 c i i1 v4 phases next o s s1
+      required1 status1 interior1 previous1 i3)
+    (required, status, interior, previous, i2)
+
+/-- [labyrinth_core::scene::check_route]:
+    Source: 'src/scene.rs', lines 964:0-999:1 -/
+def scene.check_route
+  (layout : scene.Layout) (route : scene.Route) (circle : Std.Usize)
+  (phases : Slice Std.I32) (next : Slice Std.I32)
+  (publication : scene.RoutePublication)
+  (required : alloc.vec.Vec topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    topology.Edge))
+  := do
+  if route.circle != circle
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry, required)
+  else
+    let i := alloc.vec.Vec.len route.cells
+    if i < 7#usize
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry, required)
+    else
+      let i1 := alloc.vec.Vec.len route.cells
+      let i2 := alloc.vec.Vec.len layout.cells
+      if i1 > i2
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry, required)
+      else
+        let (required1, status, interior) ←
+          scene.check_route_loop layout.cell_grid layout.cells layout.circles
+            layout.portals layout.bands layout.geometry layout.carrier
+            layout.transforms route.circle route.cells phases next
+            publication.current_tree publication.remove publication.add
+            required (core.result.Result.Ok ()) false 0#usize 0#usize
+        let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+        match cf with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          if interior
+          then ok (core.result.Result.Ok (), required1)
+          else
+            ok (core.result.Result.Err topology.Error.InvalidGeometry,
+              required1)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              Unit (core.convert.FromSame topology.Error) residual
+          ok (r, required1)
+
+/-- [labyrinth_core::scene::check_routes]: loop body 0:
+    Source: 'src/scene.rs', lines 957:4-960:5 -/
+@[rust_loop_body]
+def scene.check_routes_loop.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) (s : Slice topology.Edge) (s1 : Slice topology.Edge)
+  (current_tree : Option spanning_tree.Tree)
+  (required : alloc.vec.Vec topology.Edge)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × (core.result.Result
+    Unit topology.Error) × Std.Usize) ((core.result.Result Unit
+    topology.Error) × (alloc.vec.Vec topology.Edge)))
+  := do
+  let i1 := Slice.len routes
+  if r < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let r1 ← Slice.index_usize routes r
+      let (status1, required1) ←
+        scene.check_route
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          } r1 r phases next { current_tree, remove := s, add := s1 } required
+      let r2 ← r + 1#usize
+      ok (cont (required1, status1, r2))
+    else ok (done (status, required))
+  else ok (done (status, required))
+
+/-- [labyrinth_core::scene::check_routes]: loop 0:
+    Source: 'src/scene.rs', lines 957:4-960:5 -/
+@[rust_loop]
+def scene.check_routes_loop
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) (s : Slice topology.Edge) (s1 : Slice topology.Edge)
+  (required : alloc.vec.Vec topology.Edge)
+  (current_tree : Option spanning_tree.Tree)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    topology.Edge))
+  := do
+  loop
+    (fun (required1, status1, r1) => scene.check_routes_loop.body g v v1 v2 v3
+      g1 c i routes phases next s s1 current_tree required1 status1 r1)
+    (required, status, r)
+
+/-- [labyrinth_core::scene::check_routes]:
+    Source: 'src/scene.rs', lines 937:0-962:1 -/
+def scene.check_routes
+  (layout : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) (current_tree : Option spanning_tree.Tree)
+  (edit : scene.Edit) (required : alloc.vec.Vec topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    topology.Edge))
+  := do
+  let i := Slice.len routes
+  let i1 := alloc.vec.Vec.len layout.circles
+  if i != i1
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry, required)
+  else
+    let required1 ← alloc.vec.Vec.clear alloc.alloc.Global required
+    scene.check_routes_loop layout.cell_grid layout.cells layout.circles
+      layout.portals layout.bands layout.geometry layout.carrier
+      layout.transforms routes phases next edit.remove edit.add required1
+      current_tree (core.result.Result.Ok ()) 0#usize
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 0:
+    Source: 'src/scene.rs', lines 1374:8-1377:9 -/
+@[rust_loop_body]
+def scene.Scene.preflight_edit_loop0.body
+  (self : scene.Scene) (s : Slice topology.Edge)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := Slice.len s
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let e ← Slice.index_usize s i
+      let e1 ← topology.Edge.new e.u e.v
+      let status1 ← scene.Scene.check_removal self e1
+      let i2 ← i + 1#usize
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 0:
+    Source: 'src/scene.rs', lines 1374:8-1377:9 -/
+@[rust_loop]
+def scene.Scene.preflight_edit_loop0
+  (self : scene.Scene) (s : Slice topology.Edge)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => scene.Scene.preflight_edit_loop0.body self s status1
+      i1)
+    (status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 1:
+    Source: 'src/scene.rs', lines 1401:8-1429:9 -/
+@[rust_loop_body]
+def scene.Scene.preflight_edit_loop1.body
+  (l : scene.Layout) (t : spanning_tree.Tree) (v : alloc.vec.Vec Std.I32)
+  (v1 : alloc.vec.Vec Std.I32) (s : Slice topology.Edge)
+  (status : core.result.Result Unit topology.Error) (moving : Std.Usize)
+  (cell : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize ×
+    Std.Usize) ((core.result.Result Unit topology.Error) × Std.Usize))
+  := do
+  let s1 ← spanning_tree.Tree.impl.parents t
+  let i := Slice.len s1
+  if cell < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let parent ← Slice.index_usize s1 cell
+      let (status1, moving1) ←
+        if parent != cell
+        then
+          do
+          let edge ← topology.Edge.new cell parent
+          let b1 ← scene.contains s edge
+          if b1
+          then ok (status, moving)
+          else
+            let s2 := alloc.vec.Vec.deref v
+            let s3 := alloc.vec.Vec.deref v1
+            let r ← scene.Layout.doorway l edge s2 s3
+            let status2 ←
+              match r with
+              | core.result.Result.Ok _ => ok status
+              | core.result.Result.Err error =>
+                ok (core.result.Result.Err error)
+            let s4 := alloc.vec.Vec.deref v
+            let lp ← scene.Layout.frame_pose l cell s4
+            let s5 := alloc.vec.Vec.deref v
+            let p ← scene.Layout.world l lp s5
+            let s6 := alloc.vec.Vec.deref v1
+            let lp1 ← scene.Layout.frame_pose l cell s6
+            let s7 := alloc.vec.Vec.deref v1
+            let p1 ← scene.Layout.world l lp1 s7
+            let b2 ←
+              core.cmp.PartialEq.ne.trait_default
+                grid.Point.Insts.CoreCmpPartialEqPoint p p1
+            let i1 ←
+              if b2
+              then moving + 1#usize
+              else
+                do
+                let s8 := alloc.vec.Vec.deref v
+                let lp2 ← scene.Layout.frame_pose l parent s8
+                let s9 := alloc.vec.Vec.deref v
+                let p2 ← scene.Layout.world l lp2 s9
+                let s10 := alloc.vec.Vec.deref v1
+                let lp3 ← scene.Layout.frame_pose l parent s10
+                let s11 := alloc.vec.Vec.deref v1
+                let p3 ← scene.Layout.world l lp3 s11
+                let b3 ←
+                  core.cmp.PartialEq.ne.trait_default
+                    grid.Point.Insts.CoreCmpPartialEqPoint p2 p3
+                if b3
+                then moving + 1#usize
+                else ok moving
+            ok (status2, i1)
+        else ok (status, moving)
+      let cell1 ← cell + 1#usize
+      ok (cont (status1, moving1, cell1))
+    else ok (done (status, moving))
+  else ok (done (status, moving))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 1:
+    Source: 'src/scene.rs', lines 1401:8-1429:9 -/
+@[rust_loop]
+def scene.Scene.preflight_edit_loop1
+  (l : scene.Layout) (t : spanning_tree.Tree) (v : alloc.vec.Vec Std.I32)
+  (v1 : alloc.vec.Vec Std.I32) (s : Slice topology.Edge)
+  (status : core.result.Result Unit topology.Error) (moving : Std.Usize)
+  (cell : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × Std.Usize)
+  := do
+  loop
+    (fun (status1, moving1, cell1) => scene.Scene.preflight_edit_loop1.body l t
+      v v1 s status1 moving1 cell1)
+    (status, moving, cell)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop body 2:
+    Source: 'src/scene.rs', lines 1431:8-1440:9 -/
+@[rust_loop_body]
+def scene.Scene.preflight_edit_loop2.body
+  (l : scene.Layout) (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
+  (s : Slice topology.Edge) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := Slice.len s
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let e ← Slice.index_usize s i
+      let e1 ← topology.Edge.new e.u e.v
+      let s1 := alloc.vec.Vec.deref v
+      let s2 := alloc.vec.Vec.deref v1
+      let r ← scene.Layout.doorway l e1 s1 s2
+      let status1 ←
+        match r with
+        | core.result.Result.Ok _ => ok status
+        | core.result.Result.Err error => ok (core.result.Result.Err error)
+      let i2 ← i + 1#usize
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]: loop 2:
+    Source: 'src/scene.rs', lines 1431:8-1440:9 -/
+@[rust_loop]
+def scene.Scene.preflight_edit_loop2
+  (l : scene.Layout) (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
+  (s : Slice topology.Edge) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => scene.Scene.preflight_edit_loop2.body l v v1 s
+      status1 i1)
+    (status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::preflight_edit]:
+    Source: 'src/scene.rs', lines 1368:4-1443:5 -/
+def scene.Scene.preflight_edit
+  (self : scene.Scene) (edit : scene.Edit) :
+  Result ((core.result.Result Std.Usize topology.Error) × scene.Scene)
+  := do
+  let i := Slice.len edit.remove
+  let i1 := Slice.len edit.add
+  if i != i1
+  then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+  else
+    let status ←
+      scene.Scene.preflight_edit_loop0 self edit.remove (core.result.Result.Ok
+        ()) 0#usize
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let (v, r) ←
+        match edit.routes with
+        | none =>
+          do
+          let s := alloc.vec.Vec.deref self.routes
+          let s1 := alloc.vec.Vec.deref self.phases
+          let s2 := alloc.vec.Vec.deref self.next_phases
+          let (r1, v1) ←
+            scene.check_routes self.layout s s1 s2 (some self.tree) edit
+              self.required
+          ok (v1, r1)
+        | some routes =>
+          do
+          let s := alloc.vec.Vec.deref self.phases
+          let s1 := alloc.vec.Vec.deref self.next_phases
+          let (r1, v1) ←
+            scene.check_routes self.layout routes s s1 (some self.tree) edit
+              self.required
+          ok (v1, r1)
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let (status1, moving) ←
+          scene.Scene.preflight_edit_loop1 self.layout self.tree self.phases
+            self.next_phases edit.remove status 0#usize 0#usize
+        let status2 ←
+          scene.Scene.preflight_edit_loop2 self.layout self.phases
+            self.next_phases edit.add status1 0#usize
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          ok (core.result.Result.Ok moving, { self with required := v })
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r1 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              Std.Usize (core.convert.FromSame topology.Error) residual
+          ok (r1, { self with required := v })
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r1 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Std.Usize (core.convert.FromSame topology.Error) residual
+        ok (r1, { self with required := v })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Std.Usize (core.convert.FromSame topology.Error) residual
+      ok (r, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]: loop body 0:
+    Source: 'src/scene.rs', lines 1497:8-1500:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.motion_loop.body
+  (steps : Slice Std.I32) (stationary : Bool) (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := Slice.len steps
+  if i < i1
+  then
+    if stationary
+    then
+      let i2 ← Slice.index_usize steps i
+      let i3 ← i + 1#usize
+      ok (cont (i2 = 0#i32, i3))
+    else ok (done stationary)
+  else ok (done stationary)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]: loop 0:
+    Source: 'src/scene.rs', lines 1497:8-1500:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.motion_loop
+  (steps : Slice Std.I32) (stationary : Bool) (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (stationary1, i1) => scene.Scene.motion_loop.body steps stationary1
+      i1)
+    (stationary, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion]:
+    Source: 'src/scene.rs', lines 1488:4-1520:5
+    Visibility: public -/
+def scene.Scene.motion
+  (self : scene.Scene) (stamp : walker.Stamp) (steps : Slice Std.I32)
+  (edit : scene.Edit) :
+  Result ((core.result.Result scene.MotionEvent topology.Error) × scene.Scene)
+  := do
+  let (r, self1) ← scene.Scene.prepare_motion self stamp steps
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let stationary ← scene.Scene.motion_loop steps true 0#usize
+    if stationary
+    then
+      let b ← core.slice.Slice.is_empty edit.remove
+      if b
+      then
+        let b1 ← core.slice.Slice.is_empty edit.add
+        if b1
+        then
+          let b2 := core.option.Option.is_none edit.routes
+          if b2
+          then
+            ok (core.result.Result.Ok
+              {
+                stamp := { self1.stamp with revision := val },
+                replaced := 0#usize,
+                moving_doorways := 0#usize
+              }, { self1 with stamp := { self1.stamp with revision := val } })
+          else
+            let (r1, self2) ← scene.Scene.preflight_edit self1 edit
+            let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+            match cf1 with
+            | core.ops.control_flow.ControlFlow.Continue val1 =>
+              if b
+              then
+                let self3 ← scene.Scene.commit_edit self2 edit val
+                let i := Slice.len edit.remove
+                ok (core.result.Result.Ok
+                  {
+                    stamp := self3.stamp,
+                    replaced := i,
+                    moving_doorways := val1
+                  }, self3)
+              else
+                let (r2, t, w) ←
+                  spanning_tree.Tree.edit_edges self2.tree self2.layout.carrier
+                    edit.remove edit.add self2.work
+                let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+                match cf2 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let self3 ←
+                    scene.Scene.commit_edit { self2 with tree := t, work := w }
+                      edit val
+                  let i := Slice.len edit.remove
+                  ok (core.result.Result.Ok
+                    {
+                      stamp := self3.stamp,
+                      replaced := i,
+                      moving_doorways := val1
+                    }, self3)
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r3 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      scene.MotionEvent (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r3, { self2 with tree := t, work := w })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r2 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  scene.MotionEvent (core.convert.FromSame topology.Error)
+                  residual
+              ok (r2, self2)
+        else
+          let (r1, self2) ← scene.Scene.preflight_edit self1 edit
+          let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+          match cf1 with
+          | core.ops.control_flow.ControlFlow.Continue val1 =>
+            if b
+            then
+              let self3 ← scene.Scene.commit_edit self2 edit val
+              let i := Slice.len edit.remove
+              ok (core.result.Result.Ok
+                { stamp := self3.stamp, replaced := i, moving_doorways := val1
+                }, self3)
+            else
+              let (r2, t, w) ←
+                spanning_tree.Tree.edit_edges self2.tree self2.layout.carrier
+                  edit.remove edit.add self2.work
+              let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+              match cf2 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let self3 ←
+                  scene.Scene.commit_edit { self2 with tree := t, work := w }
+                    edit val
+                let i := Slice.len edit.remove
+                ok (core.result.Result.Ok
+                  {
+                    stamp := self3.stamp,
+                    replaced := i,
+                    moving_doorways := val1
+                  }, self3)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r3 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    scene.MotionEvent (core.convert.FromSame topology.Error)
+                    residual
+                ok (r3, { self2 with tree := t, work := w })
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                scene.MotionEvent (core.convert.FromSame topology.Error)
+                residual
+            ok (r2, self2)
+      else
+        let (r1, self2) ← scene.Scene.preflight_edit self1 edit
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue val1 =>
+          if b
+          then
+            let self3 ← scene.Scene.commit_edit self2 edit val
+            let i := Slice.len edit.remove
+            ok (core.result.Result.Ok
+              { stamp := self3.stamp, replaced := i, moving_doorways := val1 },
+              self3)
+          else
+            let (r2, t, w) ←
+              spanning_tree.Tree.edit_edges self2.tree self2.layout.carrier
+                edit.remove edit.add self2.work
+            let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+            match cf2 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let self3 ←
+                scene.Scene.commit_edit { self2 with tree := t, work := w }
+                  edit val
+              let i := Slice.len edit.remove
+              ok (core.result.Result.Ok
+                { stamp := self3.stamp, replaced := i, moving_doorways := val1
+                }, self3)
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r3 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  scene.MotionEvent (core.convert.FromSame topology.Error)
+                  residual
+              ok (r3, { self2 with tree := t, work := w })
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r2 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              scene.MotionEvent (core.convert.FromSame topology.Error) residual
+          ok (r2, self2)
+    else
+      let (r1, self2) ← scene.Scene.preflight_edit self1 edit
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let b ← core.slice.Slice.is_empty edit.remove
+        if b
+        then
+          let self3 ← scene.Scene.commit_edit self2 edit val
+          let i := Slice.len edit.remove
+          ok (core.result.Result.Ok
+            { stamp := self3.stamp, replaced := i, moving_doorways := val1 },
+            self3)
+        else
+          let (r2, t, w) ←
+            spanning_tree.Tree.edit_edges self2.tree self2.layout.carrier
+              edit.remove edit.add self2.work
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let self3 ←
+              scene.Scene.commit_edit { self2 with tree := t, work := w } edit
+                val
+            let i := Slice.len edit.remove
+            ok (core.result.Result.Ok
+              { stamp := self3.stamp, replaced := i, moving_doorways := val1 },
+              self3)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r3 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                scene.MotionEvent (core.convert.FromSame topology.Error)
+                residual
+            ok (r3, { self2 with tree := t, work := w })
       | core.ops.control_flow.ControlFlow.Break residual =>
         let r2 ←
           core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
-        ok (r2, rng1, work1)
+            scene.MotionEvent (core.convert.FromSame topology.Error) residual
+        ok (r2, self2)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        scene.MotionEvent (core.convert.FromSame topology.Error) residual
+    ok (r1, self1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tree]:
+    Source: 'src/scene.rs', lines 1184:4-1186:5
+    Visibility: public -/
+def scene.Scene.impl.tree
+  (self : scene.Scene) : Result spanning_tree.Tree := do
+  ok self.tree
+
+/-- [labyrinth_core::scene::{impl core::default::Default for labyrinth_core::scene::Edit<'a>}::default]:
+    Source: 'src/scene.rs', lines 886:22-886:29
+    Visibility: public -/
+def scene.Edit.Insts.CoreDefaultDefault.default : Result scene.Edit := do
+  let s ← Shared0Slice.Insts.CoreDefaultDefault.default topology.Edge
+  let o ←
+    core.option.Option.Insts.CoreDefaultDefault.default (Slice scene.Route)
+  ok { remove := s, add := s, routes := o }
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::motion_edge]:
+    Source: 'src/scene.rs', lines 1954:4-1957:5 -/
+def scene.Scene.motion_edge
+  (self : scene.Scene) (edge : topology.Edge) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let s := alloc.vec.Vec.deref self.phases
+  let s1 := alloc.vec.Vec.deref self.next_phases
+  let r ← scene.Layout.doorway self.layout edge s s1
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    ok (core.result.Result.Ok ())
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::virtual_edge]:
+    Source: 'src/motion.rs', lines 535:4-537:5 -/
+def motion.MotionWorkspace.virtual_edge
+  (self : motion.MotionWorkspace) (current : scene.Scene)
+  (edge : topology.Edge) :
+  Result Bool
+  := do
+  let s := alloc.vec.Vec.deref self.add
+  let b ←
+    core.slice.Slice.contains topology.Edge.Insts.CoreCmpPartialEqEdge s edge
+  if b
+  then ok true
+  else
+    let t ← scene.Scene.impl.tree current
+    let b1 ← spanning_tree.Tree.has_edge t edge
+    if b1
+    then
+      let s1 := alloc.vec.Vec.deref self.remove
+      let b2 ←
+        core.slice.Slice.contains topology.Edge.Insts.CoreCmpPartialEqEdge s1
+          edge
+      ok (¬ b2)
+    else ok false
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]: loop body 0:
+    Source: 'src/motion.rs', lines 368:8-371:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.clear_search_loop.body
+  (self : motion.MotionWorkspace) (i : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize)))
+  := do
+  let i1 := alloc.vec.Vec.len self.parent
+  if i < i1
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.parent i
+    let i2 ← i + 1#usize
+    let v := index_mut_back core.num.Usize.MAX
+    ok (cont ({ self with parent := v }, i2))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]: loop 0:
+    Source: 'src/motion.rs', lines 368:8-371:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.clear_search_loop
+  (self : motion.MotionWorkspace) (i : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (self1, i1) => motion.MotionWorkspace.clear_search_loop.body self1 i1)
+    (self, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::clear_search]:
+    Source: 'src/motion.rs', lines 366:4-374:5 -/
+def motion.MotionWorkspace.clear_search
+  (self : motion.MotionWorkspace) (source : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  let (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13,
+    v14, v15, v16) ←
+    motion.MotionWorkspace.clear_search_loop self 0#usize
+  let (_, index_mut_back) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      v13 source
+  let (_, index_mut_back1) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      v14 0#usize
+  let v17 := index_mut_back source
+  let v18 := index_mut_back1 source
+  ok
+    {
+      epoch := i,
+      cells := i1,
+      edges := i2,
+      endpoints := v,
+      steps := v1,
+      routes := v2,
+      routes_changed := b,
+      remove := v3,
+      add := v4,
+      admissible := v5,
+      «protected» := v6,
+      locked := v7,
+      «from» := v8,
+      «to» := v9,
+      offsets := v10,
+      arcs := v11,
+      residual := v12,
+      parent := v17,
+      queue := v18,
+      first := v15,
+      second := v16
+    }
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop body 1:
+    Source: 'src/motion.rs', lines 547:12-559:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.tree_path_loop0_loop0.body
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (cell : Std.Usize)
+  (node : Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (written : Std.Usize) (pos : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize)
+    × Std.Usize × Std.Usize) ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize))
+  := do
+  let i3 ← node + 1#usize
+  let i4 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v10
+      i3
+  if pos < i4
+  then
+    let arc ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v11
+        pos
+    let i5 ← i1 * 4#usize
+    let (v17, v18, written1) ←
+      if arc >= i5
+      then
+        do
+        let i6 ← lift (arc &&& 1#usize)
+        if i6 = 0#usize
+        then
+          let i7 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v9 arc
+          let next ← i7 / 2#usize
+          let edge ← topology.Edge.new cell next
+          let i8 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v15 next
+          if i8 = core.num.Usize.MAX
+          then
+            let b1 ←
+              motion.MotionWorkspace.virtual_edge
+                {
+                  epoch := i,
+                  cells := i1,
+                  edges := i2,
+                  endpoints := v,
+                  steps := v1,
+                  routes := v2,
+                  routes_changed := b,
+                  remove := v3,
+                  add := v4,
+                  admissible := v5,
+                  «protected» := v6,
+                  locked := v7,
+                  «from» := v8,
+                  «to» := v9,
+                  offsets := v10,
+                  arcs := v11,
+                  residual := v12,
+                  parent := v15,
+                  queue := v16,
+                  first := v13,
+                  second := v14
+                } current edge
+            if b1
+            then
+              let (_, index_mut_back) ←
+                alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                  Std.Usize) v15 next
+              let (_, index_mut_back1) ←
+                alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                  Std.Usize) v16 written
+              let written2 ← written + 1#usize
+              let v19 := index_mut_back1 next
+              let v20 := index_mut_back cell
+              ok (v20, v19, written2)
+            else ok (v15, v16, written)
+          else ok (v15, v16, written)
+        else ok (v15, v16, written)
+      else ok (v15, v16, written)
+    let pos1 ← pos + 1#usize
+    ok (cont (v17, v18, written1, pos1))
+  else ok (done (v15, v16, written))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop 1:
+    Source: 'src/motion.rs', lines 547:12-559:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.tree_path_loop0_loop0
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (written : Std.Usize)
+  (cell : Std.Usize) (node : Std.Usize) (pos : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize)
+  := do
+  loop
+    (fun (v17, v18, written1, pos1) =>
+      motion.MotionWorkspace.tree_path_loop0_loop0.body i i1 i2 v v1 v2 b v3 v4
+      v5 v6 v7 v8 v9 v10 v11 v12 v15 v16 current cell node v17 v18 written1
+      pos1)
+    (v13, v14, written, pos)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop body 0:
+    Source: 'src/motion.rs', lines 543:8-561:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.tree_path_loop0.body
+  (current : scene.Scene) (target : Std.Usize) (self : motion.MotionWorkspace)
+  (read : Std.Usize) (written : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if read < written
+  then
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.parent target
+    if i = core.num.Usize.MAX
+    then
+      let cell ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.queue read
+      let i1 ← cell * 2#usize
+      let node ← i1 + 1#usize
+      let pos ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.offsets node
+      let (v, v1, written1) ←
+        motion.MotionWorkspace.tree_path_loop0_loop0 self.epoch self.cells
+          self.edges self.endpoints self.steps self.routes self.routes_changed
+          self.remove self.add self.admissible self.protected self.locked
+          self.from self.to self.offsets self.arcs self.residual self.parent
+          self.queue self.first self.second current written cell node pos
+      let read1 ← read + 1#usize
+      ok (cont ({ self with parent := v, queue := v1 }, read1, written1))
+    else ok (done self)
+  else ok (done self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]: loop 0:
+    Source: 'src/motion.rs', lines 543:8-561:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.tree_path_loop0
+  (self : motion.MotionWorkspace) (current : scene.Scene) (target : Std.Usize)
+  (read : Std.Usize) (written : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (self1, read1, written1) =>
+      motion.MotionWorkspace.tree_path_loop0.body current target self1 read1
+      written1)
+    (self, read, written)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::tree_path]:
+    Source: 'src/motion.rs', lines 539:4-563:5 -/
+def motion.MotionWorkspace.tree_path
+  (self : motion.MotionWorkspace) (current : scene.Scene) (source : Std.Usize)
+  (target : Std.Usize) :
+  Result (Bool × motion.MotionWorkspace)
+  := do
+  let self1 ← motion.MotionWorkspace.clear_search self source
+  let self2 ←
+    motion.MotionWorkspace.tree_path_loop0 self1 current target 0#usize 1#usize
+  let i ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self2.parent target
+  ok (i != core.num.Usize.MAX, self2)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::circles]:
+    Source: 'src/scene.rs', lines 553:4-555:5
+    Visibility: public -/
+def scene.Layout.impl.circles
+  (self : scene.Layout) : Result (Slice polar.Circle) := do
+  ok (alloc.vec.Vec.deref self.circles)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::center_cell]:
+    Source: 'src/polar.rs', lines 401:4-403:5
+    Visibility: public -/
+def polar.Circle.impl.center_cell
+  (self : polar.Circle) : Result Std.Usize := do
+  ok self.center_cell
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 1:
+    Source: 'src/motion.rs', lines 416:12-425:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.flow_path_loop0_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (v2 : alloc.vec.Vec Std.Usize) (v3 : alloc.vec.Vec Std.U8) (node : Std.Usize)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec Std.Usize)
+  (written : Std.Usize) (pos : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize)
+    × Std.Usize × Std.Usize) ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize))
+  := do
+  let i ← node + 1#usize
+  let i1 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v1 i
+  if pos < i1
+  then
+    let arc ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v2
+        pos
+    let next ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        arc
+    let i2 ← lift (arc &&& 1#usize)
+    let (v6, v7, written1) ←
+      if i2 = 0#usize
+      then
+        do
+        let i3 ← lift (arc ^^^ 1#usize)
+        let i4 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.U8) v3
+            i3
+        if i4 != 0#u8
+        then
+          let i5 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v4 next
+          if i5 = core.num.Usize.MAX
+          then
+            let (_, index_mut_back) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v4 next
+            let (_, index_mut_back1) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v5 written
+            let written2 ← written + 1#usize
+            let v8 := index_mut_back1 next
+            let v9 := index_mut_back arc
+            ok (v9, v8, written2)
+          else ok (v4, v5, written)
+        else ok (v4, v5, written)
+      else ok (v4, v5, written)
+    let pos1 ← pos + 1#usize
+    ok (cont (v6, v7, written1, pos1))
+  else ok (done (v4, v5, written))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 1:
+    Source: 'src/motion.rs', lines 416:12-425:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.flow_path_loop0_loop0
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (v2 : alloc.vec.Vec Std.Usize) (v3 : alloc.vec.Vec Std.U8)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec Std.Usize)
+  (written : Std.Usize) (node : Std.Usize) (pos : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize)
+  := do
+  loop
+    (fun (v6, v7, written1, pos1) =>
+      motion.MotionWorkspace.flow_path_loop0_loop0.body v v1 v2 v3 node v6 v7
+      written1 pos1)
+    (v4, v5, written, pos)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 0:
+    Source: 'src/motion.rs', lines 413:8-427:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.flow_path_loop0.body
+  (target : Std.Usize) (self : motion.MotionWorkspace) (read : Std.Usize)
+  (written : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if read < written
+  then
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.parent target
+    if i = core.num.Usize.MAX
+    then
+      let node ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.queue read
+      let pos ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.offsets node
+      let (v, v1, written1) ←
+        motion.MotionWorkspace.flow_path_loop0_loop0 self.to self.offsets
+          self.arcs self.residual self.parent self.queue written node pos
+      let read1 ← read + 1#usize
+      ok (cont ({ self with parent := v, queue := v1 }, read1, written1))
+    else ok (done self)
+  else ok (done self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 0:
+    Source: 'src/motion.rs', lines 413:8-427:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.flow_path_loop0
+  (self : motion.MotionWorkspace) (target : Std.Usize) (read : Std.Usize)
+  (written : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (self1, read1, written1) =>
+      motion.MotionWorkspace.flow_path_loop0.body target self1 read1 written1)
+    (self, read, written)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop body 2:
+    Source: 'src/motion.rs', lines 433:8-441:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.flow_path_loop1.body
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (source : Std.Usize) (v2 : alloc.vec.Vec Std.U8)
+  (v3 : alloc.vec.Vec Std.Usize) (node : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize) ((alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize)))
+  := do
+  if node != source
+  then
+    let i ← lift (node &&& 1#usize)
+    let v4 ←
+      if i = 0#usize
+      then do
+           let i1 ← node / 2#usize
+           alloc.vec.Vec.push v3 i1
+      else ok v3
+    let arc ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v1
+        node
+    let i1 ← lift (arc ^^^ 1#usize)
+    let (i2, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8) v2
+        i1
+    let i3 ← i2 - 1#u8
+    let v5 := index_mut_back i3
+    let (i4, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8) v5
+        arc
+    let i5 ← i4 + 1#u8
+    let node1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        arc
+    let v6 := index_mut_back1 i5
+    ok (cont (v6, v4, node1))
+  else ok (done (v2, v3))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]: loop 2:
+    Source: 'src/motion.rs', lines 433:8-441:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.flow_path_loop1
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.U8)
+  (v2 : alloc.vec.Vec Std.Usize) (v3 : alloc.vec.Vec Std.Usize)
+  (source : Std.Usize) (node : Std.Usize) :
+  Result ((alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (v4, v5, node1) => motion.MotionWorkspace.flow_path_loop1.body v v2
+      source v4 v5 node1)
+    (v1, v3, node)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::flow_path]:
+    Source: 'src/motion.rs', lines 409:4-444:5 -/
+def motion.MotionWorkspace.flow_path
+  (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × motion.MotionWorkspace)
+  := do
+  let self1 ← motion.MotionWorkspace.clear_search self source
+  let self2 ←
+    motion.MotionWorkspace.flow_path_loop0 self1 target 0#usize 1#usize
+  let i ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self2.parent target
+  if i = core.num.Usize.MAX
+  then ok (core.result.Result.Err topology.Error.InvalidForest, self2)
+  else
+    let v ← alloc.vec.Vec.clear alloc.alloc.Global self2.second
+    let (v1, v2) ←
+      motion.MotionWorkspace.flow_path_loop1 self2.from self2.residual
+        self2.parent v source target
+    let i1 ← source / 2#usize
+    let v3 ← alloc.vec.Vec.push v2 i1
+    ok (core.result.Result.Ok (), { self2 with residual := v1, second := v3 })
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]: loop body 0:
+    Source: 'src/motion.rs', lines 400:8-405:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.augment_loop.body
+  (source : Std.Usize) (self : motion.MotionWorkspace) (node : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if node != source
+  then
+    let arc ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.parent node
+    let (i, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8)
+        self.residual arc
+    let i1 ← i - 1#u8
+    let v := index_mut_back i1
+    let i2 ← lift (arc ^^^ 1#usize)
+    let (i3, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8) v
+        i2
+    let i4 ← i3 + 1#u8
+    let node1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.from arc
+    let v1 := index_mut_back1 i4
+    ok (cont ({ self with residual := v1 }, node1))
+  else ok (done self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]: loop 0:
+    Source: 'src/motion.rs', lines 400:8-405:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.augment_loop
+  (self : motion.MotionWorkspace) (source : Std.Usize) (node : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (self1, node1) => motion.MotionWorkspace.augment_loop.body source
+      self1 node1)
+    (self, node)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::augment]:
+    Source: 'src/motion.rs', lines 398:4-406:5 -/
+@[reducible]
+def motion.MotionWorkspace.augment
+  (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  motion.MotionWorkspace.augment_loop self source target
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop body 1:
+    Source: 'src/motion.rs', lines 383:12-392:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.residual_path_loop0_loop0.body
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (v2 : alloc.vec.Vec Std.Usize) (v3 : alloc.vec.Vec Std.U8) (node : Std.Usize)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec Std.Usize)
+  (written : Std.Usize) (pos : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize)
+    × Std.Usize × Std.Usize) ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize))
+  := do
+  let i ← node + 1#usize
+  let i1 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v1 i
+  if pos < i1
+  then
+    let arc ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v2
+        pos
+    let next ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        arc
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.U8) v3 arc
+    let (v6, v7, written1) ←
+      if i2 != 0#u8
+      then
+        do
+        let i3 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            v4 next
+        if i3 = core.num.Usize.MAX
+        then
+          let (_, index_mut_back) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v4 next
+          let (_, index_mut_back1) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) v5 written
+          let written2 ← written + 1#usize
+          let v8 := index_mut_back1 next
+          let v9 := index_mut_back arc
+          ok (v9, v8, written2)
+        else ok (v4, v5, written)
+      else ok (v4, v5, written)
+    let pos1 ← pos + 1#usize
+    ok (cont (v6, v7, written1, pos1))
+  else ok (done (v4, v5, written))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop 1:
+    Source: 'src/motion.rs', lines 383:12-392:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.residual_path_loop0_loop0
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (v2 : alloc.vec.Vec Std.Usize) (v3 : alloc.vec.Vec Std.U8)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec Std.Usize)
+  (written : Std.Usize) (node : Std.Usize) (pos : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize)
+  := do
+  loop
+    (fun (v6, v7, written1, pos1) =>
+      motion.MotionWorkspace.residual_path_loop0_loop0.body v v1 v2 v3 node v6
+      v7 written1 pos1)
+    (v4, v5, written, pos)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop body 0:
+    Source: 'src/motion.rs', lines 380:8-394:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.residual_path_loop0.body
+  (target : Std.Usize) (self : motion.MotionWorkspace) (read : Std.Usize)
+  (written : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  if read < written
+  then
+    let i ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.parent target
+    if i = core.num.Usize.MAX
+    then
+      let node ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.queue read
+      let pos ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.offsets node
+      let (v, v1, written1) ←
+        motion.MotionWorkspace.residual_path_loop0_loop0 self.to self.offsets
+          self.arcs self.residual self.parent self.queue written node pos
+      let read1 ← read + 1#usize
+      ok (cont ({ self with parent := v, queue := v1 }, read1, written1))
+    else ok (done self)
+  else ok (done self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]: loop 0:
+    Source: 'src/motion.rs', lines 380:8-394:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.residual_path_loop0
+  (self : motion.MotionWorkspace) (target : Std.Usize) (read : Std.Usize)
+  (written : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (self1, read1, written1) =>
+      motion.MotionWorkspace.residual_path_loop0.body target self1 read1
+      written1)
+    (self, read, written)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::residual_path]:
+    Source: 'src/motion.rs', lines 376:4-396:5 -/
+def motion.MotionWorkspace.residual_path
+  (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize) :
+  Result (Bool × motion.MotionWorkspace)
+  := do
+  let self1 ← motion.MotionWorkspace.clear_search self source
+  let self2 ←
+    motion.MotionWorkspace.residual_path_loop0 self1 target 0#usize 1#usize
+  let i ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self2.parent target
+  ok (i != core.num.Usize.MAX, self2)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::eligible]:
+    Source: 'src/motion.rs', lines 326:4-334:5 -/
+def motion.MotionWorkspace.eligible
+  (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
+  (cell : Std.Usize) :
+  Result Bool
+  := do
+  let ends ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Array Std.Usize
+      4#usize)) self.endpoints circle
+  let l ← scene.Scene.impl.layout current
+  let s ← scene.Layout.impl.cells l
+  let kind ← Slice.index_usize s cell
+  match kind with
+  | scene.Cell.Grid _ _ _ => ok false
+  | scene.Cell.Center owner => ok (owner = circle)
+  | scene.Cell.Sector owner _ _ => ok (owner = circle)
+  | scene.Cell.Transition _ =>
+    let i ← Array.index_usize ends 1#usize
+    if cell = i
+    then ok true
+    else let i1 ← Array.index_usize ends 2#usize
+         ok (cell = i1)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 0:
+    Source: 'src/motion.rs', lines 338:8-341:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.reset_flow_loop0.body
+  (self : motion.MotionWorkspace) (a : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize)))
+  := do
+  let i := alloc.vec.Vec.len self.residual
+  if a < i
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8)
+        self.residual a
+    let a1 ← a + 1#usize
+    let v := index_mut_back 0#u8
+    ok (cont ({ self with residual := v }, a1))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 0:
+    Source: 'src/motion.rs', lines 338:8-341:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.reset_flow_loop0
+  (self : motion.MotionWorkspace) (a : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (self1, a1) => motion.MotionWorkspace.reset_flow_loop0.body self1 a1)
+    (self, a)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 1:
+    Source: 'src/motion.rs', lines 344:8-349:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.reset_flow_loop1.body
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.Usize) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (current : scene.Scene) (circle : Std.Usize) (pivot : Std.Usize)
+  (v16 : alloc.vec.Vec Std.U8) (v17 : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.U8) × Std.Usize) (alloc.vec.Vec
+    Std.U8))
+  := do
+  if v17 < i1
+  then
+    let b1 ←
+      motion.MotionWorkspace.eligible
+        {
+          epoch := i,
+          cells := i1,
+          edges := i2,
+          endpoints := v,
+          steps := v1,
+          routes := v2,
+          routes_changed := b,
+          remove := v3,
+          add := v4,
+          admissible := v5,
+          «protected» := v6,
+          locked := v7,
+          «from» := v8,
+          «to» := v9,
+          offsets := v10,
+          arcs := v11,
+          residual := v16,
+          parent := v12,
+          queue := v13,
+          first := v14,
+          second := v15
+        } current circle v17
+    let v18 ←
+      if b1
+      then
+        do
+        let i3 ← if v17 = pivot
+                   then ok 2#u8
+                   else ok 1#u8
+        let i4 ← v17 * 4#usize
+        let (_, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            Std.U8) v16 i4
+        ok (index_mut_back i3)
+      else ok v16
+    let v19 ← v17 + 1#usize
+    ok (cont (v18, v19))
+  else ok (done v16)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 1:
+    Source: 'src/motion.rs', lines 344:8-349:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.reset_flow_loop1
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (circle : Std.Usize)
+  (pivot : Std.Usize) (v17 : Std.Usize) :
+  Result (alloc.vec.Vec Std.U8)
+  := do
+  loop
+    (fun (v18, v19) => motion.MotionWorkspace.reset_flow_loop1.body i i1 i2 v
+      v1 v2 b v3 v4 v5 v6 v7 v8 v9 v10 v11 v13 v14 v15 v16 current circle pivot
+      v18 v19)
+    (v12, v17)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop body 2:
+    Source: 'src/motion.rs', lines 353:8-363:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.reset_flow_loop2.body
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.Usize) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (current : scene.Scene) (circle : Std.Usize) (v16 : alloc.vec.Vec Std.U8)
+  (e : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.U8) × Std.Usize) (alloc.vec.Vec
+    Std.U8))
+  := do
+  if e < i2
+  then
+    let l ← scene.Scene.impl.layout current
+    let c ← scene.Layout.impl.carrier l
+    let s ← topology.Carrier.impl.edges c
+    let edge ← Slice.index_usize s e
+    let b1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v5 e
+    let v17 ←
+      if b1
+      then
+        do
+        let b2 ←
+          motion.MotionWorkspace.eligible
+            {
+              epoch := i,
+              cells := i1,
+              edges := i2,
+              endpoints := v,
+              steps := v1,
+              routes := v2,
+              routes_changed := b,
+              remove := v3,
+              add := v4,
+              admissible := v5,
+              «protected» := v6,
+              locked := v7,
+              «from» := v8,
+              «to» := v9,
+              offsets := v10,
+              arcs := v11,
+              residual := v16,
+              parent := v12,
+              queue := v13,
+              first := v14,
+              second := v15
+            } current circle edge.u
+        if b2
+        then
+          let b3 ←
+            motion.MotionWorkspace.eligible
+              {
+                epoch := i,
+                cells := i1,
+                edges := i2,
+                endpoints := v,
+                steps := v1,
+                routes := v2,
+                routes_changed := b,
+                remove := v3,
+                add := v4,
+                admissible := v5,
+                «protected» := v6,
+                locked := v7,
+                «from» := v8,
+                «to» := v9,
+                offsets := v10,
+                arcs := v11,
+                residual := v16,
+                parent := v12,
+                queue := v13,
+                first := v14,
+                second := v15
+              } current circle edge.v
+          if b3
+          then
+            let i3 ← i1 * 4#usize
+            let i4 ← e * 4#usize
+            let i5 ← i3 + i4
+            let (_, index_mut_back) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.U8) v16 i5
+            let v18 := index_mut_back 1#u8
+            let i6 ← i3 + i4
+            let i7 ← i6 + 2#usize
+            let (_, index_mut_back1) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.U8) v18 i7
+            ok (index_mut_back1 1#u8)
+          else ok v16
+        else ok v16
+      else ok v16
+    let e1 ← e + 1#usize
+    ok (cont (v17, e1))
+  else ok (done v16)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]: loop 2:
+    Source: 'src/motion.rs', lines 353:8-363:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.reset_flow_loop2
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (circle : Std.Usize)
+  (e : Std.Usize) :
+  Result (alloc.vec.Vec Std.U8)
+  := do
+  loop
+    (fun (v17, e1) => motion.MotionWorkspace.reset_flow_loop2.body i i1 i2 v v1
+      v2 b v3 v4 v5 v6 v7 v8 v9 v10 v11 v13 v14 v15 v16 current circle v17 e1)
+    (v12, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::reset_flow]:
+    Source: 'src/motion.rs', lines 336:4-364:5 -/
+def motion.MotionWorkspace.reset_flow
+  (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
+  (pivot : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  let (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13,
+    v14, v15, v16) ←
+    motion.MotionWorkspace.reset_flow_loop0 self 0#usize
+  let ends ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Array Std.Usize
+      4#usize)) v circle
+  let v17 ←
+    motion.MotionWorkspace.reset_flow_loop1 i i1 i2 v v1 v2 b v3 v4 v5 v6 v7 v8
+      v9 v10 v11 v12 v13 v14 v15 v16 current circle pivot 0#usize
+  let i3 ← Array.index_usize ends 1#usize
+  let i4 ← i3 * 4#usize
+  let i5 ← i4 + 2#usize
+  let (_, index_mut_back) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8) v17
+      i5
+  let v18 := index_mut_back 1#u8
+  let i6 ← Array.index_usize ends 2#usize
+  let i7 ← i6 * 4#usize
+  let i8 ← i7 + 2#usize
+  let (_, index_mut_back1) ←
+    alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.U8) v18
+      i8
+  let v19 := index_mut_back1 1#u8
+  let v20 ←
+    motion.MotionWorkspace.reset_flow_loop2 i i1 i2 v v1 v2 b v3 v4 v5 v6 v7 v8
+      v9 v10 v11 v19 v13 v14 v15 v16 current circle 0#usize
+  ok
+    {
+      epoch := i,
+      cells := i1,
+      edges := i2,
+      endpoints := v,
+      steps := v1,
+      routes := v2,
+      routes_changed := b,
+      remove := v3,
+      add := v4,
+      admissible := v5,
+      «protected» := v6,
+      locked := v7,
+      «from» := v8,
+      «to» := v9,
+      offsets := v10,
+      arcs := v11,
+      residual := v20,
+      parent := v13,
+      queue := v14,
+      first := v15,
+      second := v16
+    }
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 0:
+    Source: 'src/motion.rs', lines 457:8-463:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.route_through_loop0.body
+  (source : Std.Usize) (target : Std.Usize) (self : motion.MotionWorkspace)
+  (units : Std.I32) (possible : Bool) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.I32 × Bool)
+    (motion.MotionWorkspace × Std.I32))
+  := do
+  if units < 2#i32
+  then
+    if possible
+    then
+      let (possible1, self1) ←
+        motion.MotionWorkspace.residual_path self source target
+      if possible1
+      then
+        let self2 ← motion.MotionWorkspace.augment self1 source target
+        let units1 ← units + 1#i32
+        ok (cont (self2, units1, possible1))
+      else ok (cont (self1, units, possible1))
+    else ok (done (self, units))
+  else ok (done (self, units))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 0:
+    Source: 'src/motion.rs', lines 457:8-463:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.route_through_loop0
+  (self : motion.MotionWorkspace) (source : Std.Usize) (target : Std.Usize)
+  (units : Std.I32) (possible : Bool) :
+  Result (motion.MotionWorkspace × Std.I32)
+  := do
+  loop
+    (fun (self1, units1, possible1) =>
+      motion.MotionWorkspace.route_through_loop0.body source target self1
+      units1 possible1)
+    (self, units, possible)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 1:
+    Source: 'src/motion.rs', lines 475:8-479:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.route_through_loop1.body
+  (v : alloc.vec.Vec Std.Usize) (circle : Std.Usize)
+  (v1 : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec scene.Route) × Std.Usize) (alloc.vec.Vec
+    scene.Route))
+  := do
+  if i > 0#usize
+  then
+    let i1 ← i - 1#usize
+    let cell ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+        i1
+    let (r, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        scene.Route) v1 circle
+    let v2 ← alloc.vec.Vec.push r.cells cell
+    let v3 := index_mut_back { r with cells := v2 }
+    ok (cont (v3, i1))
+  else ok (done v1)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 1:
+    Source: 'src/motion.rs', lines 475:8-479:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.route_through_loop1
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec Std.Usize)
+  (circle : Std.Usize) (i : Std.Usize) :
+  Result (alloc.vec.Vec scene.Route)
+  := do
+  loop
+    (fun (v2, i1) => motion.MotionWorkspace.route_through_loop1.body v1 circle
+      v2 i1)
+    (v, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop body 2:
+    Source: 'src/motion.rs', lines 481:8-485:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.route_through_loop2.body
+  (v : alloc.vec.Vec Std.Usize) (circle : Std.Usize)
+  (v1 : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec scene.Route) × Std.Usize) (alloc.vec.Vec
+    scene.Route))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    let cell ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v i
+    let (r, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        scene.Route) v1 circle
+    let v2 ← alloc.vec.Vec.push r.cells cell
+    let i2 ← i + 1#usize
+    let v3 := index_mut_back { r with cells := v2 }
+    ok (cont (v3, i2))
+  else ok (done v1)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]: loop 2:
+    Source: 'src/motion.rs', lines 481:8-485:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.route_through_loop2
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec Std.Usize)
+  (circle : Std.Usize) (i : Std.Usize) :
+  Result (alloc.vec.Vec scene.Route)
+  := do
+  loop
+    (fun (v2, i1) => motion.MotionWorkspace.route_through_loop2.body v1 circle
+      v2 i1)
+    (v, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_through]:
+    Source: 'src/motion.rs', lines 446:4-489:5 -/
+def motion.MotionWorkspace.route_through
+  (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
+  (pivot : Std.Usize) :
+  Result ((core.result.Result Bool topology.Error) × motion.MotionWorkspace)
+  := do
+  let self1 ← motion.MotionWorkspace.reset_flow self current circle pivot
+  let source ← self1.cells * 2#usize
+  let i ← pivot * 2#usize
+  let target ← i + 1#usize
+  let (self2, units) ←
+    motion.MotionWorkspace.route_through_loop0 self1 source target 0#i32 true
+  if units != 2#i32
+  then ok (core.result.Result.Ok false, self2)
+  else
+    let ends ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Array
+        Std.Usize 4#usize)) self2.endpoints circle
+    let i1 ← Array.index_usize ends 1#usize
+    let i2 ← i1 * 2#usize
+    let (r, self3) ← motion.MotionWorkspace.flow_path self2 i2 target
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let v ← alloc.vec.Vec.clear alloc.alloc.Global self3.first
+      let s := alloc.vec.Vec.deref self3.second
+      let v1 ← alloc.vec.Vec.extend_from_slice core.clone.CloneUsize v s
+      let i3 ← Array.index_usize ends 2#usize
+      let i4 ← i3 * 2#usize
+      let (r1, self4) ←
+        motion.MotionWorkspace.flow_path { self3 with first := v1 } i4 target
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let (r2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            scene.Route) self4.routes circle
+        let v2 ← alloc.vec.Vec.clear alloc.alloc.Global r2.cells
+        let v3 := index_mut_back { r2 with cells := v2 }
+        let (r3, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            scene.Route) v3 circle
+        let i5 ← Array.index_usize ends 0#usize
+        let v4 ← alloc.vec.Vec.push r3.cells i5
+        let i6 := alloc.vec.Vec.len self4.first
+        let v5 := index_mut_back1 { r3 with cells := v4 }
+        let v6 ←
+          motion.MotionWorkspace.route_through_loop1 v5 self4.first circle i6
+        let v7 ←
+          motion.MotionWorkspace.route_through_loop2 v6 self4.second circle
+            1#usize
+        let (r4, index_mut_back2) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            scene.Route) v7 circle
+        let i7 ← Array.index_usize ends 3#usize
+        let v8 ← alloc.vec.Vec.push r4.cells i7
+        let v9 := index_mut_back2 { r4 with cells := v8 }
+        ok (core.result.Result.Ok true,
+          { self4 with routes := v9, routes_changed := true })
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r2 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Bool (core.convert.FromSame topology.Error) residual
+        ok (r2, self4)
     | core.ops.control_flow.ControlFlow.Break residual =>
       let r1 ←
         core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
-      ok (r1, rng, work)
+          Bool (core.convert.FromSame topology.Error) residual
+      ok (r1, self3)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]: loop body 0:
+    Source: 'src/motion.rs', lines 299:8-305:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.edge_index_loop.body
+  (i : Std.Usize) (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (i1 : Std.Usize) («end» : Std.Usize) (pos : Std.Usize)
+  (found : Option Std.Usize) :
+  Result (ControlFlow (Std.Usize × (Option Std.Usize)) (Option Std.Usize))
+  := do
+  if pos < «end»
+  then
+    let b := core.option.Option.is_none found
+    if b
+    then
+      let arc ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          v1 pos
+      let i2 ← i * 4#usize
+      let found1 ←
+        if arc >= i2
+        then
+          do
+          let i3 ← lift (arc &&& 1#usize)
+          if i3 = 0#usize
+          then
+            let i4 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v arc
+            let i5 ← i1 * 2#usize
+            if i4 = i5
+            then let i6 ← arc - i2
+                 let i7 ← i6 / 4#usize
+                 ok (some i7)
+            else ok found
+          else ok found
+        else ok found
+      let pos1 ← pos + 1#usize
+      ok (cont (pos1, found1))
+    else ok (done found)
+  else ok (done found)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]: loop 0:
+    Source: 'src/motion.rs', lines 299:8-305:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.edge_index_loop
+  (i : Std.Usize) (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec Std.Usize)
+  (i1 : Std.Usize) (pos : Std.Usize) («end» : Std.Usize)
+  (found : Option Std.Usize) :
+  Result (Option Std.Usize)
+  := do
+  loop
+    (fun (pos1, found1) => motion.MotionWorkspace.edge_index_loop.body i v v1
+      i1 «end» pos1 found1)
+    (pos, found)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::edge_index]:
+    Source: 'src/motion.rs', lines 294:4-307:5 -/
+def motion.MotionWorkspace.edge_index
+  (self : motion.MotionWorkspace) (edge : topology.Edge) :
+  Result (core.result.Result Std.Usize topology.Error)
+  := do
+  let i ← edge.u * 2#usize
+  let node ← i + 1#usize
+  let pos ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.offsets node
+  let i1 ← node + 1#usize
+  let «end» ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      self.offsets i1
+  let found ←
+    motion.MotionWorkspace.edge_index_loop self.cells self.to self.arcs 
+      edge.v pos «end» none
+  core.option.Option.ok_or found topology.Error.InvalidCarrier
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]: loop body 0:
+    Source: 'src/motion.rs', lines 314:8-321:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.route_admissible_loop.body
+  (cells : Slice Std.Usize) (self : motion.MotionWorkspace) (keep : Bool)
+  (i : Std.Usize) (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (motion.MotionWorkspace × Bool × Std.Usize ×
+    (core.result.Result Unit topology.Error)) (Bool × (core.result.Result Unit
+    topology.Error)))
+  := do
+  let i1 := Slice.len cells
+  if i < i1
+  then
+    if keep
+    then
+      let b ← core.result.Result.is_ok status
+      if b
+      then
+        let i2 ← i - 1#usize
+        let i3 ← Slice.index_usize cells i2
+        let i4 ← Slice.index_usize cells i
+        let edge ← topology.Edge.new i3 i4
+        let r ← motion.MotionWorkspace.edge_index self edge
+        let (self1, keep1, status1) ←
+          match r with
+          | core.result.Result.Ok index =>
+            do
+            let keep2 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+                self.admissible index
+            ok (self, keep2, status)
+          | core.result.Result.Err error =>
+            ok (self, keep, core.result.Result.Err error)
+        let i5 ← i + 1#usize
+        ok (cont (self1, keep1, i5, status1))
+      else ok (done (keep, status))
+    else ok (done (keep, status))
+  else ok (done (keep, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]: loop 0:
+    Source: 'src/motion.rs', lines 314:8-321:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.route_admissible_loop
+  (self : motion.MotionWorkspace) (cells : Slice Std.Usize) (keep : Bool)
+  (i : Std.Usize) (status : core.result.Result Unit topology.Error) :
+  Result (Bool × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (self1, keep1, i1, status1) =>
+      motion.MotionWorkspace.route_admissible_loop.body cells self1 keep1 i1
+      status1)
+    (self, keep, i, status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::route_admissible]:
+    Source: 'src/motion.rs', lines 310:4-324:5 -/
+def motion.MotionWorkspace.route_admissible
+  (self : motion.MotionWorkspace) (cells : Slice Std.Usize) :
+  Result (core.result.Result Bool topology.Error)
+  := do
+  let (keep, status) ←
+    motion.MotionWorkspace.route_admissible_loop self cells true 1#usize
+      (core.result.Result.Ok ())
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    ok (core.result.Result.Ok keep)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Bool (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]: loop body 0:
+    Source: 'src/motion.rs', lines 510:8-526:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_route_loop.body
+  (current : scene.Scene) (circle : Std.Usize) (self : motion.MotionWorkspace)
+  (found : Bool) (v : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (motion.MotionWorkspace × Bool × Std.Usize ×
+    (core.result.Result Unit topology.Error)) (Std.U64 × Std.Usize ×
+    Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) × (alloc.vec.Vec
+    Std.I32) × (alloc.vec.Vec scene.Route) × Bool × (alloc.vec.Vec
+    topology.Edge) × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize)
+    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Bool × (core.result.Result Unit topology.Error)))
+  := do
+  if v < self.cells
+  then
+    if found
+    then
+      ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+        self.routes, self.routes_changed, self.remove, self.add,
+        self.admissible, self.protected, self.locked, self.from, self.to,
+        self.offsets, self.arcs, self.residual, self.parent, self.queue,
+        self.first, self.second, found, status))
+    else
+      let b ← core.result.Result.is_ok status
+      if b
+      then
+        let l ← scene.Scene.impl.layout current
+        let s ← scene.Layout.impl.cells l
+        let kind ← Slice.index_usize s v
+        let (self1, found1, status1) ←
+          match kind with
+          | scene.Cell.Grid _ _ _ => ok (self, found, status)
+          | scene.Cell.Center _ => ok (self, found, status)
+          | scene.Cell.Sector owner ring _ =>
+            if owner = circle
+            then
+              do
+              let i ← ring + 1#usize
+              let s1 ← scene.Layout.impl.circles l
+              let c ← Slice.index_usize s1 circle
+              let i1 ← polar.Circle.ring_count c
+              if i < i1
+              then
+                let (r, self2) ←
+                  motion.MotionWorkspace.route_through self current circle v
+                let (b1, r1) ←
+                  match r with
+                  | core.result.Result.Ok route => ok (route, status)
+                  | core.result.Result.Err error =>
+                    ok (found, core.result.Result.Err error)
+                ok (self2, b1, r1)
+              else ok (self, found, status)
+            else ok (self, found, status)
+          | scene.Cell.Transition _ => ok (self, found, status)
+        let v1 ← v + 1#usize
+        ok (cont (self1, found1, v1, status1))
+      else
+        ok (done (self.epoch, self.cells, self.edges, self.endpoints,
+          self.steps, self.routes, self.routes_changed, self.remove, 
+          self.add, self.admissible, self.protected, self.locked, self.from,
+          self.to, self.offsets, self.arcs, self.residual, self.parent,
+          self.queue, self.first, self.second, found, status))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second, found, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]: loop 0:
+    Source: 'src/motion.rs', lines 510:8-526:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_route_loop
+  (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
+  (found : Bool) (v : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × Bool × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (self1, found1, v1, status1) =>
+      motion.MotionWorkspace.plan_route_loop.body current circle self1 found1
+      v1 status1)
+    (self, found, v, status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan_route]:
+    Source: 'src/motion.rs', lines 491:4-533:5 -/
+def motion.MotionWorkspace.plan_route
+  (self : motion.MotionWorkspace) (current : scene.Scene) (circle : Std.Usize)
+  :
+  Result ((core.result.Result Unit topology.Error) × motion.MotionWorkspace)
+  := do
+  let s ← scene.Scene.impl.routes current
+  let r ← Slice.index_usize s circle
+  let s1 := alloc.vec.Vec.deref r.cells
+  let r1 ← motion.MotionWorkspace.route_admissible self s1
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r1
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    if val
+    then
+      let (r2, index_mut_back) ←
+        alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+          scene.Route) self.routes circle
+      let v ← alloc.vec.Vec.clear alloc.alloc.Global r2.cells
+      let v1 := index_mut_back { r2 with cells := v }
+      let (r3, index_mut_back1) ←
+        alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+          scene.Route) v1 circle
+      let r4 ← Slice.index_usize s circle
+      let s2 := alloc.vec.Vec.deref r4.cells
+      let v2 ←
+        alloc.vec.Vec.extend_from_slice core.clone.CloneUsize r3.cells s2
+      let v3 := index_mut_back1 { r3 with cells := v2 }
+      ok (core.result.Result.Ok (), { self with routes := v3 })
+    else
+      let ends ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice (Array
+          Std.Usize 4#usize)) self.endpoints circle
+      let i ← Array.index_usize ends 0#usize
+      let i1 ← Array.index_usize ends 1#usize
+      let e ← topology.Edge.new i i1
+      let r2 ← motion.MotionWorkspace.edge_index self e
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r2
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let i2 ← Array.index_usize ends 2#usize
+        let i3 ← Array.index_usize ends 3#usize
+        let e1 ← topology.Edge.new i2 i3
+        let r3 ← motion.MotionWorkspace.edge_index self e1
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r3
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue val2 =>
+          let b ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+              self.admissible val1
+          if b
+          then
+            let b1 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+                self.admissible val2
+            if b1
+            then
+              let l ← scene.Scene.impl.layout current
+              let s2 ← scene.Layout.impl.circles l
+              let c ← Slice.index_usize s2 circle
+              let center ← polar.Circle.impl.center_cell c
+              let (r4, self1) ←
+                motion.MotionWorkspace.route_through self current circle center
+              let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r4
+              match cf3 with
+              | core.ops.control_flow.ControlFlow.Continue val3 =>
+                let (i4, i5, i6, v, v1, v2, b2, v3, v4, v5, v6, v7, v8, v9,
+                  v10, v11, v12, v13, v14, v15, v16, found, status) ←
+                  motion.MotionWorkspace.plan_route_loop self1 current circle
+                    val3 0#usize (core.result.Result.Ok ())
+                let cf4 ← core.result.Result.Insts.CoreOpsTry.branch status
+                match cf4 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  if found
+                  then
+                    ok (core.result.Result.Ok (),
+                      {
+                        epoch := i4,
+                        cells := i5,
+                        edges := i6,
+                        endpoints := v,
+                        steps := v1,
+                        routes := v2,
+                        routes_changed := b2,
+                        remove := v3,
+                        add := v4,
+                        admissible := v5,
+                        «protected» := v6,
+                        locked := v7,
+                        «from» := v8,
+                        «to» := v9,
+                        offsets := v10,
+                        arcs := v11,
+                        residual := v12,
+                        parent := v13,
+                        queue := v14,
+                        first := v15,
+                        second := v16
+                      })
+                  else
+                    ok (core.result.Result.Err topology.Error.InvalidGeometry,
+                      {
+                        epoch := i4,
+                        cells := i5,
+                        edges := i6,
+                        endpoints := v,
+                        steps := v1,
+                        routes := v2,
+                        routes_changed := b2,
+                        remove := v3,
+                        add := v4,
+                        admissible := v5,
+                        «protected» := v6,
+                        locked := v7,
+                        «from» := v8,
+                        «to» := v9,
+                        offsets := v10,
+                        arcs := v11,
+                        residual := v12,
+                        parent := v13,
+                        queue := v14,
+                        first := v15,
+                        second := v16
+                      })
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r5 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      Unit (core.convert.FromSame topology.Error) residual
+                  ok (r5,
+                    {
+                      epoch := i4,
+                      cells := i5,
+                      edges := i6,
+                      endpoints := v,
+                      steps := v1,
+                      routes := v2,
+                      routes_changed := b2,
+                      remove := v3,
+                      add := v4,
+                      admissible := v5,
+                      «protected» := v6,
+                      locked := v7,
+                      «from» := v8,
+                      «to» := v9,
+                      offsets := v10,
+                      arcs := v11,
+                      residual := v12,
+                      parent := v13,
+                      queue := v14,
+                      first := v15,
+                      second := v16
+                    })
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r5 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    Unit (core.convert.FromSame topology.Error) residual
+                ok (r5, self1)
+            else
+              ok (core.result.Result.Err topology.Error.InvalidGeometry, self)
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry, self)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r4 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              Unit (core.convert.FromSame topology.Error) residual
+          ok (r4, self)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r3 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Unit (core.convert.FromSame topology.Error) residual
+        ok (r3, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r2 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r2, self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 0:
+    Source: 'src/motion.rs', lines 570:8-575:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop0.body
+  (i : Std.Usize) (v : alloc.vec.Vec Bool) (current : scene.Scene)
+  (v1 : alloc.vec.Vec Bool) (v2 : alloc.vec.Vec Bool) (e : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    Std.Usize) ((alloc.vec.Vec Bool) × (alloc.vec.Vec Bool)))
+  := do
+  if e < i
+  then
+    let l ← scene.Scene.impl.layout current
+    let c ← scene.Layout.impl.carrier l
+    let s ← topology.Carrier.impl.edges c
+    let edge ← Slice.index_usize s e
+    let r ← scene.Scene.motion_edge current edge
+    let b ← core.result.Result.is_ok r
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool) v1 e
+    let b1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v e
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool) v2 e
+    let e1 ← e + 1#usize
+    let v3 := index_mut_back1 b1
+    let v4 := index_mut_back b
+    ok (cont (v4, v3, e1))
+  else ok (done (v1, v2))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 0:
+    Source: 'src/motion.rs', lines 570:8-575:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop0
+  (i : Std.Usize) (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Bool)
+  (v2 : alloc.vec.Vec Bool) (current : scene.Scene) (e : Std.Usize) :
+  Result ((alloc.vec.Vec Bool) × (alloc.vec.Vec Bool))
+  := do
+  loop
+    (fun (v3, v4, e1) => motion.MotionWorkspace.plan_loop0.body i v2 current v3
+      v4 e1)
+    (v, v1, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 2:
+    Source: 'src/motion.rs', lines 581:12-588:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop1_loop0.body
+  (r : Std.Usize) (self : motion.MotionWorkspace)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × (core.result.Result Unit
+    topology.Error) × Std.Usize) (Std.U64 × Std.Usize × Std.Usize ×
+    (alloc.vec.Vec (Array Std.Usize 4#usize)) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec scene.Route) × Bool × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (core.result.Result Unit topology.Error)))
+  := do
+  let r1 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Route)
+      self.routes r
+  let i1 := alloc.vec.Vec.len r1.cells
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← i - 1#usize
+      let i3 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          r1.cells i2
+      let i4 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          r1.cells i
+      let edge ← topology.Edge.new i3 i4
+      let r2 ← motion.MotionWorkspace.edge_index self edge
+      let (v, status1) ←
+        match r2 with
+        | core.result.Result.Ok e =>
+          do
+          let (_, index_mut_back) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Bool) self.protected e
+          let v1 := index_mut_back true
+          ok (v1, status)
+        | core.result.Result.Err error =>
+          ok (self.protected, core.result.Result.Err error)
+      let i5 ← i + 1#usize
+      ok (cont ({ self with «protected» := v }, status1, i5))
+    else
+      ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+        self.routes, self.routes_changed, self.remove, self.add,
+        self.admissible, self.protected, self.locked, self.from, self.to,
+        self.offsets, self.arcs, self.residual, self.parent, self.queue,
+        self.first, self.second, status))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 2:
+    Source: 'src/motion.rs', lines 581:12-588:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop1_loop0
+  (self : motion.MotionWorkspace) (r : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (self1, status1, i1) => motion.MotionWorkspace.plan_loop1_loop0.body r
+      self1 status1 i1)
+    (self, status, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 1:
+    Source: 'src/motion.rs', lines 578:8-590:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop1.body
+  (current : scene.Scene) (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (r : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec
+    (Array Std.Usize 4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    scene.Route) × Bool × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec
+    topology.Edge) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    Std.Usize × (core.result.Result Unit topology.Error)) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error)))
+  := do
+  let i3 := alloc.vec.Vec.len v2
+  if r < i3
+  then
+    let b1 ← core.result.Result.is_ok status
+    if b1
+    then
+      let (status1, self) ←
+        motion.MotionWorkspace.plan_route
+          {
+            epoch := i,
+            cells := i1,
+            edges := i2,
+            endpoints := v,
+            steps := v1,
+            routes := v2,
+            routes_changed := b,
+            remove := v3,
+            add := v4,
+            admissible := v5,
+            «protected» := v6,
+            locked := v7,
+            «from» := v8,
+            «to» := v9,
+            offsets := v10,
+            arcs := v11,
+            residual := v12,
+            parent := v13,
+            queue := v14,
+            first := v15,
+            second := v16
+          } current r
+      let (i4, i5, i6, v17, v18, v19, b2, v20, v21, v22, v23, v24, v25, v26,
+        v27, v28, v29, v30, v31, v32, v33, status2) ←
+        motion.MotionWorkspace.plan_loop1_loop0 self r status1 1#usize
+      let r1 ← r + 1#usize
+      ok (cont (i4, i5, i6, v17, v18, v19, b2, v20, v21, v22, v23, v24, v25,
+        v26, v27, v28, v29, v30, v31, v32, v33, r1, status2))
+    else
+      ok (done (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11,
+        v12, v13, v14, v15, v16, status))
+  else
+    ok (done (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11,
+      v12, v13, v14, v15, v16, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 1:
+    Source: 'src/motion.rs', lines 578:8-590:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop1
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (current : scene.Scene) (r : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (i3, i4, i5, v17, v18, v19, b1, v20, v21, v22, v23, v24, v25, v26,
+      v27, v28, v29, v30, v31, v32, v33, r1, status1) =>
+      motion.MotionWorkspace.plan_loop1.body current i3 i4 i5 v17 v18 v19 b1
+      v20 v21 v22 v23 v24 v25 v26 v27 v28 v29 v30 v31 v32 v33 r1 status1)
+    (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13,
+      v14, v15, v16, r, status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 3:
+    Source: 'src/motion.rs', lines 594:8-604:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop2.body
+  (i : Std.Usize) (v : alloc.vec.Vec Bool) (v1 : alloc.vec.Vec Bool)
+  (current : scene.Scene) (v2 : alloc.vec.Vec topology.Edge)
+  (status : core.result.Result Unit topology.Error) (e : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × (core.result.Result
+    Unit topology.Error) × Std.Usize) ((alloc.vec.Vec topology.Edge) ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  if e < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let l ← scene.Scene.impl.layout current
+      let c ← scene.Layout.impl.carrier l
+      let s ← topology.Carrier.impl.edges c
+      let edge ← Slice.index_usize s e
+      let t ← scene.Scene.impl.tree current
+      let b1 ← spanning_tree.Tree.has_edge t edge
+      let (v3, status1) ←
+        if b1
+        then
+          do
+          let b2 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v
+              e
+          if b2
+          then ok (v2, status)
+          else
+            let b3 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+                v1 e
+            if b3
+            then ok (v2, core.result.Result.Err topology.Error.Occupied)
+            else let v4 ← alloc.vec.Vec.push v2 edge
+                 ok (v4, status)
+        else ok (v2, status)
+      let e1 ← e + 1#usize
+      ok (cont (v3, status1, e1))
+    else ok (done (v2, status))
+  else ok (done (v2, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 3:
+    Source: 'src/motion.rs', lines 594:8-604:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop2
+  (i : Std.Usize) (v : alloc.vec.Vec topology.Edge) (v1 : alloc.vec.Vec Bool)
+  (v2 : alloc.vec.Vec Bool) (current : scene.Scene)
+  (status : core.result.Result Unit topology.Error) (e : Std.Usize) :
+  Result ((alloc.vec.Vec topology.Edge) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (v3, status1, e1) => motion.MotionWorkspace.plan_loop2.body i v1 v2
+      current v3 status1 e1)
+    (v, status, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 6:
+    Source: 'src/motion.rs', lines 616:24-628:25 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop3_loop0_loop0.body
+  (self : motion.MotionWorkspace) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (cell : Std.Usize)
+  (cut : Option topology.Edge) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize ×
+    (Option topology.Edge)) (motion.MotionWorkspace × (core.result.Result Unit
+    topology.Error) × (Option topology.Edge)))
+  := do
+  if cell != i
+  then
+    let b := core.option.Option.is_none cut
+    if b
+    then
+      let b1 ← core.result.Result.is_ok status
+      if b1
+      then
+        let parent ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            self.parent cell
+        let candidate ← topology.Edge.new cell parent
+        let r ← motion.MotionWorkspace.edge_index self candidate
+        match r with
+        | core.result.Result.Ok index =>
+          let b2 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+              self.protected index
+          if b2
+          then ok (cont (status, parent, cut))
+          else ok (cont (status, parent, some candidate))
+        | core.result.Result.Err error =>
+          ok (cont (core.result.Result.Err error, parent, cut))
+      else ok (done (self, status, cut))
+    else ok (done (self, status, cut))
+  else ok (done (self, status, cut))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 6:
+    Source: 'src/motion.rs', lines 616:24-628:25 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop3_loop0_loop0
+  (self : motion.MotionWorkspace)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize)
+  (cell : Std.Usize) (cut : Option topology.Edge) :
+  Result (motion.MotionWorkspace × (core.result.Result Unit topology.Error) ×
+    (Option topology.Edge))
+  := do
+  loop
+    (fun (status1, cell1, cut1) =>
+      motion.MotionWorkspace.plan_loop3_loop0_loop0.body self i status1 cell1
+      cut1)
+    (status, cell, cut)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 5:
+    Source: 'src/motion.rs', lines 610:12-641:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop3_loop0.body
+  (current : scene.Scene) (r : Std.Usize) (self : motion.MotionWorkspace)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × (core.result.Result Unit
+    topology.Error) × Std.Usize) (Std.U64 × Std.Usize × Std.Usize ×
+    (alloc.vec.Vec (Array Std.Usize 4#usize)) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec scene.Route) × Bool × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (core.result.Result Unit topology.Error)))
+  := do
+  let r1 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Route)
+      self.routes r
+  let i1 := alloc.vec.Vec.len r1.cells
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← i - 1#usize
+      let i3 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          r1.cells i2
+      let i4 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          r1.cells i
+      let edge ← topology.Edge.new i3 i4
+      let b1 ← motion.MotionWorkspace.virtual_edge self current edge
+      if b1
+      then let i5 ← i + 1#usize
+           ok (cont (self, status, i5))
+      else
+        let (b2, self1) ←
+          motion.MotionWorkspace.tree_path self current edge.u edge.v
+        if b2
+        then
+          let (self2, status1, cut) ←
+            motion.MotionWorkspace.plan_loop3_loop0_loop0 self1 status 
+              edge.u edge.v none
+          let b3 ← core.result.Result.is_ok status1
+          let (self3, status2) ←
+            if b3
+            then
+              match cut with
+              | none =>
+                ok (self2, core.result.Result.Err topology.Error.Occupied)
+              | some edge1 =>
+                do
+                let v ← alloc.vec.Vec.push self2.remove edge1
+                ok ({ self2 with remove := v }, status1)
+            else ok (self2, status1)
+          let b4 ← core.result.Result.is_ok status2
+          let self4 ←
+            if b4
+            then
+              do
+              let v ← alloc.vec.Vec.push self3.add edge
+              ok { self3 with add := v }
+            else ok self3
+          let i5 ← i + 1#usize
+          ok (cont (self4, status2, i5))
+        else
+          let self2 ←
+            if b
+            then
+              do
+              let v ← alloc.vec.Vec.push self1.add edge
+              ok { self1 with add := v }
+            else ok self1
+          let i5 ← i + 1#usize
+          ok (cont (self2, status, i5))
+    else
+      ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+        self.routes, self.routes_changed, self.remove, self.add,
+        self.admissible, self.protected, self.locked, self.from, self.to,
+        self.offsets, self.arcs, self.residual, self.parent, self.queue,
+        self.first, self.second, status))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 5:
+    Source: 'src/motion.rs', lines 610:12-641:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop3_loop0
+  (self : motion.MotionWorkspace) (current : scene.Scene)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize)
+  (i : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (self1, status1, i1) => motion.MotionWorkspace.plan_loop3_loop0.body
+      current r self1 status1 i1)
+    (self, status, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 4:
+    Source: 'src/motion.rs', lines 608:8-643:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop3.body
+  (current : scene.Scene) (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result (ControlFlow (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec
+    (Array Std.Usize 4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    scene.Route) × Bool × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec
+    topology.Edge) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    (alloc.vec.Vec Std.U8) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
+    (core.result.Result Unit topology.Error) × Std.Usize) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error)))
+  := do
+  let i3 := alloc.vec.Vec.len v2
+  if r < i3
+  then
+    let b1 ← core.result.Result.is_ok status
+    if b1
+    then
+      let (i4, i5, i6, v17, v18, v19, b2, v20, v21, v22, v23, v24, v25, v26,
+        v27, v28, v29, v30, v31, v32, v33, status1) ←
+        motion.MotionWorkspace.plan_loop3_loop0
+          {
+            epoch := i,
+            cells := i1,
+            edges := i2,
+            endpoints := v,
+            steps := v1,
+            routes := v2,
+            routes_changed := b,
+            remove := v3,
+            add := v4,
+            admissible := v5,
+            «protected» := v6,
+            locked := v7,
+            «from» := v8,
+            «to» := v9,
+            offsets := v10,
+            arcs := v11,
+            residual := v12,
+            parent := v13,
+            queue := v14,
+            first := v15,
+            second := v16
+          } current status r 1#usize
+      let r1 ← r + 1#usize
+      ok (cont (i4, i5, i6, v17, v18, v19, b2, v20, v21, v22, v23, v24, v25,
+        v26, v27, v28, v29, v30, v31, v32, v33, status1, r1))
+    else
+      ok (done (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11,
+        v12, v13, v14, v15, v16, status))
+  else
+    ok (done (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11,
+      v12, v13, v14, v15, v16, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 4:
+    Source: 'src/motion.rs', lines 608:8-643:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop3
+  (i : Std.U64) (i1 : Std.Usize) (i2 : Std.Usize)
+  (v : alloc.vec.Vec (Array Std.Usize 4#usize)) (v1 : alloc.vec.Vec Std.I32)
+  (v2 : alloc.vec.Vec scene.Route) (b : Bool)
+  (v3 : alloc.vec.Vec topology.Edge) (v4 : alloc.vec.Vec topology.Edge)
+  (v5 : alloc.vec.Vec Bool) (v6 : alloc.vec.Vec Bool) (v7 : alloc.vec.Vec Bool)
+  (v8 : alloc.vec.Vec Std.Usize) (v9 : alloc.vec.Vec Std.Usize)
+  (v10 : alloc.vec.Vec Std.Usize) (v11 : alloc.vec.Vec Std.Usize)
+  (v12 : alloc.vec.Vec Std.U8) (v13 : alloc.vec.Vec Std.Usize)
+  (v14 : alloc.vec.Vec Std.Usize) (v15 : alloc.vec.Vec Std.Usize)
+  (v16 : alloc.vec.Vec Std.Usize) (current : scene.Scene)
+  (status : core.result.Result Unit topology.Error) (r : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (i3, i4, i5, v17, v18, v19, b1, v20, v21, v22, v23, v24, v25, v26,
+      v27, v28, v29, v30, v31, v32, v33, status1, r1) =>
+      motion.MotionWorkspace.plan_loop3.body current i3 i4 i5 v17 v18 v19 b1
+      v20 v21 v22 v23 v24 v25 v26 v27 v28 v29 v30 v31 v32 v33 status1 r1)
+    (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11, v12, v13,
+      v14, v15, v16, status, r)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop body 7:
+    Source: 'src/motion.rs', lines 647:8-656:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.plan_loop4.body
+  (current : scene.Scene) (self : motion.MotionWorkspace) (e : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize)))
+  := do
+  if e < self.edges
+  then
+    let i := alloc.vec.Vec.len self.add
+    let i1 := alloc.vec.Vec.len self.remove
+    if i < i1
+    then
+      let l ← scene.Scene.impl.layout current
+      let c ← scene.Layout.impl.carrier l
+      let s ← topology.Carrier.impl.edges c
+      let edge ← Slice.index_usize s e
+      let b ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+          self.admissible e
+      let self1 ←
+        if b
+        then
+          do
+          let b1 ← motion.MotionWorkspace.virtual_edge self current edge
+          if b1
+          then ok self
+          else
+            let (b2, self2) ←
+              motion.MotionWorkspace.tree_path self current edge.u edge.v
+            if b2
+            then ok self2
+            else
+              let v ← alloc.vec.Vec.push self2.add edge
+              ok { self2 with add := v }
+        else ok self
+      let e1 ← e + 1#usize
+      ok (cont (self1, e1))
+    else
+      ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+        self.routes, self.routes_changed, self.remove, self.add,
+        self.admissible, self.protected, self.locked, self.from, self.to,
+        self.offsets, self.arcs, self.residual, self.parent, self.queue,
+        self.first, self.second))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]: loop 7:
+    Source: 'src/motion.rs', lines 647:8-656:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.plan_loop4
+  (self : motion.MotionWorkspace) (current : scene.Scene) (e : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (self1, e1) => motion.MotionWorkspace.plan_loop4.body current self1
+      e1)
+    (self, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::plan]:
+    Source: 'src/motion.rs', lines 565:4-661:5 -/
+def motion.MotionWorkspace.plan
+  (self : motion.MotionWorkspace) (current : scene.Scene) :
+  Result ((core.result.Result Unit topology.Error) × motion.MotionWorkspace)
+  := do
+  let v ← alloc.vec.Vec.clear alloc.alloc.Global self.remove
+  let v1 ← alloc.vec.Vec.clear alloc.alloc.Global self.add
+  let (v2, v3) ←
+    motion.MotionWorkspace.plan_loop0 self.edges self.admissible self.protected
+      self.locked current 0#usize
+  let (i, i1, i2, v4, v5, v6, b, v7, v8, v9, v10, v11, v12, v13, v14, v15, v16,
+    v17, v18, v19, v20, status) ←
+    motion.MotionWorkspace.plan_loop1 self.epoch self.cells self.edges
+      self.endpoints self.steps self.routes false v v1 v2 v3 self.locked
+      self.from self.to self.offsets self.arcs self.residual self.parent
+      self.queue self.first self.second current 0#usize (core.result.Result.Ok
+      ())
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let (v21, status1) ←
+      motion.MotionWorkspace.plan_loop2 i2 v7 v9 v10 current status 0#usize
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let (i3, i4, i5, v22, v23, v24, b1, v25, v26, v27, v28, v29, v30, v31,
+        v32, v33, v34, v35, v36, v37, v38, status2) ←
+        motion.MotionWorkspace.plan_loop3 i i1 i2 v4 v5 v6 b v21 v8 v9 v10 v11
+          v12 v13 v14 v15 v16 v17 v18 v19 v20 current status1 0#usize
+      let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status2
+      match cf2 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let (i6, i7, i8, v39, v40, v41, b2, v42, v43, v44, v45, v46, v47, v48,
+          v49, v50, v51, v52, v53, v54, v55) ←
+          motion.MotionWorkspace.plan_loop4
+            {
+              epoch := i3,
+              cells := i4,
+              edges := i5,
+              endpoints := v22,
+              steps := v23,
+              routes := v24,
+              routes_changed := b1,
+              remove := v25,
+              add := v26,
+              admissible := v27,
+              «protected» := v28,
+              locked := v29,
+              «from» := v30,
+              «to» := v31,
+              offsets := v32,
+              arcs := v33,
+              residual := v34,
+              parent := v35,
+              queue := v36,
+              first := v37,
+              second := v38
+            } current 0#usize
+        let i9 := alloc.vec.Vec.len v43
+        let i10 := alloc.vec.Vec.len v42
+        if i9 != i10
+        then
+          ok (core.result.Result.Err topology.Error.Disconnected,
+            {
+              epoch := i6,
+              cells := i7,
+              edges := i8,
+              endpoints := v39,
+              steps := v40,
+              routes := v41,
+              routes_changed := b2,
+              remove := v42,
+              add := v43,
+              admissible := v44,
+              «protected» := v45,
+              locked := v46,
+              «from» := v47,
+              «to» := v48,
+              offsets := v49,
+              arcs := v50,
+              residual := v51,
+              parent := v52,
+              queue := v53,
+              first := v54,
+              second := v55
+            })
+        else
+          ok (core.result.Result.Ok (),
+            {
+              epoch := i6,
+              cells := i7,
+              edges := i8,
+              endpoints := v39,
+              steps := v40,
+              routes := v41,
+              routes_changed := b2,
+              remove := v42,
+              add := v43,
+              admissible := v44,
+              «protected» := v45,
+              locked := v46,
+              «from» := v47,
+              «to» := v48,
+              offsets := v49,
+              arcs := v50,
+              residual := v51,
+              parent := v52,
+              queue := v53,
+              first := v54,
+              second := v55
+            })
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Unit (core.convert.FromSame topology.Error) residual
+        ok (r,
+          {
+            epoch := i3,
+            cells := i4,
+            edges := i5,
+            endpoints := v22,
+            steps := v23,
+            routes := v24,
+            routes_changed := b1,
+            remove := v25,
+            add := v26,
+            admissible := v27,
+            «protected» := v28,
+            locked := v29,
+            «from» := v30,
+            «to» := v31,
+            offsets := v32,
+            arcs := v33,
+            residual := v34,
+            parent := v35,
+            queue := v36,
+            first := v37,
+            second := v38
+          })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r,
+        {
+          epoch := i,
+          cells := i1,
+          edges := i2,
+          endpoints := v4,
+          steps := v5,
+          routes := v6,
+          routes_changed := b,
+          remove := v21,
+          add := v8,
+          admissible := v9,
+          «protected» := v10,
+          locked := v11,
+          «from» := v12,
+          «to» := v13,
+          offsets := v14,
+          arcs := v15,
+          residual := v16,
+          parent := v17,
+          queue := v18,
+          first := v19,
+          second := v20
+        })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r,
+      {
+        epoch := i,
+        cells := i1,
+        edges := i2,
+        endpoints := v4,
+        steps := v5,
+        routes := v6,
+        routes_changed := b,
+        remove := v7,
+        add := v8,
+        admissible := v9,
+        «protected» := v10,
+        locked := v11,
+        «from» := v12,
+        «to» := v13,
+        offsets := v14,
+        arcs := v15,
+        residual := v16,
+        parent := v17,
+        queue := v18,
+        first := v19,
+        second := v20
+      })
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{impl core::ops::function::FnOnce<(u64,), ()> for labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}}::call_once]:
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
+def
+  motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple.call_once
+  (c : motion.MotionWorkspace.advance.closure) (tupled_args : Std.U64) :
+  Result Unit
+  := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{impl core::ops::function::FnOnce<(u64,), ()> for labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance::{closure}}]
+    Source: 'src/motion.rs', lines 250:71-250:77 -/
+@[reducible]
+def
+  motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple
+  : core.ops.function.FnOnce motion.MotionWorkspace.advance.closure Std.U64
+  Unit := {
+  call_once :=
+    motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple.call_once
+}
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 0:
+    Source: 'src/motion.rs', lines 224:8-227:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.advance_loop0.body
+  (requested : Slice Std.I32) (maximum : Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow (Std.Usize × Std.Usize) Std.Usize)
+  := do
+  let i1 := Slice.len requested
+  if i < i1
+  then
+    let i2 ← Slice.index_usize requested i
+    let i3 ← lift (IScalar.hcast .Usize i2)
+    let maximum1 ← lift (core.cmp.impls.OrdUsize.max maximum i3)
+    let i4 ← i + 1#usize
+    ok (cont (maximum1, i4))
+  else ok (done maximum)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 0:
+    Source: 'src/motion.rs', lines 224:8-227:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.advance_loop0
+  (requested : Slice Std.I32) (maximum : Std.Usize) (i : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun (maximum1, i1) => motion.MotionWorkspace.advance_loop0.body requested
+      maximum1 i1)
+    (maximum, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 1:
+    Source: 'src/motion.rs', lines 235:8-239:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.advance_loop1.body
+  (current : scene.Scene) (self : motion.MotionWorkspace) (e : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize) (Std.U64 ×
+    Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize 4#usize)) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool ×
+    (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize)))
+  := do
+  if e < self.edges
+  then
+    let l ← scene.Scene.impl.layout current
+    let c ← scene.Layout.impl.carrier l
+    let s ← topology.Carrier.impl.edges c
+    let edge ← Slice.index_usize s e
+    let t ← scene.Scene.impl.tree current
+    let b ← spanning_tree.Tree.has_edge t edge
+    let b1 ←
+      if b
+      then
+        do
+        let r ← scene.Scene.check_removal current edge
+        core.result.Result.is_err r
+      else ok false
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        self.locked e
+    let e1 ← e + 1#usize
+    let v := index_mut_back b1
+    ok (cont ({ self with locked := v }, e1))
+  else
+    ok (done (self.epoch, self.cells, self.edges, self.endpoints, self.steps,
+      self.routes, self.routes_changed, self.remove, self.add, self.admissible,
+      self.protected, self.locked, self.from, self.to, self.offsets, 
+      self.arcs, self.residual, self.parent, self.queue, self.first,
+      self.second))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 1:
+    Source: 'src/motion.rs', lines 235:8-239:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.advance_loop1
+  (self : motion.MotionWorkspace) (current : scene.Scene) (e : Std.Usize) :
+  Result (Std.U64 × Std.Usize × Std.Usize × (alloc.vec.Vec (Array Std.Usize
+    4#usize)) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec scene.Route) × Bool
+    × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) × (alloc.vec.Vec Bool) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.U8) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (self1, e1) => motion.MotionWorkspace.advance_loop1.body current self1
+      e1)
+    (self, e)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 3:
+    Source: 'src/motion.rs', lines 246:12-249:13 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.advance_loop2_loop0.body
+  (requested : Slice Std.I32) (divisor : Std.Usize)
+  (self : motion.MotionWorkspace) (i : Std.Usize) :
+  Result (ControlFlow (motion.MotionWorkspace × Std.Usize)
+    motion.MotionWorkspace)
+  := do
+  let i1 := Slice.len requested
+  if i < i1
+  then
+    let i2 ← Slice.index_usize requested i
+    let i3 ← lift (UScalar.hcast .I32 divisor)
+    massert (¬ (i3 = 0#i32))
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.steps i
+    let i4 ← I32.div i2 i3
+    let i5 ← i + 1#usize
+    let v := index_mut_back i4
+    ok (cont ({ self with steps := v }, i5))
+  else ok (done self)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 3:
+    Source: 'src/motion.rs', lines 246:12-249:13 -/
+@[rust_loop]
+def motion.MotionWorkspace.advance_loop2_loop0
+  (self : motion.MotionWorkspace) (requested : Slice Std.I32)
+  (divisor : Std.Usize) (i : Std.Usize) :
+  Result motion.MotionWorkspace
+  := do
+  loop
+    (fun (self1, i1) => motion.MotionWorkspace.advance_loop2_loop0.body
+      requested divisor self1 i1)
+    (self, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 4:
+    Source: 'src/motion.rs', lines 264:16-270:17 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.advance_loop2_loop1.body
+  (self : motion.MotionWorkspace) (requested : Slice Std.I32)
+  (next : Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow (Std.Usize × Std.Usize) (motion.MotionWorkspace ×
+    Std.Usize))
+  := do
+  let i1 := Slice.len requested
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        self.steps i
+    let quotient ← lift (IScalar.hcast .Usize i2)
+    let i3 ← Slice.index_usize requested i
+    let i4 ← lift (IScalar.hcast .Usize i3)
+    let o ← lift (Usize.checked_div i4 quotient)
+    let next1 ←
+      match o with
+      | none => ok next
+      | some «end» =>
+        do
+        let i5 ← «end» + 1#usize
+        ok (core.cmp.impls.OrdUsize.min next i5)
+    let i5 ← i + 1#usize
+    ok (cont (next1, i5))
+  else ok (done (self, next))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 4:
+    Source: 'src/motion.rs', lines 264:16-270:17 -/
+@[rust_loop]
+def motion.MotionWorkspace.advance_loop2_loop1
+  (self : motion.MotionWorkspace) (requested : Slice Std.I32)
+  (next : Std.Usize) (i : Std.Usize) :
+  Result (motion.MotionWorkspace × Std.Usize)
+  := do
+  loop
+    (fun (next1, i1) => motion.MotionWorkspace.advance_loop2_loop1.body self
+      requested next1 i1)
+    (next, i)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop body 2:
+    Source: 'src/motion.rs', lines 244:8-273:9 -/
+@[rust_loop_body]
+def motion.MotionWorkspace.advance_loop2.body
+  (expected : walker.Stamp) (requested : Slice Std.I32) (maximum : Std.Usize)
+  (self : motion.MotionWorkspace) (current : scene.Scene) (divisor : Std.Usize)
+  (planned : Bool) (failure : topology.Error)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (motion.MotionWorkspace × scene.Scene × Std.Usize ×
+    Bool × topology.Error × (core.result.Result Unit topology.Error))
+    (motion.MotionWorkspace × scene.Scene × Std.Usize × Bool ×
+    topology.Error × (core.result.Result Unit topology.Error)))
+  := do
+  if divisor <= maximum
+  then
+    if planned
+    then ok (done (self, current, divisor, planned, failure, status))
+    else
+      let b ← core.result.Result.is_ok status
+      if b
+      then
+        let self1 ←
+          motion.MotionWorkspace.advance_loop2_loop0 self requested divisor
+            0#usize
+        let s := alloc.vec.Vec.deref self1.steps
+        let (r, current1) ← scene.Scene.prepare_motion current expected s
+        let status1 ←
+          core.result.Result.map
+            motion.MotionWorkspace.advance.closure.Insts.CoreOpsFunctionFnOnceTupleU64Tuple
+            r ()
+        let b1 ← core.result.Result.is_ok status1
+        let (self2, planned1, failure1, status2) ←
+          if b1
+          then
+            do
+            let (r1, self3) ← motion.MotionWorkspace.plan self1 current1
+            match r1 with
+            | core.result.Result.Ok _ => ok (self3, true, failure, status1)
+            | core.result.Result.Err e =>
+              let (e1, r2) ←
+                match e with
+                | topology.Error.InvalidSize => ok (failure, r1)
+                | topology.Error.InvalidIndex => ok (failure, r1)
+                | topology.Error.InvalidCarrier => ok (failure, r1)
+                | topology.Error.Disconnected =>
+                  ok (topology.Error.Disconnected, status1)
+                | topology.Error.InvalidChoice => ok (failure, r1)
+                | topology.Error.InvalidForest => ok (failure, r1)
+                | topology.Error.InvalidTree => ok (failure, r1)
+                | topology.Error.InvalidTransition => ok (failure, r1)
+                | topology.Error.InsufficientWorkspace => ok (failure, r1)
+                | topology.Error.Overflow => ok (failure, r1)
+                | topology.Error.StaleEpoch => ok (failure, r1)
+                | topology.Error.StaleRevision => ok (failure, r1)
+                | topology.Error.Occupied =>
+                  ok (topology.Error.Occupied, status1)
+                | topology.Error.InvalidGeometry =>
+                  ok (topology.Error.InvalidGeometry, status1)
+              ok (self3, planned, e1, r2)
+          else ok (self1, planned, failure, status1)
+        if planned1
+        then ok (cont (self2, current1, divisor, planned1, failure1, status2))
+        else
+          let b2 ← core.result.Result.is_ok status2
+          if b2
+          then
+            let next ← maximum + 1#usize
+            let (self3, next1) ←
+              motion.MotionWorkspace.advance_loop2_loop1 self2 requested next
+                0#usize
+            ok (cont (self3, current1, next1, planned1, failure1, status2))
+          else
+            ok (cont (self2, current1, divisor, planned1, failure1, status2))
+      else ok (done (self, current, divisor, planned, failure, status))
+  else ok (done (self, current, divisor, planned, failure, status))
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]: loop 2:
+    Source: 'src/motion.rs', lines 244:8-273:9 -/
+@[rust_loop]
+def motion.MotionWorkspace.advance_loop2
+  (self : motion.MotionWorkspace) (current : scene.Scene)
+  (expected : walker.Stamp) (requested : Slice Std.I32) (maximum : Std.Usize)
+  (divisor : Std.Usize) (planned : Bool) (failure : topology.Error)
+  (status : core.result.Result Unit topology.Error) :
+  Result (motion.MotionWorkspace × scene.Scene × Std.Usize × Bool ×
+    topology.Error × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (self1, current1, divisor1, planned1, failure1, status1) =>
+      motion.MotionWorkspace.advance_loop2.body expected requested maximum
+      self1 current1 divisor1 planned1 failure1 status1)
+    (self, current, divisor, planned, failure, status)
+
+/-- [labyrinth_core::motion::{labyrinth_core::motion::MotionWorkspace}::advance]:
+    Source: 'src/motion.rs', lines 213:4-292:5 -/
+def motion.MotionWorkspace.advance
+  (self : motion.MotionWorkspace) (current : scene.Scene)
+  (expected : walker.Stamp) (requested : Slice Std.I32) :
+  Result ((core.result.Result motion.MotionAdvance topology.Error) ×
+    motion.MotionWorkspace × scene.Scene)
+  := do
+  let (r, current1) ← scene.Scene.prepare_motion current expected requested
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let r1 ← motion.MotionWorkspace.check_scene self current1
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let maximum ←
+        motion.MotionWorkspace.advance_loop0 requested 0#usize 0#usize
+      if maximum = 0#usize
+      then
+        let e ← scene.Edit.Insts.CoreDefaultDefault.default
+        let (r2, current2) ← scene.Scene.motion current1 expected requested e
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue val =>
+          ok (core.result.Result.Ok { event := val, divisor := 1#usize }, self,
+            current2)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r3 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              motion.MotionAdvance (core.convert.FromSame topology.Error)
+              residual
+          ok (r3, self, current2)
+      else
+        let (i, i1, i2, v, v1, v2, b, v3, v4, v5, v6, v7, v8, v9, v10, v11,
+          v12, v13, v14, v15, v16) ←
+          motion.MotionWorkspace.advance_loop1 self current1 0#usize
+        let (self1, current2, divisor, planned, failure, status) ←
+          motion.MotionWorkspace.advance_loop2
+            {
+              epoch := i,
+              cells := i1,
+              edges := i2,
+              endpoints := v,
+              steps := v1,
+              routes := v2,
+              routes_changed := b,
+              remove := v3,
+              add := v4,
+              admissible := v5,
+              «protected» := v6,
+              locked := v7,
+              «from» := v8,
+              «to» := v9,
+              offsets := v10,
+              arcs := v11,
+              residual := v12,
+              parent := v13,
+              queue := v14,
+              first := v15,
+              second := v16
+            } current1 expected requested maximum 1#usize false
+            topology.Error.InvalidGeometry (core.result.Result.Ok ())
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          if planned
+          then
+            let s := alloc.vec.Vec.deref self1.steps
+            let s1 := alloc.vec.Vec.deref self1.remove
+            let s2 := alloc.vec.Vec.deref self1.add
+            if self1.routes_changed
+            then
+              let s3 := alloc.vec.Vec.deref self1.routes
+              let (r2, current3) ←
+                scene.Scene.motion current2 expected s
+                  { remove := s1, add := s2, routes := (some s3) }
+              let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r2
+              match cf3 with
+              | core.ops.control_flow.ControlFlow.Continue val =>
+                ok (core.result.Result.Ok { event := val, divisor }, self1,
+                  current3)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r3 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    motion.MotionAdvance (core.convert.FromSame topology.Error)
+                    residual
+                ok (r3, self1, current3)
+            else
+              let (r2, current3) ←
+                scene.Scene.motion current2 expected s
+                  { remove := s1, add := s2, routes := none }
+              let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r2
+              match cf3 with
+              | core.ops.control_flow.ControlFlow.Continue val =>
+                ok (core.result.Result.Ok { event := val, divisor }, self1,
+                  current3)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r3 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    motion.MotionAdvance (core.convert.FromSame topology.Error)
+                    residual
+                ok (r3, self1, current3)
+          else ok (core.result.Result.Err failure, self1, current2)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r2 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              motion.MotionAdvance (core.convert.FromSame topology.Error)
+              residual
+          ok (r2, self1, current2)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          motion.MotionAdvance (core.convert.FromSame topology.Error) residual
+      ok (r2, self, current1)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        motion.MotionAdvance (core.convert.FromSame topology.Error) residual
+    ok (r1, self, current1)
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Arc}::fmt]:
+    Source: 'src/polar.rs', lines 60:9-60:14
+    Visibility: public -/
+def polar.Arc.Insts.CoreFmtDebug.fmt
+  (self : polar.Arc) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugI32 self.start
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.length
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Arc") (toStr "start")
+    dyn (toStr "length") dyn1
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:9-60:14 -/
+@[reducible]
+def polar.Arc.Insts.CoreFmtDebug : core.fmt.Debug polar.Arc := {
+  fmt := polar.Arc.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::Arc}::clone]:
+    Source: 'src/polar.rs', lines 60:16-60:21
+    Visibility: public -/
+def polar.Arc.Insts.CoreCloneClone.clone
+  (self : polar.Arc) : Result polar.Arc := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:16-60:21 -/
+@[reducible]
+def polar.Arc.Insts.CoreCloneClone : core.clone.Clone polar.Arc := {
+  clone := polar.Arc.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::Copy for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:23-60:27 -/
+@[reducible]
+def polar.Arc.Insts.CoreMarkerCopy : core.marker.Copy polar.Arc := {
+  cloneInst := polar.Arc.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::StructuralPartialEq for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:29-60:38 -/
+@[reducible]
+def polar.Arc.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq polar.Arc := {
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::Arc> for labyrinth_core::polar::Arc}::eq]:
+    Source: 'src/polar.rs', lines 60:29-60:38
+    Visibility: public -/
+def polar.Arc.Insts.CoreCmpPartialEqArc.eq
+  (self : polar.Arc) (other : polar.Arc) : Result Bool := do
+  if self.start = other.start
+  then ok (self.length = other.length)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::Arc> for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:29-60:38 -/
+@[reducible]
+impl_def polar.Arc.Insts.CoreCmpPartialEqArc : core.cmp.PartialEq polar.Arc
+  polar.Arc := {
+  eq := polar.Arc.Insts.CoreCmpPartialEqArc.eq
+  ne := core.cmp.PartialEq.ne.trait_default polar.Arc.Insts.CoreCmpPartialEqArc
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::Arc}::assert_fields_are_eq]:
+    Source: 'src/polar.rs', lines 60:40-60:42
+    Visibility: public -/
+def polar.Arc.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : polar.Arc) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::Arc}]
+    Source: 'src/polar.rs', lines 60:40-60:42 -/
+@[reducible]
+def polar.Arc.Insts.CoreCmpEq : core.cmp.Eq polar.Arc := {
+  partialEqInst := polar.Arc.Insts.CoreCmpPartialEqArc
+  assert_fields_are_eq := polar.Arc.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Arc}::validate]:
+    Source: 'src/polar.rs', lines 67:4-72:5
+    Visibility: public -/
+def polar.Arc.validate
+  (self : polar.Arc) : Result (core.result.Result Unit topology.Error) := do
+  if self.start < 0#i32
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    if self.start >= polar.TURN
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      if self.length <= 0#i32
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        if self.length > polar.TURN
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::polar::project]:
+    Source: 'src/polar.rs', lines 177:0-185:1
+    Visibility: public -/
+def polar.project
+  (center : grid.Point) (radius : Std.I32) (angle : Std.I32) :
+  Result (core.result.Result grid.Point topology.Error)
+  := do
+  let r ← grid.Point.validate center
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let ri ← core.ops.range.RangeInclusive.new 0#i32 grid.COORD_LIMIT
+    let b ←
+      core.ops.range.RangeInclusive.contains core.cmp.PartialOrdI32
+        core.cmp.PartialOrdI32 core.cmp.PartialOrdI32 ri radius
+    if b
+    then
+      let result ← polar.point center radius angle
+      let r1 ← grid.Point.validate result
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        ok (core.result.Result.Ok result)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Point (core.convert.FromSame topology.Error) residual
+    else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      grid.Point (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Direction}::fmt]:
+    Source: 'src/polar.rs', lines 224:9-224:14
+    Visibility: public -/
+def polar.Direction.Insts.CoreFmtDebug.fmt
+  (self : polar.Direction) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | polar.Direction.Clockwise =>
+    core.fmt.Formatter.write_str f (toStr "Clockwise")
+  | polar.Direction.Counterclockwise =>
+    core.fmt.Formatter.write_str f (toStr "Counterclockwise")
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:9-224:14 -/
+@[reducible]
+def polar.Direction.Insts.CoreFmtDebug : core.fmt.Debug polar.Direction := {
+  fmt := polar.Direction.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::Direction}::clone]:
+    Source: 'src/polar.rs', lines 224:16-224:21
+    Visibility: public -/
+def polar.Direction.Insts.CoreCloneClone.clone
+  (self : polar.Direction) : Result polar.Direction := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:16-224:21 -/
+@[reducible]
+def polar.Direction.Insts.CoreCloneClone : core.clone.Clone polar.Direction
+  := {
+  clone := polar.Direction.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::Copy for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:23-224:27 -/
+@[reducible]
+def polar.Direction.Insts.CoreMarkerCopy : core.marker.Copy polar.Direction
+  := {
+  cloneInst := polar.Direction.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::StructuralPartialEq for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:29-224:38 -/
+@[reducible]
+def polar.Direction.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq polar.Direction := {
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::Direction> for labyrinth_core::polar::Direction}::eq]:
+    Source: 'src/polar.rs', lines 224:29-224:38
+    Visibility: public -/
+def polar.Direction.Insts.CoreCmpPartialEqDirection.eq
+  (self : polar.Direction) (other : polar.Direction) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  ok (self1 = other1)
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::Direction> for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:29-224:38 -/
+@[reducible]
+impl_def polar.Direction.Insts.CoreCmpPartialEqDirection : core.cmp.PartialEq
+  polar.Direction polar.Direction := {
+  eq := polar.Direction.Insts.CoreCmpPartialEqDirection.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    polar.Direction.Insts.CoreCmpPartialEqDirection
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::Direction}]
+    Source: 'src/polar.rs', lines 224:40-224:42 -/
+@[reducible]
+impl_def polar.Direction.Insts.CoreCmpEq : core.cmp.Eq polar.Direction := {
+  partialEqInst := polar.Direction.Insts.CoreCmpPartialEqDirection
+  assert_fields_are_eq := core.cmp.Eq.assert_fields_are_eq.default
+    polar.Direction.Insts.CoreCmpEq
+}
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::MotionMode}::fmt]:
+    Source: 'src/polar.rs', lines 239:9-239:14
+    Visibility: public -/
+def polar.MotionMode.Insts.CoreFmtDebug.fmt
+  (self : polar.MotionMode) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | polar.MotionMode.Spinning =>
+    core.fmt.Formatter.write_str f (toStr "Spinning")
+  | polar.MotionMode.Twisting __self_0 __self_1 =>
+    let __self_01 := Dyn.mk _ core.fmt.DebugI32 __self_0
+    let __self_11 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) __self_1
+    core.fmt.Formatter.debug_struct_field2_finish f (toStr "Twisting") (toStr
+      "amplitude") __self_01 (toStr "max_relative") __self_11
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:9-239:14 -/
+@[reducible]
+def polar.MotionMode.Insts.CoreFmtDebug : core.fmt.Debug polar.MotionMode := {
+  fmt := polar.MotionMode.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::MotionMode}::clone]:
+    Source: 'src/polar.rs', lines 239:16-239:21
+    Visibility: public -/
+def polar.MotionMode.Insts.CoreCloneClone.clone
+  (self : polar.MotionMode) : Result polar.MotionMode := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:16-239:21 -/
+@[reducible]
+def polar.MotionMode.Insts.CoreCloneClone : core.clone.Clone polar.MotionMode
+  := {
+  clone := polar.MotionMode.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::Copy for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:23-239:27 -/
+@[reducible]
+def polar.MotionMode.Insts.CoreMarkerCopy : core.marker.Copy polar.MotionMode
+  := {
+  cloneInst := polar.MotionMode.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::StructuralPartialEq for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:29-239:38 -/
+@[reducible]
+def polar.MotionMode.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq polar.MotionMode := {
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::MotionMode> for labyrinth_core::polar::MotionMode}::eq]:
+    Source: 'src/polar.rs', lines 239:29-239:38
+    Visibility: public -/
+def polar.MotionMode.Insts.CoreCmpPartialEqMotionMode.eq
+  (self : polar.MotionMode) (other : polar.MotionMode) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | polar.MotionMode.Spinning => ok true
+    | polar.MotionMode.Twisting __self_0 __self_1 =>
+      match other with
+      | polar.MotionMode.Spinning => ok true
+      | polar.MotionMode.Twisting __arg1_0 __arg1_1 =>
+        let b ← lift (core.cmp.impls.PartialEqI32.eq __self_0 __arg1_0)
+        if b
+        then lift (core.cmp.impls.PartialEqI32.eq __self_1 __arg1_1)
+        else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::MotionMode> for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:29-239:38 -/
+@[reducible]
+impl_def polar.MotionMode.Insts.CoreCmpPartialEqMotionMode : core.cmp.PartialEq
+  polar.MotionMode polar.MotionMode := {
+  eq := polar.MotionMode.Insts.CoreCmpPartialEqMotionMode.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    polar.MotionMode.Insts.CoreCmpPartialEqMotionMode
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::MotionMode}::assert_fields_are_eq]:
+    Source: 'src/polar.rs', lines 239:40-239:42
+    Visibility: public -/
+def polar.MotionMode.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : polar.MotionMode) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::MotionMode}]
+    Source: 'src/polar.rs', lines 239:40-239:42 -/
+@[reducible]
+def polar.MotionMode.Insts.CoreCmpEq : core.cmp.Eq polar.MotionMode := {
+  partialEqInst := polar.MotionMode.Insts.CoreCmpPartialEqMotionMode
+  assert_fields_are_eq := polar.MotionMode.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::PolarSpec}::fmt]:
+    Source: 'src/polar.rs', lines 249:9-249:14
+    Visibility: public -/
+def polar.PolarSpec.Insts.CoreFmtDebug.fmt
+  (self : polar.PolarSpec) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ grid.Point.Insts.CoreFmtDebug self.center
+  let dyn1 := Dyn.mk _ core.fmt.DebugI32 self.center_radius
+  let dyn2 := Dyn.mk _ core.fmt.DebugI32 self.ring_width
+  let dyn3 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.sectors
+  let dyn4 :=
+    Dyn.mk _ (core.fmt.DebugVec polar.Direction.Insts.CoreFmtDebug)
+      self.directions
+  let dyn5 :=
+    Dyn.mk _ (core.fmt.DebugShared polar.MotionMode.Insts.CoreFmtDebug)
+      self.mode
+  let values :=
+    Array.to_slice (Array.make 6#usize [ dyn, dyn1, dyn2, dyn3, dyn4, dyn5 ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 6#usize [
+        toStr "center", toStr "center_radius", toStr "ring_width", toStr
+        "sectors", toStr "directions", toStr "mode"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "PolarSpec") s values
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::PolarSpec}]
+    Source: 'src/polar.rs', lines 249:9-249:14 -/
+@[reducible]
+def polar.PolarSpec.Insts.CoreFmtDebug : core.fmt.Debug polar.PolarSpec := {
+  fmt := polar.PolarSpec.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::PolarSpec}::clone]:
+    Source: 'src/polar.rs', lines 249:16-249:21
+    Visibility: public -/
+def polar.PolarSpec.Insts.CoreCloneClone.clone
+  (self : polar.PolarSpec) : Result polar.PolarSpec := do
+  let p ← grid.Point.Insts.CoreCloneClone.clone self.center
+  let i ← lift (core.clone.impls.CloneI32.clone self.center_radius)
+  let i1 ← lift (core.clone.impls.CloneI32.clone self.ring_width)
+  let v ← alloc.vec.CloneVec.clone core.clone.CloneUsize self.sectors
+  let v1 ←
+    alloc.vec.CloneVec.clone polar.Direction.Insts.CoreCloneClone
+      self.directions
+  let mm ← polar.MotionMode.Insts.CoreCloneClone.clone self.mode
+  ok
+    {
+      center := p,
+      center_radius := i,
+      ring_width := i1,
+      sectors := v,
+      directions := v1,
+      mode := mm
+    }
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::PolarSpec}]
+    Source: 'src/polar.rs', lines 249:16-249:21 -/
+@[reducible]
+def polar.PolarSpec.Insts.CoreCloneClone : core.clone.Clone polar.PolarSpec
+  := {
+  clone := polar.PolarSpec.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::StructuralPartialEq for labyrinth_core::polar::PolarSpec}]
+    Source: 'src/polar.rs', lines 249:23-249:32 -/
+@[reducible]
+def polar.PolarSpec.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq polar.PolarSpec := {
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::PolarSpec> for labyrinth_core::polar::PolarSpec}::eq]:
+    Source: 'src/polar.rs', lines 249:23-249:32
+    Visibility: public -/
+def polar.PolarSpec.Insts.CoreCmpPartialEqPolarSpec.eq
+  (self : polar.PolarSpec) (other : polar.PolarSpec) : Result Bool := do
+  if self.center_radius = other.center_radius
+  then
+    if self.ring_width = other.ring_width
+    then
+      let b ←
+        grid.Point.Insts.CoreCmpPartialEqPoint.eq self.center other.center
+      if b
+      then
+        let b1 ←
+          alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize
+            self.sectors other.sectors
+        if b1
+        then
+          let b2 ←
+            alloc.vec.partial_eq.PartialEqVec.eq
+              polar.Direction.Insts.CoreCmpPartialEqDirection self.directions
+              other.directions
+          if b2
+          then
+            polar.MotionMode.Insts.CoreCmpPartialEqMotionMode.eq self.mode
+              other.mode
+          else ok false
+        else ok false
+      else ok false
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::PolarSpec> for labyrinth_core::polar::PolarSpec}]
+    Source: 'src/polar.rs', lines 249:23-249:32 -/
+@[reducible]
+impl_def polar.PolarSpec.Insts.CoreCmpPartialEqPolarSpec : core.cmp.PartialEq
+  polar.PolarSpec polar.PolarSpec := {
+  eq := polar.PolarSpec.Insts.CoreCmpPartialEqPolarSpec.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    polar.PolarSpec.Insts.CoreCmpPartialEqPolarSpec
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::PolarSpec}::assert_fields_are_eq]:
+    Source: 'src/polar.rs', lines 249:34-249:36
+    Visibility: public -/
+def polar.PolarSpec.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : polar.PolarSpec) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::PolarSpec}]
+    Source: 'src/polar.rs', lines 249:34-249:36 -/
+@[reducible]
+def polar.PolarSpec.Insts.CoreCmpEq : core.cmp.Eq polar.PolarSpec := {
+  partialEqInst := polar.PolarSpec.Insts.CoreCmpPartialEqPolarSpec
+  assert_fields_are_eq := polar.PolarSpec.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::PortalSpec}::fmt]:
+    Source: 'src/polar.rs', lines 259:9-259:14
+    Visibility: public -/
+def polar.PortalSpec.Insts.CoreFmtDebug.fmt
+  (self : polar.PortalSpec) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.circle
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.column
+  let dyn2 := Dyn.mk _ core.fmt.DebugUsize self.row
+  let dyn3 := Dyn.mk _ polar.Arc.Insts.CoreFmtDebug self.mouth
+  let dyn4 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.band
+  core.fmt.Formatter.debug_struct_field5_finish f (toStr "PortalSpec") (toStr
+    "circle") dyn (toStr "column") dyn1 (toStr "row") dyn2 (toStr "mouth") dyn3
+    (toStr "band") dyn4
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:9-259:14 -/
+@[reducible]
+def polar.PortalSpec.Insts.CoreFmtDebug : core.fmt.Debug polar.PortalSpec := {
+  fmt := polar.PortalSpec.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::PortalSpec}::clone]:
+    Source: 'src/polar.rs', lines 259:16-259:21
+    Visibility: public -/
+def polar.PortalSpec.Insts.CoreCloneClone.clone
+  (self : polar.PortalSpec) : Result polar.PortalSpec := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::clone::Clone for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:16-259:21 -/
+@[reducible]
+def polar.PortalSpec.Insts.CoreCloneClone : core.clone.Clone polar.PortalSpec
+  := {
+  clone := polar.PortalSpec.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::Copy for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:23-259:27 -/
+@[reducible]
+def polar.PortalSpec.Insts.CoreMarkerCopy : core.marker.Copy polar.PortalSpec
+  := {
+  cloneInst := polar.PortalSpec.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::marker::StructuralPartialEq for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:29-259:38 -/
+@[reducible]
+def polar.PortalSpec.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq polar.PortalSpec := {
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::PortalSpec> for labyrinth_core::polar::PortalSpec}::eq]:
+    Source: 'src/polar.rs', lines 259:29-259:38
+    Visibility: public -/
+def polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec.eq
+  (self : polar.PortalSpec) (other : polar.PortalSpec) : Result Bool := do
+  if self.band = other.band
+  then
+    if self.circle = other.circle
+    then
+      if self.column = other.column
+      then
+        if self.row = other.row
+        then polar.Arc.Insts.CoreCmpPartialEqArc.eq self.mouth other.mouth
+        else ok false
+      else ok false
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::PartialEq<labyrinth_core::polar::PortalSpec> for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:29-259:38 -/
+@[reducible]
+impl_def polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec : core.cmp.PartialEq
+  polar.PortalSpec polar.PortalSpec := {
+  eq := polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec
+}
+
+/-- [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::PortalSpec}::assert_fields_are_eq]:
+    Source: 'src/polar.rs', lines 259:40-259:42
+    Visibility: public -/
+def polar.PortalSpec.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : polar.PortalSpec) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::cmp::Eq for labyrinth_core::polar::PortalSpec}]
+    Source: 'src/polar.rs', lines 259:40-259:42 -/
+@[reducible]
+def polar.PortalSpec.Insts.CoreCmpEq : core.cmp.Eq polar.PortalSpec := {
+  partialEqInst := polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec
+  assert_fields_are_eq := polar.PortalSpec.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Circle}::fmt]:
+    Source: 'src/polar.rs', lines 268:9-268:14
+    Visibility: public -/
+def polar.Circle.Insts.CoreFmtDebug.fmt
+  (self : polar.Circle) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ polar.PolarSpec.Insts.CoreFmtDebug self.spec
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.center_cell
+  let dyn2 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.ring_starts
+  let dyn3 := Dyn.mk _ core.fmt.DebugUsize self.transform_start
+  let dyn4 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) self.outer
+  core.fmt.Formatter.debug_struct_field5_finish f (toStr "Circle") (toStr
+    "spec") dyn (toStr "center_cell") dyn1 (toStr "ring_starts") dyn2 (toStr
+    "transform_start") dyn3 (toStr "outer") dyn4
+
+/-- Trait implementation: [labyrinth_core::polar::{impl core::fmt::Debug for labyrinth_core::polar::Circle}]
+    Source: 'src/polar.rs', lines 268:9-268:14 -/
+@[reducible]
+def polar.Circle.Insts.CoreFmtDebug : core.fmt.Debug polar.Circle := {
+  fmt := polar.Circle.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop body 0:
+    Source: 'src/polar.rs', lines 319:8-336:9 -/
+@[rust_loop_body]
+def polar.Circle.new_loop0.body
+  (i : Std.I32) (i1 : Std.I32) (v : alloc.vec.Vec Std.Usize) (margin : Std.I32)
+  (ring_starts : alloc.vec.Vec Std.Usize) (next : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize ×
+    (core.result.Result Unit topology.Error) × Std.Usize) ((alloc.vec.Vec
+    Std.Usize) × (core.result.Result Unit topology.Error)))
+  := do
+  let i2 := alloc.vec.Vec.len v
+  if ring < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let count ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+          ring
+      let i3 ← lift (UScalar.hcast .I32 ring)
+      let i4 ← i3 * i1
+      let inner ← i + i4
+      let (ring_starts1, next1, status1) ←
+        if count < 2#usize
+        then
+          ok (ring_starts, next, core.result.Result.Err
+            topology.Error.InvalidSize)
+        else
+          do
+          let i5 ← lift (IScalar.hcast .Usize polar.TURN)
+          let i6 ← i5 / 2#usize
+          if count > i6
+          then
+            ok (ring_starts, next, core.result.Result.Err
+              topology.Error.InvalidSize)
+          else
+            let i7 ← lift (core.convert.num.FromI64I32.from inner)
+            let i8 ← lift (UScalar.hcast .I32 count)
+            let i9 ← polar.TURN / i8
+            let i10 ← lift (core.convert.num.FromI64I32.from i9)
+            let i11 ← i7 * i10
+            let i12 ← lift (core.convert.num.FromI64I32.from margin)
+            let i13 ← i12 * 2#i64
+            let i14 ← lift (core.convert.num.FromI64I32.from polar.TURN)
+            let i15 ← i13 * i14
+            if i11 < i15
+            then
+              ok (ring_starts, next, core.result.Result.Err
+                topology.Error.InvalidGeometry)
+            else
+              let ring_starts2 ← alloc.vec.Vec.push ring_starts next
+              let o ← lift (Usize.checked_add next count)
+              let (i16, r) ←
+                match o with
+                | none =>
+                  ok (next, core.result.Result.Err topology.Error.Overflow)
+                | some value => ok (value, status)
+              ok (ring_starts2, i16, r)
+      let ring1 ← ring + 1#usize
+      ok (cont (ring_starts1, next1, status1, ring1))
+    else ok (done (ring_starts, status))
+  else ok (done (ring_starts, status))
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop 0:
+    Source: 'src/polar.rs', lines 319:8-336:9 -/
+@[rust_loop]
+def polar.Circle.new_loop0
+  (i : Std.I32) (i1 : Std.I32) (v : alloc.vec.Vec Std.Usize) (margin : Std.I32)
+  (ring_starts : alloc.vec.Vec Std.Usize) (next : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (ring_starts1, next1, status1, ring1) => polar.Circle.new_loop0.body i
+      i1 v margin ring_starts1 next1 status1 ring1)
+    (ring_starts, next, status, ring)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop body 1:
+    Source: 'src/polar.rs', lines 347:12-362:13 -/
+@[rust_loop_body]
+def polar.Circle.new_loop1.body
+  (i : Std.I32) (i1 : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (clearance : Std.I64) (status : core.result.Result Unit topology.Error)
+  (ring : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i2 := alloc.vec.Vec.len v
+  if ring < i2
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i3 ← lift (core.convert.num.FromI64I32.from i)
+      let i4 ← ring - 1#usize
+      let i5 ← lift (UScalar.hcast .I64 i4)
+      let i6 ← lift (core.convert.num.FromI64I32.from i1)
+      let i7 ← i5 * i6
+      let i8 ← i3 + i7
+      let i9 ← i1 / 2#i32
+      let i10 ← lift (core.convert.num.FromI64I32.from i9)
+      let radius ← i8 + i10
+      let i11 ← clearance + radius
+      let i12 ← i11 - 1#i64
+      let minimum ← i12 / radius
+      let i13 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+          i4
+      let i14 ← lift (UScalar.hcast .I32 i13)
+      let i15 ← polar.TURN / i14
+      let inner_width ← lift (core.convert.num.FromI64I32.from i15)
+      let i16 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
+          ring
+      let i17 ← lift (UScalar.hcast .I32 i16)
+      let i18 ← polar.TURN / i17
+      let outer_width ← lift (core.convert.num.FromI64I32.from i18)
+      let i19 ← minimum * 2#i64
+      let i20 ← i19 + 2#i64
+      let status1 ←
+        if inner_width < i20
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          do
+          let i21 ← i19 + 2#i64
+          if outer_width < i21
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok status
+      let ring1 ← ring + 1#usize
+      ok (cont (status1, ring1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop 1:
+    Source: 'src/polar.rs', lines 347:12-362:13 -/
+@[rust_loop]
+def polar.Circle.new_loop1
+  (i : Std.I32) (i1 : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (status : core.result.Result Unit topology.Error) (clearance : Std.I64)
+  (ring : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, ring1) => polar.Circle.new_loop1.body i i1 v clearance
+      status1 ring1)
+    (status, ring)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop body 2:
+    Source: 'src/polar.rs', lines 374:12-389:13 -/
+@[rust_loop_body]
+def polar.Circle.new_loop2.body
+  (i : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec polar.Direction) (margin : Std.I32) (outer : Std.I32)
+  (amplitude : Std.I32) (max_relative : Std.I32)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if ring < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← ring + 1#usize
+      let i3 := alloc.vec.Vec.len v
+      let relative ←
+        if i2 < i3
+        then
+          do
+          let d ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              polar.Direction) v1 ring
+          let d1 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              polar.Direction) v1 i2
+          let b1 ←
+            core.cmp.PartialEq.ne.trait_default
+              polar.Direction.Insts.CoreCmpPartialEqDirection d d1
+          if b1
+          then amplitude * 2#i32
+          else ok amplitude
+        else ok amplitude
+      let status1 ←
+        if relative > max_relative
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          do
+          let i4 ← lift (core.convert.num.FromI64I32.from outer)
+          let i5 ← lift (core.convert.num.FromI64I32.from relative)
+          let i6 ← i4 * i5
+          let i7 ← i6 * 8#i64
+          let i8 ← margin * 2#i32
+          let i9 ← i - i8
+          let i10 ← lift (core.convert.num.FromI64I32.from i9)
+          let i11 ← lift (core.convert.num.FromI64I32.from polar.TURN)
+          let i12 ← i10 * i11
+          if i7 > i12
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok status
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop 2:
+    Source: 'src/polar.rs', lines 374:12-389:13 -/
+@[rust_loop]
+def polar.Circle.new_loop2
+  (i : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec polar.Direction) (margin : Std.I32) (outer : Std.I32)
+  (status : core.result.Result Unit topology.Error) (amplitude : Std.I32)
+  (max_relative : Std.I32) (ring : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, ring1) => polar.Circle.new_loop2.body i v v1 margin outer
+      amplitude max_relative status1 ring1)
+    (status, ring)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop body 3:
+    Source: 'src/polar.rs', lines 374:12-389:13 -/
+@[rust_loop_body]
+def polar.Circle.new_loop3.body
+  (i : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec polar.Direction) (margin : Std.I32) (outer : Std.I32)
+  (amplitude : Std.I32) (max_relative : Std.I32)
+  (status : core.result.Result Unit topology.Error) (ring : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if ring < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← ring + 1#usize
+      let i3 := alloc.vec.Vec.len v
+      let relative ←
+        if i2 < i3
+        then
+          do
+          let d ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              polar.Direction) v1 ring
+          let d1 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+              polar.Direction) v1 i2
+          let b1 ←
+            core.cmp.PartialEq.ne.trait_default
+              polar.Direction.Insts.CoreCmpPartialEqDirection d d1
+          if b1
+          then amplitude * 2#i32
+          else ok amplitude
+        else ok amplitude
+      let status1 ←
+        if relative > max_relative
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          do
+          let i4 ← lift (core.convert.num.FromI64I32.from outer)
+          let i5 ← lift (core.convert.num.FromI64I32.from relative)
+          let i6 ← i4 * i5
+          let i7 ← i6 * 8#i64
+          let i8 ← margin * 2#i32
+          let i9 ← i - i8
+          let i10 ← lift (core.convert.num.FromI64I32.from i9)
+          let i11 ← lift (core.convert.num.FromI64I32.from polar.TURN)
+          let i12 ← i10 * i11
+          if i7 > i12
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok status
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]: loop 3:
+    Source: 'src/polar.rs', lines 374:12-389:13 -/
+@[rust_loop]
+def polar.Circle.new_loop3
+  (i : Std.I32) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec polar.Direction) (margin : Std.I32) (outer : Std.I32)
+  (status : core.result.Result Unit topology.Error) (amplitude : Std.I32)
+  (max_relative : Std.I32) (ring : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, ring1) => polar.Circle.new_loop3.body i v v1 margin outer
+      amplitude max_relative status1 ring1)
+    (status, ring)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::new]:
+    Source: 'src/polar.rs', lines 278:4-399:5 -/
+def polar.Circle.new
+  (spec : polar.PolarSpec) (center_cell : Std.Usize)
+  (transform_start : Std.Usize) (margin : Std.I32) :
+  Result (core.result.Result polar.Circle topology.Error)
+  := do
+  let r ← grid.Point.validate spec.center
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let b ← alloc.vec.Vec.is_empty spec.sectors
+    if b
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      let i := alloc.vec.Vec.len spec.sectors
+      let i1 := alloc.vec.Vec.len spec.directions
+      if i != i1
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        let i2 ← margin * 4#i32
+        if spec.center_radius < i2
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          if spec.ring_width < i2
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else
+            let i3 := alloc.vec.Vec.len spec.sectors
+            let i4 ← lift (IScalar.hcast .Usize core.num.I32.MAX)
+            if i3 > i4
+            then ok (core.result.Result.Err topology.Error.Overflow)
+            else
+              let i5 := alloc.vec.Vec.len spec.sectors
+              let ring_count ← lift (UScalar.hcast .I32 i5)
+              let o ← lift (I32.checked_mul ring_count spec.ring_width)
+              let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+              let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+              match cf1 with
+              | core.ops.control_flow.ControlFlow.Continue val =>
+                let o1 ← lift (I32.checked_add val spec.center_radius)
+                let r2 ← core.option.Option.ok_or o1 topology.Error.Overflow
+                let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+                match cf2 with
+                | core.ops.control_flow.ControlFlow.Continue val1 =>
+                  if val1 > grid.COORD_LIMIT
+                  then
+                    ok (core.result.Result.Err topology.Error.InvalidGeometry)
+                  else
+                    let r3 ←
+                      polar.bounds spec.center 0#i32 val1
+                        { start := 0#i32, length := polar.TURN } margin
+                    let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                    match cf3 with
+                    | core.ops.control_flow.ControlFlow.Continue _ =>
+                      let i6 := alloc.vec.Vec.len spec.sectors
+                      let ring_starts :=
+                        alloc.vec.Vec.with_capacity Std.Usize i6
+                      let o2 ← lift (Usize.checked_add center_cell 1#usize)
+                      let r4 ←
+                        core.option.Option.ok_or o2 topology.Error.Overflow
+                      let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                      match cf4 with
+                      | core.ops.control_flow.ControlFlow.Continue val2 =>
+                        let (ring_starts1, status) ←
+                          polar.Circle.new_loop0 spec.center_radius
+                            spec.ring_width spec.sectors margin ring_starts
+                            val2 (core.result.Result.Ok ()) 0#usize
+                        let cf5 ←
+                          core.result.Result.Insts.CoreOpsTry.branch status
+                        match cf5 with
+                        | core.ops.control_flow.ControlFlow.Continue _ =>
+                          let b1 ←
+                            polar.MotionMode.Insts.CoreCmpPartialEqMotionMode.eq
+                              spec.mode polar.MotionMode.Spinning
+                          if b1
+                          then
+                            let i7 ←
+                              lift (core.convert.num.FromI64I32.from margin)
+                            let i8 ← i7 * 2#i64
+                            let i9 ←
+                              lift (core.convert.num.FromI64I32.from
+                                polar.TURN)
+                            let clearance ← i8 * i9
+                            let center ←
+                              lift (core.convert.num.FromI64I32.from
+                                spec.center_radius)
+                            let i10 ← clearance + center
+                            let i11 ← i10 - 1#i64
+                            let center_minimum ← i11 / center
+                            let i12 ←
+                              alloc.vec.Vec.index
+                                (core.slice.index.SliceIndexUsizeSlice
+                                Std.Usize) spec.sectors 0#usize
+                            let i13 ← lift (UScalar.hcast .I32 i12)
+                            let i14 ← polar.TURN / i13
+                            let i15 ←
+                              lift (core.convert.num.FromI64I32.from i14)
+                            let i16 ← center_minimum + 1#i64
+                            if i15 < i16
+                            then
+                              ok (core.result.Result.Err
+                                topology.Error.InvalidGeometry)
+                            else
+                              let status1 ←
+                                polar.Circle.new_loop1 spec.center_radius
+                                  spec.ring_width spec.sectors status clearance
+                                  1#usize
+                              let cf6 ←
+                                core.result.Result.Insts.CoreOpsTry.branch
+                                  status1
+                              match cf6 with
+                              | core.ops.control_flow.ControlFlow.Continue _ =>
+                                match spec.mode with
+                                | polar.MotionMode.Spinning =>
+                                  match cf6 with
+                                  | core.ops.control_flow.ControlFlow.Continue
+                                    _ =>
+                                    ok (core.result.Result.Ok
+                                      {
+                                        spec,
+                                        center_cell,
+                                        ring_starts := ring_starts1,
+                                        transform_start,
+                                        outer := val1
+                                      })
+                                  | core.ops.control_flow.ControlFlow.Break
+                                    residual =>
+                                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                      polar.Circle (core.convert.FromSame
+                                      topology.Error) residual
+                                | polar.MotionMode.Twisting amplitude
+                                  max_relative =>
+                                  massert (¬ (8#i32 = 0#i32))
+                                  let i17 ← I32.div polar.TURN 8#i32
+                                  let ri ←
+                                    core.ops.range.RangeInclusive.new 0#i32 i17
+                                  let b2 ←
+                                    core.ops.range.RangeInclusive.contains
+                                      core.cmp.PartialOrdI32
+                                      core.cmp.PartialOrdI32
+                                      core.cmp.PartialOrdI32 ri amplitude
+                                  massert ((¬ b2) || (¬ (4#i32 = 0#i32)))
+                                  if b2
+                                  then
+                                    let i18 ← I32.div polar.TURN 4#i32
+                                    let ri1 ←
+                                      core.ops.range.RangeInclusive.new 0#i32
+                                        i18
+                                    let b3 ←
+                                      core.ops.range.RangeInclusive.contains
+                                        core.cmp.PartialOrdI32
+                                        core.cmp.PartialOrdI32
+                                        core.cmp.PartialOrdI32 ri1 max_relative
+                                    if b3
+                                    then
+                                      let status2 ←
+                                        polar.Circle.new_loop2 spec.ring_width
+                                          spec.sectors spec.directions margin
+                                          val1 status1 amplitude max_relative
+                                          0#usize
+                                      let cf7 ←
+                                        core.result.Result.Insts.CoreOpsTry.branch
+                                          status2
+                                      match cf7 with
+                                      |
+                                        core.ops.control_flow.ControlFlow.Continue
+                                        _ =>
+                                        ok (core.result.Result.Ok
+                                          {
+                                            spec,
+                                            center_cell,
+                                            ring_starts := ring_starts1,
+                                            transform_start,
+                                            outer := val1
+                                          })
+                                      | core.ops.control_flow.ControlFlow.Break
+                                        residual =>
+                                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                          polar.Circle (core.convert.FromSame
+                                          topology.Error) residual
+                                    else
+                                      ok (core.result.Result.Err
+                                        topology.Error.InvalidGeometry)
+                                  else
+                                    ok (core.result.Result.Err
+                                      topology.Error.InvalidGeometry)
+                              | core.ops.control_flow.ControlFlow.Break
+                                residual =>
+                                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                  polar.Circle (core.convert.FromSame
+                                  topology.Error) residual
+                          else
+                            match spec.mode with
+                            | polar.MotionMode.Spinning =>
+                              match cf5 with
+                              | core.ops.control_flow.ControlFlow.Continue _ =>
+                                ok (core.result.Result.Ok
+                                  {
+                                    spec,
+                                    center_cell,
+                                    ring_starts := ring_starts1,
+                                    transform_start,
+                                    outer := val1
+                                  })
+                              | core.ops.control_flow.ControlFlow.Break
+                                residual =>
+                                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                  polar.Circle (core.convert.FromSame
+                                  topology.Error) residual
+                            | polar.MotionMode.Twisting amplitude max_relative
+                              =>
+                              massert (¬ (8#i32 = 0#i32))
+                              let i7 ← I32.div polar.TURN 8#i32
+                              let ri ←
+                                core.ops.range.RangeInclusive.new 0#i32 i7
+                              let b2 ←
+                                core.ops.range.RangeInclusive.contains
+                                  core.cmp.PartialOrdI32 core.cmp.PartialOrdI32
+                                  core.cmp.PartialOrdI32 ri amplitude
+                              massert ((¬ b2) || (¬ (4#i32 = 0#i32)))
+                              if b2
+                              then
+                                let i8 ← I32.div polar.TURN 4#i32
+                                let ri1 ←
+                                  core.ops.range.RangeInclusive.new 0#i32 i8
+                                let b3 ←
+                                  core.ops.range.RangeInclusive.contains
+                                    core.cmp.PartialOrdI32
+                                    core.cmp.PartialOrdI32
+                                    core.cmp.PartialOrdI32 ri1 max_relative
+                                if b3
+                                then
+                                  let status1 ←
+                                    polar.Circle.new_loop3 spec.ring_width
+                                      spec.sectors spec.directions margin val1
+                                      status amplitude max_relative 0#usize
+                                  let cf6 ←
+                                    core.result.Result.Insts.CoreOpsTry.branch
+                                      status1
+                                  match cf6 with
+                                  | core.ops.control_flow.ControlFlow.Continue
+                                    _ =>
+                                    ok (core.result.Result.Ok
+                                      {
+                                        spec,
+                                        center_cell,
+                                        ring_starts := ring_starts1,
+                                        transform_start,
+                                        outer := val1
+                                      })
+                                  | core.ops.control_flow.ControlFlow.Break
+                                    residual =>
+                                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                      polar.Circle (core.convert.FromSame
+                                      topology.Error) residual
+                                else
+                                  ok (core.result.Result.Err
+                                    topology.Error.InvalidGeometry)
+                              else
+                                ok (core.result.Result.Err
+                                  topology.Error.InvalidGeometry)
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            polar.Circle (core.convert.FromSame topology.Error)
+                            residual
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          polar.Circle (core.convert.FromSame topology.Error)
+                          residual
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        polar.Circle (core.convert.FromSame topology.Error)
+                        residual
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    polar.Circle (core.convert.FromSame topology.Error)
+                    residual
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  polar.Circle (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      polar.Circle (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::outer_radius]:
+    Source: 'src/polar.rs', lines 410:4-412:5
+    Visibility: public -/
+def polar.Circle.outer_radius (self : polar.Circle) : Result Std.I32 := do
+  ok self.outer
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::transform_start]:
+    Source: 'src/polar.rs', lines 416:4-418:5
+    Visibility: public -/
+def polar.Circle.impl.transform_start
+  (self : polar.Circle) : Result Std.Usize := do
+  ok self.transform_start
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::spec]:
+    Source: 'src/polar.rs', lines 419:4-421:5
+    Visibility: public -/
+def polar.Circle.impl.spec (self : polar.Circle) : Result polar.PolarSpec := do
+  ok self.spec
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::sector]:
+    Source: 'src/polar.rs', lines 423:4-428:5
+    Visibility: public -/
+def polar.Circle.sector
+  (self : polar.Circle) (ring : Std.Usize) (sector : Std.Usize) :
+  Result (Option Std.Usize)
+  := do
+  let i ← polar.Circle.ring_count self
+  if ring >= i
+  then ok none
+  else
+    let i1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        self.spec.sectors ring
+    if sector >= i1
+    then ok none
+    else
+      let i2 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          self.ring_starts ring
+      let i3 ← i2 + sector
+      ok (some i3)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::sector_arc]:
+    Source: 'src/polar.rs', lines 430:4-435:5
+    Visibility: public -/
+def polar.Circle.sector_arc
+  (self : polar.Circle) (ring : Std.Usize) (sector : Std.Usize) :
+  Result (core.result.Result polar.Arc topology.Error)
+  := do
+  let o ← polar.Circle.sector self ring sector
+  let b := core.option.Option.is_none o
+  if b
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else let a ← polar.Circle.arc self ring sector
+       ok (core.result.Result.Ok a)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::ring_offset]:
+    Source: 'src/polar.rs', lines 437:4-442:5
+    Visibility: public -/
+def polar.Circle.ring_offset
+  (self : polar.Circle) (ring : Std.Usize) (phases : Slice Std.I32) :
+  Result (core.result.Result Std.I32 topology.Error)
+  := do
+  let i ← polar.Circle.ring_count self
+  if ring >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    let i1 := Slice.len phases
+    let i2 ← polar.Circle.ring_count self
+    let i3 ← self.transform_start + i2
+    if i1 < i3
+    then ok (core.result.Result.Err topology.Error.InvalidIndex)
+    else
+      let i4 ← polar.Circle.offset self ring phases
+      ok (core.result.Result.Ok i4)
+
+/-- [labyrinth_core::polar::{labyrinth_core::polar::Circle}::offset_at]:
+    Source: 'src/polar.rs', lines 471:4-485:5
+    Visibility: public -/
+def polar.Circle.offset_at
+  (self : polar.Circle) (radius : Std.I32) (adapter_band : Std.I32)
+  (phases : Slice Std.I32) :
+  Result (core.result.Result Std.I32 topology.Error)
+  := do
+  let o ← lift (I32.checked_add self.outer adapter_band)
+  let r ← core.option.Option.ok_or o topology.Error.Overflow
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let i := Slice.len phases
+    let i1 ← polar.Circle.ring_count self
+    let i2 ← self.transform_start + i1
+    if i < i2
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      if radius < 0#i32
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        if radius > val
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          if adapter_band <= 0#i32
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else
+            if val > grid.COORD_LIMIT
+            then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+            else
+              let i3 ←
+                polar.Circle.offset_at_valid self radius adapter_band phases
+              ok (core.result.Result.Ok i3)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Std.I32 (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Cell}::fmt]:
+    Source: 'src/scene.rs', lines 16:9-16:14
+    Visibility: public -/
+def scene.Cell.Insts.CoreFmtDebug.fmt
+  (self : scene.Cell) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | scene.Cell.Grid __self_0 __self_1 __self_2 =>
+    let __self_01 := Dyn.mk _ core.fmt.DebugUsize __self_0
+    let __self_11 := Dyn.mk _ core.fmt.DebugUsize __self_1
+    let __self_21 :=
+      Dyn.mk _ (core.fmt.DebugShared grid.Rect.Insts.CoreFmtDebug) __self_2
+    core.fmt.Formatter.debug_struct_field3_finish f (toStr "Grid") (toStr
+      "column") __self_01 (toStr "row") __self_11 (toStr "bounds") __self_21
+  | scene.Cell.Center __self_0 =>
+    let __self_01 :=
+      Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) __self_0
+    core.fmt.Formatter.debug_struct_field1_finish f (toStr "Center") (toStr
+      "circle") __self_01
+  | scene.Cell.Sector __self_0 __self_1 __self_2 =>
+    let __self_01 := Dyn.mk _ core.fmt.DebugUsize __self_0
+    let __self_11 := Dyn.mk _ core.fmt.DebugUsize __self_1
+    let __self_21 :=
+      Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) __self_2
+    core.fmt.Formatter.debug_struct_field3_finish f (toStr "Sector") (toStr
+      "circle") __self_01 (toStr "ring") __self_11 (toStr "sector") __self_21
+  | scene.Cell.Transition __self_0 =>
+    let __self_01 :=
+      Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) __self_0
+    core.fmt.Formatter.debug_struct_field1_finish f (toStr "Transition") (toStr
+      "portal") __self_01
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:9-16:14 -/
+@[reducible]
+def scene.Cell.Insts.CoreFmtDebug : core.fmt.Debug scene.Cell := {
+  fmt := scene.Cell.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Cell}::clone]:
+    Source: 'src/scene.rs', lines 16:16-16:21
+    Visibility: public -/
+def scene.Cell.Insts.CoreCloneClone.clone
+  (self : scene.Cell) : Result scene.Cell := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:16-16:21 -/
+@[reducible]
+def scene.Cell.Insts.CoreCloneClone : core.clone.Clone scene.Cell := {
+  clone := scene.Cell.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:23-16:27 -/
+@[reducible]
+def scene.Cell.Insts.CoreMarkerCopy : core.marker.Copy scene.Cell := {
+  cloneInst := scene.Cell.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:29-16:38 -/
+@[reducible]
+def scene.Cell.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq scene.Cell := {
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Cell> for labyrinth_core::scene::Cell}::eq]:
+    Source: 'src/scene.rs', lines 16:29-16:38
+    Visibility: public -/
+def scene.Cell.Insts.CoreCmpPartialEqCell.eq
+  (self : scene.Cell) (other : scene.Cell) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | scene.Cell.Grid __self_0 __self_1 __self_2 =>
+      match other with
+      | scene.Cell.Grid __arg1_0 __arg1_1 __arg1_2 =>
+        let b ← lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+        if b
+        then
+          let b1 ← lift (core.cmp.impls.PartialEqUsize.eq __self_1 __arg1_1)
+          if b1
+          then grid.Rect.Insts.CoreCmpPartialEqRect.eq __self_2 __arg1_2
+          else ok false
+        else ok false
+      | scene.Cell.Center _ => fail panic
+      | scene.Cell.Sector _ _ _ => fail panic
+      | scene.Cell.Transition _ => fail panic
+    | scene.Cell.Center __self_0 =>
+      match other with
+      | scene.Cell.Grid _ _ _ => fail panic
+      | scene.Cell.Center __arg1_0 =>
+        lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+      | scene.Cell.Sector _ _ _ => fail panic
+      | scene.Cell.Transition _ => fail panic
+    | scene.Cell.Sector __self_0 __self_1 __self_2 =>
+      match other with
+      | scene.Cell.Grid _ _ _ => fail panic
+      | scene.Cell.Center _ => fail panic
+      | scene.Cell.Sector __arg1_0 __arg1_1 __arg1_2 =>
+        let b ← lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+        if b
+        then
+          let b1 ← lift (core.cmp.impls.PartialEqUsize.eq __self_1 __arg1_1)
+          if b1
+          then lift (core.cmp.impls.PartialEqUsize.eq __self_2 __arg1_2)
+          else ok false
+        else ok false
+      | scene.Cell.Transition _ => fail panic
+    | scene.Cell.Transition __self_0 =>
+      match other with
+      | scene.Cell.Grid _ _ _ => fail panic
+      | scene.Cell.Center _ => fail panic
+      | scene.Cell.Sector _ _ _ => fail panic
+      | scene.Cell.Transition __arg1_0 =>
+        lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Cell> for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:29-16:38 -/
+@[reducible]
+impl_def scene.Cell.Insts.CoreCmpPartialEqCell : core.cmp.PartialEq scene.Cell
+  scene.Cell := {
+  eq := scene.Cell.Insts.CoreCmpPartialEqCell.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    scene.Cell.Insts.CoreCmpPartialEqCell
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Cell}::assert_fields_are_eq]:
+    Source: 'src/scene.rs', lines 16:40-16:42
+    Visibility: public -/
+def scene.Cell.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : scene.Cell) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Cell}]
+    Source: 'src/scene.rs', lines 16:40-16:42 -/
+@[reducible]
+def scene.Cell.Insts.CoreCmpEq : core.cmp.Eq scene.Cell := {
+  partialEqInst := scene.Cell.Insts.CoreCmpPartialEqCell
+  assert_fields_are_eq := scene.Cell.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Portal}::fmt]:
+    Source: 'src/scene.rs', lines 36:9-36:14
+    Visibility: public -/
+def scene.Portal.Insts.CoreFmtDebug.fmt
+  (self : scene.Portal) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ polar.PortalSpec.Insts.CoreFmtDebug self.spec
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.grid_cell
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.transition_cell
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Portal") (toStr
+    "spec") dyn (toStr "grid_cell") dyn1 (toStr "transition_cell") dyn2
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:9-36:14 -/
+@[reducible]
+def scene.Portal.Insts.CoreFmtDebug : core.fmt.Debug scene.Portal := {
+  fmt := scene.Portal.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Portal}::clone]:
+    Source: 'src/scene.rs', lines 36:16-36:21
+    Visibility: public -/
+def scene.Portal.Insts.CoreCloneClone.clone
+  (self : scene.Portal) : Result scene.Portal := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:16-36:21 -/
+@[reducible]
+def scene.Portal.Insts.CoreCloneClone : core.clone.Clone scene.Portal := {
+  clone := scene.Portal.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:23-36:27 -/
+@[reducible]
+def scene.Portal.Insts.CoreMarkerCopy : core.marker.Copy scene.Portal := {
+  cloneInst := scene.Portal.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:29-36:38 -/
+@[reducible]
+def scene.Portal.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq scene.Portal := {
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Portal> for labyrinth_core::scene::Portal}::eq]:
+    Source: 'src/scene.rs', lines 36:29-36:38
+    Visibility: public -/
+def scene.Portal.Insts.CoreCmpPartialEqPortal.eq
+  (self : scene.Portal) (other : scene.Portal) : Result Bool := do
+  let b ←
+    polar.PortalSpec.Insts.CoreCmpPartialEqPortalSpec.eq self.spec other.spec
+  if b
+  then
+    if self.grid_cell = other.grid_cell
+    then ok (self.transition_cell = other.transition_cell)
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Portal> for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:29-36:38 -/
+@[reducible]
+impl_def scene.Portal.Insts.CoreCmpPartialEqPortal : core.cmp.PartialEq
+  scene.Portal scene.Portal := {
+  eq := scene.Portal.Insts.CoreCmpPartialEqPortal.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    scene.Portal.Insts.CoreCmpPartialEqPortal
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Portal}::assert_fields_are_eq]:
+    Source: 'src/scene.rs', lines 36:40-36:42
+    Visibility: public -/
+def scene.Portal.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : scene.Portal) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Portal}]
+    Source: 'src/scene.rs', lines 36:40-36:42 -/
+@[reducible]
+def scene.Portal.Insts.CoreCmpEq : core.cmp.Eq scene.Portal := {
+  partialEqInst := scene.Portal.Insts.CoreCmpPartialEqPortal
+  assert_fields_are_eq := scene.Portal.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}::fmt]:
+    Source: 'src/topology.rs', lines 132:9-132:14
+    Visibility: public -/
+def topology.Carrier.Insts.CoreFmtDebug.fmt
+  (self : topology.Carrier) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.offsets
+  let dyn1 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.neighbors
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec
+      topology.Edge.Insts.CoreFmtDebug)) self.edges
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Carrier") (toStr
+    "offsets") dyn (toStr "neighbors") dyn1 (toStr "edges") dyn2
+
+/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}]
+    Source: 'src/topology.rs', lines 132:9-132:14 -/
+@[reducible]
+def topology.Carrier.Insts.CoreFmtDebug : core.fmt.Debug topology.Carrier := {
+  fmt := topology.Carrier.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Layout}::fmt]:
+    Source: 'src/scene.rs', lines 43:9-43:14
+    Visibility: public -/
+def scene.Layout.Insts.CoreFmtDebug.fmt
+  (self : scene.Layout) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ grid.Grid.Insts.CoreFmtDebug self.cell_grid
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugVec scene.Cell.Insts.CoreFmtDebug) self.cells
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugVec polar.Circle.Insts.CoreFmtDebug) self.circles
+  let dyn3 :=
+    Dyn.mk _ (core.fmt.DebugVec scene.Portal.Insts.CoreFmtDebug) self.portals
+  let dyn4 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugI32) self.bands
+  let dyn5 := Dyn.mk _ grid.Geometry.Insts.CoreFmtDebug self.geometry
+  let dyn6 := Dyn.mk _ topology.Carrier.Insts.CoreFmtDebug self.carrier
+  let dyn7 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.transforms
+  let values :=
+    Array.to_slice
+      (Array.make 8#usize [ dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7 ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 8#usize [
+        toStr "cell_grid", toStr "cells", toStr "circles", toStr "portals",
+        toStr "bands", toStr "geometry", toStr "carrier", toStr "transforms"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Layout") s values
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Layout}]
+    Source: 'src/scene.rs', lines 43:9-43:14 -/
+@[reducible]
+def scene.Layout.Insts.CoreFmtDebug : core.fmt.Debug scene.Layout := {
+  fmt := scene.Layout.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Holds}::fmt]:
+    Source: 'src/walker.rs', lines 98:9-98:14
+    Visibility: public -/
+def walker.Holds.Insts.CoreFmtDebug.fmt
+  (self : walker.Holds) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn :=
+    Dyn.mk _ (Array.Insts.CoreFmtDebug 4#usize core.fmt.DebugUsize) self.ids
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.count
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Holds") (toStr "ids")
+    dyn (toStr "count") dyn1
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:9-98:14 -/
+@[reducible]
+def walker.Holds.Insts.CoreFmtDebug : core.fmt.Debug walker.Holds := {
+  fmt := walker.Holds.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Path}::fmt]:
+    Source: 'src/walker.rs', lines 30:9-30:14
+    Visibility: public -/
+def walker.Path.Insts.CoreFmtDebug.fmt
+  (self : walker.Path) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | walker.Path.Cartesian __self_0 __self_1 =>
+    let __self_01 := Dyn.mk _ grid.Point.Insts.CoreFmtDebug __self_0
+    let __self_11 :=
+      Dyn.mk _ (core.fmt.DebugShared grid.Point.Insts.CoreFmtDebug) __self_1
+    core.fmt.Formatter.debug_struct_field2_finish f (toStr "Cartesian") (toStr
+      "from") __self_01 (toStr "to") __self_11
+  | walker.Path.Polar __self_0 __self_1 __self_2 __self_3 __self_4 __self_5 =>
+    let __self_01 := Dyn.mk _ core.fmt.DebugUsize __self_0
+    let __self_11 := Dyn.mk _ core.fmt.DebugI32 __self_1
+    let __self_21 := Dyn.mk _ core.fmt.DebugI32 __self_2
+    let __self_31 := Dyn.mk _ core.fmt.DebugI32 __self_3
+    let __self_41 := Dyn.mk _ core.fmt.DebugI32 __self_4
+    let __self_51 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) __self_5
+    let values :=
+      Array.to_slice
+        (Array.make 6#usize [
+          __self_01, __self_11, __self_21, __self_31, __self_41, __self_51
+          ])
+    let s ←
+      lift (Array.to_slice
+        (Array.make 6#usize [
+          toStr "circle", toStr "from_radius", toStr "to_radius", toStr
+          "from_angle", toStr "doorway_angle", toStr "to_angle"
+          ]))
+    core.fmt.Formatter.debug_struct_fields_finish f (toStr "Polar") s values
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:9-30:14 -/
+@[reducible]
+def walker.Path.Insts.CoreFmtDebug : core.fmt.Debug walker.Path := {
+  fmt := walker.Path.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Doorway}::fmt]:
+    Source: 'src/scene.rs', lines 55:9-55:14
+    Visibility: public -/
+def scene.Doorway.Insts.CoreFmtDebug.fmt
+  (self : scene.Doorway) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ grid.Rect.Insts.CoreFmtDebug self.corridor
+  let dyn1 := Dyn.mk _ walker.Path.Insts.CoreFmtDebug self.path
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared walker.Holds.Insts.CoreFmtDebug) self.holds
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Doorway") (toStr
+    "corridor") dyn (toStr "path") dyn1 (toStr "holds") dyn2
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Doorway}]
+    Source: 'src/scene.rs', lines 55:9-55:14 -/
+@[reducible]
+def scene.Doorway.Insts.CoreFmtDebug : core.fmt.Debug scene.Doorway := {
+  fmt := scene.Doorway.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Doorway}::clone]:
+    Source: 'src/scene.rs', lines 55:16-55:21
+    Visibility: public -/
+def scene.Doorway.Insts.CoreCloneClone.clone
+  (self : scene.Doorway) : Result scene.Doorway := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Doorway}]
+    Source: 'src/scene.rs', lines 55:16-55:21 -/
+@[reducible]
+def scene.Doorway.Insts.CoreCloneClone : core.clone.Clone scene.Doorway := {
+  clone := scene.Doorway.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Doorway}]
+    Source: 'src/scene.rs', lines 55:23-55:27 -/
+@[reducible]
+def scene.Doorway.Insts.CoreMarkerCopy : core.marker.Copy scene.Doorway := {
+  cloneInst := scene.Doorway.Insts.CoreCloneClone
+}
+
+/-- [labyrinth_core::scene::grid_intersects]:
+    Source: 'src/scene.rs', lines 62:0-70:1 -/
+def scene.grid_intersects
+  (cell : scene.Cell) (corridor : grid.Rect) (included : Bool) :
+  Result Bool
+  := do
+  if included
+  then
+    match cell with
+    | scene.Cell.Grid _ _ bounds => grid.Rect.intersects corridor bounds
+    | scene.Cell.Center _ => ok false
+    | scene.Cell.Sector _ _ _ => ok false
+    | scene.Cell.Transition _ => ok false
+  else ok false
+
+/-- [labyrinth_core::scene::disk_intersects]:
+    Source: 'src/scene.rs', lines 72:0-74:1 -/
+def scene.disk_intersects
+  (corridor : grid.Rect) (center : grid.Point) (radius : Std.I32)
+  (included : Bool) :
+  Result Bool
+  := do
+  if included
+  then grid.Rect.touches_disk corridor center radius
+  else ok false
+
+/-- [labyrinth_core::scene::oriented_path]:
+    Source: 'src/scene.rs', lines 76:0-98:1 -/
+def scene.oriented_path
+  (path : walker.Path) (forward : Bool) : Result walker.Path := do
+  if forward
+  then ok path
+  else
+    match path with
+    | walker.Path.Cartesian «from» «to» =>
+      ok (walker.Path.Cartesian «to» «from»)
+    | walker.Path.Polar circle from_radius to_radius from_angle doorway_angle
+      to_angle =>
+      ok (walker.Path.Polar circle to_radius from_radius to_angle doorway_angle
+        from_angle)
+
+/-- [labyrinth_core::scene::check_hold_capacity]: loop body 0:
+    Source: 'src/scene.rs', lines 110:4-113:5 -/
+@[rust_loop_body]
+def scene.check_hold_capacity_loop.body
+  (holds : walker.Holds) (counts : Slice Std.Usize) (overflow : Bool)
+  (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if i < holds.count
+  then
+    if overflow
+    then ok (done overflow)
+    else
+      let i1 ← Array.index_usize holds.ids i
+      let i2 ← Slice.index_usize counts i1
+      let i3 ← i + 1#usize
+      ok (cont (i2 = core.num.Usize.MAX, i3))
+  else ok (done overflow)
+
+/-- [labyrinth_core::scene::check_hold_capacity]: loop 0:
+    Source: 'src/scene.rs', lines 110:4-113:5 -/
+@[rust_loop]
+def scene.check_hold_capacity_loop
+  (holds : walker.Holds) (counts : Slice Std.Usize) (overflow : Bool)
+  (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (overflow1, i1) => scene.check_hold_capacity_loop.body holds counts
+      overflow1 i1)
+    (overflow, i)
+
+/-- [labyrinth_core::scene::check_hold_capacity]:
+    Source: 'src/scene.rs', lines 107:0-119:1 -/
+def scene.check_hold_capacity
+  (holds : walker.Holds) (counts : Slice Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let overflow ← scene.check_hold_capacity_loop holds counts false 0#usize
+  if overflow
+  then ok (core.result.Result.Err topology.Error.Overflow)
+  else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::scene::acquire_holds]: loop body 0:
+    Source: 'src/scene.rs', lines 123:4-126:5 -/
+@[rust_loop_body]
+def scene.acquire_holds_loop.body
+  (holds : walker.Holds) (counts : Slice Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow ((Slice Std.Usize) × Std.Usize) (Slice Std.Usize))
+  := do
+  if i < holds.count
+  then
+    let i1 ← Array.index_usize holds.ids i
+    let i2 ← Slice.index_usize counts i1
+    let i3 ← i2 + 1#usize
+    let s ← Slice.update counts i1 i3
+    let i4 ← i + 1#usize
+    ok (cont (s, i4))
+  else ok (done counts)
+
+/-- [labyrinth_core::scene::acquire_holds]: loop 0:
+    Source: 'src/scene.rs', lines 123:4-126:5 -/
+@[rust_loop]
+def scene.acquire_holds_loop
+  (counts : Slice Std.Usize) (holds : walker.Holds) (i : Std.Usize) :
+  Result (Slice Std.Usize)
+  := do
+  loop
+    (fun (counts1, i1) => scene.acquire_holds_loop.body holds counts1 i1)
+    (counts, i)
+
+/-- [labyrinth_core::scene::acquire_holds]:
+    Source: 'src/scene.rs', lines 121:0-127:1 -/
+@[reducible]
+def scene.acquire_holds
+  (counts : Slice Std.Usize) (holds : walker.Holds) :
+  Result (Slice Std.Usize)
+  := do
+  scene.acquire_holds_loop counts holds 0#usize
+
+/-- [labyrinth_core::scene::push_edge]:
+    Source: 'src/scene.rs', lines 144:0-146:1 -/
+def scene.push_edge
+  (edges : alloc.vec.Vec topology.Edge) (u : Std.Usize) (v : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  let e ← topology.Edge.new u v
+  alloc.vec.Vec.push edges e
+
+/-- [labyrinth_core::scene::check_portal_spec]:
+    Source: 'src/scene.rs', lines 158:0-171:1 -/
+def scene.check_portal_spec
+  (portal : polar.PortalSpec) (circles : Slice polar.Circle) (margin : Std.I32)
+  :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := Slice.len circles
+  if portal.circle >= i
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    let i1 ← margin * 4#i32
+    if portal.band < i1
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else
+      let r ← polar.Arc.validate portal.mouth
+      let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let i2 ← polar.TURN / 2#i32
+        if portal.mouth.length > i2
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          let c ← Slice.index_usize circles portal.circle
+          let i3 ← lift (core.convert.num.FromI64I32.from c.outer)
+          let i4 ←
+            lift (core.convert.num.FromI64I32.from portal.mouth.length)
+          let i5 ← i3 * i4
+          let i6 ← lift (core.convert.num.FromI64I32.from margin)
+          let i7 ← i6 * 2#i64
+          let i8 ← lift (core.convert.num.FromI64I32.from polar.TURN)
+          let i9 ← i7 * i8
+          if i5 < i9
+          then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+          else ok (core.result.Result.Ok ())
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::check_circle_extent]: loop body 0:
+    Source: 'src/scene.rs', lines 211:4-218:5 -/
+@[rust_loop_body]
+def scene.check_circle_extent_loop0.body
+  (index : Std.Usize) (circles : Slice polar.Circle) (bands : Slice Std.I32)
+  (margin : Std.I32) (ps : polar.PolarSpec) (i : Std.Usize)
+  (v : alloc.vec.Vec Std.Usize) (i1 : Std.Usize) (i2 : Std.I32)
+  (radius : Std.I32) (overlap : Bool) (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < index
+  then
+    if overlap
+    then ok (done overlap)
+    else
+      let c ← Slice.index_usize circles j
+      let i3 ← Slice.index_usize bands j
+      let other ← c.outer + i3
+      let i4 ← lift (core.convert.num.FromI64I32.from radius)
+      let i5 ← lift (core.convert.num.FromI64I32.from other)
+      let i6 ← i4 + i5
+      let i7 ← lift (core.convert.num.FromI64I32.from margin)
+      let i8 ← i7 * 2#i64
+      let distance ← i6 + i8
+      let p ←
+        polar.Circle.center
+          {
+            spec := ps,
+            center_cell := i,
+            ring_starts := v,
+            transform_start := i1,
+            outer := i2
+          }
+      let i9 ← lift (core.convert.num.FromI64I32.from p.x)
+      let p1 ← polar.Circle.center c
+      let i10 ← lift (core.convert.num.FromI64I32.from p1.x)
+      let dx ← i9 - i10
+      let i11 ← lift (core.convert.num.FromI64I32.from p.y)
+      let p2 ← polar.Circle.center c
+      let i12 ← lift (core.convert.num.FromI64I32.from p2.y)
+      let dy ← i11 - i12
+      let i13 ← dx * dx
+      let i14 ← dy * dy
+      let i15 ← i13 + i14
+      let i16 ← distance * distance
+      let j1 ← j + 1#usize
+      ok (cont (i15 <= i16, j1))
+  else ok (done overlap)
+
+/-- [labyrinth_core::scene::check_circle_extent]: loop 0:
+    Source: 'src/scene.rs', lines 211:4-218:5 -/
+@[rust_loop]
+def scene.check_circle_extent_loop0
+  (index : Std.Usize) (circles : Slice polar.Circle) (bands : Slice Std.I32)
+  (margin : Std.I32) (ps : polar.PolarSpec) (i : Std.Usize)
+  (v : alloc.vec.Vec Std.Usize) (i1 : Std.Usize) (i2 : Std.I32)
+  (radius : Std.I32) (overlap : Bool) (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (overlap1, j1) => scene.check_circle_extent_loop0.body index circles
+      bands margin ps i v i1 i2 radius overlap1 j1)
+    (overlap, j)
+
+/-- [labyrinth_core::scene::check_circle_extent]: loop body 1:
+    Source: 'src/scene.rs', lines 211:4-218:5 -/
+@[rust_loop_body]
+def scene.check_circle_extent_loop1.body
+  (index : Std.Usize) (circles : Slice polar.Circle) (bands : Slice Std.I32)
+  (margin : Std.I32) (p : grid.Point) (i : Std.I32) (i1 : Std.I32)
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec polar.Direction)
+  (mm : polar.MotionMode) (i2 : Std.Usize) (v2 : alloc.vec.Vec Std.Usize)
+  (i3 : Std.Usize) (i4 : Std.I32) (radius : Std.I32) (overlap : Bool)
+  (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  if j < index
+  then
+    if overlap
+    then ok (done overlap)
+    else
+      let c ← Slice.index_usize circles j
+      let i5 ← Slice.index_usize bands j
+      let other ← c.outer + i5
+      let i6 ← lift (core.convert.num.FromI64I32.from radius)
+      let i7 ← lift (core.convert.num.FromI64I32.from other)
+      let i8 ← i6 + i7
+      let i9 ← lift (core.convert.num.FromI64I32.from margin)
+      let i10 ← i9 * 2#i64
+      let distance ← i8 + i10
+      let p1 ←
+        polar.Circle.center
+          {
+            spec :=
+              {
+                center := p,
+                center_radius := i,
+                ring_width := i1,
+                sectors := v,
+                directions := v1,
+                mode := mm
+              },
+            center_cell := i2,
+            ring_starts := v2,
+            transform_start := i3,
+            outer := i4
+          }
+      let i11 ← lift (core.convert.num.FromI64I32.from p1.x)
+      let p2 ← polar.Circle.center c
+      let i12 ← lift (core.convert.num.FromI64I32.from p2.x)
+      let dx ← i11 - i12
+      let i13 ← lift (core.convert.num.FromI64I32.from p1.y)
+      let p3 ← polar.Circle.center c
+      let i14 ← lift (core.convert.num.FromI64I32.from p3.y)
+      let dy ← i13 - i14
+      let i15 ← dx * dx
+      let i16 ← dy * dy
+      let i17 ← i15 + i16
+      let i18 ← distance * distance
+      let j1 ← j + 1#usize
+      ok (cont (i17 <= i18, j1))
+  else ok (done overlap)
+
+/-- [labyrinth_core::scene::check_circle_extent]: loop 1:
+    Source: 'src/scene.rs', lines 211:4-218:5 -/
+@[rust_loop]
+def scene.check_circle_extent_loop1
+  (index : Std.Usize) (circles : Slice polar.Circle) (bands : Slice Std.I32)
+  (margin : Std.I32) (p : grid.Point) (i : Std.I32) (i1 : Std.I32)
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec polar.Direction)
+  (mm : polar.MotionMode) (i2 : Std.Usize) (v2 : alloc.vec.Vec Std.Usize)
+  (i3 : Std.Usize) (i4 : Std.I32) (radius : Std.I32) (overlap : Bool)
+  (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (overlap1, j1) => scene.check_circle_extent_loop1.body index circles
+      bands margin p i i1 v v1 mm i2 v2 i3 i4 radius overlap1 j1)
+    (overlap, j)
+
+/-- [labyrinth_core::scene::check_circle_extent]:
+    Source: 'src/scene.rs', lines 173:0-224:1 -/
+def scene.check_circle_extent
+  (index : Std.Usize) (circles : Slice polar.Circle) (bands : Slice Std.I32)
+  (counts : Slice Std.Usize) (margin : Std.I32) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i ← Slice.index_usize counts index
+  if i < 2#usize
+  then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+  else
+    let circle ← Slice.index_usize circles index
+    let i1 ← Slice.index_usize bands index
+    let o ← lift (I32.checked_add circle.outer i1)
+    let r ← core.option.Option.ok_or o topology.Error.Overflow
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      if val > grid.COORD_LIMIT
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        let p ← polar.Circle.center circle
+        let r1 ←
+          polar.bounds p 0#i32 val { start := 0#i32, length := polar.TURN }
+            margin
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let mm ← polar.Circle.mode circle
+          match mm with
+          | polar.MotionMode.Spinning =>
+            let overlap ←
+              scene.check_circle_extent_loop0 index circles bands margin
+                circle.spec circle.center_cell circle.ring_starts
+                circle.transform_start circle.outer val false 0#usize
+            if overlap
+            then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+            else ok (core.result.Result.Ok ())
+          | polar.MotionMode.Twisting amplitude _ =>
+            let i2 ← circle.spec.ring_width / 2#i32
+            let width ← i2 + i1
+            let i3 ← lift (core.convert.num.FromI64I32.from val)
+            let i4 ← lift (core.convert.num.FromI64I32.from amplitude)
+            let i5 ← i3 * i4
+            let i6 ← i5 * 8#i64
+            let i7 ← margin * 2#i32
+            let i8 ← width - i7
+            let i9 ← lift (core.convert.num.FromI64I32.from i8)
+            let i10 ← lift (core.convert.num.FromI64I32.from polar.TURN)
+            let i11 ← i9 * i10
+            if i6 > i11
+            then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+            else
+              let overlap ←
+                scene.check_circle_extent_loop1 index circles bands margin
+                  circle.spec.center circle.spec.center_radius
+                  circle.spec.ring_width circle.spec.sectors
+                  circle.spec.directions circle.spec.mode circle.center_cell
+                  circle.ring_starts circle.transform_start circle.outer val
+                  false 0#usize
+              if overlap
+              then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+              else ok (core.result.Result.Ok ())
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Unit (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::resolve_portal]: loop body 0:
+    Source: 'src/scene.rs', lines 237:4-252:5 -/
+@[rust_loop_body]
+def scene.resolve_portal_loop.body
+  (i : Std.Usize) (a : polar.Arc) (portals : Slice scene.Portal)
+  (grid_cell : Std.Usize) (conflict : Bool) (j : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := Slice.len portals
+  if j < i1
+  then
+    if conflict
+    then ok (done conflict)
+    else
+      let previous ← Slice.index_usize portals j
+      let conflict1 ←
+        if previous.spec.circle = i
+        then
+          if previous.grid_cell = grid_cell
+          then ok true
+          else
+            do
+            let r ←
+              polar.overlap
+                (Array.make 4#usize [
+                  previous.spec.mouth, a, previous.spec.mouth, a
+                  ]) 1#i32
+            core.result.Result.is_ok r
+        else ok false
+      let j1 ← j + 1#usize
+      ok (cont (conflict1, j1))
+  else ok (done conflict)
+
+/-- [labyrinth_core::scene::resolve_portal]: loop 0:
+    Source: 'src/scene.rs', lines 237:4-252:5 -/
+@[rust_loop]
+def scene.resolve_portal_loop
+  (i : Std.Usize) (a : polar.Arc) (portals : Slice scene.Portal)
+  (grid_cell : Std.Usize) (conflict : Bool) (j : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (conflict1, j1) => scene.resolve_portal_loop.body i a portals
+      grid_cell conflict1 j1)
+    (conflict, j)
+
+/-- [labyrinth_core::scene::resolve_portal]:
+    Source: 'src/scene.rs', lines 226:0-261:1 -/
+def scene.resolve_portal
+  (spec : polar.PortalSpec) (cell_grid : grid.Grid)
+  (portals : Slice scene.Portal) (transition_cell : Std.Usize) :
+  Result (core.result.Result scene.Portal topology.Error)
+  := do
+  let o ← grid.Grid.cell cell_grid spec.column spec.row
+  let r ← core.option.Option.ok_or o topology.Error.InvalidGeometry
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let conflict ←
+      scene.resolve_portal_loop spec.circle spec.mouth portals val false
+        0#usize
+    if conflict
+    then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else ok (core.result.Result.Ok { spec, grid_cell := val, transition_cell })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      scene.Portal (core.convert.FromSame topology.Error) residual
 
 /-- [labyrinth_core::topology::validate_row_entry]: loop body 0:
-    Source: 'src/topology.rs', lines 122:4-124:5 -/
+    Source: 'src/topology.rs', lines 116:4-118:5 -/
 @[rust_loop_body]
 def topology.validate_row_entry_loop0.body
   (neighbors : Slice Std.Usize) (index : Std.Usize) (neighbor : Std.Usize)
@@ -848,7 +10957,7 @@ def topology.validate_row_entry_loop0.body
   else ok (done j)
 
 /-- [labyrinth_core::topology::validate_row_entry]: loop 0:
-    Source: 'src/topology.rs', lines 122:4-124:5 -/
+    Source: 'src/topology.rs', lines 116:4-118:5 -/
 @[rust_loop]
 def topology.validate_row_entry_loop0
   (neighbors : Slice Std.Usize) (index : Std.Usize) (neighbor : Std.Usize)
@@ -861,7 +10970,7 @@ def topology.validate_row_entry_loop0
     j
 
 /-- [labyrinth_core::topology::validate_row_entry]: loop body 1:
-    Source: 'src/topology.rs', lines 129:4-131:5 -/
+    Source: 'src/topology.rs', lines 123:4-125:5 -/
 @[rust_loop_body]
 def topology.validate_row_entry_loop1.body
   (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
@@ -880,7 +10989,7 @@ def topology.validate_row_entry_loop1.body
   else ok (done j)
 
 /-- [labyrinth_core::topology::validate_row_entry]: loop 1:
-    Source: 'src/topology.rs', lines 129:4-131:5 -/
+    Source: 'src/topology.rs', lines 123:4-125:5 -/
 @[rust_loop]
 def topology.validate_row_entry_loop1
   (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
@@ -893,7 +11002,7 @@ def topology.validate_row_entry_loop1
     j
 
 /-- [labyrinth_core::topology::validate_row_entry]:
-    Source: 'src/topology.rs', lines 108:0-136:1 -/
+    Source: 'src/topology.rs', lines 102:0-130:1 -/
 def topology.validate_row_entry
   (offsets : Slice Std.Usize) (neighbors : Slice Std.Usize) (cell : Std.Usize)
   (index : Std.Usize) :
@@ -922,15 +11031,6 @@ def topology.validate_row_entry
         then ok (core.result.Result.Err topology.Error.InvalidCarrier)
         else ok (core.result.Result.Ok ())
 
-/-- [labyrinth_core::topology::{labyrinth_core::topology::Edge}::new]:
-    Source: 'src/topology.rs', lines 56:4-62:5
-    Visibility: public -/
-def topology.Edge.new
-  (u : Std.Usize) (v : Std.Usize) : Result topology.Edge := do
-  if u <= v
-  then ok { u, v }
-  else ok { u := v, v := u }
-
 /-- [labyrinth_core::topology::{impl core::clone::Clone for labyrinth_core::topology::Edge}::clone]:
     Source: 'src/topology.rs', lines 49:16-49:21
     Visibility: public -/
@@ -946,7 +11046,7 @@ def topology.Edge.Insts.CoreCloneClone : core.clone.Clone topology.Edge := {
 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 0:
-    Source: 'src/topology.rs', lines 201:8-205:9
+    Source: 'src/topology.rs', lines 197:8-200:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop0.body
@@ -980,7 +11080,7 @@ def topology.Carrier.from_csr_loop0.body
   else ok (done valid_offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 0:
-    Source: 'src/topology.rs', lines 201:8-205:9
+    Source: 'src/topology.rs', lines 197:8-200:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop0
@@ -994,7 +11094,7 @@ def topology.Carrier.from_csr_loop0
     (u, valid_offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 2:
-    Source: 'src/topology.rs', lines 213:12-216:13
+    Source: 'src/topology.rs', lines 208:12-211:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop1_loop0.body
@@ -1022,7 +11122,7 @@ def topology.Carrier.from_csr_loop1_loop0.body
   else ok (done status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 2:
-    Source: 'src/topology.rs', lines 213:12-216:13
+    Source: 'src/topology.rs', lines 208:12-211:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop1_loop0
@@ -1037,7 +11137,7 @@ def topology.Carrier.from_csr_loop1_loop0
     (status, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 1:
-    Source: 'src/topology.rs', lines 211:8-218:9
+    Source: 'src/topology.rs', lines 206:8-213:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop1.body
@@ -1063,7 +11163,7 @@ def topology.Carrier.from_csr_loop1.body
   else ok (done (u, status))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 1:
-    Source: 'src/topology.rs', lines 211:8-218:9
+    Source: 'src/topology.rs', lines 206:8-213:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop1
@@ -1078,7 +11178,7 @@ def topology.Carrier.from_csr_loop1
     (u, status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 4:
-    Source: 'src/topology.rs', lines 230:12-239:13
+    Source: 'src/topology.rs', lines 225:12-234:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop2_loop0.body
@@ -1121,7 +11221,7 @@ def topology.Carrier.from_csr_loop2_loop0.body
   else ok (done (seen, stack, depth, reached))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 4:
-    Source: 'src/topology.rs', lines 230:12-239:13
+    Source: 'src/topology.rs', lines 225:12-234:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop2_loop0
@@ -1138,7 +11238,7 @@ def topology.Carrier.from_csr_loop2_loop0
     (seen, stack, depth, reached, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 3:
-    Source: 'src/topology.rs', lines 226:8-240:9
+    Source: 'src/topology.rs', lines 221:8-235:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop2.body
@@ -1164,7 +11264,7 @@ def topology.Carrier.from_csr_loop2.body
   else ok (done reached)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 3:
-    Source: 'src/topology.rs', lines 226:8-240:9
+    Source: 'src/topology.rs', lines 221:8-235:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop2
@@ -1180,7 +11280,7 @@ def topology.Carrier.from_csr_loop2
     (u, seen, stack, depth, reached)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 6:
-    Source: 'src/topology.rs', lines 250:12-257:13
+    Source: 'src/topology.rs', lines 245:12-252:13
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop3_loop0.body
@@ -1216,7 +11316,7 @@ def topology.Carrier.from_csr_loop3_loop0.body
   else ok (done (edges, count))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 6:
-    Source: 'src/topology.rs', lines 250:12-257:13
+    Source: 'src/topology.rs', lines 245:12-252:13
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop3_loop0
@@ -1231,7 +11331,7 @@ def topology.Carrier.from_csr_loop3_loop0
     (edges, count, i)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop body 5:
-    Source: 'src/topology.rs', lines 248:8-259:9
+    Source: 'src/topology.rs', lines 243:8-254:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_csr_loop3.body
@@ -1253,7 +11353,7 @@ def topology.Carrier.from_csr_loop3.body
   else ok (done edges)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]: loop 5:
-    Source: 'src/topology.rs', lines 248:8-259:9
+    Source: 'src/topology.rs', lines 243:8-254:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_csr_loop3
@@ -1268,7 +11368,7 @@ def topology.Carrier.from_csr_loop3
     (u, edges, count)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_csr]:
-    Source: 'src/topology.rs', lines 191:4-265:5
+    Source: 'src/topology.rs', lines 187:4-260:5
     Visibility: public -/
 def topology.Carrier.from_csr
   (offsets : alloc.vec.Vec Std.Usize) (neighbors : alloc.vec.Vec Std.Usize) :
@@ -1349,7 +11449,7 @@ def topology.Carrier.from_csr
         else ok (core.result.Result.Err topology.Error.InvalidCarrier)
 
 /-- [labyrinth_core::topology::prefix_offsets]: loop body 0:
-    Source: 'src/topology.rs', lines 98:4-104:5 -/
+    Source: 'src/topology.rs', lines 92:4-98:5 -/
 @[rust_loop_body]
 def topology.prefix_offsets_loop.body
   (offsets : Slice Std.Usize) (i : Std.Usize)
@@ -1380,7 +11480,7 @@ def topology.prefix_offsets_loop.body
   else ok (done (status, offsets))
 
 /-- [labyrinth_core::topology::prefix_offsets]: loop 0:
-    Source: 'src/topology.rs', lines 98:4-104:5 -/
+    Source: 'src/topology.rs', lines 92:4-98:5 -/
 @[rust_loop]
 def topology.prefix_offsets_loop
   (offsets : Slice Std.Usize) (i : Std.Usize)
@@ -1393,7 +11493,7 @@ def topology.prefix_offsets_loop
     (offsets, i, status)
 
 /-- [labyrinth_core::topology::prefix_offsets]:
-    Source: 'src/topology.rs', lines 95:0-106:1 -/
+    Source: 'src/topology.rs', lines 89:0-100:1 -/
 @[reducible]
 def topology.prefix_offsets
   (offsets : Slice Std.Usize) :
@@ -1402,7 +11502,7 @@ def topology.prefix_offsets
   topology.prefix_offsets_loop offsets 1#usize (core.result.Result.Ok ())
 
 /-- [labyrinth_core::topology::count_edge]:
-    Source: 'src/topology.rs', lines 75:0-93:1 -/
+    Source: 'src/topology.rs', lines 73:0-87:1 -/
 def topology.count_edge
   (offsets : Slice Std.Usize) (cell_count : Std.Usize) (edge : topology.Edge) :
   Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize))
@@ -1445,7 +11545,7 @@ def topology.count_edge
           ok (r1, offsets)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 0:
-    Source: 'src/topology.rs', lines 162:8-165:9
+    Source: 'src/topology.rs', lines 157:8-160:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop0.body
@@ -1472,7 +11572,7 @@ def topology.Carrier.from_edges_loop0.body
   else ok (done (offsets, status))
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 0:
-    Source: 'src/topology.rs', lines 162:8-165:9
+    Source: 'src/topology.rs', lines 157:8-160:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop0
@@ -1488,7 +11588,7 @@ def topology.Carrier.from_edges_loop0
     (offsets, i, status)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 1:
-    Source: 'src/topology.rs', lines 170:8-173:9
+    Source: 'src/topology.rs', lines 165:8-168:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop1.body
@@ -1511,7 +11611,7 @@ def topology.Carrier.from_edges_loop1.body
   else ok (done next)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 1:
-    Source: 'src/topology.rs', lines 170:8-173:9
+    Source: 'src/topology.rs', lines 165:8-168:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop1
@@ -1525,7 +11625,7 @@ def topology.Carrier.from_edges_loop1
     (i, next)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop body 2:
-    Source: 'src/topology.rs', lines 176:8-183:9
+    Source: 'src/topology.rs', lines 171:8-178:9
     Visibility: public -/
 @[rust_loop_body]
 def topology.Carrier.from_edges_loop2.body
@@ -1567,7 +11667,7 @@ def topology.Carrier.from_edges_loop2.body
   else ok (done neighbors)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]: loop 2:
-    Source: 'src/topology.rs', lines 176:8-183:9
+    Source: 'src/topology.rs', lines 171:8-178:9
     Visibility: public -/
 @[rust_loop]
 def topology.Carrier.from_edges_loop2
@@ -1581,7 +11681,7 @@ def topology.Carrier.from_edges_loop2
     (i, next, neighbors)
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::from_edges]:
-    Source: 'src/topology.rs', lines 150:4-185:5
+    Source: 'src/topology.rs', lines 145:4-180:5
     Visibility: public -/
 def topology.Carrier.from_edges
   (cell_count : Std.Usize) (edges : Slice topology.Edge) :
@@ -1666,8 +11766,2382 @@ def topology.Carrier.from_edges
       core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
         topology.Carrier (core.convert.FromSame topology.Error) residual
 
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector_pair]:
+    Source: 'src/scene.rs', lines 510:4-545:5 -/
+def scene.Layout.check_connector_pair
+  (self : scene.Layout) (portal : scene.Portal) (corridor : grid.Rect)
+  (other : scene.Portal) (phases : Slice Std.I32) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let e ← topology.Edge.new other.grid_cell other.transition_cell
+  let r ← scene.Layout.doorway self e phases phases
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let b ← grid.Rect.intersects corridor val.corridor
+    if b
+    then
+      let i ←
+        lift (core.cmp.impls.OrdI32.max corridor.min.x val.corridor.min.x)
+      let i1 ←
+        lift (core.cmp.impls.OrdI32.max corridor.min.y val.corridor.min.y)
+      let i2 ←
+        lift (core.cmp.impls.OrdI32.min corridor.max.x val.corridor.max.x)
+      let i3 ←
+        lift (core.cmp.impls.OrdI32.min corridor.max.y val.corridor.max.y)
+      if portal.grid_cell = other.grid_cell
+      then
+        let c ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            scene.Cell) self.cells portal.grid_cell
+        match c with
+        | scene.Cell.Grid _ _ bounds =>
+          let b1 ←
+            grid.Rect.contains bounds
+              { min := { x := i, y := i1 }, max := { x := i2, y := i3 } }
+          if b1
+          then ok (core.result.Result.Ok ())
+          else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Center _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Sector _ _ _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        | scene.Cell.Transition _ =>
+          ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+    else ok (core.result.Result.Ok ())
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 0:
+    Source: 'src/scene.rs', lines 486:8-490:9 -/
+@[rust_loop_body]
+def scene.Layout.check_connector_loop0.body
+  (v : alloc.vec.Vec scene.Cell) (i : Std.Usize) (corridor : grid.Rect)
+  (blocked : Bool) (cell : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if cell < i1
+  then
+    if blocked
+    then ok (done blocked)
+    else
+      let kind ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+          v cell
+      let blocked1 ← scene.grid_intersects kind corridor (cell != i)
+      let cell1 ← cell + 1#usize
+      ok (cont (blocked1, cell1))
+  else ok (done blocked)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 0:
+    Source: 'src/scene.rs', lines 486:8-490:9 -/
+@[rust_loop]
+def scene.Layout.check_connector_loop0
+  (v : alloc.vec.Vec scene.Cell) (i : Std.Usize) (corridor : grid.Rect)
+  (blocked : Bool) (cell : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (blocked1, cell1) => scene.Layout.check_connector_loop0.body v i
+      corridor blocked1 cell1)
+    (blocked, cell)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 1:
+    Source: 'src/scene.rs', lines 492:8-497:9 -/
+@[rust_loop_body]
+def scene.Layout.check_connector_loop1.body
+  (v : alloc.vec.Vec polar.Circle) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize)
+  (corridor : grid.Rect) (margin : Std.I32) (blocked : Bool)
+  (other : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if other < i1
+  then
+    if blocked
+    then ok (done blocked)
+    else
+      let c ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Circle) v other
+      let center ← polar.Circle.center c
+      let i2 ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32) v1
+          other
+      let i3 ← c.outer + i2
+      let radius ← i3 + margin
+      let blocked1 ←
+        scene.disk_intersects corridor center radius (other != i)
+      let other1 ← other + 1#usize
+      ok (cont (blocked1, other1))
+  else ok (done blocked)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 1:
+    Source: 'src/scene.rs', lines 492:8-497:9 -/
+@[rust_loop]
+def scene.Layout.check_connector_loop1
+  (v : alloc.vec.Vec polar.Circle) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize)
+  (corridor : grid.Rect) (margin : Std.I32) (blocked : Bool)
+  (other : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (blocked1, other1) => scene.Layout.check_connector_loop1.body v v1 i
+      corridor margin blocked1 other1)
+    (blocked, other)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop body 2:
+    Source: 'src/scene.rs', lines 503:8-506:9 -/
+@[rust_loop_body]
+def scene.Layout.check_connector_loop2.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (index : Std.Usize) (phases : Slice Std.I32) (i1 : Std.Usize)
+  (i2 : Std.Usize) (i3 : Std.Usize) (a : polar.Arc) (i4 : Std.I32)
+  (i5 : Std.Usize) (i6 : Std.Usize) (corridor : grid.Rect)
+  (status : core.result.Result Unit topology.Error) (other : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  if other < index
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let p ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          scene.Portal) v2 other
+      let status1 ←
+        scene.Layout.check_connector_pair
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          }
+          {
+            spec :=
+              { circle := i1, column := i2, row := i3, mouth := a, band := i4 },
+            grid_cell := i5,
+            transition_cell := i6
+          } corridor p phases
+      let other1 ← other + 1#usize
+      ok (cont (status1, other1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]: loop 2:
+    Source: 'src/scene.rs', lines 503:8-506:9 -/
+@[rust_loop]
+def scene.Layout.check_connector_loop2
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (index : Std.Usize) (phases : Slice Std.I32) (i1 : Std.Usize)
+  (i2 : Std.Usize) (i3 : Std.Usize) (a : polar.Arc) (i4 : Std.I32)
+  (i5 : Std.Usize) (i6 : Std.Usize) (corridor : grid.Rect)
+  (status : core.result.Result Unit topology.Error) (other : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, other1) => scene.Layout.check_connector_loop2.body g v v1 v2
+      v3 g1 c i index phases i1 i2 i3 a i4 i5 i6 corridor status1 other1)
+    (status, other)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_connector]:
+    Source: 'src/scene.rs', lines 470:4-508:5 -/
+def scene.Layout.check_connector
+  (self : scene.Layout) (index : Std.Usize) (phases : Slice Std.I32) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let portal ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Portal)
+      self.portals index
+  let e ← topology.Edge.new portal.grid_cell portal.transition_cell
+  let r ← scene.Layout.doorway self e phases phases
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let circle ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        self.circles portal.spec.circle
+    let r1 ← grid.Geometry.margin self.geometry
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      let p ← polar.Circle.center circle
+      let i ← circle.outer + val1
+      let b ← grid.Rect.touches_disk val.corridor p i
+      if b
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        let blocked ←
+          scene.Layout.check_connector_loop0 self.cells portal.grid_cell
+            val.corridor false 0#usize
+        let blocked1 ←
+          scene.Layout.check_connector_loop1 self.circles self.bands
+            portal.spec.circle val.corridor val1 blocked 0#usize
+        if blocked1
+        then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          scene.Layout.check_connector_loop2 self.cell_grid self.cells
+            self.circles self.portals self.bands self.geometry self.carrier
+            self.transforms index phases portal.spec.circle portal.spec.column
+            portal.spec.row portal.spec.mouth portal.spec.band portal.grid_cell
+            portal.transition_cell val.corridor (core.result.Result.Ok ())
+            0#usize
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      Unit (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 0:
+    Source: 'src/scene.rs', lines 286:8-299:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop0.body
+  (margin : Std.I32) (iter : alloc.vec.into_iter.IntoIter polar.PolarSpec)
+  (circles : alloc.vec.Vec polar.Circle) (transforms : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow ((alloc.vec.into_iter.IntoIter polar.PolarSpec) ×
+    (alloc.vec.Vec polar.Circle) × Std.Usize × (core.result.Result Unit
+    topology.Error)) ((alloc.vec.Vec polar.Circle) × Std.Usize ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let (o, iter1) ← alloc.vec.into_iter.IteratorIntoIter.next iter
+  match o with
+  | none => ok (done (circles, transforms, status))
+  | some spec =>
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let r ← polar.Circle.new spec 0#usize transforms margin
+      match r with
+      | core.result.Result.Ok circle =>
+        let i ← polar.Circle.ring_count circle
+        let o1 ← lift (Usize.checked_add transforms i)
+        match o1 with
+        | none =>
+          ok (cont (iter1, circles, transforms, core.result.Result.Err
+            topology.Error.Overflow))
+        | some count =>
+          let circles1 ← alloc.vec.Vec.push circles circle
+          ok (cont (iter1, circles1, count, status))
+      | core.result.Result.Err error =>
+        ok (cont (iter1, circles, transforms, core.result.Result.Err error))
+    else ok (cont (iter1, circles, transforms, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 0:
+    Source: 'src/scene.rs', lines 286:8-299:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop0
+  (iter : alloc.vec.into_iter.IntoIter polar.PolarSpec) (margin : Std.I32)
+  (circles : alloc.vec.Vec polar.Circle) (transforms : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result ((alloc.vec.Vec polar.Circle) × Std.Usize × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (iter1, circles1, transforms1, status1) => scene.Layout.new_loop0.body
+      margin iter1 circles1 transforms1 status1)
+    (iter, circles, transforms, status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 1:
+    Source: 'src/scene.rs', lines 304:8-312:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop1.body
+  (portal_specs : Slice polar.PortalSpec) (margin : Std.I32)
+  (circles : alloc.vec.Vec polar.Circle)
+  (status : core.result.Result Unit topology.Error)
+  (bands : alloc.vec.Vec Std.I32) (portal_counts : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.Usize) × Std.Usize)
+    ((core.result.Result Unit topology.Error) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec Std.Usize)))
+  := do
+  let i1 := Slice.len portal_specs
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let portal ← Slice.index_usize portal_specs i
+      let s := alloc.vec.Vec.deref circles
+      let status1 ← scene.check_portal_spec portal s margin
+      let b1 ← core.result.Result.is_ok status1
+      let (bands1, portal_counts1) ←
+        if b1
+        then
+          do
+          let i2 ←
+            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32)
+              bands portal.circle
+          let i3 ← lift (core.cmp.impls.OrdI32.max i2 portal.band)
+          let (_, index_mut_back) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.I32) bands portal.circle
+          let (i4, index_mut_back1) ←
+            alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+              Std.Usize) portal_counts portal.circle
+          let i5 ← i4 + 1#usize
+          let portal_counts2 := index_mut_back1 i5
+          let bands2 := index_mut_back i3
+          ok (bands2, portal_counts2)
+        else ok (bands, portal_counts)
+      let i2 ← i + 1#usize
+      ok (cont (status1, bands1, portal_counts1, i2))
+    else ok (done (status, bands, portal_counts))
+  else ok (done (status, bands, portal_counts))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 1:
+    Source: 'src/scene.rs', lines 304:8-312:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop1
+  (portal_specs : Slice polar.PortalSpec) (margin : Std.I32)
+  (circles : alloc.vec.Vec polar.Circle)
+  (status : core.result.Result Unit topology.Error)
+  (bands : alloc.vec.Vec Std.I32) (portal_counts : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec Std.I32)
+    × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (status1, bands1, portal_counts1, i1) => scene.Layout.new_loop1.body
+      portal_specs margin circles status1 bands1 portal_counts1 i1)
+    (status, bands, portal_counts, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 2:
+    Source: 'src/scene.rs', lines 315:8-318:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop2.body
+  (margin : Std.I32) (circles : alloc.vec.Vec polar.Circle)
+  (bands : alloc.vec.Vec Std.I32) (portal_counts : alloc.vec.Vec Std.Usize)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := alloc.vec.Vec.len circles
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let s := alloc.vec.Vec.deref circles
+      let s1 := alloc.vec.Vec.deref bands
+      let s2 := alloc.vec.Vec.deref portal_counts
+      let status1 ← scene.check_circle_extent i s s1 s2 margin
+      let i2 ← i + 1#usize
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 2:
+    Source: 'src/scene.rs', lines 315:8-318:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop2
+  (margin : Std.I32) (circles : alloc.vec.Vec polar.Circle)
+  (status : core.result.Result Unit topology.Error)
+  (bands : alloc.vec.Vec Std.I32) (portal_counts : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => scene.Layout.new_loop2.body margin circles bands
+      portal_counts status1 i1)
+    (status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 5:
+    Source: 'src/scene.rs', lines 328:16-333:17
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop3_loop0_loop0.body
+  (circles : alloc.vec.Vec polar.Circle) (bands : alloc.vec.Vec Std.I32)
+  (bounds : grid.Rect) (removed : Bool) (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len circles
+  if i < i1
+  then
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        circles i
+    let p ← polar.Circle.center c
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32) bands
+        i
+    let i3 ← c.outer + i2
+    let b ← grid.Rect.touches_disk bounds p i3
+    let removed1 ← if b
+                     then ok true
+                     else ok removed
+    let i4 ← i + 1#usize
+    ok (cont (removed1, i4))
+  else ok (done removed)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 5:
+    Source: 'src/scene.rs', lines 328:16-333:17
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop3_loop0_loop0
+  (circles : alloc.vec.Vec polar.Circle) (bands : alloc.vec.Vec Std.I32)
+  (bounds : grid.Rect) (removed : Bool) (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (removed1, i1) => scene.Layout.new_loop3_loop0_loop0.body circles
+      bands bounds removed1 i1)
+    (removed, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 4:
+    Source: 'src/scene.rs', lines 324:12-343:13
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop3_loop0.body
+  (i : Std.Usize) (geometry : grid.Geometry)
+  (circles : alloc.vec.Vec polar.Circle) (bands : alloc.vec.Vec Std.I32)
+  (row : Std.Usize) (cell_grid : grid.Grid) (cells : alloc.vec.Vec scene.Cell)
+  (column : Std.Usize) :
+  Result (ControlFlow (grid.Grid × (alloc.vec.Vec scene.Cell) × Std.Usize)
+    (grid.Grid × (alloc.vec.Vec scene.Cell)))
+  := do
+  if column < i
+  then
+    let bounds ← grid.Grid.bounds cell_grid column row
+    let r ← grid.Geometry.check geometry bounds
+    let removed ← core.result.Result.is_err r
+    let removed1 ←
+      scene.Layout.new_loop3_loop0_loop0 circles bands bounds removed 0#usize
+    let (cell_grid1, cells1) ←
+      if removed1
+      then ok (cell_grid, cells)
+      else
+        do
+        let i1 := alloc.vec.Vec.len cells
+        let cell_grid2 ← grid.Grid.retain cell_grid column row i1
+        let cells2 ←
+          alloc.vec.Vec.push cells (scene.Cell.Grid column row bounds)
+        ok (cell_grid2, cells2)
+    let column1 ← column + 1#usize
+    ok (cont (cell_grid1, cells1, column1))
+  else ok (done (cell_grid, cells))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 4:
+    Source: 'src/scene.rs', lines 324:12-343:13
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop3_loop0
+  (i : Std.Usize) (geometry : grid.Geometry) (cell_grid : grid.Grid)
+  (circles : alloc.vec.Vec polar.Circle) (bands : alloc.vec.Vec Std.I32)
+  (cells : alloc.vec.Vec scene.Cell) (row : Std.Usize) (column : Std.Usize) :
+  Result (grid.Grid × (alloc.vec.Vec scene.Cell))
+  := do
+  loop
+    (fun (cell_grid1, cells1, column1) => scene.Layout.new_loop3_loop0.body i
+      geometry circles bands row cell_grid1 cells1 column1)
+    (cell_grid, cells, column)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 3:
+    Source: 'src/scene.rs', lines 322:8-345:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop3.body
+  (i : Std.Usize) (i1 : Std.Usize) (geometry : grid.Geometry)
+  (circles : alloc.vec.Vec polar.Circle) (bands : alloc.vec.Vec Std.I32)
+  (cell_grid : grid.Grid) (cells : alloc.vec.Vec scene.Cell) (row : Std.Usize)
+  :
+  Result (ControlFlow (grid.Grid × (alloc.vec.Vec scene.Cell) × Std.Usize)
+    (grid.Grid × (alloc.vec.Vec scene.Cell)))
+  := do
+  if row < i1
+  then
+    let (cell_grid1, cells1) ←
+      scene.Layout.new_loop3_loop0 i geometry cell_grid circles bands cells row
+        0#usize
+    let row1 ← row + 1#usize
+    ok (cont (cell_grid1, cells1, row1))
+  else ok (done (cell_grid, cells))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 3:
+    Source: 'src/scene.rs', lines 322:8-345:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop3
+  (i : Std.Usize) (i1 : Std.Usize) (geometry : grid.Geometry)
+  (cell_grid : grid.Grid) (circles : alloc.vec.Vec polar.Circle)
+  (bands : alloc.vec.Vec Std.I32) (cells : alloc.vec.Vec scene.Cell)
+  (row : Std.Usize) :
+  Result (grid.Grid × (alloc.vec.Vec scene.Cell))
+  := do
+  loop
+    (fun (cell_grid1, cells1, row1) => scene.Layout.new_loop3.body i i1
+      geometry circles bands cell_grid1 cells1 row1)
+    (cell_grid, cells, row)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 8:
+    Source: 'src/scene.rs', lines 355:16-362:17
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop4_loop0_loop0.body
+  (circles : alloc.vec.Vec polar.Circle) (ci : Std.Usize) (ring : Std.Usize)
+  (cells : alloc.vec.Vec scene.Cell) (sector : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec scene.Cell) × Std.Usize) (alloc.vec.Vec
+    scene.Cell))
+  := do
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+      circles ci
+  let i ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      c.spec.sectors ring
+  if sector < i
+  then
+    let cells1 ← alloc.vec.Vec.push cells (scene.Cell.Sector ci ring sector)
+    let sector1 ← sector + 1#usize
+    ok (cont (cells1, sector1))
+  else ok (done cells)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 8:
+    Source: 'src/scene.rs', lines 355:16-362:17
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop4_loop0_loop0
+  (circles : alloc.vec.Vec polar.Circle) (cells : alloc.vec.Vec scene.Cell)
+  (ci : Std.Usize) (ring : Std.Usize) (sector : Std.Usize) :
+  Result (alloc.vec.Vec scene.Cell)
+  := do
+  loop
+    (fun (cells1, sector1) => scene.Layout.new_loop4_loop0_loop0.body circles
+      ci ring cells1 sector1)
+    (cells, sector)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 7:
+    Source: 'src/scene.rs', lines 352:12-364:13
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop4_loop0.body
+  (ci : Std.Usize) (circles : alloc.vec.Vec polar.Circle)
+  (cells : alloc.vec.Vec scene.Cell) (ring : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec
+    scene.Cell) × Std.Usize) ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec
+    scene.Cell)))
+  := do
+  let c ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+      circles ci
+  let i ← polar.Circle.ring_count c
+  if ring < i
+  then
+    let i1 := alloc.vec.Vec.len cells
+    let (c1, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        polar.Circle) circles ci
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        c1.ring_starts ring
+    let v := index_mut_back1 i1
+    let circles1 := index_mut_back { c1 with ring_starts := v }
+    let cells1 ←
+      scene.Layout.new_loop4_loop0_loop0 circles1 cells ci ring 0#usize
+    let ring1 ← ring + 1#usize
+    ok (cont (circles1, cells1, ring1))
+  else ok (done (circles, cells))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 7:
+    Source: 'src/scene.rs', lines 352:12-364:13
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop4_loop0
+  (circles : alloc.vec.Vec polar.Circle) (cells : alloc.vec.Vec scene.Cell)
+  (ci : Std.Usize) (ring : Std.Usize) :
+  Result ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec scene.Cell))
+  := do
+  loop
+    (fun (circles1, cells1, ring1) => scene.Layout.new_loop4_loop0.body ci
+      circles1 cells1 ring1)
+    (circles, cells, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 6:
+    Source: 'src/scene.rs', lines 347:8-366:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop4.body
+  (circles : alloc.vec.Vec polar.Circle) (cells : alloc.vec.Vec scene.Cell)
+  (ci : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec
+    scene.Cell) × Std.Usize) ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec
+    scene.Cell)))
+  := do
+  let i := alloc.vec.Vec.len circles
+  if ci < i
+  then
+    let start := alloc.vec.Vec.len cells
+    let (c, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        polar.Circle) circles ci
+    let cells1 ← alloc.vec.Vec.push cells (scene.Cell.Center ci)
+    let circles1 := index_mut_back { c with center_cell := start }
+    let (circles2, cells2) ←
+      scene.Layout.new_loop4_loop0 circles1 cells1 ci 0#usize
+    let ci1 ← ci + 1#usize
+    ok (cont (circles2, cells2, ci1))
+  else ok (done (circles, cells))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 6:
+    Source: 'src/scene.rs', lines 347:8-366:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop4
+  (circles : alloc.vec.Vec polar.Circle) (cells : alloc.vec.Vec scene.Cell)
+  (ci : Std.Usize) :
+  Result ((alloc.vec.Vec polar.Circle) × (alloc.vec.Vec scene.Cell))
+  := do
+  loop
+    (fun (circles1, cells1, ci1) => scene.Layout.new_loop4.body circles1 cells1
+      ci1)
+    (circles, cells, ci)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 9:
+    Source: 'src/scene.rs', lines 369:8-378:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop5.body
+  (portal_specs : Slice polar.PortalSpec) (cell_grid : grid.Grid)
+  (status : core.result.Result Unit topology.Error)
+  (cells : alloc.vec.Vec scene.Cell) (portals : alloc.vec.Vec scene.Portal)
+  (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) ×
+    (alloc.vec.Vec scene.Cell) × (alloc.vec.Vec scene.Portal) × Std.Usize)
+    ((core.result.Result Unit topology.Error) × (alloc.vec.Vec scene.Cell) ×
+    (alloc.vec.Vec scene.Portal)))
+  := do
+  let i1 := Slice.len portal_specs
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let ps ← Slice.index_usize portal_specs i
+      let s := alloc.vec.Vec.deref portals
+      let i2 := alloc.vec.Vec.len cells
+      let r ← scene.resolve_portal ps cell_grid s i2
+      let (status1, cells1, portals1) ←
+        match r with
+        | core.result.Result.Ok portal =>
+          do
+          let cells2 ← alloc.vec.Vec.push cells (scene.Cell.Transition i)
+          let portals2 ← alloc.vec.Vec.push portals portal
+          ok (status, cells2, portals2)
+        | core.result.Result.Err error =>
+          ok (core.result.Result.Err error, cells, portals)
+      let i3 ← i + 1#usize
+      ok (cont (status1, cells1, portals1, i3))
+    else ok (done (status, cells, portals))
+  else ok (done (status, cells, portals))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 9:
+    Source: 'src/scene.rs', lines 369:8-378:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop5
+  (portal_specs : Slice polar.PortalSpec) (cell_grid : grid.Grid)
+  (status : core.result.Result Unit topology.Error)
+  (cells : alloc.vec.Vec scene.Cell) (portals : alloc.vec.Vec scene.Portal)
+  (i : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × (alloc.vec.Vec
+    scene.Cell) × (alloc.vec.Vec scene.Portal))
+  := do
+  loop
+    (fun (status1, cells1, portals1, i1) => scene.Layout.new_loop5.body
+      portal_specs cell_grid status1 cells1 portals1 i1)
+    (status, cells, portals, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 10:
+    Source: 'src/scene.rs', lines 389:8-399:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop6.body
+  (cell_grid : grid.Grid) (cells : alloc.vec.Vec scene.Cell)
+  (edges : alloc.vec.Vec topology.Edge) (cell : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let i := alloc.vec.Vec.len cells
+  if cell < i
+  then
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Cell)
+        cells cell
+    let edges1 ←
+      match c with
+      | scene.Cell.Grid column row _ =>
+        do
+        let i1 ← column + 1#usize
+        let o ← grid.Grid.cell cell_grid i1 row
+        let edges2 ←
+          match o with
+          | none => ok edges
+          | some right => scene.push_edge edges cell right
+        let i2 ← row + 1#usize
+        let o1 ← grid.Grid.cell cell_grid column i2
+        match o1 with
+        | none => ok edges2
+        | some down => scene.push_edge edges2 cell down
+      | scene.Cell.Center _ => ok edges
+      | scene.Cell.Sector _ _ _ => ok edges
+      | scene.Cell.Transition _ => ok edges
+    let cell1 ← cell + 1#usize
+    ok (cont (edges1, cell1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 10:
+    Source: 'src/scene.rs', lines 389:8-399:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop6
+  (cell_grid : grid.Grid) (cells : alloc.vec.Vec scene.Cell)
+  (edges : alloc.vec.Vec topology.Edge) (cell : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, cell1) => scene.Layout.new_loop6.body cell_grid cells edges1
+      cell1)
+    (edges, cell)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 14:
+    Source: 'src/scene.rs', lines 421:24-424:25
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop7_loop0_loop0_loop0.body
+  (here : Std.Usize) (inner_sectors : Std.Usize) (inner_start : Std.Usize)
+  (edges : alloc.vec.Vec topology.Edge) (inner : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  if inner < inner_sectors
+  then
+    let i ← inner_start + inner
+    let edges1 ← scene.push_edge edges here i
+    let inner1 ← inner + 1#usize
+    ok (cont (edges1, inner1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 14:
+    Source: 'src/scene.rs', lines 421:24-424:25
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop7_loop0_loop0_loop0
+  (edges : alloc.vec.Vec topology.Edge) (here : Std.Usize)
+  (inner_sectors : Std.Usize) (inner_start : Std.Usize) (inner : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, inner1) => scene.Layout.new_loop7_loop0_loop0_loop0.body here
+      inner_sectors inner_start edges1 inner1)
+    (edges, inner)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 13:
+    Source: 'src/scene.rs', lines 409:16-427:17
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop7_loop0_loop0.body
+  (circles : alloc.vec.Vec polar.Circle) (ci : Std.Usize)
+  (center_cell : Std.Usize) (ring : Std.Usize) (sectors : Std.Usize)
+  (ring_start : Std.Usize) (edges : alloc.vec.Vec topology.Edge)
+  (sector : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  if sector < sectors
+  then
+    let here ← ring_start + sector
+    let i ← sector + 1#usize
+    let i1 ← i % sectors
+    let next ← ring_start + i1
+    let edges1 ←
+      if sectors > 2#usize
+      then scene.push_edge edges here next
+      else
+        if sector = 0#usize
+        then scene.push_edge edges here next
+        else ok edges
+    if ring = 0#usize
+    then
+      let edges2 ← scene.push_edge edges1 here center_cell
+      ok (cont (edges2, i))
+    else
+      let c ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Circle) circles ci
+      let i2 ← ring - 1#usize
+      let inner_sectors ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          c.spec.sectors i2
+      let inner_start ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+          c.ring_starts i2
+      let edges2 ←
+        scene.Layout.new_loop7_loop0_loop0_loop0 edges1 here inner_sectors
+          inner_start 0#usize
+      let sector1 ← sector + 1#usize
+      ok (cont (edges2, sector1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 13:
+    Source: 'src/scene.rs', lines 409:16-427:17
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop7_loop0_loop0
+  (circles : alloc.vec.Vec polar.Circle) (edges : alloc.vec.Vec topology.Edge)
+  (ci : Std.Usize) (center_cell : Std.Usize) (ring : Std.Usize)
+  (sectors : Std.Usize) (ring_start : Std.Usize) (sector : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, sector1) => scene.Layout.new_loop7_loop0_loop0.body circles
+      ci center_cell ring sectors ring_start edges1 sector1)
+    (edges, sector)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 12:
+    Source: 'src/scene.rs', lines 405:12-429:13
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop7_loop0.body
+  (circles : alloc.vec.Vec polar.Circle) (ci : Std.Usize)
+  (ring_count : Std.Usize) (center_cell : Std.Usize)
+  (edges : alloc.vec.Vec topology.Edge) (ring : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  if ring < ring_count
+  then
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        circles ci
+    let sectors ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        c.spec.sectors ring
+    let ring_start ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        c.ring_starts ring
+    let edges1 ←
+      scene.Layout.new_loop7_loop0_loop0 circles edges ci center_cell ring
+        sectors ring_start 0#usize
+    let ring1 ← ring + 1#usize
+    ok (cont (edges1, ring1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 12:
+    Source: 'src/scene.rs', lines 405:12-429:13
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop7_loop0
+  (circles : alloc.vec.Vec polar.Circle) (edges : alloc.vec.Vec topology.Edge)
+  (ci : Std.Usize) (ring_count : Std.Usize) (center_cell : Std.Usize)
+  (ring : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, ring1) => scene.Layout.new_loop7_loop0.body circles ci
+      ring_count center_cell edges1 ring1)
+    (edges, ring)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 11:
+    Source: 'src/scene.rs', lines 401:8-431:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop7.body
+  (circles : alloc.vec.Vec polar.Circle) (edges : alloc.vec.Vec topology.Edge)
+  (ci : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let i := alloc.vec.Vec.len circles
+  if ci < i
+  then
+    let c ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        circles ci
+    let ring_count ← polar.Circle.ring_count c
+    let edges1 ←
+      scene.Layout.new_loop7_loop0 circles edges ci ring_count c.center_cell
+        0#usize
+    let ci1 ← ci + 1#usize
+    ok (cont (edges1, ci1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 11:
+    Source: 'src/scene.rs', lines 401:8-431:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop7
+  (circles : alloc.vec.Vec polar.Circle) (edges : alloc.vec.Vec topology.Edge)
+  (ci : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, ci1) => scene.Layout.new_loop7.body circles edges1 ci1)
+    (edges, ci)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 16:
+    Source: 'src/scene.rs', lines 439:12-446:13
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop8_loop0.body
+  (i : Std.Usize) (circle : polar.Circle) (ring : Std.Usize)
+  (edges : alloc.vec.Vec topology.Edge) (sector : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let i1 ←
+    alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+      circle.spec.sectors ring
+  if sector < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        circle.ring_starts ring
+    let i3 ← i2 + sector
+    let edges1 ← scene.push_edge edges i i3
+    let sector1 ← sector + 1#usize
+    ok (cont (edges1, sector1))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 16:
+    Source: 'src/scene.rs', lines 439:12-446:13
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop8_loop0
+  (edges : alloc.vec.Vec topology.Edge) (i : Std.Usize) (circle : polar.Circle)
+  (ring : Std.Usize) (sector : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, sector1) => scene.Layout.new_loop8_loop0.body i circle ring
+      edges1 sector1)
+    (edges, sector)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 15:
+    Source: 'src/scene.rs', lines 433:8-448:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop8.body
+  (circles : alloc.vec.Vec polar.Circle) (portals : alloc.vec.Vec scene.Portal)
+  (edges : alloc.vec.Vec topology.Edge) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let i1 := alloc.vec.Vec.len portals
+  if i < i1
+  then
+    let portal ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice scene.Portal)
+        portals i
+    let circle ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice polar.Circle)
+        circles portal.spec.circle
+    let edges1 ←
+      scene.push_edge edges portal.grid_cell portal.transition_cell
+    let i2 ← polar.Circle.ring_count circle
+    let ring ← i2 - 1#usize
+    let edges2 ←
+      scene.Layout.new_loop8_loop0 edges1 portal.transition_cell circle ring
+        0#usize
+    let i3 ← i + 1#usize
+    ok (cont (edges2, i3))
+  else ok (done edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 15:
+    Source: 'src/scene.rs', lines 433:8-448:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop8
+  (circles : alloc.vec.Vec polar.Circle) (portals : alloc.vec.Vec scene.Portal)
+  (edges : alloc.vec.Vec topology.Edge) (i : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (edges1, i1) => scene.Layout.new_loop8.body circles portals edges1 i1)
+    (edges, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop body 17:
+    Source: 'src/scene.rs', lines 462:8-465:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Layout.new_loop9.body
+  (cell_grid : grid.Grid) (cells : alloc.vec.Vec scene.Cell)
+  (circles : alloc.vec.Vec polar.Circle) (portals : alloc.vec.Vec scene.Portal)
+  (bands : alloc.vec.Vec Std.I32) (geometry : grid.Geometry)
+  (val : topology.Carrier) (transforms : Std.Usize)
+  (zero : alloc.vec.Vec Std.I32)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i1 := alloc.vec.Vec.len portals
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let s := alloc.vec.Vec.deref zero
+      let status1 ←
+        scene.Layout.check_connector
+          {
+            cell_grid,
+            cells,
+            circles,
+            portals,
+            bands,
+            geometry,
+            carrier := val,
+            transforms
+          } i s
+      let i2 ← i + 1#usize
+      ok (cont (status1, i2))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]: loop 17:
+    Source: 'src/scene.rs', lines 462:8-465:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Layout.new_loop9
+  (status : core.result.Result Unit topology.Error) (cell_grid : grid.Grid)
+  (cells : alloc.vec.Vec scene.Cell) (circles : alloc.vec.Vec polar.Circle)
+  (portals : alloc.vec.Vec scene.Portal) (bands : alloc.vec.Vec Std.I32)
+  (geometry : grid.Geometry) (val : topology.Carrier) (transforms : Std.Usize)
+  (zero : alloc.vec.Vec Std.I32) (i : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i1) => scene.Layout.new_loop9.body cell_grid cells circles
+      portals bands geometry val transforms zero status1 i1)
+    (status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::new]:
+    Source: 'src/scene.rs', lines 269:4-468:5
+    Visibility: public -/
+def scene.Layout.new
+  (grid_spec : grid.GridSpec) (specs : alloc.vec.Vec polar.PolarSpec)
+  (portal_specs : Slice polar.PortalSpec) (geometry : grid.Geometry) :
+  Result (core.result.Result scene.Layout topology.Error)
+  := do
+  let r ← grid.Geometry.validate geometry
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let r1 ← grid.Geometry.margin geometry
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let i ← val * 2#i32
+      if grid_spec.cell_size < i
+      then ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      else
+        let r2 ← grid.Grid.new grid_spec
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue val1 =>
+          let i1 := alloc.vec.Vec.len specs
+          let r3 ← topology.check_storage i1 128#usize
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let i2 := Slice.len portal_specs
+            let r4 ← topology.check_storage i2 56#usize
+            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+            match cf4 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let i3 := alloc.vec.Vec.len specs
+              let circles := alloc.vec.Vec.with_capacity polar.Circle i3
+              let iter ← alloc.vec.IntoIteratorVec.into_iter specs
+              let (circles1, transforms, status) ←
+                scene.Layout.new_loop0 iter val circles 0#usize
+                  (core.result.Result.Ok ())
+              let cf5 ← core.result.Result.Insts.CoreOpsTry.branch status
+              match cf5 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let i4 := alloc.vec.Vec.len circles1
+                let bands ← alloc.vec.from_elem core.clone.CloneI32 0#i32 i4
+                let i5 := alloc.vec.Vec.len circles1
+                let portal_counts ←
+                  alloc.vec.from_elem core.clone.CloneUsize 0#usize i5
+                let (status1, bands1, portal_counts1) ←
+                  scene.Layout.new_loop1 portal_specs val circles1 status bands
+                    portal_counts 0#usize
+                let cf6 ← core.result.Result.Insts.CoreOpsTry.branch status1
+                match cf6 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let status2 ←
+                    scene.Layout.new_loop2 val circles1 status1 bands1
+                      portal_counts1 0#usize
+                  let cf7 ←
+                    core.result.Result.Insts.CoreOpsTry.branch status2
+                  match cf7 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    let (cell_grid, cells) ←
+                      scene.Layout.new_loop3 grid_spec.columns grid_spec.rows
+                        geometry val1 circles1 bands1 (alloc.vec.Vec.new
+                        scene.Cell) 0#usize
+                    let (circles2, cells1) ←
+                      scene.Layout.new_loop4 circles1 cells 0#usize
+                    let i6 := Slice.len portal_specs
+                    let portals := alloc.vec.Vec.with_capacity scene.Portal i6
+                    let (status3, cells2, portals1) ←
+                      scene.Layout.new_loop5 portal_specs cell_grid status2
+                        cells1 portals 0#usize
+                    let cf8 ←
+                      core.result.Result.Insts.CoreOpsTry.branch status3
+                    match cf8 with
+                    | core.ops.control_flow.ControlFlow.Continue _ =>
+                      let b ← alloc.vec.Vec.is_empty cells2
+                      if b
+                      then
+                        ok (core.result.Result.Err topology.Error.InvalidSize)
+                      else
+                        let i7 := alloc.vec.Vec.len cells2
+                        let i8 := alloc.vec.Vec.len cells2
+                        let o ← lift (Usize.checked_mul i7 i8)
+                        let r5 ←
+                          core.option.Option.ok_or o topology.Error.Overflow
+                        let cf9 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r5
+                        match cf9 with
+                        | core.ops.control_flow.ControlFlow.Continue _ =>
+                          let edges ←
+                            scene.Layout.new_loop6 cell_grid cells2
+                              (alloc.vec.Vec.new topology.Edge) 0#usize
+                          let edges1 ←
+                            scene.Layout.new_loop7 circles2 edges 0#usize
+                          let edges2 ←
+                            scene.Layout.new_loop8 circles2 portals1 edges1
+                              0#usize
+                          let i9 := alloc.vec.Vec.len cells2
+                          let s := alloc.vec.Vec.deref edges2
+                          let r6 ← topology.Carrier.from_edges i9 s
+                          let cf10 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r6
+                          match cf10 with
+                          | core.ops.control_flow.ControlFlow.Continue val2 =>
+                            let zero ←
+                              alloc.vec.from_elem core.clone.CloneI32 0#i32
+                                transforms
+                            let status4 ←
+                              scene.Layout.new_loop9 status3 cell_grid cells2
+                                circles2 portals1 bands1 geometry val2
+                                transforms zero 0#usize
+                            let cf11 ←
+                              core.result.Result.Insts.CoreOpsTry.branch
+                                status4
+                            match cf11 with
+                            | core.ops.control_flow.ControlFlow.Continue _ =>
+                              ok (core.result.Result.Ok
+                                {
+                                  cell_grid,
+                                  cells := cells2,
+                                  circles := circles2,
+                                  portals := portals1,
+                                  bands := bands1,
+                                  geometry,
+                                  carrier := val2,
+                                  transforms
+                                })
+                            | core.ops.control_flow.ControlFlow.Break residual
+                              =>
+                              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                scene.Layout (core.convert.FromSame
+                                topology.Error) residual
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              scene.Layout (core.convert.FromSame
+                              topology.Error) residual
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            scene.Layout (core.convert.FromSame topology.Error)
+                            residual
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        scene.Layout (core.convert.FromSame topology.Error)
+                        residual
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      scene.Layout (core.convert.FromSame topology.Error)
+                      residual
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    scene.Layout (core.convert.FromSame topology.Error)
+                    residual
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  scene.Layout (core.convert.FromSame topology.Error) residual
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                scene.Layout (core.convert.FromSame topology.Error) residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              scene.Layout (core.convert.FromSame topology.Error) residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            scene.Layout (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        scene.Layout (core.convert.FromSame topology.Error) residual
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      scene.Layout (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::grid]:
+    Source: 'src/scene.rs', lines 547:4-549:5
+    Visibility: public -/
+def scene.Layout.grid (self : scene.Layout) : Result grid.Grid := do
+  ok self.cell_grid
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::portals]:
+    Source: 'src/scene.rs', lines 556:4-558:5
+    Visibility: public -/
+def scene.Layout.impl.portals
+  (self : scene.Layout) : Result (Slice scene.Portal) := do
+  ok (alloc.vec.Vec.deref self.portals)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::transform_count]:
+    Source: 'src/scene.rs', lines 562:4-564:5
+    Visibility: public -/
+def scene.Layout.transform_count (self : scene.Layout) : Result Std.Usize := do
+  ok self.transforms
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::geometry]:
+    Source: 'src/scene.rs', lines 565:4-567:5
+    Visibility: public -/
+def scene.Layout.impl.geometry
+  (self : scene.Layout) : Result grid.Geometry := do
+  ok self.geometry
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::adapter_band]:
+    Source: 'src/scene.rs', lines 569:4-571:5
+    Visibility: public -/
+def scene.Layout.adapter_band
+  (self : scene.Layout) (circle : Std.Usize) : Result (Option Std.I32) := do
+  let s := alloc.vec.Vec.deref self.bands
+  let o ←
+    core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice Std.I32) s
+      circle
+  core.option.OptionShared0T.copied core.marker.CopyI32 o
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 2:
+    Source: 'src/scene.rs', lines 839:20-862:21 -/
+@[rust_loop_body]
+def scene.Layout.check_spinning_portals_loop0_loop0_loop0.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (phases : Slice Std.I32) (next : Slice Std.I32)
+  (start : Std.Usize) (count : Std.Usize) (entrance : Std.Usize)
+  (exit : Std.Usize) (entrance_neighbor : Option Std.Usize)
+  (exit_neighbor : Option Std.Usize) (matched : Bool) (sector : Std.Usize) :
+  Result (ControlFlow ((Option Std.Usize) × (Option Std.Usize) × Bool ×
+    Std.Usize) Bool)
+  := do
+  if sector < count
+  then
+    if matched
+    then ok (done matched)
+    else
+      let cell ← start + sector
+      let e ← topology.Edge.new entrance cell
+      let r ←
+        scene.Layout.doorway
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          } e phases next
+      let admits_entrance ← core.result.Result.is_ok r
+      let e1 ← topology.Edge.new exit cell
+      let r1 ←
+        scene.Layout.doorway
+          {
+            cell_grid := g,
+            cells := v,
+            circles := v1,
+            portals := v2,
+            bands := v3,
+            geometry := g1,
+            carrier := c,
+            transforms := i
+          } e1 phases next
+      let admits_exit ← core.result.Result.is_ok r1
+      let (entrance_neighbor1, exit_neighbor1, matched1) ←
+        if admits_entrance
+        then
+          do
+          let matched2 ←
+            match exit_neighbor with
+            | none => ok matched
+            | some other => ok (other != cell)
+          let b := core.option.Option.is_none entrance_neighbor
+          let o ← if b
+                    then ok (some cell)
+                    else ok entrance_neighbor
+          ok (o, exit_neighbor, matched2)
+        else ok (entrance_neighbor, exit_neighbor, matched)
+      let (entrance_neighbor2, exit_neighbor2, matched2) ←
+        if admits_exit
+        then
+          do
+          let matched3 ←
+            match entrance_neighbor1 with
+            | none => ok matched1
+            | some other => if matched1
+                            then ok true
+                            else ok (other != cell)
+          let b := core.option.Option.is_none exit_neighbor1
+          let o ← if b
+                    then ok (some cell)
+                    else ok exit_neighbor1
+          ok (entrance_neighbor1, o, matched3)
+        else ok (entrance_neighbor1, exit_neighbor1, matched1)
+      let sector1 ← sector + 1#usize
+      ok (cont (entrance_neighbor2, exit_neighbor2, matched2, sector1))
+  else ok (done matched)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 2:
+    Source: 'src/scene.rs', lines 839:20-862:21 -/
+@[rust_loop]
+def scene.Layout.check_spinning_portals_loop0_loop0_loop0
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (phases : Slice Std.I32) (next : Slice Std.I32)
+  (start : Std.Usize) (count : Std.Usize) (entrance : Std.Usize)
+  (exit : Std.Usize) (entrance_neighbor : Option Std.Usize)
+  (exit_neighbor : Option Std.Usize) (matched : Bool) (sector : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (entrance_neighbor1, exit_neighbor1, matched1, sector1) =>
+      scene.Layout.check_spinning_portals_loop0_loop0_loop0.body g v v1 v2 v3
+      g1 c i phases next start count entrance exit entrance_neighbor1
+      exit_neighbor1 matched1 sector1)
+    (entrance_neighbor, exit_neighbor, matched, sector)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 1:
+    Source: 'src/scene.rs', lines 832:16-867:17 -/
+@[rust_loop_body]
+def scene.Layout.check_spinning_portals_loop0_loop0.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (transform : Std.Usize) (start : Std.Usize)
+  (count : Std.Usize) (entrance : Std.Usize) (exit : Std.Usize)
+  (phases : Slice Std.I32) (next : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (phase : Std.I32) :
+  Result (ControlFlow ((Slice Std.I32) × (Slice Std.I32) ×
+    (core.result.Result Unit topology.Error) × Std.I32) ((Slice Std.I32) ×
+    (Slice Std.I32) × (core.result.Result Unit topology.Error)))
+  := do
+  if phase < polar.TURN
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let s ← Slice.update phases transform phase
+      let i1 ← phase + 1#i32
+      let i2 ← polar.normalize i1
+      let s1 ← Slice.update next transform i2
+      let matched ←
+        scene.Layout.check_spinning_portals_loop0_loop0_loop0 g v v1 v2 v3 g1 c
+          i s s1 start count entrance exit none none false 0#usize
+      let status1 ←
+        if matched
+        then ok status
+        else ok (core.result.Result.Err topology.Error.InvalidGeometry)
+      let phase1 ← phase + 1#i32
+      ok (cont (s, s1, status1, phase1))
+    else ok (done (phases, next, status))
+  else ok (done (phases, next, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 1:
+    Source: 'src/scene.rs', lines 832:16-867:17 -/
+@[rust_loop]
+def scene.Layout.check_spinning_portals_loop0_loop0
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (phases : Slice Std.I32) (next : Slice Std.I32)
+  (status : core.result.Result Unit topology.Error) (transform : Std.Usize)
+  (start : Std.Usize) (count : Std.Usize) (entrance : Std.Usize)
+  (exit : Std.Usize) (phase : Std.I32) :
+  Result ((Slice Std.I32) × (Slice Std.I32) × (core.result.Result Unit
+    topology.Error))
+  := do
+  loop
+    (fun (phases1, next1, status1, phase1) =>
+      scene.Layout.check_spinning_portals_loop0_loop0.body g v v1 v2 v3 g1 c i
+      transform start count entrance exit phases1 next1 status1 phase1)
+    (phases, next, status, phase)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop body 0:
+    Source: 'src/scene.rs', lines 821:8-872:9 -/
+@[rust_loop_body]
+def scene.Layout.check_spinning_portals_loop0.body
+  (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) (status : core.result.Result Unit topology.Error)
+  (r : Std.Usize) :
+  Result (ControlFlow ((Slice Std.I32) × (Slice Std.I32) ×
+    (core.result.Result Unit topology.Error) × Std.Usize) ((core.result.Result
+    Unit topology.Error) × (Slice Std.I32) × (Slice Std.I32)))
+  := do
+  let i := Slice.len routes
+  if r < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let r1 ← Slice.index_usize routes r
+      let c ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          polar.Circle) self.circles r1.circle
+      let mode ← polar.Circle.mode c
+      let b1 ←
+        polar.MotionMode.Insts.CoreCmpPartialEqMotionMode.eq mode
+          polar.MotionMode.Spinning
+      if b1
+      then
+        let i1 ← polar.Circle.ring_count c
+        let ring ← i1 - 1#usize
+        let transform ← c.transform_start + ring
+        let start ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            c.ring_starts ring
+        let count ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            c.spec.sectors ring
+        let entrance ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            r1.cells 1#usize
+        let i2 := alloc.vec.Vec.len r1.cells
+        let i3 ← i2 - 2#usize
+        let exit ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+            r1.cells i3
+        let (phases1, next1, status1) ←
+          scene.Layout.check_spinning_portals_loop0_loop0 self.cell_grid
+            self.cells self.circles self.portals self.bands self.geometry
+            self.carrier self.transforms phases next status transform start
+            count entrance exit 0#i32
+        let s ← Slice.update phases1 transform 0#i32
+        let s1 ← Slice.update next1 transform 0#i32
+        let r2 ← r + 1#usize
+        ok (cont (s, s1, status1, r2))
+      else let r2 ← r + 1#usize
+           ok (cont (phases, next, status, r2))
+    else ok (done (status, phases, next))
+  else ok (done (status, phases, next))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]: loop 0:
+    Source: 'src/scene.rs', lines 821:8-872:9 -/
+@[rust_loop]
+def scene.Layout.check_spinning_portals_loop0
+  (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) (status : core.result.Result Unit topology.Error)
+  (r : Std.Usize) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.I32) × (Slice
+    Std.I32))
+  := do
+  loop
+    (fun (phases1, next1, status1, r1) =>
+      scene.Layout.check_spinning_portals_loop0.body self routes phases1 next1
+      status1 r1)
+    (phases, next, status, r)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Layout}::check_spinning_portals]:
+    Source: 'src/scene.rs', lines 813:4-874:5 -/
+@[reducible]
+def scene.Layout.check_spinning_portals
+  (self : scene.Layout) (routes : Slice scene.Route) (phases : Slice Std.I32)
+  (next : Slice Std.I32) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.I32) × (Slice
+    Std.I32))
+  := do
+  scene.Layout.check_spinning_portals_loop0 self routes phases next
+    (core.result.Result.Ok ()) 0#usize
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Route}::clone]:
+    Source: 'src/scene.rs', lines 877:16-877:21
+    Visibility: public -/
+def scene.Route.Insts.CoreCloneClone.clone
+  (self : scene.Route) : Result scene.Route := do
+  let i ← lift (core.clone.impls.CloneUsize.clone self.circle)
+  let v ← alloc.vec.CloneVec.clone core.clone.CloneUsize self.cells
+  ok { circle := i, cells := v }
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Route}]
+    Source: 'src/scene.rs', lines 877:16-877:21 -/
+@[reducible]
+def scene.Route.Insts.CoreCloneClone : core.clone.Clone scene.Route := {
+  clone := scene.Route.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Route}]
+    Source: 'src/scene.rs', lines 877:23-877:32 -/
+@[reducible]
+def scene.Route.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq scene.Route := {
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Route> for labyrinth_core::scene::Route}::eq]:
+    Source: 'src/scene.rs', lines 877:23-877:32
+    Visibility: public -/
+def scene.Route.Insts.CoreCmpPartialEqRoute.eq
+  (self : scene.Route) (other : scene.Route) : Result Bool := do
+  if self.circle = other.circle
+  then
+    alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize self.cells
+      other.cells
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Route> for labyrinth_core::scene::Route}]
+    Source: 'src/scene.rs', lines 877:23-877:32 -/
+@[reducible]
+impl_def scene.Route.Insts.CoreCmpPartialEqRoute : core.cmp.PartialEq
+  scene.Route scene.Route := {
+  eq := scene.Route.Insts.CoreCmpPartialEqRoute.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    scene.Route.Insts.CoreCmpPartialEqRoute
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Route}::assert_fields_are_eq]:
+    Source: 'src/scene.rs', lines 877:34-877:36
+    Visibility: public -/
+def scene.Route.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : scene.Route) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Route}]
+    Source: 'src/scene.rs', lines 877:34-877:36 -/
+@[reducible]
+def scene.Route.Insts.CoreCmpEq : core.cmp.Eq scene.Route := {
+  partialEqInst := scene.Route.Insts.CoreCmpPartialEqRoute
+  assert_fields_are_eq := scene.Route.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Edit<'a>}::clone]:
+    Source: 'src/scene.rs', lines 886:9-886:14
+    Visibility: public -/
+def scene.Edit.Insts.CoreCloneClone.clone
+  (self : scene.Edit) : Result scene.Edit := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Edit<'a>}]
+    Source: 'src/scene.rs', lines 886:9-886:14 -/
+@[reducible]
+def scene.Edit.Insts.CoreCloneClone : core.clone.Clone scene.Edit := {
+  clone := scene.Edit.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Edit<'a>}]
+    Source: 'src/scene.rs', lines 886:16-886:20 -/
+@[reducible]
+def scene.Edit.Insts.CoreMarkerCopy : core.marker.Copy scene.Edit := {
+  cloneInst := scene.Edit.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::default::Default for labyrinth_core::scene::Edit<'a>}]
+    Source: 'src/scene.rs', lines 886:22-886:29 -/
+@[reducible]
+def scene.Edit.Insts.CoreDefaultDefault : core.default.Default scene.Edit := {
+  default := scene.Edit.Insts.CoreDefaultDefault.default
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::MotionEvent}::clone]:
+    Source: 'src/scene.rs', lines 893:16-893:21
+    Visibility: public -/
+def scene.MotionEvent.Insts.CoreCloneClone.clone
+  (self : scene.MotionEvent) : Result scene.MotionEvent := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:16-893:21 -/
+@[reducible]
+def scene.MotionEvent.Insts.CoreCloneClone : core.clone.Clone scene.MotionEvent
+  := {
+  clone := scene.MotionEvent.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:23-893:27 -/
+@[reducible]
+def scene.MotionEvent.Insts.CoreMarkerCopy : core.marker.Copy scene.MotionEvent
+  := {
+  cloneInst := scene.MotionEvent.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:29-893:38 -/
+@[reducible]
+def scene.MotionEvent.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq scene.MotionEvent := {
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::MotionEvent> for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:29-893:38 -/
+@[reducible]
+impl_def scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent :
+  core.cmp.PartialEq scene.MotionEvent scene.MotionEvent := {
+  eq := scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::MotionEvent}::assert_fields_are_eq]:
+    Source: 'src/scene.rs', lines 893:40-893:42
+    Visibility: public -/
+def scene.MotionEvent.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : scene.MotionEvent) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::MotionEvent}]
+    Source: 'src/scene.rs', lines 893:40-893:42 -/
+@[reducible]
+def scene.MotionEvent.Insts.CoreCmpEq : core.cmp.Eq scene.MotionEvent := {
+  partialEqInst := scene.MotionEvent.Insts.CoreCmpPartialEqMotionEvent
+  assert_fields_are_eq :=
+    scene.MotionEvent.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Retired}::fmt]:
+    Source: 'src/scene.rs', lines 900:9-900:14
+    Visibility: public -/
+def scene.Retired.Insts.CoreFmtDebug.fmt
+  (self : scene.Retired) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.epoch
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.terminated_walkers
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize)
+      self.released_reservations
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Retired") (toStr
+    "epoch") dyn (toStr "terminated_walkers") dyn1 (toStr
+    "released_reservations") dyn2
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:9-900:14 -/
+@[reducible]
+def scene.Retired.Insts.CoreFmtDebug : core.fmt.Debug scene.Retired := {
+  fmt := scene.Retired.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Retired}::clone]:
+    Source: 'src/scene.rs', lines 900:16-900:21
+    Visibility: public -/
+def scene.Retired.Insts.CoreCloneClone.clone
+  (self : scene.Retired) : Result scene.Retired := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:16-900:21 -/
+@[reducible]
+def scene.Retired.Insts.CoreCloneClone : core.clone.Clone scene.Retired := {
+  clone := scene.Retired.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:23-900:27 -/
+@[reducible]
+def scene.Retired.Insts.CoreMarkerCopy : core.marker.Copy scene.Retired := {
+  cloneInst := scene.Retired.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::StructuralPartialEq for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:29-900:38 -/
+@[reducible]
+def scene.Retired.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq scene.Retired := {
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Retired> for labyrinth_core::scene::Retired}::eq]:
+    Source: 'src/scene.rs', lines 900:29-900:38
+    Visibility: public -/
+def scene.Retired.Insts.CoreCmpPartialEqRetired.eq
+  (self : scene.Retired) (other : scene.Retired) : Result Bool := do
+  if self.epoch = other.epoch
+  then
+    if self.terminated_walkers = other.terminated_walkers
+    then ok (self.released_reservations = other.released_reservations)
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::PartialEq<labyrinth_core::scene::Retired> for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:29-900:38 -/
+@[reducible]
+impl_def scene.Retired.Insts.CoreCmpPartialEqRetired : core.cmp.PartialEq
+  scene.Retired scene.Retired := {
+  eq := scene.Retired.Insts.CoreCmpPartialEqRetired.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    scene.Retired.Insts.CoreCmpPartialEqRetired
+}
+
+/-- [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Retired}::assert_fields_are_eq]:
+    Source: 'src/scene.rs', lines 900:40-900:42
+    Visibility: public -/
+def scene.Retired.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : scene.Retired) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::cmp::Eq for labyrinth_core::scene::Retired}]
+    Source: 'src/scene.rs', lines 900:40-900:42 -/
+@[reducible]
+def scene.Retired.Insts.CoreCmpEq : core.cmp.Eq scene.Retired := {
+  partialEqInst := scene.Retired.Insts.CoreCmpPartialEqRetired
+  assert_fields_are_eq := scene.Retired.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::LocalPose}::fmt]:
+    Source: 'src/walker.rs', lines 20:9-20:14
+    Visibility: public -/
+def walker.LocalPose.Insts.CoreFmtDebug.fmt
+  (self : walker.LocalPose) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | walker.LocalPose.Cartesian __self_0 =>
+    let __self_01 :=
+      Dyn.mk _ (core.fmt.DebugShared grid.Point.Insts.CoreFmtDebug) __self_0
+    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Cartesian")
+      __self_01
+  | walker.LocalPose.Polar __self_0 __self_1 __self_2 =>
+    let __self_01 := Dyn.mk _ core.fmt.DebugUsize __self_0
+    let __self_11 := Dyn.mk _ core.fmt.DebugI32 __self_1
+    let __self_21 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugI32) __self_2
+    core.fmt.Formatter.debug_struct_field3_finish f (toStr "Polar") (toStr
+      "circle") __self_01 (toStr "radius") __self_11 (toStr "angle") __self_21
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:9-20:14 -/
+@[reducible]
+def walker.LocalPose.Insts.CoreFmtDebug : core.fmt.Debug walker.LocalPose := {
+  fmt := walker.LocalPose.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Reservation}::fmt]:
+    Source: 'src/walker.rs', lines 13:9-13:14
+    Visibility: public -/
+def walker.Reservation.Insts.CoreFmtDebug.fmt
+  (self : walker.Reservation) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.epoch
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.walker
+  let dyn2 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) self.serial
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Reservation") (toStr
+    "epoch") dyn (toStr "walker") dyn1 (toStr "serial") dyn2
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:9-13:14 -/
+@[reducible]
+def walker.Reservation.Insts.CoreFmtDebug : core.fmt.Debug walker.Reservation
+  := {
+  fmt := walker.Reservation.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Crossing}::fmt]:
+    Source: 'src/walker.rs', lines 128:9-128:14
+    Visibility: public -/
+def walker.Crossing.Insts.CoreFmtDebug.fmt
+  (self : walker.Crossing) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.source
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.target
+  let dyn2 := Dyn.mk _ core.fmt.DebugU32 self.elapsed
+  let dyn3 := Dyn.mk _ core.fmt.DebugU32 self.duration
+  let dyn4 := Dyn.mk _ walker.Reservation.Insts.CoreFmtDebug self.reservation
+  let dyn5 := Dyn.mk _ grid.Rect.Insts.CoreFmtDebug self.corridor
+  let dyn6 := Dyn.mk _ walker.Path.Insts.CoreFmtDebug self.path
+  let dyn7 := Dyn.mk _ walker.LocalPose.Insts.CoreFmtDebug self.target_pose
+  let dyn8 :=
+    Dyn.mk _ (core.fmt.DebugShared walker.Holds.Insts.CoreFmtDebug) self.holds
+  let values :=
+    Array.to_slice
+      (Array.make 9#usize [
+        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8
+        ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 9#usize [
+        toStr "source", toStr "target", toStr "elapsed", toStr "duration",
+        toStr "reservation", toStr "corridor", toStr "path", toStr
+        "target_pose", toStr "holds"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Crossing") s values
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:9-128:14 -/
+@[reducible]
+def walker.Crossing.Insts.CoreFmtDebug : core.fmt.Debug walker.Crossing := {
+  fmt := walker.Crossing.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::WalkerState}::fmt]:
+    Source: 'src/walker.rs', lines 147:9-147:14
+    Visibility: public -/
+def walker.WalkerState.Insts.CoreFmtDebug.fmt
+  (self : walker.WalkerState) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | walker.WalkerState.Ready => core.fmt.Formatter.write_str f (toStr "Ready")
+  | walker.WalkerState.Crossing __self_0 =>
+    let __self_01 :=
+      Dyn.mk _ (core.fmt.DebugShared walker.Crossing.Insts.CoreFmtDebug)
+        __self_0
+    core.fmt.Formatter.debug_tuple_field1_finish f (toStr "Crossing") __self_01
+  | walker.WalkerState.Parked =>
+    core.fmt.Formatter.write_str f (toStr "Parked")
+  | walker.WalkerState.Hidden =>
+    core.fmt.Formatter.write_str f (toStr "Hidden")
+  | walker.WalkerState.Terminated =>
+    core.fmt.Formatter.write_str f (toStr "Terminated")
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:9-147:14 -/
+@[reducible]
+def walker.WalkerState.Insts.CoreFmtDebug : core.fmt.Debug walker.WalkerState
+  := {
+  fmt := walker.WalkerState.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Walker}::fmt]:
+    Source: 'src/walker.rs', lines 156:9-156:14
+    Visibility: public -/
+def walker.Walker.Insts.CoreFmtDebug.fmt
+  (self : walker.Walker) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.cell
+  let dyn1 := Dyn.mk _ walker.LocalPose.Insts.CoreFmtDebug self.local
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared walker.WalkerState.Insts.CoreFmtDebug)
+      self.state
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Walker") (toStr
+    "cell") dyn (toStr "local") dyn1 (toStr "state") dyn2
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::fmt::Debug for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:9-156:14 -/
+@[reducible]
+def walker.Walker.Insts.CoreFmtDebug : core.fmt.Debug walker.Walker := {
+  fmt := walker.Walker.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 203:9-203:14
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Tree) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
+  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.root
+  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Tree") (toStr
+    "parents") dyn (toStr "root") dyn1
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 203:9-203:14 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Tree
+  := {
+  fmt := spanning_tree.Tree.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 9:9-9:14
+    Visibility: public -/
+def spanning_tree.Frame.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Frame) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugUsize self.cell
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.next
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.remaining
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Frame") (toStr
+    "cell") dyn (toStr "next") dyn1 (toStr "remaining") dyn2
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:9-9:14 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreFmtDebug : core.fmt.Debug spanning_tree.Frame
+  := {
+  fmt := spanning_tree.Frame.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}::fmt]:
+    Source: 'src/spanning_tree.rs', lines 16:9-16:14
+    Visibility: public -/
+def spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
+  (self : spanning_tree.Workspace) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugBool) self.seen
+  let dyn1 :=
+    Dyn.mk _ (core.fmt.DebugVec spanning_tree.Frame.Insts.CoreFmtDebug)
+      self.frames
+  let dyn2 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.path
+  let dyn3 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.parents
+  let dyn4 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.incoming
+  let dyn5 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_slots
+  let dyn6 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.edit_nodes
+  let dyn7 := Dyn.mk _ core.fmt.DebugUsize self.edit_count
+  let dyn8 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.edge_capacity
+  let values :=
+    Array.to_slice
+      (Array.make 9#usize [
+        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8
+        ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 9#usize [
+        toStr "seen", toStr "frames", toStr "path", toStr "parents", toStr
+        "incoming", toStr "edit_slots", toStr "edit_nodes", toStr "edit_count",
+        toStr "edge_capacity"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Workspace") s values
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::fmt::Debug for labyrinth_core::spanning_tree::Workspace}]
+    Source: 'src/spanning_tree.rs', lines 16:9-16:14 -/
+@[reducible]
+def spanning_tree.Workspace.Insts.CoreFmtDebug : core.fmt.Debug
+  spanning_tree.Workspace := {
+  fmt := spanning_tree.Workspace.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Stage}::fmt]:
+    Source: 'src/shatter.rs', lines 16:9-16:14
+    Visibility: public -/
+def shatter.Stage.Insts.CoreFmtDebug.fmt
+  (self : shatter.Stage) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  match self with
+  | shatter.Stage.Idle => core.fmt.Formatter.write_str f (toStr "Idle")
+  | shatter.Stage.Draining => core.fmt.Formatter.write_str f (toStr "Draining")
+  | shatter.Stage.Parked => core.fmt.Formatter.write_str f (toStr "Parked")
+  | shatter.Stage.Hidden => core.fmt.Formatter.write_str f (toStr "Hidden")
+  | shatter.Stage.Scattered __self_0 =>
+    let __self_01 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) __self_0
+    core.fmt.Formatter.debug_struct_field1_finish f (toStr "Scattered") (toStr
+      "until") __self_01
+  | shatter.Stage.Reforming __self_0 =>
+    let __self_01 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) __self_0
+    core.fmt.Formatter.debug_struct_field1_finish f (toStr "Reforming") (toStr
+      "until") __self_01
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:9-16:14 -/
+@[reducible]
+def shatter.Stage.Insts.CoreFmtDebug : core.fmt.Debug shatter.Stage := {
+  fmt := shatter.Stage.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Patch}::fmt]:
+    Source: 'src/shatter.rs', lines 26:9-26:14
+    Visibility: public -/
+def shatter.Patch.Insts.CoreFmtDebug.fmt
+  (self : shatter.Patch) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.serial
+  let dyn1 := Dyn.mk _ shatter.Stage.Insts.CoreFmtDebug self.stage
+  let dyn2 :=
+    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec core.fmt.DebugBool))
+      self.cells
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Patch") (toStr
+    "serial") dyn (toStr "stage") dyn1 (toStr "cells") dyn2
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::Patch}]
+    Source: 'src/shatter.rs', lines 26:9-26:14 -/
+@[reducible]
+def shatter.Patch.Insts.CoreFmtDebug : core.fmt.Debug shatter.Patch := {
+  fmt := shatter.Patch.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Scene}::fmt]:
+    Source: 'src/scene.rs', lines 907:9-907:14
+    Visibility: public -/
+def scene.Scene.Insts.CoreFmtDebug.fmt
+  (self : scene.Scene) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ scene.Layout.Insts.CoreFmtDebug self.layout
+  let dyn1 := Dyn.mk _ spanning_tree.Tree.Insts.CoreFmtDebug self.tree
+  let dyn2 := Dyn.mk _ spanning_tree.Workspace.Insts.CoreFmtDebug self.work
+  let dyn3 :=
+    Dyn.mk _ (core.fmt.DebugVec scene.Route.Insts.CoreFmtDebug) self.routes
+  let dyn4 :=
+    Dyn.mk _ (core.fmt.DebugVec topology.Edge.Insts.CoreFmtDebug) self.required
+  let dyn5 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugI32) self.phases
+  let dyn6 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugI32) self.next_phases
+  let dyn7 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.holds
+  let dyn8 :=
+    Dyn.mk _ (core.fmt.DebugVec walker.Walker.Insts.CoreFmtDebug) self.walkers
+  let dyn9 :=
+    Dyn.mk _ (core.fmt.DebugVec shatter.Patch.Insts.CoreFmtDebug) self.patches
+  let dyn10 := Dyn.mk _ walker.Stamp.Insts.CoreFmtDebug self.stamp
+  let dyn11 := Dyn.mk _ core.fmt.DebugU64 self.clock
+  let dyn12 := Dyn.mk _ core.fmt.DebugU64 self.wall
+  let dyn13 := Dyn.mk _ core.fmt.DebugBool self.reanchor
+  let dyn14 := Dyn.mk _ core.fmt.DebugBool self.suspended
+  let dyn15 := Dyn.mk _ core.fmt.DebugBool self.inactive
+  let dyn16 := Dyn.mk _ core.fmt.DebugU64 self.latest_request
+  let dyn17 :=
+    Dyn.mk _ (core.option.Option.Insts.CoreFmtDebug core.fmt.DebugU64)
+      self.pending
+  let dyn18 :=
+    Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) self.trail_revision
+  let values :=
+    Array.to_slice
+      (Array.make 19#usize [
+        dyn, dyn1, dyn2, dyn3, dyn4, dyn5, dyn6, dyn7, dyn8, dyn9, dyn10,
+        dyn11, dyn12, dyn13, dyn14, dyn15, dyn16, dyn17, dyn18
+        ])
+  let s ←
+    lift (Array.to_slice
+      (Array.make 19#usize [
+        toStr "layout", toStr "tree", toStr "work", toStr "routes", toStr
+        "required", toStr "phases", toStr "next_phases", toStr "holds", toStr
+        "walkers", toStr "patches", toStr "stamp", toStr "clock", toStr "wall",
+        toStr "reanchor", toStr "suspended", toStr "inactive", toStr
+        "latest_request", toStr "pending", toStr "trail_revision"
+        ]))
+  core.fmt.Formatter.debug_struct_fields_finish f (toStr "Scene") s values
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::fmt::Debug for labyrinth_core::scene::Scene}]
+    Source: 'src/scene.rs', lines 907:9-907:14 -/
+@[reducible]
+def scene.Scene.Insts.CoreFmtDebug : core.fmt.Debug scene.Scene := {
+  fmt := scene.Scene.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}::clone]:
+    Source: 'src/scene.rs', lines 930:9-930:14
+    Visibility: public -/
+def scene.RoutePublication.Insts.CoreCloneClone.clone
+  (self : scene.RoutePublication) : Result scene.RoutePublication := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::clone::Clone for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}]
+    Source: 'src/scene.rs', lines 930:9-930:14 -/
+@[reducible]
+def scene.RoutePublication.Insts.CoreCloneClone : core.clone.Clone
+  scene.RoutePublication := {
+  clone := scene.RoutePublication.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::scene::{impl core::marker::Copy for labyrinth_core::scene::RoutePublication<'tree, 'remove, 'add>}]
+    Source: 'src/scene.rs', lines 930:16-930:20 -/
+@[reducible]
+def scene.RoutePublication.Insts.CoreMarkerCopy : core.marker.Copy
+  scene.RoutePublication := {
+  cloneInst := scene.RoutePublication.Insts.CoreCloneClone
+}
+
+/-- [labyrinth_core::spanning_tree::representative]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 175:4-177:5 -/
+@[rust_loop_body]
+def spanning_tree.representative_loop.body
+  (links : Slice Std.Usize) (cell : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i ← Slice.index_usize links cell
+  if i != cell
+  then ok (cont i)
+  else ok (done cell)
+
+/-- [labyrinth_core::spanning_tree::representative]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 175:4-177:5 -/
+@[rust_loop]
+def spanning_tree.representative_loop
+  (links : Slice Std.Usize) (cell : Std.Usize) : Result Std.Usize := do
+  loop
+    (fun cell1 => spanning_tree.representative_loop.body links cell1)
+    cell
+
+/-- [labyrinth_core::spanning_tree::representative]:
+    Source: 'src/spanning_tree.rs', lines 173:0-179:1 -/
+@[reducible]
+def spanning_tree.representative
+  (links : Slice Std.Usize) (start : Std.Usize) : Result Std.Usize := do
+  spanning_tree.representative_loop links start
+
+/-- [labyrinth_core::spanning_tree::join_required]:
+    Source: 'src/spanning_tree.rs', lines 181:0-201:1 -/
+def spanning_tree.join_required
+  (carrier : topology.Carrier) (links : Slice Std.Usize)
+  (sizes : Slice Std.Usize) (edge : topology.Edge) :
+  Result ((core.result.Result Unit topology.Error) × (Slice Std.Usize) ×
+    (Slice Std.Usize))
+  := do
+  let b ← topology.Carrier.contains_edge carrier edge
+  if b
+  then
+    let u ← spanning_tree.representative links edge.u
+    let v ← spanning_tree.representative links edge.v
+    if u = v
+    then ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
+    else
+      let i ← Slice.index_usize sizes u
+      let i1 ← Slice.index_usize sizes v
+      let (u1, v1) ← if i < i1
+                       then ok (core.mem.swap u v)
+                       else ok (u, v)
+      let links1 ← Slice.update links v1 u1
+      let i2 ← Slice.index_usize sizes v1
+      let i3 ← Slice.index_usize sizes u1
+      let i4 ← i3 + i2
+      let sizes1 ← Slice.update sizes u1 i4
+      ok (core.result.Result.Ok (), links1, sizes1)
+  else ok (core.result.Result.Err topology.Error.InvalidForest, links, sizes)
+
+/-- [labyrinth_core::spanning_tree::enter]:
+    Source: 'src/spanning_tree.rs', lines 100:0-115:1 -/
+def spanning_tree.enter
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (cell : Std.Usize) (rng : R) :
+  Result ((core.result.Result spanning_tree.Frame topology.Error) × R)
+  := do
+  let i ← cell + 1#usize
+  let i1 ← Slice.index_usize offsets i
+  let i2 ← Slice.index_usize offsets cell
+  let degree ← i1 - i2
+  if degree > 0#usize
+  then
+    let (choice, rng1) ← treeRngInst.next_below rng degree
+    if choice >= degree
+    then ok (core.result.Result.Err topology.Error.InvalidChoice, rng1)
+    else
+      let next ← i2 + choice
+      ok (core.result.Result.Ok { cell, next, remaining := degree }, rng1)
+  else
+    ok (core.result.Result.Ok { cell, next := i2, remaining := degree }, rng)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 127:4-132:5 -/
+@[rust_loop_body]
+def spanning_tree.depth_first_loop0.body
+  (root : Std.Usize) (n : Std.Usize) (work : spanning_tree.Workspace)
+  (i : Std.Usize) :
+  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
+    spanning_tree.Workspace)
+  := do
+  if i < n
+  then
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        work.seen i
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let (_, index_mut_back2) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.incoming i
+    let i1 ← i + 1#usize
+    let v := index_mut_back2 0#usize
+    let v1 := index_mut_back1 root
+    let v2 := index_mut_back false
+    ok (cont ({ work with seen := v2, parents := v1, incoming := v }, i1))
+  else ok (done work)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 127:4-132:5 -/
+@[rust_loop]
+def spanning_tree.depth_first_loop0
+  (root : Std.Usize) (work : spanning_tree.Workspace) (n : Std.Usize)
+  (i : Std.Usize) :
+  Result spanning_tree.Workspace
+  := do
+  loop
+    (fun (work1, i1) => spanning_tree.depth_first_loop0.body root n work1 i1)
+    (work, i)
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop body 1:
+    Source: 'src/spanning_tree.rs', lines 138:4-165:5 -/
+@[rust_loop_body]
+def spanning_tree.depth_first_loop1.body
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
+  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (ControlFlow (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize × Std.Usize × (core.result.Result Unit
+    topology.Error)) (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec
+    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    Std.Usize) × Std.Usize × (core.result.Result Unit topology.Error)))
+  := do
+  if depth > 0#usize
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i ← depth - 1#usize
+      let frame ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          spanning_tree.Frame) v1 i
+      if frame.remaining = 0#usize
+      then ok (cont (rng, v, v1, v2, v3, reached, i, status))
+      else
+        let neighbor ← Slice.index_usize neighbors frame.next
+        let next ← frame.next + 1#usize
+        let i1 ← frame.cell + 1#usize
+        let i2 ← Slice.index_usize offsets i1
+        let next1 ←
+          if next = i2
+          then Slice.index_usize offsets frame.cell
+          else ok next
+        let (f, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            spanning_tree.Frame) v1 i
+        let v4 := index_mut_back { f with next := next1 }
+        let (f1, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            spanning_tree.Frame) v4 i
+        let i3 ← f1.remaining - 1#usize
+        let b1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool) v
+            neighbor
+        if b1
+        then
+          let v5 := index_mut_back1 { f1 with remaining := i3 }
+          ok (cont (rng, v, v5, v2, v3, reached, depth, status))
+        else
+          let (r, rng1) ←
+            spanning_tree.enter treeRngInst offsets neighbor rng
+          match r with
+          | core.result.Result.Ok child_frame =>
+            let (_, index_mut_back2) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v2 neighbor
+            let (_, index_mut_back3) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.Usize) v3 neighbor
+            let (_, index_mut_back4) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Bool) v neighbor
+            let v5 := index_mut_back1 { f1 with remaining := i3 }
+            let (_, index_mut_back5) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                spanning_tree.Frame) v5 depth
+            let depth1 ← depth + 1#usize
+            let reached1 ← reached + 1#usize
+            let v6 := index_mut_back5 child_frame
+            let v7 := index_mut_back4 true
+            let v8 := index_mut_back3 frame.next
+            let v9 := index_mut_back2 frame.cell
+            ok (cont (rng1, v7, v6, v9, v8, reached1, depth1, status))
+          | core.result.Result.Err error =>
+            let v5 := index_mut_back1 { f1 with remaining := i3 }
+            ok (cont (rng1, v, v5, v2, v3, reached, depth,
+              core.result.Result.Err error))
+    else ok (done (rng, v, v1, v2, v3, reached, status))
+  else ok (done (rng, v, v1, v2, v3, reached, status))
+
+/-- [labyrinth_core::spanning_tree::depth_first]: loop 1:
+    Source: 'src/spanning_tree.rs', lines 138:4-165:5 -/
+@[rust_loop]
+def spanning_tree.depth_first_loop1
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (rng : R) (v : alloc.vec.Vec Bool)
+  (v1 : alloc.vec.Vec spanning_tree.Frame) (v2 : alloc.vec.Vec Std.Usize)
+  (v3 : alloc.vec.Vec Std.Usize) (reached : Std.Usize) (depth : Std.Usize)
+  (status : core.result.Result Unit topology.Error) :
+  Result (R × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame) ×
+    (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × Std.Usize ×
+    (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (rng1, v4, v5, v6, v7, reached1, depth1, status1) =>
+      spanning_tree.depth_first_loop1.body treeRngInst offsets neighbors rng1
+      v4 v5 v6 v7 reached1 depth1 status1)
+    (rng, v, v1, v2, v3, reached, depth, status)
+
+/-- [labyrinth_core::spanning_tree::depth_first]:
+    Source: 'src/spanning_tree.rs', lines 117:0-171:1 -/
+def spanning_tree.depth_first
+  {R : Type _} (treeRngInst : tree.Rng R) (offsets : Slice Std.Usize)
+  (neighbors : Slice Std.Usize) (root : Std.Usize) (rng : R)
+  (work : spanning_tree.Workspace) :
+  Result ((core.result.Result Unit topology.Error) × R ×
+    spanning_tree.Workspace)
+  := do
+  let i := Slice.len offsets
+  let n ← i - 1#usize
+  let work1 ← spanning_tree.Workspace.clear_edits work
+  let work2 ← spanning_tree.depth_first_loop0 root work1 n 0#usize
+  let (r, rng1) ← spanning_tree.enter treeRngInst offsets root rng
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        spanning_tree.Frame) work2.frames 0#usize
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        work2.seen root
+    let v := index_mut_back1 true
+    let v1 := index_mut_back val
+    let (rng2, v2, v3, v4, v5, reached, status) ←
+      spanning_tree.depth_first_loop1 treeRngInst offsets neighbors rng1 v v1
+        work2.parents work2.incoming 1#usize 1#usize (core.result.Result.Ok ())
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      if reached != n
+      then
+        ok (core.result.Result.Err topology.Error.Disconnected, rng2,
+          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
+          })
+      else
+        ok (core.result.Result.Ok (), rng2,
+          { work2 with seen := v2, frames := v3, parents := v4, incoming := v5
+          })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Unit (core.convert.FromSame topology.Error) residual
+      ok (r1, rng2,
+        { work2 with seen := v2, frames := v3, parents := v4, incoming := v5 })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Unit (core.convert.FromSame topology.Error) residual
+    ok (r1, rng1, work2)
+
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 251:8-254:9
+    Source: 'src/spanning_tree.rs', lines 258:8-261:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop0.body
@@ -1686,7 +14160,7 @@ def spanning_tree.Tree.scene_dfs_loop0.body
   else ok (done links)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 251:8-254:9
+    Source: 'src/spanning_tree.rs', lines 258:8-261:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop0
@@ -1698,7 +14172,7 @@ def spanning_tree.Tree.scene_dfs_loop0
     (links, i)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 257:8-260:9
+    Source: 'src/spanning_tree.rs', lines 264:8-267:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop1.body
@@ -1727,7 +14201,7 @@ def spanning_tree.Tree.scene_dfs_loop1.body
   else ok (done (links, status))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 257:8-260:9
+    Source: 'src/spanning_tree.rs', lines 264:8-267:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop1
@@ -1744,7 +14218,7 @@ def spanning_tree.Tree.scene_dfs_loop1
     (links, sizes, i, status)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 2:
-    Source: 'src/spanning_tree.rs', lines 266:8-274:9
+    Source: 'src/spanning_tree.rs', lines 273:8-281:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop2.body
@@ -1784,7 +14258,7 @@ def spanning_tree.Tree.scene_dfs_loop2.body
   else ok (done (components, component_count))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 2:
-    Source: 'src/spanning_tree.rs', lines 266:8-274:9
+    Source: 'src/spanning_tree.rs', lines 273:8-281:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop2
@@ -1800,7 +14274,7 @@ def spanning_tree.Tree.scene_dfs_loop2
     (i, components, labels, component_count)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 3:
-    Source: 'src/spanning_tree.rs', lines 280:8-287:9
+    Source: 'src/spanning_tree.rs', lines 287:8-294:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop3.body
@@ -1841,7 +14315,7 @@ def spanning_tree.Tree.scene_dfs_loop3.body
   else ok (done (status, offsets))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 3:
-    Source: 'src/spanning_tree.rs', lines 280:8-287:9
+    Source: 'src/spanning_tree.rs', lines 287:8-294:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop3
@@ -1857,7 +14331,7 @@ def spanning_tree.Tree.scene_dfs_loop3
     (i, status, offsets)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 4:
-    Source: 'src/spanning_tree.rs', lines 297:8-300:9
+    Source: 'src/spanning_tree.rs', lines 304:8-307:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop4.body
@@ -1880,7 +14354,7 @@ def spanning_tree.Tree.scene_dfs_loop4.body
   else ok (done next)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 4:
-    Source: 'src/spanning_tree.rs', lines 297:8-300:9
+    Source: 'src/spanning_tree.rs', lines 304:8-307:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop4
@@ -1894,7 +14368,7 @@ def spanning_tree.Tree.scene_dfs_loop4
     (i, next)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 5:
-    Source: 'src/spanning_tree.rs', lines 302:8-315:9
+    Source: 'src/spanning_tree.rs', lines 309:8-322:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop5.body
@@ -1958,7 +14432,7 @@ def spanning_tree.Tree.scene_dfs_loop5.body
   else ok (done (neighbors, witnesses))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 5:
-    Source: 'src/spanning_tree.rs', lines 302:8-315:9
+    Source: 'src/spanning_tree.rs', lines 309:8-322:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop5
@@ -1974,7 +14448,7 @@ def spanning_tree.Tree.scene_dfs_loop5
     (i, neighbors, witnesses, next)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 6:
-    Source: 'src/spanning_tree.rs', lines 321:8-324:9
+    Source: 'src/spanning_tree.rs', lines 328:8-331:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop6.body
@@ -1997,7 +14471,7 @@ def spanning_tree.Tree.scene_dfs_loop6.body
   else ok (done selected)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 6:
-    Source: 'src/spanning_tree.rs', lines 321:8-324:9
+    Source: 'src/spanning_tree.rs', lines 328:8-331:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop6
@@ -2011,7 +14485,7 @@ def spanning_tree.Tree.scene_dfs_loop6
     (i, selected)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 7:
-    Source: 'src/spanning_tree.rs', lines 327:8-333:9
+    Source: 'src/spanning_tree.rs', lines 334:8-340:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop7.body
@@ -2046,7 +14520,7 @@ def spanning_tree.Tree.scene_dfs_loop7.body
   else ok (done (work, selected))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 7:
-    Source: 'src/spanning_tree.rs', lines 327:8-333:9
+    Source: 'src/spanning_tree.rs', lines 334:8-340:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop7
@@ -2063,7 +14537,7 @@ def spanning_tree.Tree.scene_dfs_loop7
     (work, i, selected, selected_count)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 8:
-    Source: 'src/spanning_tree.rs', lines 337:8-340:9
+    Source: 'src/spanning_tree.rs', lines 344:8-347:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop8.body
@@ -2082,7 +14556,7 @@ def spanning_tree.Tree.scene_dfs_loop8.body
   else ok (done (work, i))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 8:
-    Source: 'src/spanning_tree.rs', lines 337:8-340:9
+    Source: 'src/spanning_tree.rs', lines 344:8-347:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop8
@@ -2094,7 +14568,7 @@ def spanning_tree.Tree.scene_dfs_loop8
     (work, i)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 10:
-    Source: 'src/spanning_tree.rs', lines 349:12-358:13
+    Source: 'src/spanning_tree.rs', lines 356:12-365:13
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop9_loop0.body
@@ -2137,7 +14611,7 @@ def spanning_tree.Tree.scene_dfs_loop9_loop0.body
   else ok (done (v, v1, i, parents, depth))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 10:
-    Source: 'src/spanning_tree.rs', lines 349:12-358:13
+    Source: 'src/spanning_tree.rs', lines 356:12-365:13
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop9_loop0
@@ -2154,7 +14628,7 @@ def spanning_tree.Tree.scene_dfs_loop9_loop0
     (v, v1, i, parents, depth)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop body 9:
-    Source: 'src/spanning_tree.rs', lines 344:8-359:9
+    Source: 'src/spanning_tree.rs', lines 351:8-366:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.scene_dfs_loop9.body
@@ -2179,7 +14653,7 @@ def spanning_tree.Tree.scene_dfs_loop9.body
   else ok (done (v, v1, parents))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]: loop 9:
-    Source: 'src/spanning_tree.rs', lines 344:8-359:9
+    Source: 'src/spanning_tree.rs', lines 351:8-366:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.scene_dfs_loop9
@@ -2196,7 +14670,7 @@ def spanning_tree.Tree.scene_dfs_loop9
     (v, v1, i, parents, depth)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::scene_dfs]:
-    Source: 'src/spanning_tree.rs', lines 233:4-361:5
+    Source: 'src/spanning_tree.rs', lines 240:4-368:5
     Visibility: public -/
 def spanning_tree.Tree.scene_dfs
   {R : Type _} (treeRngInst : tree.Rng R) (carrier : topology.Carrier)
@@ -2408,49 +14882,3329 @@ def spanning_tree.Tree.scene_dfs
           spanning_tree.Tree (core.convert.FromSame topology.Error) residual
       ok (r1, rng, work)
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::parents]:
-    Source: 'src/spanning_tree.rs', lines 363:4-365:5
+/-- [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}::clone]:
+    Source: 'src/spanning_tree.rs', lines 9:16-9:21
     Visibility: public -/
-def spanning_tree.Tree.impl.parents
-  (self : spanning_tree.Tree) : Result (Slice Std.Usize) := do
-  ok (alloc.vec.Vec.deref self.parents)
+def spanning_tree.Frame.Insts.CoreCloneClone.clone
+  (self : spanning_tree.Frame) : Result spanning_tree.Frame := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::clone::Clone for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:16-9:21 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreCloneClone : core.clone.Clone
+  spanning_tree.Frame := {
+  clone := spanning_tree.Frame.Insts.CoreCloneClone.clone
+}
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Workspace}::new]:
+    Source: 'src/spanning_tree.rs', lines 34:4-61:5
+    Visibility: public -/
+def spanning_tree.Workspace.new
+  (cell_count : Std.Usize) (edge_count : Std.Usize) :
+  Result (core.result.Result spanning_tree.Workspace topology.Error)
+  := do
+  if cell_count = 0#usize
+  then ok (core.result.Result.Err topology.Error.InvalidSize)
+  else
+    let r ← topology.check_storage cell_count 8#usize
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let r1 ← topology.check_storage cell_count 24#usize
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let r2 ← topology.check_storage edge_count 16#usize
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let o ← lift (Usize.checked_mul edge_count 2#usize)
+          let r3 ← core.option.Option.ok_or o topology.Error.Overflow
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue val =>
+            let r4 ← topology.check_storage val 8#usize
+            let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+            match cf4 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let v ←
+                alloc.vec.from_elem core.clone.CloneBool false cell_count
+              let v1 ←
+                alloc.vec.from_elem spanning_tree.Frame.Insts.CoreCloneClone
+                  { cell := 0#usize, next := 0#usize, remaining := 0#usize }
+                  cell_count
+              let v2 ←
+                alloc.vec.from_elem core.clone.CloneUsize 0#usize cell_count
+              let v3 ←
+                alloc.vec.from_elem core.clone.CloneUsize core.num.Usize.MAX
+                  cell_count
+              ok (core.result.Result.Ok
+                {
+                  seen := v,
+                  frames := v1,
+                  path := v2,
+                  parents := v2,
+                  incoming := v2,
+                  edit_slots := v3,
+                  edit_nodes := v2,
+                  edit_count := 0#usize,
+                  edge_capacity := edge_count
+                })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                spanning_tree.Workspace (core.convert.FromSame topology.Error)
+                residual
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              spanning_tree.Workspace (core.convert.FromSame topology.Error)
+              residual
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Workspace (core.convert.FromSame topology.Error)
+            residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Workspace (core.convert.FromSame topology.Error)
+          residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        spanning_tree.Workspace (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::new]:
+    Source: 'src/shatter.rs', lines 34:4-40:5 -/
+def shatter.Patch.new (cell_count : Std.Usize) : Result shatter.Patch := do
+  let v ← alloc.vec.from_elem core.clone.CloneBool false cell_count
+  ok { serial := 0#u64, stage := shatter.Stage.Idle, cells := v }
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 0:
+    Source: 'src/scene.rs', lines 1110:8-1116:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.new_loop0.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (phases : alloc.vec.Vec Std.I32)
+  (live_edges : alloc.vec.Vec topology.Edge) (i1 : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec topology.Edge) × Std.Usize)
+    (alloc.vec.Vec topology.Edge))
+  := do
+  let s ← topology.Carrier.impl.edges c
+  let i2 := Slice.len s
+  if i1 < i2
+  then
+    let edge ← Slice.index_usize s i1
+    let s1 := alloc.vec.Vec.deref phases
+    let s2 := alloc.vec.Vec.deref phases
+    let r ←
+      scene.Layout.doorway
+        {
+          cell_grid := g,
+          cells := v,
+          circles := v1,
+          portals := v2,
+          bands := v3,
+          geometry := g1,
+          carrier := c,
+          transforms := i
+        } edge s1 s2
+    let b ← core.result.Result.is_ok r
+    let live_edges1 ←
+      if b
+      then alloc.vec.Vec.push live_edges edge
+      else ok live_edges
+    let i3 ← i1 + 1#usize
+    ok (cont (live_edges1, i3))
+  else ok (done live_edges)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 0:
+    Source: 'src/scene.rs', lines 1110:8-1116:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.new_loop0
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (phases : alloc.vec.Vec Std.I32)
+  (live_edges : alloc.vec.Vec topology.Edge) (i1 : Std.Usize) :
+  Result (alloc.vec.Vec topology.Edge)
+  := do
+  loop
+    (fun (live_edges1, i2) => scene.Scene.new_loop0.body g v v1 v2 v3 g1 c i
+      phases live_edges1 i2)
+    (live_edges, i1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 1:
+    Source: 'src/scene.rs', lines 1122:8-1130:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.new_loop1.body
+  (routes : Slice scene.Route) (count : Std.Usize)
+  (saved_routes : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec scene.Route) × Std.Usize) (alloc.vec.Vec
+    scene.Route))
+  := do
+  let i1 := Slice.len routes
+  if i < i1
+  then
+    let cells := alloc.vec.Vec.with_capacity Std.Usize count
+    let r ← Slice.index_usize routes i
+    let s := alloc.vec.Vec.deref r.cells
+    let cells1 ←
+      alloc.vec.Vec.extend_from_slice core.clone.CloneUsize cells s
+    let saved_routes1 ←
+      alloc.vec.Vec.push saved_routes { r with cells := cells1 }
+    let i2 ← i + 1#usize
+    ok (cont (saved_routes1, i2))
+  else ok (done saved_routes)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 1:
+    Source: 'src/scene.rs', lines 1122:8-1130:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.new_loop1
+  (routes : Slice scene.Route) (count : Std.Usize)
+  (saved_routes : alloc.vec.Vec scene.Route) (i : Std.Usize) :
+  Result (alloc.vec.Vec scene.Route)
+  := do
+  loop
+    (fun (saved_routes1, i1) => scene.Scene.new_loop1.body routes count
+      saved_routes1 i1)
+    (saved_routes, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 2:
+    Source: 'src/scene.rs', lines 1134:8-1145:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.new_loop2.body
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (occupants : Slice Std.Usize) (count : Std.Usize)
+  (walkers : alloc.vec.Vec walker.Walker) (valid : Bool) (i1 : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec walker.Walker) × Bool × Std.Usize)
+    ((alloc.vec.Vec walker.Walker) × Bool))
+  := do
+  let i2 := Slice.len occupants
+  if i1 < i2
+  then
+    if valid
+    then
+      let cell ← Slice.index_usize occupants i1
+      let walkers1 ←
+        if cell < count
+        then
+          do
+          let lp ←
+            scene.Layout.local_pose
+              {
+                cell_grid := g,
+                cells := v,
+                circles := v1,
+                portals := v2,
+                bands := v3,
+                geometry := g1,
+                carrier := c,
+                transforms := i
+              } cell
+          alloc.vec.Vec.push walkers
+            ({ cell, «local» := lp, state := walker.WalkerState.Ready } :
+            walker.Walker)
+        else ok walkers
+      let i3 ← i1 + 1#usize
+      ok (cont (walkers1, cell < count, i3))
+    else ok (done (walkers, valid))
+  else ok (done (walkers, valid))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 2:
+    Source: 'src/scene.rs', lines 1134:8-1145:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.new_loop2
+  (g : grid.Grid) (v : alloc.vec.Vec scene.Cell)
+  (v1 : alloc.vec.Vec polar.Circle) (v2 : alloc.vec.Vec scene.Portal)
+  (v3 : alloc.vec.Vec Std.I32) (g1 : grid.Geometry) (c : topology.Carrier)
+  (i : Std.Usize) (occupants : Slice Std.Usize) (count : Std.Usize)
+  (walkers : alloc.vec.Vec walker.Walker) (valid : Bool) (i1 : Std.Usize) :
+  Result ((alloc.vec.Vec walker.Walker) × Bool)
+  := do
+  loop
+    (fun (walkers1, valid1, i2) => scene.Scene.new_loop2.body g v v1 v2 v3 g1 c
+      i occupants count walkers1 valid1 i2)
+    (walkers, valid, i1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop body 3:
+    Source: 'src/scene.rs', lines 1151:8-1154:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.new_loop3.body
+  (patch_capacity : Std.Usize) (count : Std.Usize)
+  (patches : alloc.vec.Vec shatter.Patch) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec shatter.Patch) × Std.Usize)
+    (alloc.vec.Vec shatter.Patch))
+  := do
+  if i < patch_capacity
+  then
+    let p ← shatter.Patch.new count
+    let patches1 ← alloc.vec.Vec.push patches p
+    let i1 ← i + 1#usize
+    ok (cont (patches1, i1))
+  else ok (done patches)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]: loop 3:
+    Source: 'src/scene.rs', lines 1151:8-1154:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.new_loop3
+  (patch_capacity : Std.Usize) (count : Std.Usize)
+  (patches : alloc.vec.Vec shatter.Patch) (i : Std.Usize) :
+  Result (alloc.vec.Vec shatter.Patch)
+  := do
+  loop
+    (fun (patches1, i1) => scene.Scene.new_loop3.body patch_capacity count
+      patches1 i1)
+    (patches, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::new]:
+    Source: 'src/scene.rs', lines 1074:4-1176:5
+    Visibility: public -/
+def scene.Scene.new
+  {R : Type _} (treeRngInst : tree.Rng R) (layout : scene.Layout)
+  (routes : Slice scene.Route) (occupants : Slice Std.Usize)
+  (patch_capacity : Std.Usize) (epoch : Std.U64) (rng : R) :
+  Result ((core.result.Result scene.Scene topology.Error) × R)
+  := do
+  let count := alloc.vec.Vec.len layout.cells
+  let o ← lift (Usize.checked_mul patch_capacity count)
+  let r ← core.option.Option.ok_or o topology.Error.Overflow
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let i := Slice.len routes
+    let o1 ← lift (Usize.checked_mul i count)
+    let r1 ← core.option.Option.ok_or o1 topology.Error.Overflow
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      let r2 ← topology.check_storage val 1#usize
+      let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+      match cf2 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let r3 ← topology.check_storage val1 8#usize
+        let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+        match cf3 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let r4 ← topology.check_storage patch_capacity 48#usize
+          let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+          match cf4 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let i1 := Slice.len occupants
+            let r5 ← topology.check_storage i1 192#usize
+            let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+            match cf5 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let i2 := Slice.len routes
+              let r6 ← topology.check_storage i2 32#usize
+              let cf6 ← core.result.Result.Insts.CoreOpsTry.branch r6
+              match cf6 with
+              | core.ops.control_flow.ControlFlow.Continue _ =>
+                let r7 ← topology.check_storage layout.transforms 8#usize
+                let cf7 ← core.result.Result.Insts.CoreOpsTry.branch r7
+                match cf7 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let phases ←
+                    alloc.vec.from_elem core.clone.CloneI32 0#i32
+                      layout.transforms
+                  let s ← topology.Carrier.impl.edges layout.carrier
+                  let i3 := Slice.len s
+                  let required := alloc.vec.Vec.with_capacity topology.Edge i3
+                  let s1 := alloc.vec.Vec.deref phases
+                  let s2 := alloc.vec.Vec.deref phases
+                  let e ← scene.Edit.Insts.CoreDefaultDefault.default
+                  let (r8, required1) ←
+                    scene.check_routes layout routes s1 s2 none e required
+                  let cf8 ← core.result.Result.Insts.CoreOpsTry.branch r8
+                  match cf8 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    let (s3, deref_mut_back) ←
+                      lift (alloc.vec.Vec.deref_mut phases)
+                    let (s4, deref_mut_back1) ←
+                      lift (alloc.vec.Vec.deref_mut phases)
+                    let (r9, s5, s6) ←
+                      scene.Layout.check_spinning_portals layout routes s3 s4
+                    let cf9 ← core.result.Result.Insts.CoreOpsTry.branch r9
+                    match cf9 with
+                    | core.ops.control_flow.ControlFlow.Continue _ =>
+                      let i4 := Slice.len s
+                      let live_edges :=
+                        alloc.vec.Vec.with_capacity topology.Edge i4
+                      let next_phases := deref_mut_back1 s6
+                      let phases1 := deref_mut_back s5
+                      let live_edges1 ←
+                        scene.Scene.new_loop0 layout.cell_grid layout.cells
+                          layout.circles layout.portals layout.bands
+                          layout.geometry layout.carrier layout.transforms
+                          phases1 live_edges 0#usize
+                      let s7 := alloc.vec.Vec.deref live_edges1
+                      let r10 ← topology.Carrier.from_edges count s7
+                      let cf10 ←
+                        core.result.Result.Insts.CoreOpsTry.branch r10
+                      match cf10 with
+                      | core.ops.control_flow.ControlFlow.Continue val2 =>
+                        let s8 ← topology.Carrier.impl.edges layout.carrier
+                        let i5 := Slice.len s8
+                        let r11 ← spanning_tree.Workspace.new count i5
+                        let cf11 ←
+                          core.result.Result.Insts.CoreOpsTry.branch r11
+                        match cf11 with
+                        | core.ops.control_flow.ControlFlow.Continue val3 =>
+                          let s9 := alloc.vec.Vec.deref required1
+                          let (r12, rng1, val4) ←
+                            spanning_tree.Tree.scene_dfs treeRngInst val2 s9
+                              0#usize rng val3
+                          let cf12 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r12
+                          match cf12 with
+                          | core.ops.control_flow.ControlFlow.Continue val5 =>
+                            let i6 := Slice.len routes
+                            let saved_routes :=
+                              alloc.vec.Vec.with_capacity scene.Route i6
+                            let saved_routes1 ←
+                              scene.Scene.new_loop1 routes count saved_routes
+                                0#usize
+                            let i7 := Slice.len occupants
+                            let walkers :=
+                              alloc.vec.Vec.with_capacity walker.Walker i7
+                            let (walkers1, valid) ←
+                              scene.Scene.new_loop2 layout.cell_grid
+                                layout.cells layout.circles layout.portals
+                                layout.bands layout.geometry layout.carrier
+                                layout.transforms occupants count walkers true
+                                0#usize
+                            if valid
+                            then
+                              let patches :=
+                                alloc.vec.Vec.with_capacity shatter.Patch
+                                  patch_capacity
+                              let patches1 ←
+                                scene.Scene.new_loop3 patch_capacity count
+                                  patches 0#usize
+                              let v ←
+                                alloc.vec.from_elem core.clone.CloneUsize
+                                  0#usize layout.transforms
+                              ok (core.result.Result.Ok
+                                {
+                                  layout,
+                                  tree := val5,
+                                  work := val4,
+                                  routes := saved_routes1,
+                                  required := required1,
+                                  phases := phases1,
+                                  next_phases,
+                                  holds := v,
+                                  walkers := walkers1,
+                                  patches := patches1,
+                                  stamp := { epoch, revision := 0#u64 },
+                                  clock := 0#u64,
+                                  wall := 0#u64,
+                                  reanchor := false,
+                                  suspended := false,
+                                  inactive := false,
+                                  latest_request := epoch,
+                                  pending := none,
+                                  trail_revision := 0#u64
+                                }, rng1)
+                            else
+                              ok (core.result.Result.Err
+                                topology.Error.InvalidIndex, rng1)
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            let r13 ←
+                              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                scene.Scene (core.convert.FromSame
+                                topology.Error) residual
+                            ok (r13, rng1)
+                        | core.ops.control_flow.ControlFlow.Break residual =>
+                          let r12 ←
+                            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                              scene.Scene (core.convert.FromSame
+                              topology.Error) residual
+                          ok (r12, rng)
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        let r11 ←
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            scene.Scene (core.convert.FromSame topology.Error)
+                            residual
+                        ok (r11, rng)
+                    | core.ops.control_flow.ControlFlow.Break residual =>
+                      let r10 ←
+                        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                          scene.Scene (core.convert.FromSame topology.Error)
+                          residual
+                      ok (r10, rng)
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    let r9 ←
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        scene.Scene (core.convert.FromSame topology.Error)
+                        residual
+                    ok (r9, rng)
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r8 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      scene.Scene (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r8, rng)
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r7 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    scene.Scene (core.convert.FromSame topology.Error) residual
+                ok (r7, rng)
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r6 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  scene.Scene (core.convert.FromSame topology.Error) residual
+              ok (r6, rng)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r5 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                scene.Scene (core.convert.FromSame topology.Error) residual
+            ok (r5, rng)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r4 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              scene.Scene (core.convert.FromSame topology.Error) residual
+          ok (r4, rng)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r3 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            scene.Scene (core.convert.FromSame topology.Error) residual
+        ok (r3, rng)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          scene.Scene (core.convert.FromSame topology.Error) residual
+      ok (r2, rng)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        scene.Scene (core.convert.FromSame topology.Error) residual
+    ok (r1, rng)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::holds]:
+    Source: 'src/scene.rs', lines 1193:4-1195:5
+    Visibility: public -/
+def scene.Scene.impl.holds
+  (self : scene.Scene) : Result (Slice Std.Usize) := do
+  ok (alloc.vec.Vec.deref self.holds)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::walkers]:
+    Source: 'src/scene.rs', lines 1196:4-1198:5
+    Visibility: public -/
+def scene.Scene.impl.walkers
+  (self : scene.Scene) : Result (Slice walker.Walker) := do
+  ok (alloc.vec.Vec.deref self.walkers)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::clock]:
+    Source: 'src/scene.rs', lines 1199:4-1201:5
+    Visibility: public -/
+def scene.Scene.impl.clock (self : scene.Scene) : Result Std.U64 := do
+  ok self.clock
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::trail_revision]:
+    Source: 'src/scene.rs', lines 1203:4-1205:5
+    Visibility: public -/
+def scene.Scene.impl.trail_revision (self : scene.Scene) : Result Std.U64 := do
+  ok self.trail_revision
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::is_suspended]:
+    Source: 'src/scene.rs', lines 1206:4-1208:5
+    Visibility: public -/
+def scene.Scene.is_suspended (self : scene.Scene) : Result Bool := do
+  ok self.suspended
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::is_inactive]:
+    Source: 'src/scene.rs', lines 1209:4-1211:5
+    Visibility: public -/
+def scene.Scene.is_inactive (self : scene.Scene) : Result Bool := do
+  ok self.inactive
+
+/-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::contains]:
+    Source: 'src/shatter.rs', lines 42:4-44:5 -/
+def shatter.Patch.contains
+  (self : shatter.Patch) (cell : Std.Usize) : Result Bool := do
+  let b ←
+    core.cmp.PartialEq.ne.trait_default
+      shatter.Stage.Insts.CoreCmpPartialEqStage self.stage shatter.Stage.Idle
+  if b
+  then
+    let i := alloc.vec.Vec.len self.cells
+    if cell < i
+    then
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Bool)
+        self.cells cell
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]: loop body 0:
+    Source: 'src/scene.rs', lines 1232:8-1235:9 -/
+@[rust_loop_body]
+def scene.Scene.admission_loop.body
+  (v : alloc.vec.Vec shatter.Patch) (cell : Std.Usize) (occupied : Bool)
+  (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    if occupied
+    then ok (done occupied)
+    else
+      let p ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          shatter.Patch) v i
+      let occupied1 ← shatter.Patch.contains p cell
+      let i2 ← i + 1#usize
+      ok (cont (occupied1, i2))
+  else ok (done occupied)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]: loop 0:
+    Source: 'src/scene.rs', lines 1232:8-1235:9 -/
+@[rust_loop]
+def scene.Scene.admission_loop
+  (v : alloc.vec.Vec shatter.Patch) (cell : Std.Usize) (occupied : Bool)
+  (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (occupied1, i1) => scene.Scene.admission_loop.body v cell occupied1
+      i1)
+    (occupied, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::admission]:
+    Source: 'src/scene.rs', lines 1223:4-1241:5 -/
+def scene.Scene.admission
+  (self : scene.Scene) (cell : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.layout.cells
+  if cell >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    if self.suspended
+    then ok (core.result.Result.Err topology.Error.InvalidTransition)
+    else
+      if self.inactive
+      then ok (core.result.Result.Err topology.Error.InvalidTransition)
+      else
+        let b := core.option.Option.is_some self.pending
+        if b
+        then ok (core.result.Result.Err topology.Error.InvalidTransition)
+        else
+          let occupied ←
+            scene.Scene.admission_loop self.patches cell false 0#usize
+          if occupied
+          then ok (core.result.Result.Err topology.Error.Occupied)
+          else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::cell_pose]:
+    Source: 'src/scene.rs', lines 1243:4-1250:5
+    Visibility: public -/
+def scene.Scene.cell_pose
+  (self : scene.Scene) (cell : Std.Usize) :
+  Result (core.result.Result grid.Point topology.Error)
+  := do
+  let i := alloc.vec.Vec.len self.layout.cells
+  if cell >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex)
+  else
+    let s := alloc.vec.Vec.deref self.phases
+    let lp ← scene.Layout.frame_pose self.layout cell s
+    let s1 := alloc.vec.Vec.deref self.phases
+    let p ← scene.Layout.world self.layout lp s1
+    ok (core.result.Result.Ok p)
+
+/-- [labyrinth_core::walker::interpolate_angle]:
+    Source: 'src/walker.rs', lines 50:0-52:1 -/
+def walker.interpolate_angle
+  («from» : Std.I32) («to» : Std.I32) (elapsed : Std.U64)
+  (duration : Std.U64) :
+  Result Std.I32
+  := do
+  let i ← polar.angle_delta «from» «to»
+  let i1 ← lift (core.convert.num.FromI64I32.from i)
+  let i2 ← lift (UScalar.hcast .I64 elapsed)
+  let i3 ← i1 * i2
+  let i4 ← lift (UScalar.hcast .I64 duration)
+  let i5 ← i3 / i4
+  let i6 ← lift (IScalar.cast .I32 i5)
+  let i7 ← «from» + i6
+  polar.normalize i7
+
+/-- [labyrinth_core::walker::interpolate]:
+    Source: 'src/walker.rs', lines 46:0-48:1 -/
+def walker.interpolate
+  («from» : Std.I32) («to» : Std.I32) (elapsed : Std.U64)
+  (duration : Std.U64) :
+  Result Std.I32
+  := do
+  let i ← «to» - «from»
+  let i1 ← lift (core.convert.num.FromI64I32.from i)
+  let i2 ← lift (UScalar.hcast .I64 elapsed)
+  let i3 ← i1 * i2
+  let i4 ← lift (UScalar.hcast .I64 duration)
+  let i5 ← i3 / i4
+  let i6 ← lift (IScalar.cast .I32 i5)
+  «from» + i6
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Path}::pose]:
+    Source: 'src/walker.rs', lines 55:4-95:5 -/
+def walker.Path.pose
+  (self : walker.Path) (elapsed : Std.U32) (duration : Std.U32) :
+  Result walker.LocalPose
+  := do
+  let elapsed1 ← lift (core.convert.num.FromU64U32.from elapsed)
+  let duration1 ← lift (core.convert.num.FromU64U32.from duration)
+  match self with
+  | walker.Path.Cartesian «from» «to» =>
+    let i ← walker.interpolate «from».x «to».x elapsed1 duration1
+    let i1 ← walker.interpolate «from».y «to».y elapsed1 duration1
+    ok (walker.LocalPose.Cartesian { x := i, y := i1 })
+  | walker.Path.Polar circle from_radius to_radius from_angle doorway_angle
+    to_angle =>
+    let phase ← elapsed1 * 3#u64
+    if phase < duration1
+    then
+      let angle ←
+        walker.interpolate_angle from_angle doorway_angle phase duration1
+      ok (walker.LocalPose.Polar circle from_radius angle)
+    else
+      let i ← duration1 * 2#u64
+      if phase < i
+      then
+        let i1 ← phase - duration1
+        let radius ← walker.interpolate from_radius to_radius i1 duration1
+        ok (walker.LocalPose.Polar circle radius doorway_angle)
+      else
+        let i1 ← phase - i
+        let angle ←
+          walker.interpolate_angle doorway_angle to_angle i1 duration1
+        ok (walker.LocalPose.Polar circle to_radius angle)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::walker_pose]:
+    Source: 'src/scene.rs', lines 1252:4-1262:5
+    Visibility: public -/
+def scene.Scene.walker_pose
+  (self : scene.Scene) (walker_index : Std.Usize) :
+  Result (core.result.Result grid.Point topology.Error)
+  := do
+  let s := alloc.vec.Vec.deref self.walkers
+  let o ←
+    core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+      s walker_index
+  let r ← core.option.Option.ok_or o topology.Error.InvalidIndex
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    match val.state with
+    | walker.WalkerState.Ready => scene.Scene.cell_pose self val.cell
+    | walker.WalkerState.Crossing crossing =>
+      let lp ←
+        walker.Path.pose crossing.path crossing.elapsed crossing.duration
+      let s1 := alloc.vec.Vec.deref self.phases
+      let p ← scene.Layout.world self.layout lp s1
+      ok (core.result.Result.Ok p)
+    | walker.WalkerState.Parked => scene.Scene.cell_pose self val.cell
+    | walker.WalkerState.Hidden => scene.Scene.cell_pose self val.cell
+    | walker.WalkerState.Terminated =>
+      ok (core.result.Result.Err topology.Error.InvalidTransition)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      grid.Point (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::doorway_bounds]:
+    Source: 'src/scene.rs', lines 1264:4-1269:5
+    Visibility: public -/
+def scene.Scene.doorway_bounds
+  (self : scene.Scene) (edge : topology.Edge) :
+  Result (core.result.Result grid.Rect topology.Error)
+  := do
+  let s := alloc.vec.Vec.deref self.phases
+  let s1 := alloc.vec.Vec.deref self.phases
+  let r ← scene.Layout.doorway self.layout edge s s1
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    ok (core.result.Result.Ok val.corridor)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      grid.Rect (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]: loop body 0:
+    Source: 'src/scene.rs', lines 1278:8-1285:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.swept_doorway_loop.body
+  (v : alloc.vec.Vec Std.I32) (steps : Slice Std.I32)
+  (v1 : alloc.vec.Vec Std.I32)
+  (status : core.result.Result Unit topology.Error) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.I32) × (core.result.Result Unit
+    topology.Error) × Std.Usize) ((alloc.vec.Vec Std.I32) ×
+    (core.result.Result Unit topology.Error)))
+  := do
+  let i1 := Slice.len steps
+  if i < i1
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i2 ← Slice.index_usize steps i
+      let (v2, status1) ←
+        if i2 < 0#i32
+        then ok (v1, core.result.Result.Err topology.Error.InvalidGeometry)
+        else
+          do
+          let i3 ← polar.TURN / 8#i32
+          if i2 > i3
+          then ok (v1, core.result.Result.Err topology.Error.InvalidGeometry)
+          else
+            let i4 ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                Std.I32) v i
+            let i5 ← i4 + i2
+            let i6 ← polar.normalize i5
+            let (_, index_mut_back) ←
+              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                Std.I32) v1 i
+            let v3 := index_mut_back i6
+            ok (v3, status)
+      let i3 ← i + 1#usize
+      ok (cont (v2, status1, i3))
+    else ok (done (v1, status))
+  else ok (done (v1, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]: loop 0:
+    Source: 'src/scene.rs', lines 1278:8-1285:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.swept_doorway_loop
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32)
+  (steps : Slice Std.I32) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) :
+  Result ((alloc.vec.Vec Std.I32) × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (v2, status1, i1) => scene.Scene.swept_doorway_loop.body v steps v2
+      status1 i1)
+    (v1, status, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::swept_doorway]:
+    Source: 'src/scene.rs', lines 1272:4-1291:5
+    Visibility: public -/
+def scene.Scene.swept_doorway
+  (self : scene.Scene) (edge : topology.Edge) (steps : Slice Std.I32) :
+  Result ((core.result.Result grid.Rect topology.Error) × scene.Scene)
+  := do
+  let i := Slice.len steps
+  let i1 := alloc.vec.Vec.len self.phases
+  if i != i1
+  then ok (core.result.Result.Err topology.Error.InvalidSize, self)
+  else
+    let (v, status) ←
+      scene.Scene.swept_doorway_loop self.phases self.next_phases steps
+        (core.result.Result.Ok ()) 0#usize
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch status
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let s := alloc.vec.Vec.deref self.phases
+      let s1 := alloc.vec.Vec.deref v
+      let r ← scene.Layout.doorway self.layout edge s s1
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val =>
+        ok (core.result.Result.Ok val.corridor, { self with next_phases := v })
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r1 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            grid.Rect (core.convert.FromSame topology.Error) residual
+        ok (r1, { self with next_phases := v })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          grid.Rect (core.convert.FromSame topology.Error) residual
+      ok (r, { self with next_phases := v })
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Reservation> for labyrinth_core::walker::Reservation}::eq]:
+    Source: 'src/walker.rs', lines 13:29-13:38
+    Visibility: public -/
+def walker.Reservation.Insts.CoreCmpPartialEqReservation.eq
+  (self : walker.Reservation) (other : walker.Reservation) : Result Bool := do
+  if self.epoch = other.epoch
+  then
+    if self.serial = other.serial
+    then ok (self.walker = other.walker)
+    else ok false
+  else ok false
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reservation]:
+    Source: 'src/scene.rs', lines 1294:4-1303:5
+    Visibility: public -/
+def scene.Scene.reservation
+  (self : scene.Scene) (token : walker.Reservation) :
+  Result (core.result.Result walker.Crossing topology.Error)
+  := do
+  if token.epoch != self.stamp.epoch
+  then ok (core.result.Result.Err topology.Error.StaleEpoch)
+  else
+    let s := alloc.vec.Vec.deref self.walkers
+    let o ←
+      core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice
+        walker.Walker) s token.walker
+    let r ← core.option.Option.ok_or o topology.Error.InvalidIndex
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      match val.state with
+      | walker.WalkerState.Ready =>
+        ok (core.result.Result.Err topology.Error.InvalidTransition)
+      | walker.WalkerState.Crossing crossing =>
+        let b ←
+          walker.Reservation.Insts.CoreCmpPartialEqReservation.eq
+            crossing.reservation token
+        if b
+        then ok (core.result.Result.Ok crossing)
+        else ok (core.result.Result.Err topology.Error.InvalidTransition)
+      | walker.WalkerState.Parked =>
+        ok (core.result.Result.Err topology.Error.InvalidTransition)
+      | walker.WalkerState.Hidden =>
+        ok (core.result.Result.Err topology.Error.InvalidTransition)
+      | walker.WalkerState.Terminated =>
+        ok (core.result.Result.Err topology.Error.InvalidTransition)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Crossing (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Holds> for labyrinth_core::walker::Holds}::eq]:
+    Source: 'src/walker.rs', lines 98:29-98:38
+    Visibility: public -/
+def walker.Holds.Insts.CoreCmpPartialEqHolds.eq
+  (self : walker.Holds) (other : walker.Holds) : Result Bool := do
+  let b ←
+    core.array.equality.PartialEqArray.eq core.cmp.PartialEqUsize self.ids
+      other.ids
+  if b
+  then ok (self.count = other.count)
+  else ok false
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Path> for labyrinth_core::walker::Path}::eq]:
+    Source: 'src/walker.rs', lines 30:29-30:38
+    Visibility: public -/
+def walker.Path.Insts.CoreCmpPartialEqPath.eq
+  (self : walker.Path) (other : walker.Path) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | walker.Path.Cartesian __self_0 __self_1 =>
+      match other with
+      | walker.Path.Cartesian __arg1_0 __arg1_1 =>
+        let b ← grid.Point.Insts.CoreCmpPartialEqPoint.eq __self_0 __arg1_0
+        if b
+        then grid.Point.Insts.CoreCmpPartialEqPoint.eq __self_1 __arg1_1
+        else ok false
+      | walker.Path.Polar _ _ _ _ _ _ => fail panic
+    | walker.Path.Polar __self_0 __self_1 __self_2 __self_3 __self_4 __self_5
+      =>
+      match other with
+      | walker.Path.Cartesian _ _ => fail panic
+      | walker.Path.Polar __arg1_0 __arg1_1 __arg1_2 __arg1_3 __arg1_4 __arg1_5
+        =>
+        let b ← lift (core.cmp.impls.PartialEqI32.eq __self_1 __arg1_1)
+        if b
+        then
+          let b1 ← lift (core.cmp.impls.PartialEqI32.eq __self_2 __arg1_2)
+          if b1
+          then
+            let b2 ← lift (core.cmp.impls.PartialEqI32.eq __self_3 __arg1_3)
+            if b2
+            then
+              let b3 ←
+                lift (core.cmp.impls.PartialEqI32.eq __self_4 __arg1_4)
+              if b3
+              then
+                let b4 ←
+                  lift (core.cmp.impls.PartialEqI32.eq __self_5 __arg1_5)
+                if b4
+                then lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+                else ok false
+              else ok false
+            else ok false
+          else ok false
+        else ok false
+  else ok false
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::LocalPose> for labyrinth_core::walker::LocalPose}::eq]:
+    Source: 'src/walker.rs', lines 20:29-20:38
+    Visibility: public -/
+def walker.LocalPose.Insts.CoreCmpPartialEqLocalPose.eq
+  (self : walker.LocalPose) (other : walker.LocalPose) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | walker.LocalPose.Cartesian __self_0 =>
+      match other with
+      | walker.LocalPose.Cartesian __arg1_0 =>
+        grid.Point.Insts.CoreCmpPartialEqPoint.eq __self_0 __arg1_0
+      | walker.LocalPose.Polar _ _ _ => fail panic
+    | walker.LocalPose.Polar __self_0 __self_1 __self_2 =>
+      match other with
+      | walker.LocalPose.Cartesian _ => fail panic
+      | walker.LocalPose.Polar __arg1_0 __arg1_1 __arg1_2 =>
+        let b ← lift (core.cmp.impls.PartialEqI32.eq __self_1 __arg1_1)
+        if b
+        then
+          let b1 ← lift (core.cmp.impls.PartialEqI32.eq __self_2 __arg1_2)
+          if b1
+          then lift (core.cmp.impls.PartialEqUsize.eq __self_0 __arg1_0)
+          else ok false
+        else ok false
+  else ok false
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Crossing> for labyrinth_core::walker::Crossing}::eq]:
+    Source: 'src/walker.rs', lines 128:29-128:38
+    Visibility: public -/
+def walker.Crossing.Insts.CoreCmpPartialEqCrossing.eq
+  (self : walker.Crossing) (other : walker.Crossing) : Result Bool := do
+  if self.elapsed = other.elapsed
+  then
+    if self.duration = other.duration
+    then
+      if self.source = other.source
+      then
+        if self.target = other.target
+        then
+          let b ←
+            walker.Reservation.Insts.CoreCmpPartialEqReservation.eq
+              self.reservation other.reservation
+          if b
+          then
+            let b1 ←
+              grid.Rect.Insts.CoreCmpPartialEqRect.eq self.corridor
+                other.corridor
+            if b1
+            then
+              let b2 ←
+                walker.Path.Insts.CoreCmpPartialEqPath.eq self.path other.path
+              if b2
+              then
+                let b3 ←
+                  walker.LocalPose.Insts.CoreCmpPartialEqLocalPose.eq
+                    self.target_pose other.target_pose
+                if b3
+                then
+                  walker.Holds.Insts.CoreCmpPartialEqHolds.eq self.holds
+                    other.holds
+                else ok false
+              else ok false
+            else ok false
+          else ok false
+        else ok false
+      else ok false
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Crossing> for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:29-128:38 -/
+@[reducible]
+impl_def walker.Crossing.Insts.CoreCmpPartialEqCrossing : core.cmp.PartialEq
+  walker.Crossing walker.Crossing := {
+  eq := walker.Crossing.Insts.CoreCmpPartialEqCrossing.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Crossing.Insts.CoreCmpPartialEqCrossing
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::WalkerState> for labyrinth_core::walker::WalkerState}::eq]:
+    Source: 'src/walker.rs', lines 147:29-147:38
+    Visibility: public -/
+def walker.WalkerState.Insts.CoreCmpPartialEqWalkerState.eq
+  (self : walker.WalkerState) (other : walker.WalkerState) : Result Bool := do
+  let self1 := read_discriminant self
+  let other1 := read_discriminant other
+  if self1 = other1
+  then
+    match self with
+    | walker.WalkerState.Ready => ok true
+    | walker.WalkerState.Crossing __self_0 =>
+      match other with
+      | walker.WalkerState.Ready => ok true
+      | walker.WalkerState.Crossing __arg1_0 =>
+        walker.Crossing.Insts.CoreCmpPartialEqCrossing.eq __self_0 __arg1_0
+      | walker.WalkerState.Parked => ok true
+      | walker.WalkerState.Hidden => ok true
+      | walker.WalkerState.Terminated => ok true
+    | walker.WalkerState.Parked => ok true
+    | walker.WalkerState.Hidden => ok true
+    | walker.WalkerState.Terminated => ok true
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::WalkerState> for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:29-147:38 -/
+@[reducible]
+impl_def walker.WalkerState.Insts.CoreCmpPartialEqWalkerState :
+  core.cmp.PartialEq walker.WalkerState walker.WalkerState := {
+  eq := walker.WalkerState.Insts.CoreCmpPartialEqWalkerState.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.WalkerState.Insts.CoreCmpPartialEqWalkerState
+}
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_crossing]:
+    Source: 'src/scene.rs', lines 1305:4-1346:5
+    Visibility: public -/
+def scene.Scene.begin_crossing
+  (self : scene.Scene) (stamp : walker.Stamp) (walker_index : Std.Usize)
+  (target : Std.Usize) (duration : Std.U32) :
+  Result ((core.result.Result walker.Reservation topology.Error) ×
+    scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let s := alloc.vec.Vec.deref self.walkers
+    let o ←
+      core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice
+        walker.Walker) s walker_index
+    let r1 ← core.option.Option.ok_or o topology.Error.InvalidIndex
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      let b ←
+        core.cmp.PartialEq.ne.trait_default
+          walker.WalkerState.Insts.CoreCmpPartialEqWalkerState val1.state
+          walker.WalkerState.Ready
+      if b
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        if duration = 0#u32
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          let r2 ← scene.Scene.admission self val1.cell
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let r3 ← scene.Scene.admission self target
+            let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+            match cf3 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let edge ← topology.Edge.new val1.cell target
+              let b1 ← spanning_tree.Tree.has_edge self.tree edge
+              if b1
+              then
+                let s1 := alloc.vec.Vec.deref self.phases
+                let s2 := alloc.vec.Vec.deref self.phases
+                let r4 ← scene.Layout.doorway self.layout edge s1 s2
+                let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                match cf4 with
+                | core.ops.control_flow.ControlFlow.Continue val2 =>
+                  let s3 := alloc.vec.Vec.deref self.holds
+                  let r5 ← scene.check_hold_capacity val2.holds s3
+                  let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+                  match cf5 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    let path ←
+                      scene.oriented_path val2.path (val1.cell = edge.u)
+                    let lp ← scene.Layout.local_pose self.layout target
+                    let (s4, deref_mut_back) ←
+                      lift (alloc.vec.Vec.deref_mut self.holds)
+                    let s5 ← scene.acquire_holds s4 val2.holds
+                    let (w, index_mut_back) ←
+                      alloc.vec.Vec.index_mut
+                        (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+                        self.walkers walker_index
+                    let v := deref_mut_back s5
+                    let v1 :=
+                      index_mut_back
+                        {
+                          w
+                            with
+                            state :=
+                              (walker.WalkerState.Crossing
+                                {
+                                  source := val1.cell,
+                                  target,
+                                  elapsed := 0#u32,
+                                  duration,
+                                  reservation :=
+                                    {
+                                      epoch := self.stamp.epoch,
+                                      walker := walker_index,
+                                      serial := val
+                                    },
+                                  corridor := val2.corridor,
+                                  path,
+                                  target_pose := lp,
+                                  holds := val2.holds
+                                })
+                        }
+                    ok (core.result.Result.Ok
+                      {
+                        epoch := self.stamp.epoch,
+                        walker := walker_index,
+                        serial := val
+                      },
+                      {
+                        self
+                          with
+                          holds := v,
+                          walkers := v1,
+                          stamp := { self.stamp with revision := val }
+                      })
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    let r6 ←
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        walker.Reservation (core.convert.FromSame
+                        topology.Error) residual
+                    ok (r6, self)
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r5 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      walker.Reservation (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r5, self)
+              else
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r4 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  walker.Reservation (core.convert.FromSame topology.Error)
+                  residual
+              ok (r4, self)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r3 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                walker.Reservation (core.convert.FromSame topology.Error)
+                residual
+            ok (r3, self)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          walker.Reservation (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Reservation (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]: loop body 0:
+    Source: 'src/scene.rs', lines 1542:8-1545:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.carve_loop.body
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.I32) × Std.Usize) (alloc.vec.Vec
+    Std.I32))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32) v i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        v1 i
+    let i3 ← i + 1#usize
+    let v2 := index_mut_back i2
+    ok (cont (v2, i3))
+  else ok (done v1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]: loop 0:
+    Source: 'src/scene.rs', lines 1542:8-1545:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.carve_loop
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize) :
+  Result (alloc.vec.Vec Std.I32)
+  := do
+  loop
+    (fun (v2, i1) => scene.Scene.carve_loop.body v v2 i1)
+    (v1, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::carve]:
+    Source: 'src/scene.rs', lines 1523:4-1552:5
+    Visibility: public -/
+def scene.Scene.carve
+  (self : scene.Scene) (stamp : walker.Stamp) (walker_index : Std.Usize)
+  (target : Std.Usize) (edit : scene.Edit) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue _ =>
+    let s := alloc.vec.Vec.deref self.walkers
+    let o ←
+      core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice
+        walker.Walker) s walker_index
+    let r1 ← core.option.Option.ok_or o topology.Error.InvalidIndex
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let b ←
+        core.cmp.PartialEq.ne.trait_default
+          walker.WalkerState.Insts.CoreCmpPartialEqWalkerState val.state
+          walker.WalkerState.Ready
+      if b
+      then ok (core.result.Result.Err topology.Error.Occupied, self)
+      else
+        let r2 ← scene.Scene.admission self val.cell
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue _ =>
+          let r3 ← scene.Scene.admission self target
+          let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+          match cf3 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            let edge ← topology.Edge.new val.cell target
+            let b1 ← spanning_tree.Tree.has_edge self.tree edge
+            if b1
+            then
+              ok (core.result.Result.Err topology.Error.InvalidTransition,
+                self)
+            else
+              let b2 ← scene.contains edit.add edge
+              if b2
+              then
+                let v ←
+                  scene.Scene.carve_loop self.phases self.next_phases 0#usize
+                let (r4, self1) ←
+                  scene.Scene.preflight_edit { self with next_phases := v }
+                    edit
+                let cf4 ← core.result.Result.Insts.CoreOpsTry.branch r4
+                match cf4 with
+                | core.ops.control_flow.ControlFlow.Continue _ =>
+                  let revision ← self1.stamp.revision + 1#u64
+                  let (r5, t, w) ←
+                    spanning_tree.Tree.edit_edges self1.tree
+                      self1.layout.carrier edit.remove edit.add self1.work
+                  let cf5 ← core.result.Result.Insts.CoreOpsTry.branch r5
+                  match cf5 with
+                  | core.ops.control_flow.ControlFlow.Continue _ =>
+                    let self2 ←
+                      scene.Scene.commit_edit
+                        { self1 with tree := t, work := w } edit revision
+                    ok (core.result.Result.Ok self2.stamp, self2)
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    let r6 ←
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        walker.Stamp (core.convert.FromSame topology.Error)
+                        residual
+                    ok (r6, { self1 with tree := t, work := w })
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r5 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      walker.Stamp (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r5, self1)
+              else
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r4 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                walker.Stamp (core.convert.FromSame topology.Error) residual
+            ok (r4, self)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r3 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              walker.Stamp (core.convert.FromSame topology.Error) residual
+          ok (r3, self)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          walker.Stamp (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 1:
+    Source: 'src/scene.rs', lines 1560:16-1569:17 -/
+@[rust_loop_body]
+def scene.Scene.drain_patches_loop0_loop0.body
+  (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
+  (p : Std.Usize) (crossing : Bool) (w : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i := alloc.vec.Vec.len v
+  if w < i
+  then
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v w
+    let crossing1 ←
+      match w1.state with
+      | walker.WalkerState.Ready => ok crossing
+      | walker.WalkerState.Crossing active =>
+        do
+        let p1 ←
+          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+            shatter.Patch) v1 p
+        let b ← shatter.Patch.contains p1 active.source
+        if b
+        then ok true
+        else
+          let b1 ← shatter.Patch.contains p1 active.target
+          if b1
+          then ok true
+          else ok crossing
+      | walker.WalkerState.Parked => ok crossing
+      | walker.WalkerState.Hidden => ok crossing
+      | walker.WalkerState.Terminated => ok crossing
+    let w2 ← w + 1#usize
+    ok (cont (crossing1, w2))
+  else ok (done crossing)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 1:
+    Source: 'src/scene.rs', lines 1560:16-1569:17 -/
+@[rust_loop]
+def scene.Scene.drain_patches_loop0_loop0
+  (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
+  (p : Std.Usize) (crossing : Bool) (w : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (crossing1, w1) => scene.Scene.drain_patches_loop0_loop0.body v v1 p
+      crossing1 w1)
+    (crossing, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 2:
+    Source: 'src/scene.rs', lines 1573:20-1578:21 -/
+@[rust_loop_body]
+def scene.Scene.drain_patches_loop0_loop1.body
+  (v : alloc.vec.Vec shatter.Patch) (p : Std.Usize)
+  (v1 : alloc.vec.Vec walker.Walker) (w : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec walker.Walker) × Std.Usize)
+    (alloc.vec.Vec walker.Walker))
+  := do
+  let i := alloc.vec.Vec.len v1
+  if w < i
+  then
+    let p1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        v p
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v1 w
+    let b ← shatter.Patch.contains p1 w1.cell
+    let v2 ←
+      if b
+      then
+        do
+        let (w2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v1 w
+        ok (index_mut_back { w2 with state := walker.WalkerState.Parked })
+      else ok v1
+    let w2 ← w + 1#usize
+    ok (cont (v2, w2))
+  else ok (done v1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 2:
+    Source: 'src/scene.rs', lines 1573:20-1578:21 -/
+@[rust_loop]
+def scene.Scene.drain_patches_loop0_loop1
+  (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
+  (p : Std.Usize) (w : Std.Usize) :
+  Result (alloc.vec.Vec walker.Walker)
+  := do
+  loop
+    (fun (v2, w1) => scene.Scene.drain_patches_loop0_loop1.body v1 p v2 w1)
+    (v, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop body 0:
+    Source: 'src/scene.rs', lines 1556:8-1582:9 -/
+@[rust_loop_body]
+def scene.Scene.drain_patches_loop0.body
+  (self : scene.Scene) (p : Std.Usize) :
+  Result (ControlFlow (scene.Scene × Std.Usize) (scene.Layout ×
+    spanning_tree.Tree × spanning_tree.Workspace × (alloc.vec.Vec
+    scene.Route) × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker) × (alloc.vec.Vec shatter.Patch) × walker.Stamp × Std.U64
+    × Std.U64 × Bool × Bool × Bool × Std.U64 × (Option Std.U64) ×
+    Std.U64))
+  := do
+  let i := alloc.vec.Vec.len self.patches
+  if p < i
+  then
+    let p1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        self.patches p
+    let b ←
+      shatter.Stage.Insts.CoreCmpPartialEqStage.eq p1.stage
+        shatter.Stage.Draining
+    if b
+    then
+      let crossing ←
+        scene.Scene.drain_patches_loop0_loop0 self.walkers self.patches p false
+          0#usize
+      if crossing
+      then let p2 ← p + 1#usize
+           ok (cont (self, p2))
+      else
+        let (p2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            shatter.Patch) self.patches p
+        let v := index_mut_back { p2 with stage := shatter.Stage.Parked }
+        let v1 ←
+          scene.Scene.drain_patches_loop0_loop1 self.walkers v p 0#usize
+        let p3 ← p + 1#usize
+        ok (cont ({ self with walkers := v1, patches := v }, p3))
+    else let p2 ← p + 1#usize
+         ok (cont (self, p2))
+  else
+    ok (done (self.layout, self.tree, self.work, self.routes, self.required,
+      self.phases, self.next_phases, self.holds, self.walkers, self.patches,
+      self.stamp, self.clock, self.wall, self.reanchor, self.suspended,
+      self.inactive, self.latest_request, self.pending, self.trail_revision))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]: loop 0:
+    Source: 'src/scene.rs', lines 1556:8-1582:9 -/
+@[rust_loop]
+def scene.Scene.drain_patches_loop0
+  (self : scene.Scene) (p : Std.Usize) :
+  Result (scene.Layout × spanning_tree.Tree × spanning_tree.Workspace ×
+    (alloc.vec.Vec scene.Route) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec walker.Walker) × (alloc.vec.Vec
+    shatter.Patch) × walker.Stamp × Std.U64 × Std.U64 × Bool × Bool ×
+    Bool × Std.U64 × (Option Std.U64) × Std.U64)
+  := do
+  loop
+    (fun (self1, p1) => scene.Scene.drain_patches_loop0.body self1 p1)
+    (self, p)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::drain_patches]:
+    Source: 'src/scene.rs', lines 1554:4-1583:5 -/
+def scene.Scene.drain_patches (self : scene.Scene) : Result scene.Scene := do
+  let (l, t, w, v, v1, v2, v3, v4, v5, v6, s, i, i1, b, b1, b2, i2, o, i3) ←
+    scene.Scene.drain_patches_loop0 self 0#usize
+  ok
+    {
+      layout := l,
+      tree := t,
+      work := w,
+      routes := v,
+      required := v1,
+      phases := v2,
+      next_phases := v3,
+      holds := v4,
+      walkers := v5,
+      patches := v6,
+      stamp := s,
+      clock := i,
+      wall := i1,
+      reanchor := b,
+      suspended := b1,
+      inactive := b2,
+      latest_request := i2,
+      pending := o,
+      trail_revision := i3
+    }
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 1:
+    Source: 'src/scene.rs', lines 1613:20-1616:21
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.tick_loop0_loop0.body
+  (h : walker.Holds) (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) (alloc.vec.Vec
+    Std.Usize))
+  := do
+  if i < h.count
+  then
+    let i1 ← Array.index_usize h.ids i
+    let (i2, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        v i1
+    let i3 ← i2 - 1#usize
+    let i4 ← i + 1#usize
+    let v1 := index_mut_back i3
+    ok (cont (v1, i4))
+  else ok (done v)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 1:
+    Source: 'src/scene.rs', lines 1613:20-1616:21
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.tick_loop0_loop0
+  (v : alloc.vec.Vec Std.Usize) (h : walker.Holds) (i : Std.Usize) :
+  Result (alloc.vec.Vec Std.Usize)
+  := do
+  loop
+    (fun (v1, i1) => scene.Scene.tick_loop0_loop0.body h v1 i1)
+    (v, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 0:
+    Source: 'src/scene.rs', lines 1605:8-1623:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.tick_loop0.body
+  (delta : Std.U64) (v : alloc.vec.Vec Std.Usize)
+  (v1 : alloc.vec.Vec walker.Walker) (w : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker) × Std.Usize) ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker)))
+  := do
+  let i := alloc.vec.Vec.len v1
+  if w < i
+  then
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v1 w
+    match w1.state with
+    | walker.WalkerState.Ready => let w2 ← w + 1#usize
+                                  ok (cont (v, v1, w2))
+    | walker.WalkerState.Crossing crossing =>
+      let i1 ← crossing.duration - crossing.elapsed
+      let remaining ← lift (core.convert.num.FromU64U32.from i1)
+      if delta >= remaining
+      then
+        let (w2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v1 w
+        let v2 := index_mut_back { w2 with cell := crossing.target }
+        let (w3, index_mut_back1) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v2 w
+        let v3 := index_mut_back1 { w3 with «local» := crossing.target_pose }
+        let (w4, index_mut_back2) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v3 w
+        let v4 := index_mut_back2 { w4 with state := walker.WalkerState.Ready }
+        let v5 ← scene.Scene.tick_loop0_loop0 v crossing.holds 0#usize
+        let w5 ← w + 1#usize
+        ok (cont (v5, v4, w5))
+      else
+        let i2 ← lift (UScalar.cast .U32 delta)
+        let i3 ← crossing.elapsed + i2
+        let (w2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v1 w
+        let w3 ← w + 1#usize
+        let v2 :=
+          index_mut_back
+            {
+              w2
+                with
+                state :=
+                  (walker.WalkerState.Crossing { crossing with elapsed := i3 })
+            }
+        ok (cont (v, v2, w3))
+    | walker.WalkerState.Parked => let w2 ← w + 1#usize
+                                   ok (cont (v, v1, w2))
+    | walker.WalkerState.Hidden => let w2 ← w + 1#usize
+                                   ok (cont (v, v1, w2))
+    | walker.WalkerState.Terminated =>
+      let w2 ← w + 1#usize
+      ok (cont (v, v1, w2))
+  else ok (done (v, v1))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 0:
+    Source: 'src/scene.rs', lines 1605:8-1623:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.tick_loop0
+  (v : alloc.vec.Vec Std.Usize) (v1 : alloc.vec.Vec walker.Walker)
+  (delta : Std.U64) (w : Std.Usize) :
+  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec walker.Walker))
+  := do
+  loop
+    (fun (v2, v3, w1) => scene.Scene.tick_loop0.body delta v2 v3 w1)
+    (v, v1, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 3:
+    Source: 'src/scene.rs', lines 1632:20-1637:21
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.tick_loop1_loop0.body
+  (v : alloc.vec.Vec shatter.Patch) (p : Std.Usize)
+  (v1 : alloc.vec.Vec walker.Walker) (w : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec walker.Walker) × Std.Usize)
+    (alloc.vec.Vec walker.Walker))
+  := do
+  let i := alloc.vec.Vec.len v1
+  if w < i
+  then
+    let p1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        v p
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v1 w
+    let b ← shatter.Patch.contains p1 w1.cell
+    let v2 ←
+      if b
+      then
+        do
+        let (w2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v1 w
+        ok (index_mut_back { w2 with state := walker.WalkerState.Ready })
+      else ok v1
+    let w2 ← w + 1#usize
+    ok (cont (v2, w2))
+  else ok (done v1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 3:
+    Source: 'src/scene.rs', lines 1632:20-1637:21
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.tick_loop1_loop0
+  (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
+  (p : Std.Usize) (w : Std.Usize) :
+  Result (alloc.vec.Vec walker.Walker)
+  := do
+  loop
+    (fun (v2, w1) => scene.Scene.tick_loop1_loop0.body v1 p v2 w1)
+    (v, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop body 2:
+    Source: 'src/scene.rs', lines 1628:8-1642:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.tick_loop1.body
+  (clock : Std.U64) (self : scene.Scene) (p : Std.Usize) :
+  Result (ControlFlow (scene.Scene × Std.Usize) (scene.Layout ×
+    spanning_tree.Tree × spanning_tree.Workspace × (alloc.vec.Vec
+    scene.Route) × (alloc.vec.Vec topology.Edge) × (alloc.vec.Vec Std.I32) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
+    walker.Walker) × (alloc.vec.Vec shatter.Patch) × walker.Stamp × Std.U64
+    × Std.U64 × Bool × Bool × Bool × Std.U64 × (Option Std.U64) ×
+    Std.U64))
+  := do
+  let i := alloc.vec.Vec.len self.patches
+  if p < i
+  then
+    let p1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        self.patches p
+    match p1.stage with
+    | shatter.Stage.Idle => let p2 ← p + 1#usize
+                            ok (cont (self, p2))
+    | shatter.Stage.Draining => let p2 ← p + 1#usize
+                                ok (cont (self, p2))
+    | shatter.Stage.Parked => let p2 ← p + 1#usize
+                              ok (cont (self, p2))
+    | shatter.Stage.Hidden => let p2 ← p + 1#usize
+                              ok (cont (self, p2))
+    | shatter.Stage.Scattered _ => let p2 ← p + 1#usize
+                                   ok (cont (self, p2))
+    | shatter.Stage.Reforming «until» =>
+      if clock >= «until»
+      then
+        let v ←
+          scene.Scene.tick_loop1_loop0 self.walkers self.patches p 0#usize
+        let (p2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            shatter.Patch) self.patches p
+        let p3 ← p + 1#usize
+        let v1 := index_mut_back { p2 with stage := shatter.Stage.Idle }
+        ok (cont ({ self with walkers := v, patches := v1 }, p3))
+      else let p2 ← p + 1#usize
+           ok (cont (self, p2))
+  else
+    ok (done (self.layout, self.tree, self.work, self.routes, self.required,
+      self.phases, self.next_phases, self.holds, self.walkers, self.patches,
+      self.stamp, self.clock, self.wall, self.reanchor, self.suspended,
+      self.inactive, self.latest_request, self.pending, self.trail_revision))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]: loop 2:
+    Source: 'src/scene.rs', lines 1628:8-1642:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.tick_loop1
+  (self : scene.Scene) (clock : Std.U64) (p : Std.Usize) :
+  Result (scene.Layout × spanning_tree.Tree × spanning_tree.Workspace ×
+    (alloc.vec.Vec scene.Route) × (alloc.vec.Vec topology.Edge) ×
+    (alloc.vec.Vec Std.I32) × (alloc.vec.Vec Std.I32) × (alloc.vec.Vec
+    Std.Usize) × (alloc.vec.Vec walker.Walker) × (alloc.vec.Vec
+    shatter.Patch) × walker.Stamp × Std.U64 × Std.U64 × Bool × Bool ×
+    Bool × Std.U64 × (Option Std.U64) × Std.U64)
+  := do
+  loop
+    (fun (self1, p1) => scene.Scene.tick_loop1.body clock self1 p1)
+    (self, p)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::tick]:
+    Source: 'src/scene.rs', lines 1586:4-1645:5
+    Visibility: public -/
+def scene.Scene.tick
+  (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    if wall < self.wall
+    then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+    else
+      if self.suspended
+      then
+        ok (core.result.Result.Ok { self.stamp with revision := val },
+          { self with stamp := { self.stamp with revision := val }, wall })
+      else
+        if self.inactive
+        then
+          ok (core.result.Result.Ok { self.stamp with revision := val },
+            { self with stamp := { self.stamp with revision := val }, wall })
+        else
+          let b := core.option.Option.is_some self.pending
+          if b
+          then
+            ok (core.result.Result.Ok { self.stamp with revision := val },
+              { self with stamp := { self.stamp with revision := val }, wall })
+          else
+            if self.reanchor
+            then
+              ok (core.result.Result.Ok { self.stamp with revision := val },
+                {
+                  self
+                    with
+                    stamp := { self.stamp with revision := val },
+                    wall,
+                    reanchor := false
+                })
+            else
+              let delta ← wall - self.wall
+              let o ← lift (U64.checked_add self.clock delta)
+              let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+              let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+              match cf1 with
+              | core.ops.control_flow.ControlFlow.Continue val1 =>
+                let (v, v1) ←
+                  scene.Scene.tick_loop0 self.holds self.walkers delta 0#usize
+                let self1 ←
+                  scene.Scene.drain_patches
+                    { self with holds := v, walkers := v1, clock := val1, wall
+                    }
+                let (l, t, w, v2, v3, v4, v5, v6, v7, v8, s, i, i1, b1, b2, b3,
+                  i2, o1, i3) ←
+                  scene.Scene.tick_loop1 self1 val1 0#usize
+                ok (core.result.Result.Ok { s with revision := val },
+                  {
+                    layout := l,
+                    tree := t,
+                    work := w,
+                    routes := v2,
+                    required := v3,
+                    phases := v4,
+                    next_phases := v5,
+                    holds := v6,
+                    walkers := v7,
+                    patches := v8,
+                    stamp := { s with revision := val },
+                    clock := i,
+                    wall := i1,
+                    reanchor := b1,
+                    suspended := b2,
+                    inactive := b3,
+                    latest_request := i2,
+                    pending := o1,
+                    trail_revision := i3
+                  })
+              | core.ops.control_flow.ControlFlow.Break residual =>
+                let r2 ←
+                  core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                    walker.Stamp (core.convert.FromSame topology.Error)
+                    residual
+                ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::suspend]:
+    Source: 'src/scene.rs', lines 1647:4-1656:5
+    Visibility: public -/
+def scene.Scene.suspend
+  (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    if wall < self.wall
+    then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+    else
+      ok (core.result.Result.Ok { self.stamp with revision := val },
+        {
+          self
+            with
+            stamp := { self.stamp with revision := val },
+            wall,
+            suspended := true
+        })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::resume]:
+    Source: 'src/scene.rs', lines 1658:4-1668:5
+    Visibility: public -/
+def scene.Scene.resume
+  (self : scene.Scene) (stamp : walker.Stamp) (wall : Std.U64) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    if wall < self.wall
+    then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+    else
+      let b := core.option.Option.is_some self.pending
+      if b
+      then
+        ok (core.result.Result.Ok { self.stamp with revision := val },
+          {
+            self
+              with
+              stamp := { self.stamp with revision := val },
+              wall,
+              reanchor := true,
+              suspended := false
+          })
+      else
+        ok (core.result.Result.Ok { self.stamp with revision := val },
+          {
+            self
+              with
+              stamp := { self.stamp with revision := val },
+              wall,
+              reanchor := self.inactive,
+              suspended := false
+          })
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 1:
+    Source: 'src/scene.rs', lines 1683:12-1688:13
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.begin_shatter_loop0_loop0.body
+  (cells : Slice Std.Usize) (i : Std.Usize)
+  (status : core.result.Result Unit topology.Error) (j : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  if j < i
+  then
+    let b ← core.result.Result.is_ok status
+    if b
+    then
+      let i1 ← Slice.index_usize cells j
+      let i2 ← Slice.index_usize cells i
+      let status1 ←
+        if i1 = i2
+        then ok (core.result.Result.Err topology.Error.InvalidIndex)
+        else ok status
+      let j1 ← j + 1#usize
+      ok (cont (status1, j1))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 1:
+    Source: 'src/scene.rs', lines 1683:12-1688:13
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.begin_shatter_loop0_loop0
+  (cells : Slice Std.Usize) (status : core.result.Result Unit topology.Error)
+  (i : Std.Usize) (j : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, j1) => scene.Scene.begin_shatter_loop0_loop0.body cells i
+      status1 j1)
+    (status, j)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 0:
+    Source: 'src/scene.rs', lines 1680:8-1690:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.begin_shatter_loop0.body
+  (l : scene.Layout) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec topology.Edge)
+  (v2 : alloc.vec.Vec Std.I32) (v3 : alloc.vec.Vec Std.I32)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec walker.Walker)
+  (v6 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i : Std.U64)
+  (i1 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i2 : Std.U64)
+  (o : Option Std.U64) (i3 : Std.U64) (cells : Slice Std.Usize)
+  (status : core.result.Result Unit topology.Error) (i4 : Std.Usize) :
+  Result (ControlFlow ((core.result.Result Unit topology.Error) × Std.Usize)
+    (core.result.Result Unit topology.Error))
+  := do
+  let i5 := Slice.len cells
+  if i4 < i5
+  then
+    let b3 ← core.result.Result.is_ok status
+    if b3
+    then
+      let i6 ← Slice.index_usize cells i4
+      let status1 ←
+        scene.Scene.admission
+          {
+            layout := l,
+            tree := t,
+            work := w,
+            routes := v,
+            required := v1,
+            phases := v2,
+            next_phases := v3,
+            holds := v4,
+            walkers := v5,
+            patches := v6,
+            stamp := s,
+            clock := i,
+            wall := i1,
+            reanchor := b,
+            suspended := b1,
+            inactive := b2,
+            latest_request := i2,
+            pending := o,
+            trail_revision := i3
+          } i6
+      let status2 ←
+        scene.Scene.begin_shatter_loop0_loop0 cells status1 i4 0#usize
+      let i7 ← i4 + 1#usize
+      ok (cont (status2, i7))
+    else ok (done status)
+  else ok (done status)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 0:
+    Source: 'src/scene.rs', lines 1680:8-1690:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.begin_shatter_loop0
+  (l : scene.Layout) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec topology.Edge)
+  (v2 : alloc.vec.Vec Std.I32) (v3 : alloc.vec.Vec Std.I32)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec walker.Walker)
+  (v6 : alloc.vec.Vec shatter.Patch) (s : walker.Stamp) (i : Std.U64)
+  (i1 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool) (i2 : Std.U64)
+  (o : Option Std.U64) (i3 : Std.U64) (cells : Slice Std.Usize)
+  (status : core.result.Result Unit topology.Error) (i4 : Std.Usize) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  loop
+    (fun (status1, i5) => scene.Scene.begin_shatter_loop0.body l t w v v1 v2 v3
+      v4 v5 v6 s i i1 b b1 b2 i2 o i3 cells status1 i5)
+    (status, i4)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 2:
+    Source: 'src/scene.rs', lines 1693:8-1695:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.begin_shatter_loop1.body
+  (v : alloc.vec.Vec shatter.Patch) (slot : Std.Usize) :
+  Result (ControlFlow Std.Usize Std.Usize)
+  := do
+  let i := alloc.vec.Vec.len v
+  if slot < i
+  then
+    let p ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        v slot
+    let b ←
+      core.cmp.PartialEq.ne.trait_default
+        shatter.Stage.Insts.CoreCmpPartialEqStage p.stage shatter.Stage.Idle
+    if b
+    then let slot1 ← slot + 1#usize
+         ok (cont slot1)
+    else ok (done slot)
+  else ok (done slot)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 2:
+    Source: 'src/scene.rs', lines 1693:8-1695:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.begin_shatter_loop1
+  (v : alloc.vec.Vec shatter.Patch) (slot : Std.Usize) : Result Std.Usize := do
+  loop
+    (fun slot1 => scene.Scene.begin_shatter_loop1.body v slot1)
+    slot
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop body 3:
+    Source: 'src/scene.rs', lines 1701:8-1704:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.begin_shatter_loop2.body
+  (cells : Slice Std.Usize) (slot : Std.Usize)
+  (v : alloc.vec.Vec shatter.Patch) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec shatter.Patch) × Std.Usize)
+    (alloc.vec.Vec shatter.Patch))
+  := do
+  let i1 := Slice.len cells
+  if i < i1
+  then
+    let (p, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        shatter.Patch) v slot
+    let i2 ← Slice.index_usize cells i
+    let (_, index_mut_back1) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Bool)
+        p.cells i2
+    let i3 ← i + 1#usize
+    let v1 := index_mut_back1 true
+    let v2 := index_mut_back { p with cells := v1 }
+    ok (cont (v2, i3))
+  else ok (done v)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]: loop 3:
+    Source: 'src/scene.rs', lines 1701:8-1704:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.begin_shatter_loop2
+  (v : alloc.vec.Vec shatter.Patch) (cells : Slice Std.Usize)
+  (slot : Std.Usize) (i : Std.Usize) :
+  Result (alloc.vec.Vec shatter.Patch)
+  := do
+  loop
+    (fun (v1, i1) => scene.Scene.begin_shatter_loop2.body cells slot v1 i1)
+    (v, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::begin_shatter]:
+    Source: 'src/scene.rs', lines 1670:4-1715:5
+    Visibility: public -/
+def scene.Scene.begin_shatter
+  (self : scene.Scene) (stamp : walker.Stamp) (cells : Slice Std.Usize) :
+  Result ((core.result.Result shatter.PatchId topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let b ← core.slice.Slice.is_empty cells
+    if b
+    then ok (core.result.Result.Err topology.Error.InvalidSize, self)
+    else
+      if self.suspended
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        if self.inactive
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          let b1 := core.option.Option.is_some self.pending
+          if b1
+          then
+            ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+          else
+            let status ←
+              scene.Scene.begin_shatter_loop0 self.layout self.tree self.work
+                self.routes self.required self.phases self.next_phases
+                self.holds self.walkers self.patches self.stamp self.clock
+                self.wall self.reanchor self.suspended self.inactive
+                self.latest_request self.pending self.trail_revision cells
+                (core.result.Result.Ok ()) 0#usize
+            let cf1 ← core.result.Result.Insts.CoreOpsTry.branch status
+            match cf1 with
+            | core.ops.control_flow.ControlFlow.Continue _ =>
+              let slot ← scene.Scene.begin_shatter_loop1 self.patches 0#usize
+              let i := alloc.vec.Vec.len self.patches
+              if slot = i
+              then
+                ok (core.result.Result.Err
+                  topology.Error.InsufficientWorkspace, self)
+              else
+                let (p, index_mut_back) ←
+                  alloc.vec.Vec.index_mut
+                    (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+                    self.patches slot
+                let (s, deref_mut_back) ←
+                  lift (alloc.vec.Vec.deref_mut p.cells)
+                let s1 ← core.slice.Slice.fill core.clone.CloneBool s false
+                let v := deref_mut_back s1
+                let v1 := index_mut_back { p with cells := v }
+                let v2 ←
+                  scene.Scene.begin_shatter_loop2 v1 cells slot 0#usize
+                let (p1, index_mut_back1) ←
+                  alloc.vec.Vec.index_mut
+                    (core.slice.index.SliceIndexUsizeSlice shatter.Patch) v2
+                    slot
+                let v3 := index_mut_back1 { p1 with serial := val }
+                let (p2, index_mut_back2) ←
+                  alloc.vec.Vec.index_mut
+                    (core.slice.index.SliceIndexUsizeSlice shatter.Patch) v3
+                    slot
+                let v4 :=
+                  index_mut_back2 { p2 with stage := shatter.Stage.Draining }
+                let self1 ←
+                  scene.Scene.drain_patches { self with patches := v4 }
+                ok (core.result.Result.Ok
+                  { epoch := self1.stamp.epoch, slot, serial := val },
+                  {
+                    self1
+                      with
+                      stamp := { self1.stamp with revision := val },
+                      trail_revision := val
+                  })
+            | core.ops.control_flow.ControlFlow.Break residual =>
+              let r1 ←
+                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                  shatter.PatchId (core.convert.FromSame topology.Error)
+                  residual
+              ok (r1, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        shatter.PatchId (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::shatter::{labyrinth_core::shatter::Patch}::validate]:
+    Source: 'src/shatter.rs', lines 46:4-51:5 -/
+def shatter.Patch.validate
+  (self : shatter.Patch) (id : shatter.PatchId) :
+  Result (core.result.Result Unit topology.Error)
+  := do
+  let b ←
+    shatter.Stage.Insts.CoreCmpPartialEqStage.eq self.stage shatter.Stage.Idle
+  if b
+  then ok (core.result.Result.Err topology.Error.InvalidTransition)
+  else
+    if self.serial != id.serial
+    then ok (core.result.Result.Err topology.Error.InvalidTransition)
+    else ok (core.result.Result.Ok ())
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::patch_slot]:
+    Source: 'src/scene.rs', lines 1717:4-1724:5 -/
+def scene.Scene.patch_slot
+  (self : scene.Scene) (id : shatter.PatchId) :
+  Result (core.result.Result Std.Usize topology.Error)
+  := do
+  if id.epoch != self.stamp.epoch
+  then ok (core.result.Result.Err topology.Error.StaleEpoch)
+  else
+    let s := alloc.vec.Vec.deref self.patches
+    let o ←
+      core.slice.Slice.get (core.slice.index.SliceIndexUsizeSlice
+        shatter.Patch) s id.slot
+    let r ← core.option.Option.ok_or o topology.Error.InvalidIndex
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let r1 ← shatter.Patch.validate val id
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        ok (core.result.Result.Ok id.slot)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Std.Usize (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Std.Usize (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::patch_stage]:
+    Source: 'src/scene.rs', lines 1726:4-1728:5
+    Visibility: public -/
+def scene.Scene.patch_stage
+  (self : scene.Scene) (id : shatter.PatchId) :
+  Result (core.result.Result shatter.Stage topology.Error)
+  := do
+  let r ← scene.Scene.patch_slot self id
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let p ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        self.patches val
+    ok (core.result.Result.Ok p.stage)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+      shatter.Stage (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]: loop body 0:
+    Source: 'src/scene.rs', lines 1740:8-1745:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.hide_patch_loop.body
+  (v : alloc.vec.Vec shatter.Patch) (slot : Std.Usize)
+  (v1 : alloc.vec.Vec walker.Walker) (w : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec walker.Walker) × Std.Usize)
+    (alloc.vec.Vec walker.Walker))
+  := do
+  let i := alloc.vec.Vec.len v1
+  if w < i
+  then
+    let p ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+        v slot
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v1 w
+    let b ← shatter.Patch.contains p w1.cell
+    let v2 ←
+      if b
+      then
+        do
+        let (w2, index_mut_back) ←
+          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+            walker.Walker) v1 w
+        ok (index_mut_back { w2 with state := walker.WalkerState.Hidden })
+      else ok v1
+    let w2 ← w + 1#usize
+    ok (cont (v2, w2))
+  else ok (done v1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]: loop 0:
+    Source: 'src/scene.rs', lines 1740:8-1745:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.hide_patch_loop
+  (v : alloc.vec.Vec walker.Walker) (v1 : alloc.vec.Vec shatter.Patch)
+  (slot : Std.Usize) (w : Std.Usize) :
+  Result (alloc.vec.Vec walker.Walker)
+  := do
+  loop
+    (fun (v2, w1) => scene.Scene.hide_patch_loop.body v1 slot v2 w1)
+    (v, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::hide_patch]:
+    Source: 'src/scene.rs', lines 1730:4-1749:5
+    Visibility: public -/
+def scene.Scene.hide_patch
+  (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let r1 ← scene.Scene.patch_slot self id
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      if self.suspended
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        let b := core.option.Option.is_some self.pending
+        if b
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          if self.inactive
+          then
+            ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+          else
+            let p ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                shatter.Patch) self.patches val1
+            let b1 ←
+              core.cmp.PartialEq.ne.trait_default
+                shatter.Stage.Insts.CoreCmpPartialEqStage p.stage
+                shatter.Stage.Parked
+            if b1
+            then ok (core.result.Result.Err topology.Error.Occupied, self)
+            else
+              let v ←
+                scene.Scene.hide_patch_loop self.walkers self.patches val1
+                  0#usize
+              let (p1, index_mut_back) ←
+                alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+                  shatter.Patch) self.patches val1
+              let v1 :=
+                index_mut_back { p1 with stage := shatter.Stage.Hidden }
+              ok (core.result.Result.Ok { self.stamp with revision := val },
+                {
+                  self
+                    with
+                    walkers := v,
+                    patches := v1,
+                    stamp := { self.stamp with revision := val }
+                })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          walker.Stamp (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::scatter_patch]:
+    Source: 'src/scene.rs', lines 1751:4-1771:5
+    Visibility: public -/
+def scene.Scene.scatter_patch
+  (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId)
+  (duration : Std.U64) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let r1 ← scene.Scene.patch_slot self id
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      if self.suspended
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        let b := core.option.Option.is_some self.pending
+        if b
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          if self.inactive
+          then
+            ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+          else
+            let p ←
+              alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                shatter.Patch) self.patches val1
+            let b1 ←
+              core.cmp.PartialEq.ne.trait_default
+                shatter.Stage.Insts.CoreCmpPartialEqStage p.stage
+                shatter.Stage.Hidden
+            if b1
+            then
+              ok (core.result.Result.Err topology.Error.InvalidTransition,
+                self)
+            else
+              if duration = 0#u64
+              then
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+              else
+                let o ← lift (U64.checked_add self.clock duration)
+                let r2 ← core.option.Option.ok_or o topology.Error.Overflow
+                let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+                match cf2 with
+                | core.ops.control_flow.ControlFlow.Continue val2 =>
+                  let (p1, index_mut_back) ←
+                    alloc.vec.Vec.index_mut
+                      (core.slice.index.SliceIndexUsizeSlice shatter.Patch)
+                      self.patches val1
+                  let v :=
+                    index_mut_back
+                      { p1 with stage := (shatter.Stage.Scattered val2) }
+                  ok (core.result.Result.Ok
+                    { self.stamp with revision := val },
+                    {
+                      self
+                        with
+                        patches := v,
+                        stamp := { self.stamp with revision := val }
+                    })
+                | core.ops.control_flow.ControlFlow.Break residual =>
+                  let r3 ←
+                    core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                      walker.Stamp (core.convert.FromSame topology.Error)
+                      residual
+                  ok (r3, self)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          walker.Stamp (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 0:
+    Source: 'src/scene.rs', lines 1793:8-1797:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.reform_patch_loop0.body
+  (v : alloc.vec.Vec shatter.Patch) (s : Slice topology.Edge)
+  (slot : Std.Usize) (outside : Bool) (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := Slice.len s
+  if i < i1
+  then
+    if outside
+    then ok (done outside)
+    else
+      let edge ← Slice.index_usize s i
+      let p ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          shatter.Patch) v slot
+      let b ← shatter.Patch.contains p edge.u
+      let outside1 ←
+        if b
+        then do
+             let b1 ← shatter.Patch.contains p edge.v
+             ok (¬ b1)
+        else ok true
+      let i2 ← i + 1#usize
+      ok (cont (outside1, i2))
+  else ok (done outside)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 0:
+    Source: 'src/scene.rs', lines 1793:8-1797:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.reform_patch_loop0
+  (v : alloc.vec.Vec shatter.Patch) (s : Slice topology.Edge)
+  (slot : Std.Usize) (outside : Bool) (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (outside1, i1) => scene.Scene.reform_patch_loop0.body v s slot
+      outside1 i1)
+    (outside, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 1:
+    Source: 'src/scene.rs', lines 1799:8-1803:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.reform_patch_loop1.body
+  (v : alloc.vec.Vec shatter.Patch) (s : Slice topology.Edge)
+  (slot : Std.Usize) (outside : Bool) (i : Std.Usize) :
+  Result (ControlFlow (Bool × Std.Usize) Bool)
+  := do
+  let i1 := Slice.len s
+  if i < i1
+  then
+    if outside
+    then ok (done outside)
+    else
+      let edge ← Slice.index_usize s i
+      let p ←
+        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+          shatter.Patch) v slot
+      let b ← shatter.Patch.contains p edge.u
+      let outside1 ←
+        if b
+        then do
+             let b1 ← shatter.Patch.contains p edge.v
+             ok (¬ b1)
+        else ok true
+      let i2 ← i + 1#usize
+      ok (cont (outside1, i2))
+  else ok (done outside)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 1:
+    Source: 'src/scene.rs', lines 1799:8-1803:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.reform_patch_loop1
+  (v : alloc.vec.Vec shatter.Patch) (s : Slice topology.Edge)
+  (slot : Std.Usize) (outside : Bool) (i : Std.Usize) :
+  Result Bool
+  := do
+  loop
+    (fun (outside1, i1) => scene.Scene.reform_patch_loop1.body v s slot
+      outside1 i1)
+    (outside, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop body 2:
+    Source: 'src/scene.rs', lines 1808:8-1811:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.reform_patch_loop2.body
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.I32) × Std.Usize) (alloc.vec.Vec
+    Std.I32))
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.I32) v i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.I32)
+        v1 i
+    let i3 ← i + 1#usize
+    let v2 := index_mut_back i2
+    ok (cont (v2, i3))
+  else ok (done v1)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]: loop 2:
+    Source: 'src/scene.rs', lines 1808:8-1811:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.reform_patch_loop2
+  (v : alloc.vec.Vec Std.I32) (v1 : alloc.vec.Vec Std.I32) (i : Std.Usize) :
+  Result (alloc.vec.Vec Std.I32)
+  := do
+  loop
+    (fun (v2, i1) => scene.Scene.reform_patch_loop2.body v v2 i1)
+    (v1, i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reform_patch]:
+    Source: 'src/scene.rs', lines 1774:4-1821:5
+    Visibility: public -/
+def scene.Scene.reform_patch
+  (self : scene.Scene) (stamp : walker.Stamp) (id : shatter.PatchId)
+  (duration : Std.U64) (edit : scene.Edit) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let r1 ← scene.Scene.patch_slot self id
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      if self.suspended
+      then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+      else
+        let b := core.option.Option.is_some self.pending
+        if b
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          if self.inactive
+          then
+            ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+          else
+            if duration = 0#u64
+            then
+              ok (core.result.Result.Err topology.Error.InvalidTransition,
+                self)
+            else
+              let p ←
+                alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
+                  shatter.Patch) self.patches val1
+              match p.stage with
+              | shatter.Stage.Idle =>
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+              | shatter.Stage.Draining =>
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+              | shatter.Stage.Parked =>
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+              | shatter.Stage.Hidden =>
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+              | shatter.Stage.Scattered «until» =>
+                if self.clock >= «until»
+                then
+                  let o ← lift (U64.checked_add self.clock duration)
+                  let r2 ← core.option.Option.ok_or o topology.Error.Overflow
+                  let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+                  match cf2 with
+                  | core.ops.control_flow.ControlFlow.Continue val2 =>
+                    let outside ←
+                      scene.Scene.reform_patch_loop0 self.patches edit.remove
+                        val1 false 0#usize
+                    let outside1 ←
+                      scene.Scene.reform_patch_loop1 self.patches edit.add val1
+                        outside 0#usize
+                    if outside1
+                    then
+                      ok (core.result.Result.Err
+                        topology.Error.InvalidTransition, self)
+                    else
+                      let v ←
+                        scene.Scene.reform_patch_loop2 self.phases
+                          self.next_phases 0#usize
+                      let (r3, self1) ←
+                        scene.Scene.preflight_edit
+                          { self with next_phases := v } edit
+                      let cf3 ← core.result.Result.Insts.CoreOpsTry.branch r3
+                      match cf3 with
+                      | core.ops.control_flow.ControlFlow.Continue _ =>
+                        let b1 ← core.slice.Slice.is_empty edit.remove
+                        if b1
+                        then
+                          let self2 ← scene.Scene.commit_edit self1 edit val
+                          let (p1, index_mut_back) ←
+                            alloc.vec.Vec.index_mut
+                              (core.slice.index.SliceIndexUsizeSlice
+                              shatter.Patch) self2.patches val1
+                          let v1 :=
+                            index_mut_back
+                              { p1 with stage := (shatter.Stage.Reforming val2)
+                              }
+                          ok (core.result.Result.Ok self2.stamp,
+                            { self2 with patches := v1, trail_revision := val })
+                        else
+                          let (r4, t, w) ←
+                            spanning_tree.Tree.edit_edges self1.tree
+                              self1.layout.carrier edit.remove edit.add
+                              self1.work
+                          let cf4 ←
+                            core.result.Result.Insts.CoreOpsTry.branch r4
+                          match cf4 with
+                          | core.ops.control_flow.ControlFlow.Continue _ =>
+                            let self2 ←
+                              scene.Scene.commit_edit
+                                { self1 with tree := t, work := w } edit val
+                            let (p1, index_mut_back) ←
+                              alloc.vec.Vec.index_mut
+                                (core.slice.index.SliceIndexUsizeSlice
+                                shatter.Patch) self2.patches val1
+                            let v1 :=
+                              index_mut_back
+                                {
+                                  p1
+                                    with
+                                    stage := (shatter.Stage.Reforming val2)
+                                }
+                            ok (core.result.Result.Ok self2.stamp,
+                              { self2 with patches := v1, trail_revision := val
+                              })
+                          | core.ops.control_flow.ControlFlow.Break residual =>
+                            let r5 ←
+                              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                                walker.Stamp (core.convert.FromSame
+                                topology.Error) residual
+                            ok (r5, { self1 with tree := t, work := w })
+                      | core.ops.control_flow.ControlFlow.Break residual =>
+                        let r4 ←
+                          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                            walker.Stamp (core.convert.FromSame topology.Error)
+                            residual
+                        ok (r4, self1)
+                  | core.ops.control_flow.ControlFlow.Break residual =>
+                    let r3 ←
+                      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                        walker.Stamp (core.convert.FromSame topology.Error)
+                        residual
+                    ok (r3, self)
+                else
+                  ok (core.result.Result.Err topology.Error.InvalidTransition,
+                    self)
+              | shatter.Stage.Reforming _ =>
+                ok (core.result.Result.Err topology.Error.InvalidTransition,
+                  self)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          walker.Stamp (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        walker.Stamp (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::request_layout]:
+    Source: 'src/scene.rs', lines 1823:4-1831:5
+    Visibility: public -/
+def scene.Scene.request_layout
+  (self : scene.Scene) (stamp : walker.Stamp) :
+  Result ((core.result.Result Std.U64 topology.Error) × scene.Scene)
+  := do
+  let r ← scene.Scene.check_stamp self stamp
+  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+  match cf with
+  | core.ops.control_flow.ControlFlow.Continue val =>
+    let o ← lift (U64.checked_add self.latest_request 1#u64)
+    let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+    match cf1 with
+    | core.ops.control_flow.ControlFlow.Continue val1 =>
+      ok (core.result.Result.Ok val1,
+        {
+          self
+            with
+            stamp := { self.stamp with revision := val },
+            reanchor := true,
+            latest_request := val1,
+            pending := (some val1)
+        })
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r2 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Std.U64 (core.convert.FromSame topology.Error) residual
+      ok (r2, self)
+  | core.ops.control_flow.ControlFlow.Break residual =>
+    let r1 ←
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Std.U64 (core.convert.FromSame topology.Error) residual
+    ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]: loop body 0:
+    Source: 'src/scene.rs', lines 1849:8-1855:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.publish_layout_loop.body
+  (v : alloc.vec.Vec walker.Walker) (i : Std.Usize) (w : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec walker.Walker) × Std.Usize × Std.Usize)
+    Std.Usize)
+  := do
+  let i1 := alloc.vec.Vec.len v
+  if w < i1
+  then
+    let w1 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice walker.Walker)
+        v w
+    let i2 ←
+      match w1.state with
+      | walker.WalkerState.Ready => ok i
+      | walker.WalkerState.Crossing _ => i + 1#usize
+      | walker.WalkerState.Parked => ok i
+      | walker.WalkerState.Hidden => ok i
+      | walker.WalkerState.Terminated => ok i
+    let (w2, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
+        walker.Walker) v w
+    let w3 ← w + 1#usize
+    let v1 := index_mut_back { w2 with state := walker.WalkerState.Terminated }
+    ok (cont (v1, i2, w3))
+  else ok (done i)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]: loop 0:
+    Source: 'src/scene.rs', lines 1849:8-1855:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.publish_layout_loop
+  (v : alloc.vec.Vec walker.Walker) (i : Std.Usize) (w : Std.Usize) :
+  Result Std.Usize
+  := do
+  loop
+    (fun (v1, i1, w1) => scene.Scene.publish_layout_loop.body v1 i1 w1)
+    (v, i, w)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::publish_layout]:
+    Source: 'src/scene.rs', lines 1833:4-1863:5
+    Visibility: public -/
+def scene.Scene.publish_layout
+  (self : scene.Scene) (request : Std.U64) (candidate : scene.Scene) :
+  Result ((core.result.Result scene.Retired topology.Error) × scene.Scene)
+  := do
+  let b ←
+    core.cmp.PartialEq.ne.trait_default
+      (core.option.Option.Insts.CoreCmpPartialEqOption core.cmp.PartialEqU64)
+      self.pending (some request)
+  if b
+  then ok (core.result.Result.Err topology.Error.StaleEpoch, self)
+  else
+    if self.latest_request != request
+    then ok (core.result.Result.Err topology.Error.StaleEpoch, self)
+    else
+      if candidate.stamp.epoch != request
+      then ok (core.result.Result.Err topology.Error.StaleEpoch, self)
+      else
+        if candidate.stamp.revision != 0#u64
+        then ok (core.result.Result.Err topology.Error.InvalidTransition, self)
+        else
+          let i := alloc.vec.Vec.len self.walkers
+          let i1 ←
+            scene.Scene.publish_layout_loop self.walkers 0#usize 0#usize
+          let (s, _) ← lift (alloc.vec.Vec.deref_mut self.holds)
+          let _ ← core.slice.Slice.fill core.clone.CloneUsize s 0#usize
+          ok (core.result.Result.Ok
+            {
+              epoch := self.stamp.epoch,
+              terminated_walkers := i,
+              released_reservations := i1
+            },
+            {
+              candidate
+                with
+                wall := self.wall,
+                reanchor := true,
+                suspended := self.suspended,
+                latest_request := request
+            })
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::cell_fits]:
+    Source: 'src/scene.rs', lines 1865:4-1876:5 -/
+def scene.Scene.cell_fits
+  (self : scene.Scene) (cell : Std.Usize) (viewport : grid.Rect) :
+  Result (core.result.Result Bool topology.Error)
+  := do
+  let s ← spanning_tree.Tree.impl.parents self.tree
+  let parent ← Slice.index_usize s cell
+  if parent != cell
+  then
+    let e ← topology.Edge.new cell parent
+    let s1 := alloc.vec.Vec.deref self.phases
+    let s2 := alloc.vec.Vec.deref self.phases
+    let r ← scene.Layout.doorway self.layout e s1 s2
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let b ← grid.Rect.contains viewport val.corridor
+      ok (core.result.Result.Ok b)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Bool (core.convert.FromSame topology.Error) residual
+  else
+    let r ← scene.Scene.cell_pose self cell
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue val =>
+      let r1 ← grid.Geometry.margin self.layout.geometry
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue val1 =>
+        let r2 ← grid.Rect.between val val val1
+        let cf2 ← core.result.Result.Insts.CoreOpsTry.branch r2
+        match cf2 with
+        | core.ops.control_flow.ControlFlow.Continue val2 =>
+          let b ← grid.Rect.contains viewport val2
+          ok (core.result.Result.Ok b)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            Bool (core.convert.FromSame topology.Error) residual
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          Bool (core.convert.FromSame topology.Error) residual
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+        Bool (core.convert.FromSame topology.Error) residual
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]: loop body 0:
+    Source: 'src/scene.rs', lines 1888:8-1894:9
+    Visibility: public -/
+@[rust_loop_body]
+def scene.Scene.reject_layout_loop.body
+  (l : scene.Layout) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec topology.Edge)
+  (v2 : alloc.vec.Vec Std.I32) (v3 : alloc.vec.Vec Std.I32)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec walker.Walker)
+  (v6 : alloc.vec.Vec shatter.Patch) (i : Std.U64) (i1 : Std.U64)
+  (i2 : Std.U64) (i3 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool)
+  (i4 : Std.U64) (o : Option Std.U64) (i5 : Std.U64) (viewport : grid.Rect)
+  (fits : Bool) (status : core.result.Result Unit topology.Error)
+  (cell : Std.Usize) :
+  Result (ControlFlow (Bool × (core.result.Result Unit topology.Error) ×
+    Std.Usize) (Bool × (core.result.Result Unit topology.Error)))
+  := do
+  let s ← spanning_tree.Tree.impl.parents t
+  let i6 := Slice.len s
+  if cell < i6
+  then
+    let b3 ← core.result.Result.is_ok status
+    if b3
+    then
+      let r ←
+        scene.Scene.cell_fits
+          {
+            layout := l,
+            tree := t,
+            work := w,
+            routes := v,
+            required := v1,
+            phases := v2,
+            next_phases := v3,
+            holds := v4,
+            walkers := v5,
+            patches := v6,
+            stamp := { epoch := i, revision := i1 },
+            clock := i2,
+            wall := i3,
+            reanchor := b,
+            suspended := b1,
+            inactive := b2,
+            latest_request := i4,
+            pending := o,
+            trail_revision := i5
+          } cell viewport
+      let (fits1, status1) ←
+        match r with
+        | core.result.Result.Ok inside =>
+          do
+          let b4 ← if fits
+                     then ok inside
+                     else ok false
+          ok (b4, status)
+        | core.result.Result.Err error =>
+          ok (fits, core.result.Result.Err error)
+      let cell1 ← cell + 1#usize
+      ok (cont (fits1, status1, cell1))
+    else ok (done (fits, status))
+  else ok (done (fits, status))
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]: loop 0:
+    Source: 'src/scene.rs', lines 1888:8-1894:9
+    Visibility: public -/
+@[rust_loop]
+def scene.Scene.reject_layout_loop
+  (l : scene.Layout) (t : spanning_tree.Tree) (w : spanning_tree.Workspace)
+  (v : alloc.vec.Vec scene.Route) (v1 : alloc.vec.Vec topology.Edge)
+  (v2 : alloc.vec.Vec Std.I32) (v3 : alloc.vec.Vec Std.I32)
+  (v4 : alloc.vec.Vec Std.Usize) (v5 : alloc.vec.Vec walker.Walker)
+  (v6 : alloc.vec.Vec shatter.Patch) (i : Std.U64) (i1 : Std.U64)
+  (i2 : Std.U64) (i3 : Std.U64) (b : Bool) (b1 : Bool) (b2 : Bool)
+  (i4 : Std.U64) (o : Option Std.U64) (i5 : Std.U64) (viewport : grid.Rect)
+  (fits : Bool) (status : core.result.Result Unit topology.Error)
+  (cell : Std.Usize) :
+  Result (Bool × (core.result.Result Unit topology.Error))
+  := do
+  loop
+    (fun (fits1, status1, cell1) => scene.Scene.reject_layout_loop.body l t w v
+      v1 v2 v3 v4 v5 v6 i i1 i2 i3 b b1 b2 i4 o i5 viewport fits1 status1
+      cell1)
+    (fits, status, cell)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::reject_layout]:
+    Source: 'src/scene.rs', lines 1879:4-1900:5
+    Visibility: public -/
+def scene.Scene.reject_layout
+  (self : scene.Scene) (request : Std.U64) (viewport : grid.Rect) :
+  Result ((core.result.Result walker.Stamp topology.Error) × scene.Scene)
+  := do
+  let b ←
+    core.cmp.PartialEq.ne.trait_default
+      (core.option.Option.Insts.CoreCmpPartialEqOption core.cmp.PartialEqU64)
+      self.pending (some request)
+  if b
+  then ok (core.result.Result.Err topology.Error.StaleEpoch, self)
+  else
+    if self.latest_request != request
+    then ok (core.result.Result.Err topology.Error.StaleEpoch, self)
+    else
+      let r ← grid.Rect.validate viewport
+      let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+      match cf with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let o ← lift (U64.checked_add self.stamp.revision 1#u64)
+        let r1 ← core.option.Option.ok_or o topology.Error.Overflow
+        let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+        match cf1 with
+        | core.ops.control_flow.ControlFlow.Continue val =>
+          let (fits, status) ←
+            scene.Scene.reject_layout_loop self.layout self.tree self.work
+              self.routes self.required self.phases self.next_phases 
+              self.holds self.walkers self.patches self.stamp.epoch
+              self.stamp.revision self.clock self.wall self.reanchor
+              self.suspended self.inactive self.latest_request self.pending
+              self.trail_revision viewport true (core.result.Result.Ok ())
+              0#usize
+          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status
+          match cf2 with
+          | core.ops.control_flow.ControlFlow.Continue _ =>
+            ok (core.result.Result.Ok { self.stamp with revision := val },
+              {
+                self
+                  with
+                  stamp := { self.stamp with revision := val },
+                  inactive := (¬ fits),
+                  pending := none
+              })
+          | core.ops.control_flow.ControlFlow.Break residual =>
+            let r2 ←
+              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+                walker.Stamp (core.convert.FromSame topology.Error) residual
+            ok (r2, self)
+        | core.ops.control_flow.ControlFlow.Break residual =>
+          let r2 ←
+            core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+              walker.Stamp (core.convert.FromSame topology.Error) residual
+          ok (r2, self)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r1 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            walker.Stamp (core.convert.FromSame topology.Error) residual
+        ok (r1, self)
+
+/-- [labyrinth_core::scene::{labyrinth_core::scene::Scene}::advance_motion]:
+    Source: 'src/scene.rs', lines 1961:4-1968:5
+    Visibility: public -/
+def scene.Scene.advance_motion
+  (self : scene.Scene) (expected : walker.Stamp)
+  (requested_steps : Slice Std.I32) (work : motion.MotionWorkspace) :
+  Result ((core.result.Result motion.MotionAdvance topology.Error) ×
+    scene.Scene × motion.MotionWorkspace)
+  := do
+  let (r, work1, self1) ←
+    motion.MotionWorkspace.advance work self expected requested_steps
+  ok (r, self1, work1)
+
+/-- [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::PatchId}::fmt]:
+    Source: 'src/shatter.rs', lines 9:9-9:14
+    Visibility: public -/
+def shatter.PatchId.Insts.CoreFmtDebug.fmt
+  (self : shatter.PatchId) (f : core.fmt.Formatter) :
+  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
+  := do
+  let dyn := Dyn.mk _ core.fmt.DebugU64 self.epoch
+  let dyn1 := Dyn.mk _ core.fmt.DebugUsize self.slot
+  let dyn2 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugU64) self.serial
+  core.fmt.Formatter.debug_struct_field3_finish f (toStr "PatchId") (toStr
+    "epoch") dyn (toStr "slot") dyn1 (toStr "serial") dyn2
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::fmt::Debug for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:9-9:14 -/
+@[reducible]
+def shatter.PatchId.Insts.CoreFmtDebug : core.fmt.Debug shatter.PatchId := {
+  fmt := shatter.PatchId.Insts.CoreFmtDebug.fmt
+}
+
+/-- [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::PatchId}::clone]:
+    Source: 'src/shatter.rs', lines 9:16-9:21
+    Visibility: public -/
+def shatter.PatchId.Insts.CoreCloneClone.clone
+  (self : shatter.PatchId) : Result shatter.PatchId := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:16-9:21 -/
+@[reducible]
+def shatter.PatchId.Insts.CoreCloneClone : core.clone.Clone shatter.PatchId
+  := {
+  clone := shatter.PatchId.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::Copy for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:23-9:27 -/
+@[reducible]
+def shatter.PatchId.Insts.CoreMarkerCopy : core.marker.Copy shatter.PatchId
+  := {
+  cloneInst := shatter.PatchId.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::StructuralPartialEq for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:29-9:38 -/
+@[reducible]
+def shatter.PatchId.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq shatter.PatchId := {
+}
+
+/-- [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::PatchId> for labyrinth_core::shatter::PatchId}::eq]:
+    Source: 'src/shatter.rs', lines 9:29-9:38
+    Visibility: public -/
+def shatter.PatchId.Insts.CoreCmpPartialEqPatchId.eq
+  (self : shatter.PatchId) (other : shatter.PatchId) : Result Bool := do
+  if self.epoch = other.epoch
+  then
+    if self.serial = other.serial
+    then ok (self.slot = other.slot)
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::PartialEq<labyrinth_core::shatter::PatchId> for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:29-9:38 -/
+@[reducible]
+impl_def shatter.PatchId.Insts.CoreCmpPartialEqPatchId : core.cmp.PartialEq
+  shatter.PatchId shatter.PatchId := {
+  eq := shatter.PatchId.Insts.CoreCmpPartialEqPatchId.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    shatter.PatchId.Insts.CoreCmpPartialEqPatchId
+}
+
+/-- [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::PatchId}::assert_fields_are_eq]:
+    Source: 'src/shatter.rs', lines 9:40-9:42
+    Visibility: public -/
+def shatter.PatchId.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : shatter.PatchId) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::PatchId}]
+    Source: 'src/shatter.rs', lines 9:40-9:42 -/
+@[reducible]
+def shatter.PatchId.Insts.CoreCmpEq : core.cmp.Eq shatter.PatchId := {
+  partialEqInst := shatter.PatchId.Insts.CoreCmpPartialEqPatchId
+  assert_fields_are_eq := shatter.PatchId.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::Stage}::clone]:
+    Source: 'src/shatter.rs', lines 16:16-16:21
+    Visibility: public -/
+def shatter.Stage.Insts.CoreCloneClone.clone
+  (self : shatter.Stage) : Result shatter.Stage := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::clone::Clone for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:16-16:21 -/
+@[reducible]
+def shatter.Stage.Insts.CoreCloneClone : core.clone.Clone shatter.Stage := {
+  clone := shatter.Stage.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::Copy for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:23-16:27 -/
+@[reducible]
+def shatter.Stage.Insts.CoreMarkerCopy : core.marker.Copy shatter.Stage := {
+  cloneInst := shatter.Stage.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::marker::StructuralPartialEq for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:29-16:38 -/
+@[reducible]
+def shatter.Stage.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq shatter.Stage := {
+}
+
+/-- [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::Stage}::assert_fields_are_eq]:
+    Source: 'src/shatter.rs', lines 16:40-16:42
+    Visibility: public -/
+def shatter.Stage.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : shatter.Stage) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::shatter::{impl core::cmp::Eq for labyrinth_core::shatter::Stage}]
+    Source: 'src/shatter.rs', lines 16:40-16:42 -/
+@[reducible]
+def shatter.Stage.Insts.CoreCmpEq : core.cmp.Eq shatter.Stage := {
+  partialEqInst := shatter.Stage.Insts.CoreCmpPartialEqStage
+  assert_fields_are_eq := shatter.Stage.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::Copy for labyrinth_core::spanning_tree::Frame}]
+    Source: 'src/spanning_tree.rs', lines 9:23-9:27 -/
+@[reducible]
+def spanning_tree.Frame.Insts.CoreMarkerCopy : core.marker.Copy
+  spanning_tree.Frame := {
+  cloneInst := spanning_tree.Frame.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::marker::StructuralPartialEq for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 203:16-203:25 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq spanning_tree.Tree := {
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}::eq]:
+    Source: 'src/spanning_tree.rs', lines 203:16-203:25
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
+  (self : spanning_tree.Tree) (other : spanning_tree.Tree) : Result Bool := do
+  let b ←
+    alloc.vec.partial_eq.PartialEqVec.eq core.cmp.PartialEqUsize self.parents
+      other.parents
+  if b
+  then ok (self.root = other.root)
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::PartialEq<labyrinth_core::spanning_tree::Tree> for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 203:16-203:25 -/
+@[reducible]
+impl_def spanning_tree.Tree.Insts.CoreCmpPartialEqTree : core.cmp.PartialEq
+  spanning_tree.Tree spanning_tree.Tree := {
+  eq := spanning_tree.Tree.Insts.CoreCmpPartialEqTree.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    spanning_tree.Tree.Insts.CoreCmpPartialEqTree
+}
+
+/-- [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}::assert_fields_are_eq]:
+    Source: 'src/spanning_tree.rs', lines 203:27-203:29
+    Visibility: public -/
+def spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : spanning_tree.Tree) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::spanning_tree::{impl core::cmp::Eq for labyrinth_core::spanning_tree::Tree}]
+    Source: 'src/spanning_tree.rs', lines 203:27-203:29 -/
+@[reducible]
+def spanning_tree.Tree.Insts.CoreCmpEq : core.cmp.Eq spanning_tree.Tree := {
+  partialEqInst := spanning_tree.Tree.Insts.CoreCmpPartialEqTree
+  assert_fields_are_eq :=
+    spanning_tree.Tree.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::storage]:
+    Source: 'src/topology.rs', lines 294:4-296:5 -/
+def topology.Carrier.storage
+  (self : topology.Carrier) :
+  Result ((Slice Std.Usize) × (Slice Std.Usize))
+  := do
+  let s := alloc.vec.Vec.deref self.offsets
+  let s1 := alloc.vec.Vec.deref self.neighbors
+  ok (s, s1)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop body 0:
+    Source: 'src/spanning_tree.rs', lines 228:8-231:9
+    Visibility: public -/
+@[rust_loop_body]
+def spanning_tree.Tree.dfs_loop.body
+  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize)
+    (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize)))
+  := do
+  let i1 := alloc.vec.Vec.len parents
+  if i < i1
+  then
+    let i2 ←
+      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        work.parents i
+    let (_, index_mut_back) ←
+      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
+        parents i
+    let i3 ← i + 1#usize
+    let parents1 := index_mut_back i2
+    ok (cont (parents1, i3))
+  else ok (done (work, parents))
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]: loop 0:
+    Source: 'src/spanning_tree.rs', lines 228:8-231:9
+    Visibility: public -/
+@[rust_loop]
+def spanning_tree.Tree.dfs_loop
+  (work : spanning_tree.Workspace) (parents : alloc.vec.Vec Std.Usize)
+  (i : Std.Usize) :
+  Result (spanning_tree.Workspace × (alloc.vec.Vec Std.Usize))
+  := do
+  loop
+    (fun (parents1, i1) => spanning_tree.Tree.dfs_loop.body work parents1 i1)
+    (parents, i)
+
+/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::dfs]:
+    Source: 'src/spanning_tree.rs', lines 214:4-233:5
+    Visibility: public -/
+def spanning_tree.Tree.dfs
+  {R : Type _} (treeRngInst : tree.Rng R) (carrier : topology.Carrier)
+  (root : Std.Usize) (rng : R) (work : spanning_tree.Workspace) :
+  Result ((core.result.Result spanning_tree.Tree topology.Error) × R ×
+    spanning_tree.Workspace)
+  := do
+  let i ← topology.Carrier.len carrier
+  if root >= i
+  then ok (core.result.Result.Err topology.Error.InvalidIndex, rng, work)
+  else
+    let s ← topology.Carrier.impl.edges carrier
+    let i1 := Slice.len s
+    let r ← spanning_tree.Workspace.ensure work i i1
+    let cf ← core.result.Result.Insts.CoreOpsTry.branch r
+    match cf with
+    | core.ops.control_flow.ControlFlow.Continue _ =>
+      let (offsets, neighbors) ← topology.Carrier.storage carrier
+      let (r1, rng1, work1) ←
+        spanning_tree.depth_first treeRngInst offsets neighbors root rng work
+      let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
+      match cf1 with
+      | core.ops.control_flow.ControlFlow.Continue _ =>
+        let parents ← alloc.vec.from_elem core.clone.CloneUsize root i
+        let (work2, parents1) ←
+          spanning_tree.Tree.dfs_loop work1 parents 0#usize
+        ok (core.result.Result.Ok { parents := parents1, root }, rng1, work2)
+      | core.ops.control_flow.ControlFlow.Break residual =>
+        let r2 ←
+          core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+            spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+        ok (r2, rng1, work1)
+    | core.ops.control_flow.ControlFlow.Break residual =>
+      let r1 ←
+        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
+          spanning_tree.Tree (core.convert.FromSame topology.Error) residual
+      ok (r1, rng, work)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::root]:
-    Source: 'src/spanning_tree.rs', lines 367:4-369:5
+    Source: 'src/spanning_tree.rs', lines 374:4-376:5
     Visibility: public -/
 def spanning_tree.Tree.impl.root
   (self : spanning_tree.Tree) : Result Std.Usize := do
   ok self.root
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::has_edge]:
-    Source: 'src/spanning_tree.rs', lines 371:4-376:5
-    Visibility: public -/
-def spanning_tree.Tree.has_edge
-  (self : spanning_tree.Tree) (edge : topology.Edge) : Result Bool := do
-  let i := alloc.vec.Vec.len self.parents
-  if edge.u < i
-  then
-    let i1 := alloc.vec.Vec.len self.parents
-    if edge.v < i1
-    then
-      if edge.u != edge.v
-      then
-        let i2 ←
-          alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-            self.parents edge.u
-        if i2 = edge.v
-        then ok true
-        else
-          let i3 ←
-            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
-              Std.Usize) self.parents edge.v
-          ok (i3 = edge.u)
-      else ok false
-    else ok false
-  else ok false
-
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 390:8-394:9
+    Source: 'src/spanning_tree.rs', lines 397:8-401:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.reroot_loop0.body
@@ -2479,7 +18233,7 @@ def spanning_tree.Tree.reroot_loop0.body
   else ok (done (work, cell, count))
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 390:8-394:9
+    Source: 'src/spanning_tree.rs', lines 397:8-401:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.reroot_loop0
@@ -2494,7 +18248,7 @@ def spanning_tree.Tree.reroot_loop0
     (work, cell, count)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 401:8-404:9
+    Source: 'src/spanning_tree.rs', lines 408:8-411:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.reroot_loop1.body
@@ -2520,7 +18274,7 @@ def spanning_tree.Tree.reroot_loop1.body
   else ok (done v1)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 401:8-404:9
+    Source: 'src/spanning_tree.rs', lines 408:8-411:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.reroot_loop1
@@ -2533,7 +18287,7 @@ def spanning_tree.Tree.reroot_loop1
     (v, i)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::reroot]:
-    Source: 'src/spanning_tree.rs', lines 382:4-408:5
+    Source: 'src/spanning_tree.rs', lines 389:4-415:5
     Visibility: public -/
 def spanning_tree.Tree.reroot
   (self : spanning_tree.Tree) (new_root : Std.Usize)
@@ -2578,664 +18332,8 @@ def spanning_tree.Tree.reroot
           Unit (core.convert.FromSame topology.Error) residual
       ok (r1, self, work)
 
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 580:8-584:9 -/
-@[rust_loop_body]
-def spanning_tree.Tree.check_carrier_loop.body
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
-  (cell : Std.Usize) (valid : Bool) :
-  Result (ControlFlow (Std.Usize × Bool) Bool)
-  := do
-  let i1 := alloc.vec.Vec.len v
-  if cell < i1
-  then
-    if valid
-    then
-      let valid1 ←
-        if cell = i
-        then ok true
-        else
-          do
-          let i2 ←
-            alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice
-              Std.Usize) v cell
-          let e ← topology.Edge.new cell i2
-          topology.Carrier.contains_edge carrier e
-      let cell1 ← cell + 1#usize
-      ok (cont (cell1, valid1))
-    else ok (done valid)
-  else ok (done valid)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 580:8-584:9 -/
-@[rust_loop]
-def spanning_tree.Tree.check_carrier_loop
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
-  (cell : Std.Usize) (valid : Bool) :
-  Result Bool
-  := do
-  loop
-    (fun (cell1, valid1) => spanning_tree.Tree.check_carrier_loop.body v i
-      carrier cell1 valid1)
-    (cell, valid)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_carrier]:
-    Source: 'src/spanning_tree.rs', lines 571:4-590:5 -/
-def spanning_tree.Tree.check_carrier
-  (self : spanning_tree.Tree) (carrier : topology.Carrier) :
-  Result (core.result.Result Unit topology.Error)
-  := do
-  let i := alloc.vec.Vec.len self.parents
-  let i1 ← topology.Carrier.len carrier
-  if i != i1
-  then ok (core.result.Result.Err topology.Error.InvalidTree)
-  else
-    let i2 := alloc.vec.Vec.len self.parents
-    if self.root >= i2
-    then ok (core.result.Result.Err topology.Error.InvalidTree)
-    else
-      let i3 ←
-        alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-          self.parents self.root
-      if i3 != self.root
-      then ok (core.result.Result.Err topology.Error.InvalidTree)
-      else
-        let valid ←
-          spanning_tree.Tree.check_carrier_loop self.parents self.root carrier
-            0#usize true
-        if valid
-        then ok (core.result.Result.Ok ())
-        else ok (core.result.Result.Err topology.Error.InvalidTree)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 555:8-563:9 -/
-@[rust_loop_body]
-def spanning_tree.Tree.virtual_root_loop.body
-  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
-  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
-  Result (ControlFlow (Std.Usize × Std.Usize × Bool) (Std.Usize × Bool))
-  := do
-  let i := alloc.vec.Vec.len self.parents
-  if steps < i
-  then
-    let i1 := alloc.vec.Vec.len self.parents
-    if cell < i1
-    then
-      if found
-      then ok (done (cell, found))
-      else
-        let s := alloc.vec.Vec.deref self.parents
-        let parent ← spanning_tree.Workspace.parent work s cell
-        let (cell1, found1) ←
-          if parent = cell
-          then ok (cell, true)
-          else ok (parent, found)
-        let steps1 ← steps + 1#usize
-        ok (cont (cell1, steps1, found1))
-    else ok (done (cell, found))
-  else ok (done (cell, found))
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 555:8-563:9 -/
-@[rust_loop]
-def spanning_tree.Tree.virtual_root_loop
-  (self : spanning_tree.Tree) (work : spanning_tree.Workspace)
-  (cell : Std.Usize) (steps : Std.Usize) (found : Bool) :
-  Result (Std.Usize × Bool)
-  := do
-  loop
-    (fun (cell1, steps1, found1) => spanning_tree.Tree.virtual_root_loop.body
-      self work cell1 steps1 found1)
-    (cell, steps, found)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::virtual_root]:
-    Source: 'src/spanning_tree.rs', lines 551:4-569:5 -/
-def spanning_tree.Tree.virtual_root
-  (self : spanning_tree.Tree) (start : Std.Usize)
-  (work : spanning_tree.Workspace) :
-  Result (core.result.Result Std.Usize topology.Error)
-  := do
-  let (cell, found) ←
-    spanning_tree.Tree.virtual_root_loop self work start 0#usize false
-  if found
-  then ok (core.result.Result.Ok cell)
-  else ok (core.result.Result.Err topology.Error.InvalidTree)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 532:8-536:9 -/
-@[rust_loop_body]
-def spanning_tree.Tree.attach_virtual_loop0.body
-  (v : alloc.vec.Vec Std.Usize) (n : Std.Usize) (component_root : Std.Usize)
-  (work : spanning_tree.Workspace) (cell : Std.Usize) (count : Std.Usize) :
-  Result (ControlFlow (spanning_tree.Workspace × Std.Usize × Std.Usize)
-    (spanning_tree.Workspace × Std.Usize × Std.Usize))
-  := do
-  if cell < n
-  then
-    if count < n
-    then
-      if cell != component_root
-      then
-        let (_, index_mut_back) ←
-          alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-            Std.Usize) work.path count
-        let count1 ← count + 1#usize
-        let v1 := index_mut_back cell
-        let s := alloc.vec.Vec.deref v
-        let cell1 ←
-          spanning_tree.Workspace.parent { work with path := v1 } s cell
-        ok (cont ({ work with path := v1 }, cell1, count1))
-      else ok (done (work, cell, count))
-    else ok (done (work, cell, count))
-  else ok (done (work, cell, count))
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 532:8-536:9 -/
-@[rust_loop]
-def spanning_tree.Tree.attach_virtual_loop0
-  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
-  (n : Std.Usize) (component_root : Std.Usize) (cell : Std.Usize)
-  (count : Std.Usize) :
-  Result (spanning_tree.Workspace × Std.Usize × Std.Usize)
-  := do
-  loop
-    (fun (work1, cell1, count1) => spanning_tree.Tree.attach_virtual_loop0.body
-      v n component_root work1 cell1 count1)
-    (work, cell, count)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 543:8-546:9 -/
-@[rust_loop_body]
-def spanning_tree.Tree.attach_virtual_loop1.body
-  (count : Std.Usize) (work : spanning_tree.Workspace) (j : Std.Usize) :
-  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
-    spanning_tree.Workspace)
-  := do
-  if j < count
-  then
-    let i ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.path j
-    let i1 ← j - 1#usize
-    let i2 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.path i1
-    let work1 ← spanning_tree.Workspace.set_parent work i i2
-    let j1 ← j + 1#usize
-    ok (cont (work1, j1))
-  else ok (done work)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 543:8-546:9 -/
-@[rust_loop]
-def spanning_tree.Tree.attach_virtual_loop1
-  (work : spanning_tree.Workspace) (count : Std.Usize) (j : Std.Usize) :
-  Result spanning_tree.Workspace
-  := do
-  loop
-    (fun (work1, j1) => spanning_tree.Tree.attach_virtual_loop1.body count
-      work1 j1)
-    (work, j)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::attach_virtual]:
-    Source: 'src/spanning_tree.rs', lines 518:4-549:5 -/
-def spanning_tree.Tree.attach_virtual
-  (self : spanning_tree.Tree) (edge : topology.Edge)
-  (work : spanning_tree.Workspace) :
-  Result ((core.result.Result Unit topology.Error) × spanning_tree.Workspace)
-  := do
-  let n := alloc.vec.Vec.len self.parents
-  let r ← spanning_tree.Tree.virtual_root self edge.u work
-  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
-  match cf with
-  | core.ops.control_flow.ControlFlow.Continue val =>
-    let r1 ← spanning_tree.Tree.virtual_root self edge.v work
-    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
-    match cf1 with
-    | core.ops.control_flow.ControlFlow.Continue val1 =>
-      if val = val1
-      then ok (core.result.Result.Err topology.Error.InvalidTransition, work)
-      else
-        let (inside, outside, component_root) ←
-          if val = self.root
-          then ok (edge.v, edge.u, val1)
-          else ok (edge.u, edge.v, val)
-        let (work1, cell, count) ←
-          spanning_tree.Tree.attach_virtual_loop0 self.parents work n
-            component_root inside 0#usize
-        if cell >= n
-        then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
-        else
-          if count >= n
-          then ok (core.result.Result.Err topology.Error.InvalidTree, work1)
-          else
-            let (_, index_mut_back) ←
-              alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice
-                Std.Usize) work1.path count
-            let count1 ← count + 1#usize
-            let v := index_mut_back cell
-            let work2 ←
-              spanning_tree.Tree.attach_virtual_loop1 { work1 with path := v }
-                count1 1#usize
-            let work3 ←
-              spanning_tree.Workspace.set_parent work2 inside outside
-            ok (core.result.Result.Ok (), work3)
-    | core.ops.control_flow.ControlFlow.Break residual =>
-      let r2 ←
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-          Unit (core.convert.FromSame topology.Error) residual
-      ok (r2, work)
-  | core.ops.control_flow.ControlFlow.Break residual =>
-    let r1 ←
-      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-        Unit (core.convert.FromSame topology.Error) residual
-    ok (r1, work)
-
-/-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}::eq]:
-    Source: 'src/topology.rs', lines 49:29-49:38
-    Visibility: public -/
-def topology.Edge.Insts.CoreCmpPartialEqEdge.eq
-  (self : topology.Edge) (other : topology.Edge) : Result Bool := do
-  if self.u = other.u
-  then ok (self.v = other.v)
-  else ok false
-
-/-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Edge> for labyrinth_core::topology::Edge}]
-    Source: 'src/topology.rs', lines 49:29-49:38 -/
-@[reducible]
-impl_def topology.Edge.Insts.CoreCmpPartialEqEdge : core.cmp.PartialEq
-  topology.Edge topology.Edge := {
-  eq := topology.Edge.Insts.CoreCmpPartialEqEdge.eq
-  ne := core.cmp.PartialEq.ne.trait_default
-    topology.Edge.Insts.CoreCmpPartialEqEdge
-}
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 498:8-502:9 -/
-@[rust_loop_body]
-def spanning_tree.Tree.check_edit_loop0.body
-  (remove : Slice topology.Edge) (add : Slice topology.Edge)
-  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
-  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
-  Result (ControlFlow (Bool × Std.Usize) Bool)
-  := do
-  if j < index
-  then
-    if duplicate
-    then ok (done duplicate)
-    else
-      let e ← Slice.index_usize remove j
-      let e1 ← topology.Edge.new e.u e.v
-      let b ←
-        topology.Edge.Insts.CoreCmpPartialEqEdge.eq e1 { u := i, v := i1 }
-      let duplicate1 ←
-        if b
-        then ok true
-        else
-          do
-          let e2 ← Slice.index_usize add j
-          let e3 ← topology.Edge.new e2.u e2.v
-          topology.Edge.Insts.CoreCmpPartialEqEdge.eq e3 { u := i2, v := i3 }
-      let j1 ← j + 1#usize
-      ok (cont (duplicate1, j1))
-  else ok (done duplicate)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 498:8-502:9 -/
-@[rust_loop]
-def spanning_tree.Tree.check_edit_loop0
-  (remove : Slice topology.Edge) (add : Slice topology.Edge)
-  (index : Std.Usize) (i : Std.Usize) (i1 : Std.Usize) (i2 : Std.Usize)
-  (i3 : Std.Usize) (duplicate : Bool) (j : Std.Usize) :
-  Result Bool
-  := do
-  loop
-    (fun (duplicate1, j1) => spanning_tree.Tree.check_edit_loop0.body remove
-      add index i i1 i2 i3 duplicate1 j1)
-    (duplicate, j)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 508:12-510:13 -/
-@[rust_loop_body]
-def spanning_tree.Tree.check_edit_loop1.body
-  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
-  (j : Std.Usize) :
-  Result (ControlFlow Std.Usize Std.Usize)
-  := do
-  let i2 := Slice.len remove
-  if j < i2
-  then
-    let e ← Slice.index_usize remove j
-    let e1 ← topology.Edge.new e.u e.v
-    let b ←
-      core.cmp.PartialEq.ne.trait_default
-        topology.Edge.Insts.CoreCmpPartialEqEdge e1 { u := i, v := i1 }
-    if b
-    then let j1 ← j + 1#usize
-         ok (cont j1)
-    else ok (done j)
-  else ok (done j)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 508:12-510:13 -/
-@[rust_loop]
-def spanning_tree.Tree.check_edit_loop1
-  (remove : Slice topology.Edge) (i : Std.Usize) (i1 : Std.Usize)
-  (j : Std.Usize) :
-  Result Std.Usize
-  := do
-  loop
-    (fun j1 => spanning_tree.Tree.check_edit_loop1.body remove i i1 j1)
-    j
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::check_edit]:
-    Source: 'src/spanning_tree.rs', lines 480:4-516:5 -/
-def spanning_tree.Tree.check_edit
-  (self : spanning_tree.Tree) (carrier : topology.Carrier)
-  (remove : Slice topology.Edge) (add : Slice topology.Edge)
-  (index : Std.Usize) :
-  Result (core.result.Result Unit topology.Error)
-  := do
-  let n := alloc.vec.Vec.len self.parents
-  let e ← Slice.index_usize remove index
-  let removal ← topology.Edge.new e.u e.v
-  let e1 ← Slice.index_usize add index
-  let addition ← topology.Edge.new e1.u e1.v
-  if removal.u >= n
-  then ok (core.result.Result.Err topology.Error.InvalidIndex)
-  else
-    if removal.v >= n
-    then ok (core.result.Result.Err topology.Error.InvalidIndex)
-    else
-      if addition.u >= n
-      then ok (core.result.Result.Err topology.Error.InvalidIndex)
-      else
-        if addition.v >= n
-        then ok (core.result.Result.Err topology.Error.InvalidIndex)
-        else
-          let b ← spanning_tree.Tree.has_edge self removal
-          if b
-          then
-            let b1 ← topology.Carrier.contains_edge carrier addition
-            if b1
-            then
-              let duplicate ←
-                spanning_tree.Tree.check_edit_loop0 remove add index 
-                  removal.u removal.v addition.u addition.v false 0#usize
-              if duplicate
-              then ok (core.result.Result.Err topology.Error.InvalidTransition)
-              else
-                let b2 ← spanning_tree.Tree.has_edge self addition
-                if b2
-                then
-                  let j ←
-                    spanning_tree.Tree.check_edit_loop1 remove addition.u
-                      addition.v 0#usize
-                  let i := Slice.len remove
-                  if j = i
-                  then
-                    ok (core.result.Result.Err
-                      topology.Error.InvalidTransition)
-                  else ok (core.result.Result.Ok ())
-                else ok (core.result.Result.Ok ())
-            else ok (core.result.Result.Err topology.Error.InvalidTransition)
-          else ok (core.result.Result.Err topology.Error.InvalidTransition)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 453:8-456:9
-    Visibility: public -/
-@[rust_loop_body]
-def spanning_tree.Tree.edit_edges_loop0.body
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
-  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (ControlFlow (Std.Usize × (core.result.Result Unit topology.Error))
-    (core.result.Result Unit topology.Error))
-  := do
-  let i2 := Slice.len remove
-  if i1 < i2
-  then
-    let b ← core.result.Result.is_ok status
-    if b
-    then
-      let status1 ←
-        spanning_tree.Tree.check_edit { parents := v, root := i } carrier
-          remove add i1
-      let i3 ← i1 + 1#usize
-      ok (cont (i3, status1))
-    else ok (done status)
-  else ok (done status)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 453:8-456:9
-    Visibility: public -/
-@[rust_loop]
-def spanning_tree.Tree.edit_edges_loop0
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (carrier : topology.Carrier)
-  (remove : Slice topology.Edge) (add : Slice topology.Edge) (i1 : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (core.result.Result Unit topology.Error)
-  := do
-  loop
-    (fun (i2, status1) => spanning_tree.Tree.edit_edges_loop0.body v i carrier
-      remove add i2 status1)
-    (i1, status)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 460:8-465:9
-    Visibility: public -/
-@[rust_loop_body]
-def spanning_tree.Tree.edit_edges_loop1.body
-  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
-  (work : spanning_tree.Workspace) (i : Std.Usize) :
-  Result (ControlFlow (spanning_tree.Workspace × Std.Usize)
-    spanning_tree.Workspace)
-  := do
-  let i1 := Slice.len remove
-  if i < i1
-  then
-    let edge ← Slice.index_usize remove i
-    let i2 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize) v
-        edge.u
-    let child ← if i2 = edge.v
-                  then ok edge.u
-                  else ok edge.v
-    let work1 ← spanning_tree.Workspace.set_parent work child child
-    let i3 ← i + 1#usize
-    ok (cont (work1, i3))
-  else ok (done work)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 460:8-465:9
-    Visibility: public -/
-@[rust_loop]
-def spanning_tree.Tree.edit_edges_loop1
-  (v : alloc.vec.Vec Std.Usize) (remove : Slice topology.Edge)
-  (work : spanning_tree.Workspace) (i : Std.Usize) :
-  Result spanning_tree.Workspace
-  := do
-  loop
-    (fun (work1, i1) => spanning_tree.Tree.edit_edges_loop1.body v remove work1
-      i1)
-    (work, i)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 2:
-    Source: 'src/spanning_tree.rs', lines 467:8-470:9
-    Visibility: public -/
-@[rust_loop_body]
-def spanning_tree.Tree.edit_edges_loop2.body
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
-  (work : spanning_tree.Workspace) (i1 : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (ControlFlow (spanning_tree.Workspace × Std.Usize ×
-    (core.result.Result Unit topology.Error)) (spanning_tree.Workspace ×
-    (core.result.Result Unit topology.Error)))
-  := do
-  let i2 := Slice.len add
-  if i1 < i2
-  then
-    let b ← core.result.Result.is_ok status
-    if b
-    then
-      let e ← Slice.index_usize add i1
-      let (status1, work1) ←
-        spanning_tree.Tree.attach_virtual { parents := v, root := i } e work
-      let i3 ← i1 + 1#usize
-      ok (cont (work1, i3, status1))
-    else ok (done (work, status))
-  else ok (done (work, status))
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 2:
-    Source: 'src/spanning_tree.rs', lines 467:8-470:9
-    Visibility: public -/
-@[rust_loop]
-def spanning_tree.Tree.edit_edges_loop2
-  (v : alloc.vec.Vec Std.Usize) (i : Std.Usize) (add : Slice topology.Edge)
-  (work : spanning_tree.Workspace) (i1 : Std.Usize)
-  (status : core.result.Result Unit topology.Error) :
-  Result (spanning_tree.Workspace × (core.result.Result Unit topology.Error))
-  := do
-  loop
-    (fun (work1, i2, status1) => spanning_tree.Tree.edit_edges_loop2.body v i
-      add work1 i2 status1)
-    (work, i1, status)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop body 3:
-    Source: 'src/spanning_tree.rs', lines 473:8-476:9
-    Visibility: public -/
-@[rust_loop_body]
-def spanning_tree.Tree.edit_edges_loop3.body
-  (work : spanning_tree.Workspace) (v : alloc.vec.Vec Std.Usize)
-  (i : Std.Usize) :
-  Result (ControlFlow ((alloc.vec.Vec Std.Usize) × Std.Usize) ((alloc.vec.Vec
-    Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec spanning_tree.Frame)
-    × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
-    Std.Usize × Std.Usize))
-  := do
-  if i < work.edit_count
-  then
-    let i1 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.parents i
-    let i2 ←
-      alloc.vec.Vec.index (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        work.edit_nodes i
-    let (_, index_mut_back) ←
-      alloc.vec.Vec.index_mut (core.slice.index.SliceIndexUsizeSlice Std.Usize)
-        v i2
-    let i3 ← i + 1#usize
-    let v1 := index_mut_back i1
-    ok (cont (v1, i3))
-  else
-    ok (done (v, work.seen, work.frames, work.path, work.parents,
-      work.incoming, work.edit_slots, work.edit_nodes, work.edit_count,
-      work.edge_capacity))
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]: loop 3:
-    Source: 'src/spanning_tree.rs', lines 473:8-476:9
-    Visibility: public -/
-@[rust_loop]
-def spanning_tree.Tree.edit_edges_loop3
-  (v : alloc.vec.Vec Std.Usize) (work : spanning_tree.Workspace)
-  (i : Std.Usize) :
-  Result ((alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Bool) × (alloc.vec.Vec
-    spanning_tree.Frame) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec
-    Std.Usize) × (alloc.vec.Vec Std.Usize) × (alloc.vec.Vec Std.Usize) ×
-    (alloc.vec.Vec Std.Usize) × Std.Usize × Std.Usize)
-  := do
-  loop
-    (fun (v1, i1) => spanning_tree.Tree.edit_edges_loop3.body work v1 i1)
-    (v, i)
-
-/-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::edit_edges]:
-    Source: 'src/spanning_tree.rs', lines 438:4-478:5
-    Visibility: public -/
-def spanning_tree.Tree.edit_edges
-  (self : spanning_tree.Tree) (carrier : topology.Carrier)
-  (remove : Slice topology.Edge) (add : Slice topology.Edge)
-  (work : spanning_tree.Workspace) :
-  Result ((core.result.Result Unit topology.Error) × spanning_tree.Tree ×
-    spanning_tree.Workspace)
-  := do
-  let n := alloc.vec.Vec.len self.parents
-  let s ← topology.Carrier.impl.edges carrier
-  let i := Slice.len s
-  let r ← spanning_tree.Workspace.ensure work n i
-  let cf ← core.result.Result.Insts.CoreOpsTry.branch r
-  match cf with
-  | core.ops.control_flow.ControlFlow.Continue _ =>
-    let r1 ← spanning_tree.Tree.check_carrier self carrier
-    let cf1 ← core.result.Result.Insts.CoreOpsTry.branch r1
-    match cf1 with
-    | core.ops.control_flow.ControlFlow.Continue _ =>
-      let i1 := Slice.len remove
-      let i2 := Slice.len add
-      if i1 != i2
-      then
-        ok (core.result.Result.Err topology.Error.InvalidTransition, self,
-          work)
-      else
-        let i3 := Slice.len remove
-        if i3 >= n
-        then
-          ok (core.result.Result.Err topology.Error.InvalidTransition, self,
-            work)
-        else
-          let status ←
-            spanning_tree.Tree.edit_edges_loop0 self.parents self.root carrier
-              remove add 0#usize (core.result.Result.Ok ())
-          let cf2 ← core.result.Result.Insts.CoreOpsTry.branch status
-          match cf2 with
-          | core.ops.control_flow.ControlFlow.Continue _ =>
-            let work1 ← spanning_tree.Workspace.clear_edits work
-            let work2 ←
-              spanning_tree.Tree.edit_edges_loop1 self.parents remove work1
-                0#usize
-            let (work3, status1) ←
-              spanning_tree.Tree.edit_edges_loop2 self.parents self.root add
-                work2 0#usize status
-            let cf3 ← core.result.Result.Insts.CoreOpsTry.branch status1
-            match cf3 with
-            | core.ops.control_flow.ControlFlow.Continue _ =>
-              let (v, v1, v2, v3, v4, v5, v6, v7, i4, i5) ←
-                spanning_tree.Tree.edit_edges_loop3 self.parents work3 0#usize
-              ok (core.result.Result.Ok (), { self with parents := v },
-                {
-                  seen := v1,
-                  frames := v2,
-                  path := v3,
-                  parents := v4,
-                  incoming := v5,
-                  edit_slots := v6,
-                  edit_nodes := v7,
-                  edit_count := i4,
-                  edge_capacity := i5
-                })
-            | core.ops.control_flow.ControlFlow.Break residual =>
-              let r2 ←
-                core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-                  Unit (core.convert.FromSame topology.Error) residual
-              ok (r2, self, work3)
-          | core.ops.control_flow.ControlFlow.Break residual =>
-            let r2 ←
-              core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-                Unit (core.convert.FromSame topology.Error) residual
-            ok (r2, self, work)
-    | core.ops.control_flow.ControlFlow.Break residual =>
-      let r2 ←
-        core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-          Unit (core.convert.FromSame topology.Error) residual
-      ok (r2, self, work)
-  | core.ops.control_flow.ControlFlow.Break residual =>
-    let r1 ←
-      core.result.Result.Insts.CoreOpsTry_traitFromResidualResult.from_residual
-        Unit (core.convert.FromSame topology.Error) residual
-    ok (r1, self, work)
-
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::exchange]:
-    Source: 'src/spanning_tree.rs', lines 415:4-430:5
+    Source: 'src/spanning_tree.rs', lines 422:4-437:5
     Visibility: public -/
 def spanning_tree.Tree.exchange
   (self : spanning_tree.Tree) (carrier : topology.Carrier)
@@ -3261,7 +18359,7 @@ def spanning_tree.Tree.exchange
       spanning_tree.Tree.edit_edges self carrier s s1 work
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop body 1:
-    Source: 'src/spanning_tree.rs', lines 604:12-607:13
+    Source: 'src/spanning_tree.rs', lines 614:12-617:13
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.validate_loop0_loop0.body
@@ -3285,7 +18383,7 @@ def spanning_tree.Tree.validate_loop0_loop0.body
   else ok (done cell)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop 1:
-    Source: 'src/spanning_tree.rs', lines 604:12-607:13
+    Source: 'src/spanning_tree.rs', lines 614:12-617:13
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.validate_loop0_loop0
@@ -3299,7 +18397,7 @@ def spanning_tree.Tree.validate_loop0_loop0
     (cell, steps)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop body 0:
-    Source: 'src/spanning_tree.rs', lines 601:8-610:9
+    Source: 'src/spanning_tree.rs', lines 611:8-620:9
     Visibility: public -/
 @[rust_loop_body]
 def spanning_tree.Tree.validate_loop0.body
@@ -3318,7 +18416,7 @@ def spanning_tree.Tree.validate_loop0.body
   else ok (done valid)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]: loop 0:
-    Source: 'src/spanning_tree.rs', lines 601:8-610:9
+    Source: 'src/spanning_tree.rs', lines 611:8-620:9
     Visibility: public -/
 @[rust_loop]
 def spanning_tree.Tree.validate_loop0
@@ -3332,7 +18430,7 @@ def spanning_tree.Tree.validate_loop0
     (start, valid)
 
 /-- [labyrinth_core::spanning_tree::{labyrinth_core::spanning_tree::Tree}::validate]:
-    Source: 'src/spanning_tree.rs', lines 596:4-616:5
+    Source: 'src/spanning_tree.rs', lines 606:4-626:5
     Visibility: public -/
 def spanning_tree.Tree.validate
   (self : spanning_tree.Tree) (carrier : topology.Carrier) :
@@ -3494,25 +18592,6 @@ def topology.Error.Insts.CoreErrorError : core.error.Error topology.Error := {
   fmtDisplayInst := topology.Error.Insts.CoreFmtDisplay
 }
 
-/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}::fmt]:
-    Source: 'src/topology.rs', lines 49:9-49:14
-    Visibility: public -/
-def topology.Edge.Insts.CoreFmtDebug.fmt
-  (self : topology.Edge) (f : core.fmt.Formatter) :
-  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
-  := do
-  let dyn := Dyn.mk _ core.fmt.DebugUsize self.u
-  let dyn1 := Dyn.mk _ (core.fmt.DebugShared core.fmt.DebugUsize) self.v
-  core.fmt.Formatter.debug_struct_field2_finish f (toStr "Edge") (toStr "u")
-    dyn (toStr "v") dyn1
-
-/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Edge}]
-    Source: 'src/topology.rs', lines 49:9-49:14 -/
-@[reducible]
-def topology.Edge.Insts.CoreFmtDebug : core.fmt.Debug topology.Edge := {
-  fmt := topology.Edge.Insts.CoreFmtDebug.fmt
-}
-
 /-- Trait implementation: [labyrinth_core::topology::{impl core::marker::Copy for labyrinth_core::topology::Edge}]
     Source: 'src/topology.rs', lines 49:23-49:27 -/
 @[reducible]
@@ -3542,37 +18621,15 @@ def topology.Edge.Insts.CoreCmpEq : core.cmp.Eq topology.Edge := {
   assert_fields_are_eq := topology.Edge.Insts.CoreCmpEq.assert_fields_are_eq
 }
 
-/-- [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}::fmt]:
-    Source: 'src/topology.rs', lines 138:9-138:14
-    Visibility: public -/
-def topology.Carrier.Insts.CoreFmtDebug.fmt
-  (self : topology.Carrier) (f : core.fmt.Formatter) :
-  Result ((core.result.Result Unit core.fmt.Error) × core.fmt.Formatter)
-  := do
-  let dyn := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.offsets
-  let dyn1 := Dyn.mk _ (core.fmt.DebugVec core.fmt.DebugUsize) self.neighbors
-  let dyn2 :=
-    Dyn.mk _ (core.fmt.DebugShared (core.fmt.DebugVec
-      topology.Edge.Insts.CoreFmtDebug)) self.edges
-  core.fmt.Formatter.debug_struct_field3_finish f (toStr "Carrier") (toStr
-    "offsets") dyn (toStr "neighbors") dyn1 (toStr "edges") dyn2
-
-/-- Trait implementation: [labyrinth_core::topology::{impl core::fmt::Debug for labyrinth_core::topology::Carrier}]
-    Source: 'src/topology.rs', lines 138:9-138:14 -/
-@[reducible]
-def topology.Carrier.Insts.CoreFmtDebug : core.fmt.Debug topology.Carrier := {
-  fmt := topology.Carrier.Insts.CoreFmtDebug.fmt
-}
-
 /-- Trait implementation: [labyrinth_core::topology::{impl core::marker::StructuralPartialEq for labyrinth_core::topology::Carrier}]
-    Source: 'src/topology.rs', lines 138:16-138:25 -/
+    Source: 'src/topology.rs', lines 132:16-132:25 -/
 @[reducible]
 def topology.Carrier.Insts.CoreMarkerStructuralPartialEq :
   core.marker.StructuralPartialEq topology.Carrier := {
 }
 
 /-- [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Carrier> for labyrinth_core::topology::Carrier}::eq]:
-    Source: 'src/topology.rs', lines 138:16-138:25
+    Source: 'src/topology.rs', lines 132:16-132:25
     Visibility: public -/
 def topology.Carrier.Insts.CoreCmpPartialEqCarrier.eq
   (self : topology.Carrier) (other : topology.Carrier) : Result Bool := do
@@ -3592,7 +18649,7 @@ def topology.Carrier.Insts.CoreCmpPartialEqCarrier.eq
   else ok false
 
 /-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::PartialEq<labyrinth_core::topology::Carrier> for labyrinth_core::topology::Carrier}]
-    Source: 'src/topology.rs', lines 138:16-138:25 -/
+    Source: 'src/topology.rs', lines 132:16-132:25 -/
 @[reducible]
 impl_def topology.Carrier.Insts.CoreCmpPartialEqCarrier : core.cmp.PartialEq
   topology.Carrier topology.Carrier := {
@@ -3602,14 +18659,14 @@ impl_def topology.Carrier.Insts.CoreCmpPartialEqCarrier : core.cmp.PartialEq
 }
 
 /-- [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Carrier}::assert_fields_are_eq]:
-    Source: 'src/topology.rs', lines 138:27-138:29
+    Source: 'src/topology.rs', lines 132:27-132:29
     Visibility: public -/
 def topology.Carrier.Insts.CoreCmpEq.assert_fields_are_eq
   (self : topology.Carrier) : Result Unit := do
   ok ()
 
 /-- Trait implementation: [labyrinth_core::topology::{impl core::cmp::Eq for labyrinth_core::topology::Carrier}]
-    Source: 'src/topology.rs', lines 138:27-138:29 -/
+    Source: 'src/topology.rs', lines 132:27-132:29 -/
 @[reducible]
 def topology.Carrier.Insts.CoreCmpEq : core.cmp.Eq topology.Carrier := {
   partialEqInst := topology.Carrier.Insts.CoreCmpPartialEqCarrier
@@ -3617,7 +18674,7 @@ def topology.Carrier.Insts.CoreCmpEq : core.cmp.Eq topology.Carrier := {
 }
 
 /-- [labyrinth_core::topology::{labyrinth_core::topology::Carrier}::is_empty]:
-    Source: 'src/topology.rs', lines 271:4-273:5
+    Source: 'src/topology.rs', lines 266:4-268:5
     Visibility: public -/
 def topology.Carrier.is_empty (self : topology.Carrier) : Result Bool := do
   let i ← topology.Carrier.len self
@@ -3781,5 +18838,462 @@ def tree.random_reparent
     let (candidate, rng1) ← RngInst.next_below rng n
     let (r, parents1) ← tree.set_parent parents child candidate
     ok (r, parents1, rng1)
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Stamp}::clone]:
+    Source: 'src/walker.rs', lines 7:16-7:21
+    Visibility: public -/
+def walker.Stamp.Insts.CoreCloneClone.clone
+  (self : walker.Stamp) : Result walker.Stamp := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:16-7:21 -/
+@[reducible]
+def walker.Stamp.Insts.CoreCloneClone : core.clone.Clone walker.Stamp := {
+  clone := walker.Stamp.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:23-7:27 -/
+@[reducible]
+def walker.Stamp.Insts.CoreMarkerCopy : core.marker.Copy walker.Stamp := {
+  cloneInst := walker.Stamp.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:29-7:38 -/
+@[reducible]
+def walker.Stamp.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Stamp := {
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Stamp> for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:29-7:38 -/
+@[reducible]
+impl_def walker.Stamp.Insts.CoreCmpPartialEqStamp : core.cmp.PartialEq
+  walker.Stamp walker.Stamp := {
+  eq := walker.Stamp.Insts.CoreCmpPartialEqStamp.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Stamp.Insts.CoreCmpPartialEqStamp
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Stamp}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 7:40-7:42
+    Visibility: public -/
+def walker.Stamp.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Stamp) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Stamp}]
+    Source: 'src/walker.rs', lines 7:40-7:42 -/
+@[reducible]
+def walker.Stamp.Insts.CoreCmpEq : core.cmp.Eq walker.Stamp := {
+  partialEqInst := walker.Stamp.Insts.CoreCmpPartialEqStamp
+  assert_fields_are_eq := walker.Stamp.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Reservation}::clone]:
+    Source: 'src/walker.rs', lines 13:16-13:21
+    Visibility: public -/
+def walker.Reservation.Insts.CoreCloneClone.clone
+  (self : walker.Reservation) : Result walker.Reservation := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:16-13:21 -/
+@[reducible]
+def walker.Reservation.Insts.CoreCloneClone : core.clone.Clone
+  walker.Reservation := {
+  clone := walker.Reservation.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:23-13:27 -/
+@[reducible]
+def walker.Reservation.Insts.CoreMarkerCopy : core.marker.Copy
+  walker.Reservation := {
+  cloneInst := walker.Reservation.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:29-13:38 -/
+@[reducible]
+def walker.Reservation.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Reservation := {
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Reservation> for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:29-13:38 -/
+@[reducible]
+impl_def walker.Reservation.Insts.CoreCmpPartialEqReservation :
+  core.cmp.PartialEq walker.Reservation walker.Reservation := {
+  eq := walker.Reservation.Insts.CoreCmpPartialEqReservation.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Reservation.Insts.CoreCmpPartialEqReservation
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Reservation}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 13:40-13:42
+    Visibility: public -/
+def walker.Reservation.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Reservation) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Reservation}]
+    Source: 'src/walker.rs', lines 13:40-13:42 -/
+@[reducible]
+def walker.Reservation.Insts.CoreCmpEq : core.cmp.Eq walker.Reservation := {
+  partialEqInst := walker.Reservation.Insts.CoreCmpPartialEqReservation
+  assert_fields_are_eq :=
+    walker.Reservation.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::LocalPose}::clone]:
+    Source: 'src/walker.rs', lines 20:16-20:21
+    Visibility: public -/
+def walker.LocalPose.Insts.CoreCloneClone.clone
+  (self : walker.LocalPose) : Result walker.LocalPose := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:16-20:21 -/
+@[reducible]
+def walker.LocalPose.Insts.CoreCloneClone : core.clone.Clone walker.LocalPose
+  := {
+  clone := walker.LocalPose.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:23-20:27 -/
+@[reducible]
+def walker.LocalPose.Insts.CoreMarkerCopy : core.marker.Copy walker.LocalPose
+  := {
+  cloneInst := walker.LocalPose.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:29-20:38 -/
+@[reducible]
+def walker.LocalPose.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.LocalPose := {
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::LocalPose> for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:29-20:38 -/
+@[reducible]
+impl_def walker.LocalPose.Insts.CoreCmpPartialEqLocalPose : core.cmp.PartialEq
+  walker.LocalPose walker.LocalPose := {
+  eq := walker.LocalPose.Insts.CoreCmpPartialEqLocalPose.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.LocalPose.Insts.CoreCmpPartialEqLocalPose
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::LocalPose}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 20:40-20:42
+    Visibility: public -/
+def walker.LocalPose.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.LocalPose) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::LocalPose}]
+    Source: 'src/walker.rs', lines 20:40-20:42 -/
+@[reducible]
+def walker.LocalPose.Insts.CoreCmpEq : core.cmp.Eq walker.LocalPose := {
+  partialEqInst := walker.LocalPose.Insts.CoreCmpPartialEqLocalPose
+  assert_fields_are_eq := walker.LocalPose.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Path}::clone]:
+    Source: 'src/walker.rs', lines 30:16-30:21
+    Visibility: public -/
+def walker.Path.Insts.CoreCloneClone.clone
+  (self : walker.Path) : Result walker.Path := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:16-30:21 -/
+@[reducible]
+def walker.Path.Insts.CoreCloneClone : core.clone.Clone walker.Path := {
+  clone := walker.Path.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:23-30:27 -/
+@[reducible]
+def walker.Path.Insts.CoreMarkerCopy : core.marker.Copy walker.Path := {
+  cloneInst := walker.Path.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:29-30:38 -/
+@[reducible]
+def walker.Path.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Path := {
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Path> for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:29-30:38 -/
+@[reducible]
+impl_def walker.Path.Insts.CoreCmpPartialEqPath : core.cmp.PartialEq
+  walker.Path walker.Path := {
+  eq := walker.Path.Insts.CoreCmpPartialEqPath.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Path.Insts.CoreCmpPartialEqPath
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Path}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 30:40-30:42
+    Visibility: public -/
+def walker.Path.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Path) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Path}]
+    Source: 'src/walker.rs', lines 30:40-30:42 -/
+@[reducible]
+def walker.Path.Insts.CoreCmpEq : core.cmp.Eq walker.Path := {
+  partialEqInst := walker.Path.Insts.CoreCmpPartialEqPath
+  assert_fields_are_eq := walker.Path.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Holds}::clone]:
+    Source: 'src/walker.rs', lines 98:16-98:21
+    Visibility: public -/
+def walker.Holds.Insts.CoreCloneClone.clone
+  (self : walker.Holds) : Result walker.Holds := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:16-98:21 -/
+@[reducible]
+def walker.Holds.Insts.CoreCloneClone : core.clone.Clone walker.Holds := {
+  clone := walker.Holds.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:23-98:27 -/
+@[reducible]
+def walker.Holds.Insts.CoreMarkerCopy : core.marker.Copy walker.Holds := {
+  cloneInst := walker.Holds.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:29-98:38 -/
+@[reducible]
+def walker.Holds.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Holds := {
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Holds> for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:29-98:38 -/
+@[reducible]
+impl_def walker.Holds.Insts.CoreCmpPartialEqHolds : core.cmp.PartialEq
+  walker.Holds walker.Holds := {
+  eq := walker.Holds.Insts.CoreCmpPartialEqHolds.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Holds.Insts.CoreCmpPartialEqHolds
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Holds}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 98:40-98:42
+    Visibility: public -/
+def walker.Holds.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Holds) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Holds}]
+    Source: 'src/walker.rs', lines 98:40-98:42 -/
+@[reducible]
+def walker.Holds.Insts.CoreCmpEq : core.cmp.Eq walker.Holds := {
+  partialEqInst := walker.Holds.Insts.CoreCmpPartialEqHolds
+  assert_fields_are_eq := walker.Holds.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Crossing}::clone]:
+    Source: 'src/walker.rs', lines 128:16-128:21
+    Visibility: public -/
+def walker.Crossing.Insts.CoreCloneClone.clone
+  (self : walker.Crossing) : Result walker.Crossing := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:16-128:21 -/
+@[reducible]
+def walker.Crossing.Insts.CoreCloneClone : core.clone.Clone walker.Crossing
+  := {
+  clone := walker.Crossing.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:23-128:27 -/
+@[reducible]
+def walker.Crossing.Insts.CoreMarkerCopy : core.marker.Copy walker.Crossing
+  := {
+  cloneInst := walker.Crossing.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:29-128:38 -/
+@[reducible]
+def walker.Crossing.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Crossing := {
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Crossing}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 128:40-128:42
+    Visibility: public -/
+def walker.Crossing.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Crossing) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Crossing}]
+    Source: 'src/walker.rs', lines 128:40-128:42 -/
+@[reducible]
+def walker.Crossing.Insts.CoreCmpEq : core.cmp.Eq walker.Crossing := {
+  partialEqInst := walker.Crossing.Insts.CoreCmpPartialEqCrossing
+  assert_fields_are_eq := walker.Crossing.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Crossing}::edge]:
+    Source: 'src/walker.rs', lines 142:4-144:5
+    Visibility: public -/
+def walker.Crossing.edge (self : walker.Crossing) : Result topology.Edge := do
+  topology.Edge.new self.source self.target
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::WalkerState}::clone]:
+    Source: 'src/walker.rs', lines 147:16-147:21
+    Visibility: public -/
+def walker.WalkerState.Insts.CoreCloneClone.clone
+  (self : walker.WalkerState) : Result walker.WalkerState := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:16-147:21 -/
+@[reducible]
+def walker.WalkerState.Insts.CoreCloneClone : core.clone.Clone
+  walker.WalkerState := {
+  clone := walker.WalkerState.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:23-147:27 -/
+@[reducible]
+def walker.WalkerState.Insts.CoreMarkerCopy : core.marker.Copy
+  walker.WalkerState := {
+  cloneInst := walker.WalkerState.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:29-147:38 -/
+@[reducible]
+def walker.WalkerState.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.WalkerState := {
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::WalkerState}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 147:40-147:42
+    Visibility: public -/
+def walker.WalkerState.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.WalkerState) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::WalkerState}]
+    Source: 'src/walker.rs', lines 147:40-147:42 -/
+@[reducible]
+def walker.WalkerState.Insts.CoreCmpEq : core.cmp.Eq walker.WalkerState := {
+  partialEqInst := walker.WalkerState.Insts.CoreCmpPartialEqWalkerState
+  assert_fields_are_eq :=
+    walker.WalkerState.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Walker}::clone]:
+    Source: 'src/walker.rs', lines 156:16-156:21
+    Visibility: public -/
+def walker.Walker.Insts.CoreCloneClone.clone
+  (self : walker.Walker) : Result walker.Walker := do
+  ok self
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::clone::Clone for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:16-156:21 -/
+@[reducible]
+def walker.Walker.Insts.CoreCloneClone : core.clone.Clone walker.Walker := {
+  clone := walker.Walker.Insts.CoreCloneClone.clone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::Copy for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:23-156:27 -/
+@[reducible]
+def walker.Walker.Insts.CoreMarkerCopy : core.marker.Copy walker.Walker := {
+  cloneInst := walker.Walker.Insts.CoreCloneClone
+}
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::marker::StructuralPartialEq for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:29-156:38 -/
+@[reducible]
+def walker.Walker.Insts.CoreMarkerStructuralPartialEq :
+  core.marker.StructuralPartialEq walker.Walker := {
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Walker> for labyrinth_core::walker::Walker}::eq]:
+    Source: 'src/walker.rs', lines 156:29-156:38
+    Visibility: public -/
+def walker.Walker.Insts.CoreCmpPartialEqWalker.eq
+  (self : walker.Walker) (other : walker.Walker) : Result Bool := do
+  if self.cell = other.cell
+  then
+    let b ←
+      walker.LocalPose.Insts.CoreCmpPartialEqLocalPose.eq self.local
+        other.local
+    if b
+    then
+      walker.WalkerState.Insts.CoreCmpPartialEqWalkerState.eq self.state
+        other.state
+    else ok false
+  else ok false
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::PartialEq<labyrinth_core::walker::Walker> for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:29-156:38 -/
+@[reducible]
+impl_def walker.Walker.Insts.CoreCmpPartialEqWalker : core.cmp.PartialEq
+  walker.Walker walker.Walker := {
+  eq := walker.Walker.Insts.CoreCmpPartialEqWalker.eq
+  ne := core.cmp.PartialEq.ne.trait_default
+    walker.Walker.Insts.CoreCmpPartialEqWalker
+}
+
+/-- [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Walker}::assert_fields_are_eq]:
+    Source: 'src/walker.rs', lines 156:40-156:42
+    Visibility: public -/
+def walker.Walker.Insts.CoreCmpEq.assert_fields_are_eq
+  (self : walker.Walker) : Result Unit := do
+  ok ()
+
+/-- Trait implementation: [labyrinth_core::walker::{impl core::cmp::Eq for labyrinth_core::walker::Walker}]
+    Source: 'src/walker.rs', lines 156:40-156:42 -/
+@[reducible]
+def walker.Walker.Insts.CoreCmpEq : core.cmp.Eq walker.Walker := {
+  partialEqInst := walker.Walker.Insts.CoreCmpPartialEqWalker
+  assert_fields_are_eq := walker.Walker.Insts.CoreCmpEq.assert_fields_are_eq
+}
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Walker}::cell]:
+    Source: 'src/walker.rs', lines 164:4-166:5
+    Visibility: public -/
+def walker.Walker.impl.cell (self : walker.Walker) : Result Std.Usize := do
+  ok self.cell
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Walker}::local_pose]:
+    Source: 'src/walker.rs', lines 167:4-169:5
+    Visibility: public -/
+def walker.Walker.local_pose
+  (self : walker.Walker) : Result walker.LocalPose := do
+  ok self.local
+
+/-- [labyrinth_core::walker::{labyrinth_core::walker::Walker}::state]:
+    Source: 'src/walker.rs', lines 170:4-172:5
+    Visibility: public -/
+def walker.Walker.impl.state
+  (self : walker.Walker) : Result walker.WalkerState := do
+  ok self.state
 
 end labyrinth_core

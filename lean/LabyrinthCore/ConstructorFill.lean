@@ -116,8 +116,10 @@ theorem constructor_filled_neighbors_length (edges : List topology.Edge) (starts
     simp only [constructorFilledNeighbors]
     split <;> simpa only [List.length_set] using ih
 
-/-- The full actual fill loop terminates and writes the exact two oriented incidences
-of every edge, at its row's input-order rank. No row-uniqueness premise is needed. -/
+/-- The full actual fill loop terminates and its output equals the ordered-write model
+`constructorFilledNeighbors`. With overlapping rows a later write can overwrite an earlier one;
+retention of both orientations of every edge is `constructor_filled_incidence`, which needs
+`hseparated`. -/
 theorem constructor_fill_edges_spec (edges : Slice topology.Edge)
     (cursor neighbors : alloc.vec.Vec Usize) (starts : Nat → Nat)
     (hedges : ∀ edge ∈ edges.val,

@@ -6,7 +6,8 @@ open Aeneas Aeneas.Std Result ControlFlow labyrinth_core
 
 namespace Labyrinth
 
-/-- Exact loop-10 row result, retaining the ghost discovery order needed by loop 9. -/
+/-- Row-closure and depth-balance result of loop 10, retaining the ghost discovery order needed
+by loop 9. -/
 def constructorOrientationRowOutput (carrier : topology.Carrier) (root capacity : Nat)
     (cell : Usize) (before : Finset Nat) (initialDepth : Nat) :
       alloc.vec.Vec Bool × alloc.vec.Vec Usize × Usize × alloc.vec.Vec Usize × Usize → Prop :=
@@ -17,7 +18,7 @@ def constructorOrientationRowOutput (carrier : topology.Carrier) (root capacity 
     ∀ w, carrierEdge carrier cell.val w → w ∈ visited
 
 /-- The actual inner orientation loop terminates, writes each newly discovered neighbor's
-carrier parent, and closes exactly the active carrier row. -/
+carrier parent, and closes the active carrier row (every row neighbour is visited). -/
 theorem constructor_scene_orientation_row_spec
     (carrier : topology.Carrier) (root capacity : Nat) (cell : Usize) (rowSlice : Slice Usize)
     (seen : alloc.vec.Vec Bool) (path parents : alloc.vec.Vec Usize) (depth : Usize)
