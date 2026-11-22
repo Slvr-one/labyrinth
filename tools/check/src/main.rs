@@ -35,9 +35,15 @@ exit status 1; bad usage exits 2; each check prints a PASS line):
                   core.ops.range.RangeInclusive.contains, core.option.Option.Insts.CoreCloneClone.clone,
                   core.option.Option.Insts.CoreCmpPartialEqOption.eq,
                   core.option.Option.Insts.CoreFmtDebug.fmt, core.option.OptionShared0T.copied);
-                  generated Types.lean and Funs.lean contain no `axiom`; both are byte-identical to
-                  lean/LabyrinthCore/{Types,Funs}.lean. The checked-in files are never overwritten.
-  repo-externals  lean/LabyrinthCore/FunsExternal.lean contains no `axiom` declaration.
+                  generated Types.lean and Funs.lean declare no axiom (see repo-externals); both
+                  are byte-identical to lean/LabyrinthCore/{Types,Funs}.lean. The checked-in files
+                  are never overwritten.
+  repo-externals  lean/LabyrinthCore/FunsExternal.lean declares no axiom: no line whose first token,
+                  after any `@[...]` attributes and private/protected/noncomputable/unsafe/partial/
+                  nonrec modifiers, is the keyword `axiom`.
+  kernel-check    no file under lean/ (outside lean/.lake) contains `skipKernelTC` or
+                  `addDeclWithoutChecking`: the option and the API that add declarations without
+                  kernel type checking.
   build           lake build in lean/ (warnings are errors via the lakefile).
   audit           `lake env lean -DwarningAsError=true Audit.lean` in lean/. The `#print axioms <ident>`
                   lines of Audit.lean are the expected roots (non-empty, no duplicates). The output
@@ -60,10 +66,11 @@ OPTIONS
     --help          this text
 ";
 
-const STEPS: [&str; 7] = [
+const STEPS: [&str; 8] = [
     "pins",
     "extraction",
     "repo-externals",
+    "kernel-check",
     "build",
     "audit",
     "axiom-guard",
@@ -88,6 +95,17 @@ const EXPECTED_EXTERNALS: [&str; 8] = [
     "core.option.Option.Insts.CoreFmtDebug.fmt",
     "core.option.OptionShared0T.copied",
 ];
+
+const DECLARATION_MODIFIERS: [&str; 6] = [
+    "private",
+    "protected",
+    "noncomputable",
+    "unsafe",
+    "partial",
+    "nonrec",
+];
+
+const KERNEL_BYPASSES: [&str; 2] = ["skipKernelTC", "addDeclWithoutChecking"];
 
 type Res = Result<(), String>;
 
@@ -134,6 +152,7 @@ fn main() {
             "pins" => ctx.pins(),
             "extraction" => ctx.extraction(),
             "repo-externals" => ctx.repo_externals(),
+            "kernel-check" => ctx.kernel_check(),
             "build" => ctx.build(),
             "audit" => ctx.audit(),
             "axiom-guard" => ctx.axiom_guard(),
@@ -167,26 +186,77 @@ fn s(path: &Path) -> &str {
     path.to_str().expect("paths are UTF-8")
 }
 
-/// Whole-line `axiom` declarations, like Lean's `axiom` keyword at the start of a line.
-fn declares_axiom(text: &str) -> bool {
-    text.lines().any(|line| {
-        line.trim_start().strip_prefix("axiom").is_some_and(|rest| {
-            rest.chars()
-                .next()
-                .is_none_or(|c| !(c.is_alphanumeric() || c == '_'))
-        })
+/// `text` without its leading `word`, when `word` is a whole token there.
+fn keyword<'a>(text: &'a str, word: &str) -> Option<&'a str> {
+    text.strip_prefix(word).filter(|rest| {
+        rest.chars()
+            .next()
+            .is_none_or(|c| !(c.is_alphanumeric() || c == '_'))
     })
+}
+
+/// The text after a line's leading `axiom` keyword, past `@[...]` attributes and modifiers.
+fn axiom_declaration(line: &str) -> Option<&str> {
+    let mut rest = line.trim_start();
+    loop {
+        if let Some(attributes) = rest.strip_prefix("@[") {
+            let mut depth = 1usize;
+            let end = attributes.char_indices().find_map(|(i, c)| {
+                match c {
+                    '[' => depth += 1,
+                    ']' => depth -= 1,
+                    _ => {}
+                }
+                (depth == 0).then_some(i + 1)
+            })?;
+            rest = attributes[end..].trim_start();
+        } else if let Some(after) = DECLARATION_MODIFIERS
+            .iter()
+            .find_map(|modifier| keyword(rest, modifier))
+        {
+            rest = after.trim_start();
+        } else {
+            return keyword(rest, "axiom");
+        }
+    }
+}
+
+fn declares_axiom(text: &str) -> bool {
+    text.lines().any(|line| axiom_declaration(line).is_some())
 }
 
 fn external_names(template: &str) -> Vec<String> {
     let mut names: Vec<String> = template
         .lines()
-        .filter_map(|line| line.strip_prefix("axiom "))
+        .filter_map(axiom_declaration)
         .filter_map(|rest| rest.split_whitespace().next())
         .map(str::to_owned)
         .collect();
     names.sort();
     names
+}
+
+/// The first kernel-check bypass named in `text`, matched anywhere including comments.
+fn kernel_bypass(text: &str) -> Option<&'static str> {
+    KERNEL_BYPASSES
+        .into_iter()
+        .find(|bypass| text.contains(bypass))
+}
+
+/// Files under `dir`, skipping `.lake` build and dependency directories.
+fn lean_tree_files(dir: &Path, files: &mut Vec<PathBuf>) -> Res {
+    let entries = fs::read_dir(dir).map_err(|e| format!("cannot list {}: {e}", dir.display()))?;
+    for entry in entries {
+        let path = entry.map_err(|e| e.to_string())?.path();
+        if path.is_dir() {
+            if path.file_name() != Some(".lake".as_ref()) {
+                lean_tree_files(&path, files)?;
+            }
+        } else {
+            files.push(path);
+        }
+    }
+    Ok(())
 }
 
 impl Ctx {
@@ -331,6 +401,22 @@ impl Ctx {
         Ok(())
     }
 
+    fn kernel_check(&self) -> Res {
+        let mut files = Vec::new();
+        lean_tree_files(&self.lean_dir(), &mut files)?;
+        files.sort();
+        for file in &files {
+            if let Some(bypass) = kernel_bypass(&read(file)?) {
+                return Err(format!("{} contains `{bypass}`", file.display()));
+            }
+        }
+        println!(
+            "PASS: no kernel-check bypass in {} files under lean/",
+            files.len()
+        );
+        Ok(())
+    }
+
     fn build(&self) -> Res {
         self.run("lake", &["build"], &self.lean_dir())?;
         println!("PASS: lake build");
@@ -456,11 +542,56 @@ mod tests {
         assert!(declares_axiom("def x := 1\naxiom foo : False\n"));
         assert!(declares_axiom("  axiom foo : False"));
         assert!(!declares_axiom("def axiomatic := 1\n-- axiom foo\n"));
+        assert!(!declares_axiom(
+            "/- private axiom foo -/\ntheorem axiom_free : True := trivial\n"
+        ));
+        assert!(!declares_axiom(
+            "private def axiom_like := 1\nprivate axiomatic : Nat\n"
+        ));
+    }
+
+    #[test]
+    fn axiom_declarations_after_modifiers_and_attributes_are_found() {
+        for line in [
+            "private axiom foo : False",
+            "protected axiom foo : False",
+            "noncomputable axiom foo : Nat",
+            "unsafe axiom foo : False",
+            "partial axiom foo : False",
+            "nonrec axiom foo : False",
+            "@[simp] axiom foo : False",
+            "  @[simp, reducible] @[instance] private noncomputable axiom foo : Nat",
+            "@[implemented_by f [x]] axiom foo : Nat",
+        ] {
+            assert!(declares_axiom(line), "{line}");
+        }
+        assert!(!declares_axiom(
+            "@[simp] theorem axiom_free : True := trivial"
+        ));
+        assert!(!declares_axiom("@[simp axiom foo : False"));
+    }
+
+    #[test]
+    fn kernel_bypasses_are_rejected() {
+        assert_eq!(
+            kernel_bypass("set_option debug.skipKernelTC true in\ntheorem t : True := trivial\n"),
+            Some("skipKernelTC")
+        );
+        assert_eq!(
+            kernel_bypass("moreLeanArgs = [\"-Ddebug.skipKernelTC=true\"]\n"),
+            Some("skipKernelTC")
+        );
+        assert_eq!(
+            kernel_bypass("#eval Lean.Environment.addDeclWithoutChecking env decl\n"),
+            Some("addDeclWithoutChecking")
+        );
+        assert_eq!(kernel_bypass("set_option maxRecDepth 4096 in\n"), None);
     }
 
     #[test]
     fn template_names_are_sorted() {
-        let template = "axiom b.c : Nat\ndef x := 1\naxiom a.b {T : Type} : T\n";
-        assert_eq!(external_names(template), ["a.b", "b.c"]);
+        let template =
+            "axiom b.c : Nat\ndef x := 1\naxiom a.b {T : Type} : T\nprivate axiom c.d : Nat\n";
+        assert_eq!(external_names(template), ["a.b", "b.c", "c.d"]);
     }
 }
