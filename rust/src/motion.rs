@@ -1,4 +1,4 @@
-//! Allocation-free boundary planning with vertex-disjoint routes and sparse tree exchanges.
+//! Boundary planning with reusable storage, vertex-disjoint routes and sparse tree exchanges.
 
 use crate::scene::{Cell, Edit, MotionEvent, Route, Scene};
 use crate::topology::{check_storage, Edge, Error};

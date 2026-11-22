@@ -1,14 +1,18 @@
 # Labyrinth
 
-A Rust maze core with connected grid/polar topology; Lean verification and Wasm delivery are in progress. Licensed under Apache-2.0.
+A Rust maze core with connected grid/polar topology, with Lean proofs about its extracted model; Wasm delivery is in progress. Licensed under Apache-2.0.
 
 ## Status
 
-Phase 1 has a checked Rust-to-Lean feasibility operation. Phase 2 has a native connected-scene
-implementation, production boundary-event planning, and handwritten structural proofs in
-progress. Native scenarios pass; the complete extraction/proof gate does not. This is not a
-verified library milestone. Solver/metric proofs, Wasm parity and Portfolio integration remain
-later phases; the website still uses its existing JavaScript.
+The crate implements connected grid/polar scenes with production boundary-event planning, and
+the extraction/proof gate in `tools/check` passes. The proofs are about the extracted Lean model
+of scene construction, edits, reservations, shatter, publication and the motion planner. Most are
+partial correctness: they describe the results an operation returns, not that it returns. The
+scene-wide invariant is proved for scenes reached from a successful `Scene::new` on a layout that
+`Layout::new` accepted, through the listed operations. [docs/properties.md](docs/properties.md)
+states exactly what is proved, under which hypotheses, the trusted components and what is not
+proved. Solver/metric proofs, Wasm parity and Portfolio integration remain later phases; the
+website still uses its existing JavaScript.
 
 - [Exact proof coverage, trust assumptions and reproduction](docs/properties.md)
 - [Pinned toolchain revisions](toolchain-pins.json)

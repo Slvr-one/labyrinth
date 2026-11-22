@@ -68,8 +68,7 @@ The model limits that remain are in "Trust and limitations".
 
 ## Carriers, tree search and tree edits
 
-These results were proved before the scene work and are used by it. All are total, with the
-hypotheses shown.
+The scene results build on these. All are total, with the hypotheses shown.
 
 - Tree interpretation: `constructor_treeValid_isTree` (a `TreeValid` parent array is a tree as a graph)
   with its supporting lemmas `constructor_parentGraph_adj_iff`, `constructor_rooted_connected` and
@@ -490,6 +489,13 @@ Extraction passes the three Charon `--include` patterns
 `FunsExternal_Template.lean` must list exactly the eight modeled externals; the repo
 `lean/LabyrinthCore/FunsExternal.lean` supplies their definitions.
 
+Two text scans precede the build. The generated `Types.lean`/`Funs.lean` and the repo
+`FunsExternal.lean` must declare no axiom: no line may start with `axiom`, also after
+`@[...]` attributes and the `private`, `protected`, `noncomputable`, `unsafe`, `partial` and
+`nonrec` modifiers. No file under `lean/` (outside `lean/.lake`) may contain `skipKernelTC`
+(the `debug.skipKernelTC` option) or `addDeclWithoutChecking` (the environment function it
+selects); both add declarations without kernel type checking.
+
 The imported axioms of every theorem listed in `lean/Audit.lean` must be drawn only from
 `propext`, `Classical.choice`, and `Quot.sound`; an unrecognized audit result also fails. A
 separate Lean fixture relying on an application-defined axiom exercises this rejection.
@@ -517,6 +523,8 @@ The native scenarios are executions, not universal proofs.
 Every root of `lean/Audit.lean` imports only `propext`, `Classical.choice` and `Quot.sound`. No
 application axiom, `sorry`, `admit`, native-evaluation axiom or skipped proof obligation is used.
 `lean/Audit.lean` prints the transitive axiom inventory, and the runner fails on any other result.
+Kernel type checking is not disabled: the runner rejects `debug.skipKernelTC` and
+`addDeclWithoutChecking` anywhere under `lean/`.
 The generated `Types.lean` and `Funs.lean` byte-match a fresh extraction of the Rust source.
 
 These are proofs about the extracted Lean model of the crate, under the model limits below. Trusted
@@ -568,6 +576,7 @@ divisor specifies the consumed phase increments.
 Native tests cover multiple circles, unequal ring counts/sectors, impossible spinning layouts,
 safe resized high-sector layouts, reserved crossings, stale workspaces and atomic rejection.
 The seeded native example traverses grid → polar interior → different portal → grid in both
-modes and completes three motion periods. Allocation instrumentation observed zero allocations
-after initialization for the exercised crossings, ticks and production planning events.
-These are execution results, not universal proofs or browser acceptance.
+modes and completes three motion periods. A counting-allocator test (`rust/tests/allocations.rs`)
+observes zero allocations across repeated `Tree::reroot`, `Tree::exchange` and `Tree::edit_edges`
+calls once the tree and its workspace exist. No test measures allocations of crossings, ticks or
+`Scene::advance_motion`. These are execution results, not universal proofs or browser acceptance.
